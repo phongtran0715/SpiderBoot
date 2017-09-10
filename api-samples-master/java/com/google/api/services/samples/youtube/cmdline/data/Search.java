@@ -14,20 +14,6 @@
 
 package com.google.api.services.samples.youtube.cmdline.data;
 
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.services.samples.youtube.cmdline.Auth;
-import com.google.api.services.youtube.YouTube;
-import com.google.api.services.youtube.model.ResourceId;
-import com.google.api.services.youtube.model.SearchListResponse;
-import com.google.api.services.youtube.model.SearchResult;
-import com.google.api.services.youtube.model.Thumbnail;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +21,16 @@ import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.services.samples.youtube.cmdline.Auth;
+import com.google.api.services.youtube.YouTube;
+import com.google.api.services.youtube.model.ResourceId;
+import com.google.api.services.youtube.model.SearchListResponse;
+import com.google.api.services.youtube.model.SearchResult;
+import com.google.api.services.youtube.model.Thumbnail;
 
 /**
  * Print a list of videos matching a search term.
@@ -47,15 +43,15 @@ public class Search {
      * Define a global variable that identifies the name of a file that
      * contains the developer's API key.
      */
-    private static final String PROPERTIES_FILENAME = "youtube.properties";
+    private final String PROPERTIES_FILENAME = "youtube.properties";
 
-    private static final long NUMBER_OF_VIDEOS_RETURNED = 25;
+    private final long NUMBER_OF_VIDEOS_RETURNED = 25;
 
     /**
      * Define a global instance of a Youtube object, which will be used
      * to make YouTube Data API requests.
      */
-    private static YouTube youtube;
+    private YouTube youtube;
 
     /**
      * Initialize a YouTube object to search for videos on YouTube. Then
@@ -63,7 +59,12 @@ public class Search {
      *
      * @param args command line args.
      */
-    public static void main(String[] args) {
+    public Search()
+    {
+    	
+    }
+    
+    public void executeQuery(String queryTerm) {
         // Read the developer key from the properties file.
         Properties properties = new Properties();
         try {
@@ -87,7 +88,7 @@ public class Search {
             }).setApplicationName("youtube-cmdline-search-sample").build();
 
             // Prompt the user to enter a query term.
-            String queryTerm = getInputQuery();
+            //String queryTerm = getInputQuery();
 
             // Define the API request for retrieving search results.
             YouTube.Search.List search = youtube.search().list("id,snippet");
@@ -127,7 +128,7 @@ public class Search {
     /*
      * Prompt the user to enter a query term and return the user-specified term.
      */
-    private static String getInputQuery() throws IOException {
+    private String getInputQuery() throws IOException {
 
         String inputQuery = "";
 
@@ -150,7 +151,7 @@ public class Search {
      *
      * @param query Search query (String)
      */
-    private static void prettyPrint(Iterator<SearchResult> iteratorSearchResults, String query) {
+    private void prettyPrint(Iterator<SearchResult> iteratorSearchResults, String query) {
 
         System.out.println("\n=============================================================");
         System.out.println(
