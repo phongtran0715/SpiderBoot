@@ -4,38 +4,32 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Frame;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.TitledBorder;
-import com.google.api.services.samples.youtube.cmdline.data.Search;
 
 public class SpiderBoot {
 
 	private JFrame frmSpiderBoot;
+	LoggingForm logFr = null;
+	SearchForm searchFrm = null;
+	BackupRestoreForm bakRestoreFr = null;
+	SystemConfigForm systrmConfigFr = null;
+	AccountManagerForm accountMngFrm = null;
+	ChannelManagerForm channelManagerFr = null;
 
 	/**
 	 * Launch the application.
@@ -87,7 +81,10 @@ public class SpiderBoot {
 		JButton btnNewButton = new JButton("Search");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SearchForm searchFrm = new SearchForm();
+				if(searchFrm == null)
+				{
+					searchFrm = new SearchForm();
+				}
 				searchFrm.setVisible(true);
 			}
 		});
@@ -97,30 +94,71 @@ public class SpiderBoot {
 		panel.add(btnNewButton);
 		
 		JButton btnAccountManager = new JButton("Account Manager");
+		btnAccountManager.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(accountMngFrm == null)
+				{
+					accountMngFrm = new AccountManagerForm();	
+				}
+				accountMngFrm.setVisible(true);
+			}
+		});
 		btnAccountManager.setIcon(new ImageIcon(SpiderBoot.class.getResource("/spiderboot/resources/resource/icon_32x32/list_32x32.png")));
 		btnAccountManager.setFont(new Font("Segoe UI", Font.PLAIN, 18));
 		btnAccountManager.setBounds(313, 38, 230, 70);
 		panel.add(btnAccountManager);
 		
 		JButton btnChannelManager = new JButton("Channel Manager");
+		btnChannelManager.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(channelManagerFr == null){
+					channelManagerFr = new ChannelManagerForm();
+				}
+				channelManagerFr.setVisible(true);
+			}
+		});
 		btnChannelManager.setIcon(new ImageIcon(SpiderBoot.class.getResource("/spiderboot/resources/resource/icon_32x32/playlist_32x32.png")));
 		btnChannelManager.setFont(new Font("Segoe UI", Font.PLAIN, 18));
 		btnChannelManager.setBounds(594, 38, 230, 70);
 		panel.add(btnChannelManager);
 		
 		JButton btnSystemconfiguration = new JButton("System \r\nConfiguration");
+		btnSystemconfiguration.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(systrmConfigFr == null){
+					systrmConfigFr = new SystemConfigForm();
+				}
+				systrmConfigFr.setVisible(true);
+			}
+		});
 		btnSystemconfiguration.setIcon(new ImageIcon(SpiderBoot.class.getResource("/spiderboot/resources/resource/icon_16x16/settings_16x16.png")));
 		btnSystemconfiguration.setFont(new Font("Segoe UI", Font.PLAIN, 18));
 		btnSystemconfiguration.setBounds(42, 130, 230, 70);
 		panel.add(btnSystemconfiguration);
 		
 		JButton btnLogging = new JButton("Logging");
+		btnLogging.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(logFr == null){
+					logFr = new LoggingForm();
+				}
+				logFr.setVisible(true);
+			}
+		});
 		btnLogging.setIcon(new ImageIcon(SpiderBoot.class.getResource("/spiderboot/resources/resource/icon_32x32/edit_32x32.png")));
 		btnLogging.setFont(new Font("Segoe UI", Font.PLAIN, 18));
 		btnLogging.setBounds(313, 130, 230, 70);
 		panel.add(btnLogging);
 		
 		JButton btnBackUp = new JButton("Back Up / Restore");
+		btnBackUp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(bakRestoreFr == null){
+					bakRestoreFr = new BackupRestoreForm();
+				}
+				bakRestoreFr.setVisible(true);
+			}
+		});
 		btnBackUp.setIcon(new ImageIcon(SpiderBoot.class.getResource("/spiderboot/resources/resource/icon_32x32/export_32x32.png")));
 		btnBackUp.setFont(new Font("Segoe UI", Font.PLAIN, 18));
 		btnBackUp.setBounds(594, 130, 230, 70);

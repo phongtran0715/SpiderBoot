@@ -113,7 +113,6 @@ public class Search {
             SearchListResponse searchResponse = search.execute();
             List<SearchResult> searchResultList = searchResponse.getItems();
             if (searchResultList != null) {
-                prettyPrint(searchResultList.iterator(), queryTerm);
             }
         } catch (GoogleJsonResponseException e) {
             System.err.println("There was a service error: " + e.getDetails().getCode() + " : "
@@ -152,7 +151,6 @@ public class Search {
      * @param query Search query (String)
      */
     private void prettyPrint(Iterator<SearchResult> iteratorSearchResults, String query) {
-
         System.out.println("\n=============================================================");
         System.out.println(
                 "   First " + NUMBER_OF_VIDEOS_RETURNED + " videos for search on \"" + query + "\".");
