@@ -241,9 +241,5 @@ public class SearchForm extends JFrame {
 		pnResult.setBounds(10, 254, 1888, 708);
 		contentPane.add(pnResult);
 		pnResult.setLayout(null);
-		
-		JTextArea textArea = new JTextArea();
-		textArea.setBounds(10, 21, 332, 366);
-		pnResult.add(textArea);
 	}
 }
