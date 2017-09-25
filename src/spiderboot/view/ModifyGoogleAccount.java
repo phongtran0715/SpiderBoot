@@ -23,7 +23,7 @@ import javax.swing.border.TitledBorder;
 import spiderboot.databaseconnection.MySqlAccess;
 import javax.swing.JPasswordField;
 
-public class AddNewAccountForm extends JDialog {
+public class ModifyGoogleAccount extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtEmail;
@@ -31,15 +31,41 @@ public class AddNewAccountForm extends JDialog {
 	private JTextField txtClientSecret;
 	private JTextField txtApiKey;
 	private JTextField txtAppName;
+	
+	//Account information
+	int id;
+	String userName;
+	String api;
+	String clientId;
+	String clientSecret;
+	String accountType;
 	private JPasswordField txtPass;
 	private JPasswordField txtConfirmPass;
+	
+	public ModifyGoogleAccount(int id, String userName, String password, String api, 
+			String clientId, String clientSecret, String accountType, String appName){
+		initialize();
+		this.id = id;
+		txtApiKey.setText(api);
+		txtAppName.setText(appName);
+		txtClientId.setText(clientId);
+		txtClientSecret.setText(clientSecret);
+		txtEmail.setText(userName);
+		txtPass.setText(password);
+		txtConfirmPass.setText(password);
+	}
+	
+	public ModifyGoogleAccount(){
+		//default construction
+		initialize();
+	}
 	/**
 	 * Create the frame.
 	 */
-	public AddNewAccountForm() {
-		setTitle("Add new Google App Account");
-		setIconImage(Toolkit.getDefaultToolkit().getImage(AddNewAccountForm.class.getResource("/spiderboot/resources/resource/icon_32x32/add_32x32.png")));
-		setBounds(100, 100, 478, 482);
+	private void initialize() {
+		setTitle("Modify Google App Account");
+		setIconImage(Toolkit.getDefaultToolkit().getImage(ModifyGoogleAccount.class.getResource("/spiderboot/resources/resource/icon_32x32/edit_32x32.png")));
+		setBounds(100, 100, 487, 457);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -48,7 +74,7 @@ public class AddNewAccountForm extends JDialog {
 		JPanel panel = new JPanel();
 		panel.setLayout(null);
 		panel.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel.setBounds(5, 5, 454, 368);
+		panel.setBounds(5, 5, 459, 353);
 		contentPane.add(panel);
 		
 		JLabel lblEmail = new JLabel("Email");
@@ -59,40 +85,40 @@ public class AddNewAccountForm extends JDialog {
 		
 		txtEmail = new JTextField();
 		txtEmail.setColumns(10);
-		txtEmail.setBounds(90, 10, 350, 30);
+		txtEmail.setBounds(95, 10, 350, 30);
 		panel.add(txtEmail);
 		
 		JLabel label_1 = new JLabel("Client ID");
 		label_1.setHorizontalAlignment(SwingConstants.RIGHT);
 		label_1.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		label_1.setBounds(5, 161, 75, 35);
+		label_1.setBounds(5, 157, 75, 35);
 		panel.add(label_1);
 		
 		txtClientId = new JTextField();
 		txtClientId.setColumns(10);
-		txtClientId.setBounds(90, 161, 350, 30);
+		txtClientId.setBounds(95, 157, 350, 30);
 		panel.add(txtClientId);
 		
 		JLabel label_2 = new JLabel("Client Secret");
 		label_2.setHorizontalAlignment(SwingConstants.RIGHT);
 		label_2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		label_2.setBounds(5, 211, 75, 35);
+		label_2.setBounds(5, 207, 75, 35);
 		panel.add(label_2);
 		
 		txtClientSecret = new JTextField();
 		txtClientSecret.setColumns(10);
-		txtClientSecret.setBounds(90, 211, 350, 30);
+		txtClientSecret.setBounds(95, 207, 350, 30);
 		panel.add(txtClientSecret);
 		
 		JLabel label_3 = new JLabel("API Key");
 		label_3.setHorizontalAlignment(SwingConstants.RIGHT);
 		label_3.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		label_3.setBounds(5, 261, 75, 35);
+		label_3.setBounds(5, 257, 75, 35);
 		panel.add(label_3);
 		
 		txtApiKey = new JTextField();
 		txtApiKey.setColumns(10);
-		txtApiKey.setBounds(90, 261, 350, 30);
+		txtApiKey.setBounds(95, 257, 350, 30);
 		panel.add(txtApiKey);
 		
 		JLabel lblAccount = new JLabel("Account");
@@ -115,27 +141,27 @@ public class AddNewAccountForm extends JDialog {
 		
 		txtAppName = new JTextField();
 		txtAppName.setColumns(10);
-		txtAppName.setBounds(280, 310, 160, 30);
+		txtAppName.setBounds(280, 310, 165, 30);
 		panel.add(txtAppName);
 		
 		JLabel lblPassword = new JLabel("Password");
 		lblPassword.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblPassword.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblPassword.setBounds(5, 60, 75, 35);
+		lblPassword.setBounds(5, 53, 75, 35);
 		panel.add(lblPassword);
 		
-		JLabel lblConfirmPass = new JLabel("Confirm Pass");
-		lblConfirmPass.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblConfirmPass.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblConfirmPass.setBounds(-6, 106, 86, 35);
-		panel.add(lblConfirmPass);
+		JLabel lblConfirmPassword = new JLabel("Confirm Pass");
+		lblConfirmPassword.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblConfirmPassword.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		lblConfirmPassword.setBounds(-29, 99, 114, 35);
+		panel.add(lblConfirmPassword);
 		
 		txtPass = new JPasswordField();
-		txtPass.setBounds(90, 63, 350, 30);
+		txtPass.setBounds(95, 51, 350, 30);
 		panel.add(txtPass);
 		
 		txtConfirmPass = new JPasswordField();
-		txtConfirmPass.setBounds(90, 106, 350, 30);
+		txtConfirmPass.setBounds(95, 99, 350, 30);
 		panel.add(txtConfirmPass);
 		
 		JButton btnOk = new JButton("OK");
@@ -150,12 +176,11 @@ public class AddNewAccountForm extends JDialog {
 				}else if(!password.equals(passwordConfirm)){
 					JOptionPane.showMessageDialog(contentPane, "Password and Confirm password do not match!", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
-				}else {
-					//insert to database
+				}else{
+					//update to database
 					PreparedStatement preparedStm = null;
-					String query = "INSERT INTO googleaccount (	UserName, Password, Api, ClientID, ClientSecret, AccountType, AppName) "
-							+ " VALUES (?,?,?,?,?,?,?)";
-					
+					String query = "UPDATE googleaccount SET UserName = ?, Password = ?, Api = ? , "
+							+ "ClientID = ?, ClientSecret= ?, AccountType= ?, AppName = ? WHERE Id = ? " ;
 					try {
 						preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
 						// execute insert SQL statement
@@ -166,6 +191,8 @@ public class AddNewAccountForm extends JDialog {
 						preparedStm.setString(5, txtClientSecret.getText().trim());
 						preparedStm.setString(6, cbAccType.getSelectedItem().toString());
 						preparedStm.setString(7, txtAppName.getText().trim());
+						preparedStm.setInt(8, id);
+						//preparedStm.executeUpdate();
 						preparedStm.executeUpdate();
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
@@ -174,27 +201,26 @@ public class AddNewAccountForm extends JDialog {
 						JOptionPane.showMessageDialog(contentPane, "Insert record false: " + e.toString());
 						return;
 					}
-				
 					JOptionPane.showMessageDialog(contentPane, "Insert record successfuly!");
 					resetGUIData();
 					dispose();
 				}
 			}
 		});
-		btnOk.setIcon(new ImageIcon(AddNewAccountForm.class.getResource("/spiderboot/resources/resource/icon_16x16/checked_16x16.png")));
+		btnOk.setIcon(new ImageIcon(ModifyGoogleAccount.class.getResource("/spiderboot/resources/resource/icon_16x16/checked_16x16.png")));
 		btnOk.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		btnOk.setBounds(200, 394, 118, 38);
+		btnOk.setBounds(205, 369, 118, 38);
 		contentPane.add(btnOk);
 		
 		JButton btnExit = new JButton("Exit");
-		btnExit.setIcon(new ImageIcon(AddNewAccountForm.class.getResource("/spiderboot/resources/resource/icon_16x16/delete_16x16.png")));
+		btnExit.setIcon(new ImageIcon(ModifyGoogleAccount.class.getResource("/spiderboot/resources/resource/icon_16x16/delete_16x16.png")));
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
 			}
 		});
 		btnExit.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		btnExit.setBounds(341, 394, 118, 38);
+		btnExit.setBounds(346, 369, 118, 38);
 		contentPane.add(btnExit);
 	}
 

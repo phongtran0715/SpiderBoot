@@ -73,8 +73,6 @@ public class ChannelManagerForm extends JFrame {
 		JButton button = new JButton("Add new");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AddNewAccountForm addNewAccFrm =  new AddNewAccountForm();
-				addNewAccFrm.setVisible(true);
 			}
 		});
 		button.setIcon(new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/add_16x16.png")));
@@ -122,8 +120,6 @@ public class ChannelManagerForm extends JFrame {
 		JButton btnNewButton = new JButton("Add new");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AddNewAccountForm addNewAccFrm =  new AddNewAccountForm();
-				addNewAccFrm.setVisible(true);
 			}
 		});
 		btnNewButton.setIcon(new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/add_16x16.png")));

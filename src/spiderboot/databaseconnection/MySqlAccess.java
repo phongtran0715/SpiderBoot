@@ -22,7 +22,7 @@ public class MySqlAccess {
 		return instance;
 	}
 
-	public int openConnection(){
+	public int DBConnect(){
 		int errCode = 0;
 		// This will load the MySQL driver, each DB has its own driver
 		try {
@@ -37,6 +37,8 @@ public class MySqlAccess {
 		try {
 			connect = DriverManager
 					.getConnection("jdbc:mysql://localhost:3306/" + dbName, userName, password);
+//			connect = DriverManager
+//					.getConnection("jdbc:mysql://35.198.246.116:3060/" + dbName, userName, password);
 
 		} catch (SQLException e) {
 			System.out.println("Connection Failed! Check output console");
@@ -51,8 +53,7 @@ public class MySqlAccess {
 		return errCode;
 	}
 
-	public int closeConnection(){
-		int errCode = 0;
+	void DBDisconnect(){
 		try{
 			if(connect != null){
 				connect.close();
@@ -60,9 +61,12 @@ public class MySqlAccess {
 		}catch(Exception e){
 			System.out.println("Can not close connection");
 			e.printStackTrace();
-			return 1;
 		}
-		return errCode;
 	}
+	
+	void DBReconnect(){
+		
+	}
+	
 }
 
