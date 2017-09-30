@@ -1,5 +1,6 @@
 package spiderboot.view;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -70,6 +71,9 @@ public class ModifyGoogleAccount extends JDialog {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		//set center screen
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		setLocation(dim.width/2- getSize().width/2, dim.height/2- getSize().height/2);
 		
 		JPanel panel = new JPanel();
 		panel.setLayout(null);

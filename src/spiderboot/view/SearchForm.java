@@ -1,6 +1,6 @@
 package spiderboot.view;
 
-import java.awt.EventQueue;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Toolkit;
@@ -32,25 +32,6 @@ public class SearchForm extends JFrame {
 	private JTextField txtRegionCode;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					SearchForm frame = new SearchForm();
-					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-					frame.pack();
-					frame.setLocationRelativeTo(null);
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
 	 * Create the frame.
 	 */
 	public SearchForm() {
@@ -64,6 +45,9 @@ public class SearchForm extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		//set center screen
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		setLocation(dim.width/2- getSize().width/2, dim.height/2- getSize().height/2);
 		
 		JButton button = new JButton("Exit");
 		button.addActionListener(new ActionListener() {

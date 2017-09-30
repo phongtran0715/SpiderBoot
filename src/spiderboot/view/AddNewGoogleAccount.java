@@ -1,5 +1,6 @@
 package spiderboot.view;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -23,7 +24,7 @@ import javax.swing.border.TitledBorder;
 import spiderboot.databaseconnection.MySqlAccess;
 import javax.swing.JPasswordField;
 
-public class AddNewAccountForm extends JDialog {
+public class AddNewGoogleAccount extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtEmail;
@@ -36,14 +37,17 @@ public class AddNewAccountForm extends JDialog {
 	/**
 	 * Create the frame.
 	 */
-	public AddNewAccountForm() {
+	public AddNewGoogleAccount() {
 		setTitle("Add new Google App Account");
-		setIconImage(Toolkit.getDefaultToolkit().getImage(AddNewAccountForm.class.getResource("/spiderboot/resources/resource/icon_32x32/add_32x32.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(AddNewGoogleAccount.class.getResource("/spiderboot/resources/resource/icon_32x32/add_32x32.png")));
 		setBounds(100, 100, 478, 482);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		//set center screen
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		setLocation(dim.width/2- getSize().width/2, dim.height/2- getSize().height/2);
 		
 		JPanel panel = new JPanel();
 		panel.setLayout(null);
@@ -181,13 +185,13 @@ public class AddNewAccountForm extends JDialog {
 				}
 			}
 		});
-		btnOk.setIcon(new ImageIcon(AddNewAccountForm.class.getResource("/spiderboot/resources/resource/icon_16x16/checked_16x16.png")));
+		btnOk.setIcon(new ImageIcon(AddNewGoogleAccount.class.getResource("/spiderboot/resources/resource/icon_16x16/checked_16x16.png")));
 		btnOk.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnOk.setBounds(200, 394, 118, 38);
 		contentPane.add(btnOk);
 		
 		JButton btnExit = new JButton("Exit");
-		btnExit.setIcon(new ImageIcon(AddNewAccountForm.class.getResource("/spiderboot/resources/resource/icon_16x16/delete_16x16.png")));
+		btnExit.setIcon(new ImageIcon(AddNewGoogleAccount.class.getResource("/spiderboot/resources/resource/icon_16x16/delete_16x16.png")));
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();

@@ -2,9 +2,8 @@ package spiderboot.view;
 
 import java.awt.BorderLayout;
 import java.awt.Dialog.ModalityType;
-import java.awt.EventQueue;
+import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,25 +37,8 @@ public class AccountManagerForm extends JFrame {
 	JTabbedPane pnAccountManager;
 	private JTable tbGoogleApp;
 	public DefaultTableModel tbGgAppMode = new DefaultTableModel();
-	public DefaultTableModel tbSpiderMode = null;
+	public DefaultTableModel tbSpiderMode = new DefaultTableModel();
 	private JTable tbSpiderHome;
-	static AccountManagerForm frame;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					frame = new AccountManagerForm();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.
@@ -67,6 +49,10 @@ public class AccountManagerForm extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 754, 553);
 		getContentPane().setLayout(null);
+		
+		//set center screen
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		setLocation(dim.width/2- getSize().width/2, dim.height/2- getSize().height/2);
 
 		pnAccountManager = new JTabbedPane(JTabbedPane.TOP);
 		pnAccountManager.addChangeListener(new ChangeListener() {
@@ -103,27 +89,77 @@ public class AccountManagerForm extends JFrame {
 		tbSpiderHome.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_1.add(tbSpiderHome.getTableHeader(),BorderLayout.NORTH);
 
-		JButton button = new JButton("Add new");
-		button.addActionListener(new ActionListener() {
+		JButton btnAddSpiderAcc = new JButton("Add new");
+		btnAddSpiderAcc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				AddNewSpiderBootAccount newSpiderAccFrm = new AddNewSpiderBootAccount();
+				newSpiderAccFrm.setModalityType(ModalityType.APPLICATION_MODAL);
+				newSpiderAccFrm.setVisible(true);
+				loadSpiderBootAccount();
 			}
 		});
-		button.setIcon(new ImageIcon(AccountManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/add_16x16.png")));
-		button.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		button.setBounds(10, 413, 118, 38);
-		pnSpiderApp.add(button);
+		btnAddSpiderAcc.setIcon(new ImageIcon(AccountManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/add_16x16.png")));
+		btnAddSpiderAcc.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		btnAddSpiderAcc.setBounds(10, 413, 118, 38);
+		pnSpiderApp.add(btnAddSpiderAcc);
 
-		JButton button_1 = new JButton("Edit");
-		button_1.setIcon(new ImageIcon(AccountManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/edit_16x16.png")));
-		button_1.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		button_1.setBounds(170, 413, 118, 38);
-		pnSpiderApp.add(button_1);
+		JButton btnEditSpiderAcc = new JButton("Edit");
+		btnEditSpiderAcc.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				int rIndex =  tbSpiderHome.getSelectedRow();
+				if(rIndex == -1){
+					JOptionPane.showMessageDialog(pnSpiderApp, "Please select one row to edit !");
+					return;
+				}else{
+					int id = (Integer)tbSpiderHome.getValueAt(rIndex, tbSpiderHome.getColumn("Id").getModelIndex());
+					String userName = (String)tbSpiderHome.getValueAt(rIndex, tbSpiderHome.getColumn("UserName").getModelIndex());
+					String email = (String)tbSpiderHome.getValueAt(rIndex, tbSpiderHome.getColumn("Email").getModelIndex());
+					String password = (String)tbSpiderHome.getValueAt(rIndex, tbSpiderHome.getColumn("Password").getModelIndex());
+					ModifySpiderBootAccount modSpiderAccFrm = new ModifySpiderBootAccount(id, userName, password, email);
+					modSpiderAccFrm.setModalityType(ModalityType.APPLICATION_MODAL);
+					modSpiderAccFrm.setVisible(true);
+					loadSpiderBootAccount();
+				}
+			}
+		});
+		btnEditSpiderAcc.setIcon(new ImageIcon(AccountManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/edit_16x16.png")));
+		btnEditSpiderAcc.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		btnEditSpiderAcc.setBounds(170, 413, 118, 38);
+		pnSpiderApp.add(btnEditSpiderAcc);
 
-		JButton button_2 = new JButton("Delete");
-		button_2.setIcon(new ImageIcon(AccountManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/trash_16x16.png")));
-		button_2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		button_2.setBounds(334, 413, 118, 38);
-		pnSpiderApp.add(button_2);
+		JButton btnDeleteSpiderAcc = new JButton("Delete");
+		btnDeleteSpiderAcc.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int selectedRow = tbSpiderHome.getSelectedRow();
+				if(selectedRow == -1){
+					return;
+				}
+				int result = JOptionPane.showConfirmDialog(pnAccountManager, "Are you sure to delete item?",
+						"Question",JOptionPane.OK_CANCEL_OPTION);
+				if(result == JOptionPane.OK_OPTION){
+					int accId = (int) tbSpiderHome.getValueAt(selectedRow, 0);
+					String query = "DELETE FROM spideraccount WHERE Id = ? ;";
+					PreparedStatement preparedStm;
+					try {
+						preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
+						preparedStm.setInt(1, accId);
+						preparedStm.executeUpdate();
+						//reload jtable
+						tbSpiderMode.removeRow(selectedRow);
+					} catch (SQLException ex) {
+						// TODO Auto-generated catch block
+						ex.printStackTrace();
+						JOptionPane.showInternalMessageDialog(pnAccountManager, "Delete item false! \n" + e.toString());
+					}	
+				}else{
+					//do nothing
+				}
+			}
+		});
+		btnDeleteSpiderAcc.setIcon(new ImageIcon(AccountManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/trash_16x16.png")));
+		btnDeleteSpiderAcc.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		btnDeleteSpiderAcc.setBounds(334, 413, 118, 38);
+		pnSpiderApp.add(btnDeleteSpiderAcc);
 
 		JButton button_3 = new JButton("Exit");
 		button_3.addActionListener(new ActionListener() {
@@ -151,6 +187,8 @@ public class AccountManagerForm extends JFrame {
 		panel.add(scrollPane);
 
 		tbGoogleApp = new JTable(tbGgAppMode){
+			private static final long serialVersionUID = 1L;
+
 			public boolean isCellEditable(int row, int column) {                
 				return false;               
 			};
@@ -187,23 +225,22 @@ public class AccountManagerForm extends JFrame {
 		tbGoogleApp.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		tbGoogleApp.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
-		JButton btnNewButton = new JButton("Add new");
-		btnNewButton.addActionListener(new ActionListener() {
+		JButton btnAddGoogleAcc = new JButton("Add new");
+		btnAddGoogleAcc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AddNewAccountForm addNewAccFrm = new AddNewAccountForm();
-				//addNewAccFrm.pack();
+				AddNewGoogleAccount addNewAccFrm = new AddNewGoogleAccount();
 				addNewAccFrm.setModalityType(ModalityType.APPLICATION_MODAL);
 				addNewAccFrm.setVisible(true);
 				loadGoogleAppAccount();
 			}
 		});
-		btnNewButton.setIcon(new ImageIcon(AccountManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/add_16x16.png")));
-		btnNewButton.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		btnNewButton.setBounds(10, 413, 118, 38);
-		pnGoogleApp.add(btnNewButton);
+		btnAddGoogleAcc.setIcon(new ImageIcon(AccountManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/add_16x16.png")));
+		btnAddGoogleAcc.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		btnAddGoogleAcc.setBounds(10, 413, 118, 38);
+		pnGoogleApp.add(btnAddGoogleAcc);
 
-		JButton btnEdit = new JButton("Edit");
-		btnEdit.addActionListener(new ActionListener() {
+		JButton btnEditGoogleAcc = new JButton("Edit");
+		btnEditGoogleAcc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int rIndex =  tbGoogleApp.getSelectedRow();
 				if(rIndex == -1){
@@ -226,13 +263,13 @@ public class AccountManagerForm extends JFrame {
 				}
 			}
 		});
-		btnEdit.setIcon(new ImageIcon(AccountManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/edit_16x16.png")));
-		btnEdit.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		btnEdit.setBounds(170, 413, 118, 38);
-		pnGoogleApp.add(btnEdit);
+		btnEditGoogleAcc.setIcon(new ImageIcon(AccountManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/edit_16x16.png")));
+		btnEditGoogleAcc.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		btnEditGoogleAcc.setBounds(170, 413, 118, 38);
+		pnGoogleApp.add(btnEditGoogleAcc);
 
-		JButton btnDelete = new JButton("Delete");
-		btnDelete.addActionListener(new ActionListener() {
+		JButton btnDeleteGoogleAcc = new JButton("Delete");
+		btnDeleteGoogleAcc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int selectedRow = tbGoogleApp.getSelectedRow();
 				if(selectedRow == -1){
@@ -263,10 +300,10 @@ public class AccountManagerForm extends JFrame {
 				}
 			}
 		});
-		btnDelete.setIcon(new ImageIcon(AccountManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/trash_16x16.png")));
-		btnDelete.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		btnDelete.setBounds(334, 413, 118, 38);
-		pnGoogleApp.add(btnDelete);
+		btnDeleteGoogleAcc.setIcon(new ImageIcon(AccountManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/trash_16x16.png")));
+		btnDeleteGoogleAcc.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		btnDeleteGoogleAcc.setBounds(334, 413, 118, 38);
+		pnGoogleApp.add(btnDeleteGoogleAcc);
 
 		JButton btnExit = new JButton("Exit");
 		btnExit.addActionListener(new ActionListener() {
@@ -285,7 +322,7 @@ public class AccountManagerForm extends JFrame {
 		Statement stmt;
 		try
 		{
-			String query = "SELECT Id, UserName,Email FROM spideraccount";
+			String query = "SELECT Id, UserName, Password, Email FROM spideraccount WHERE Id != 0";
 			stmt = MySqlAccess.getInstance().connect.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 			ResultSetMetaData metaData = rs.getMetaData();
@@ -302,12 +339,15 @@ public class AccountManagerForm extends JFrame {
 			while (rs.next()) {
 				Vector<Object> vector = new Vector<Object>();
 				for (int i = 1; i <= columnCount; i++) {
-					vector.add(rs.getObject(i));
+					vector.add(rs.getObject(i));	
 				}
 				data.add(vector);
 			}
 			tbSpiderMode.setDataVector(data, columnNames);
-
+			tbSpiderHome.setModel(tbSpiderMode);
+			//Hide password column
+			tbSpiderHome.getColumnModel().getColumn(2).setMinWidth(0);
+			tbSpiderHome.getColumnModel().getColumn(2).setMaxWidth(0);
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}
@@ -315,6 +355,7 @@ public class AccountManagerForm extends JFrame {
 
 	public void loadGoogleAppAccount(){
 		Statement stmt;
+		tbGgAppMode = new DefaultTableModel();
 		try
 		{
 			String query = "SELECT Id, UserName, Password, Api, ClientId, ClientSecret, AccountType, AppName FROM googleaccount";
@@ -342,7 +383,7 @@ public class AccountManagerForm extends JFrame {
 			tbGoogleApp.setModel(tbGgAppMode);
 			//Hide password column
 			tbGoogleApp.getColumnModel().getColumn(2).setMinWidth(0);
-			tbGoogleApp.getColumnModel().getColumn(2).setMaxWidth(0);;
+			tbGoogleApp.getColumnModel().getColumn(2).setMaxWidth(0);
 
 		}catch(Exception ex){
 			ex.printStackTrace();

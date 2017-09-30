@@ -1,6 +1,7 @@
 package spiderboot.view;
 
-import java.awt.EventQueue;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
@@ -13,34 +14,16 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.border.TitledBorder;
 import javax.swing.UIManager;
-import java.awt.Color;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 public class ChannelManagerForm extends JFrame {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	private JTable table;
-	private JTable table_1;
-	private JTable table_2;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ChannelManagerForm frame = new ChannelManagerForm();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+	private JTable tbMonitorChannel;
+	private JTable tbHomeChannel;
+	private JTable tbMapChannel;
 
 	/**
 	 * Create the frame.
@@ -51,8 +34,15 @@ public class ChannelManagerForm extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 754, 553);
 		getContentPane().setLayout(null);
+		//set center screen
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		setLocation(dim.width/2- getSize().width/2, dim.height/2- getSize().height/2);
 		
 		JTabbedPane pnChannelManager = new JTabbedPane(JTabbedPane.TOP);
+		pnChannelManager.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+			}
+		});
 		pnChannelManager.setBounds(10, 11, 718, 492);
 		getContentPane().add(pnChannelManager);
 		
@@ -60,15 +50,15 @@ public class ChannelManagerForm extends JFrame {
 		pnChannelManager.addTab("Home Spider Channel", new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/user_16x16.png")), pnHomeChannel, null);
 		pnHomeChannel.setLayout(null);
 		
-		JPanel panel_1 = new JPanel();
-		panel_1.setBorder(new TitledBorder(null, "Channel List", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel_1.setBounds(10, 11, 693, 391);
-		pnHomeChannel.add(panel_1);
+		JPanel pnHomeChannelList = new JPanel();
+		pnHomeChannelList.setBorder(new TitledBorder(null, "Channel List", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		pnHomeChannelList.setBounds(5, 5, 698, 391);
+		pnHomeChannel.add(pnHomeChannelList);
 		
-		table_1 = new JTable();
-		table_1.setFillsViewportHeight(true);
-		table_1.setBackground(SystemColor.inactiveCaption);
-		panel_1.add(table_1);
+		tbHomeChannel = new JTable();
+		tbHomeChannel.setFillsViewportHeight(true);
+		tbHomeChannel.setBackground(SystemColor.inactiveCaption);
+		pnHomeChannelList.add(tbHomeChannel);
 		
 		JButton button = new JButton("Add new");
 		button.addActionListener(new ActionListener() {
@@ -107,15 +97,15 @@ public class ChannelManagerForm extends JFrame {
 		pnChannelManager.addTab("Monitor Spider Channel", new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/google-plus16x16.png")), pnMonitorChannel, null);
 		pnMonitorChannel.setLayout(null);
 		
-		JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder(null, "Channel List", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel.setBounds(10, 11, 693, 391);
-		pnMonitorChannel.add(panel);
+		JPanel pnMonitorChannelList = new JPanel();
+		pnMonitorChannelList.setBorder(new TitledBorder(null, "Channel List", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		pnMonitorChannelList.setBounds(5, 5, 693, 391);
+		pnMonitorChannel.add(pnMonitorChannelList);
 		
-		table = new JTable();
-		table.setFillsViewportHeight(true);
-		table.setBackground(SystemColor.inactiveCaption);
-		panel.add(table);
+		tbMonitorChannel = new JTable();
+		tbMonitorChannel.setFillsViewportHeight(true);
+		tbMonitorChannel.setBackground(SystemColor.inactiveCaption);
+		pnMonitorChannelList.add(tbMonitorChannel);
 		
 		JButton btnNewButton = new JButton("Add new");
 		btnNewButton.addActionListener(new ActionListener() {
@@ -154,15 +144,15 @@ public class ChannelManagerForm extends JFrame {
 		pnChannelManager.addTab("Home-Monitor Mapping", null, pnMappingChannel, null);
 		pnMappingChannel.setLayout(null);
 		
-		JPanel panel_2 = new JPanel();
-		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Mapping List", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel_2.setBounds(10, 11, 693, 391);
-		pnMappingChannel.add(panel_2);
+		JPanel pnMapChannel = new JPanel();
+		pnMapChannel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Mapping List", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		pnMapChannel.setBounds(5, 5, 693, 391);
+		pnMappingChannel.add(pnMapChannel);
 		
-		table_2 = new JTable();
-		table_2.setFillsViewportHeight(true);
-		table_2.setBackground(SystemColor.inactiveCaption);
-		panel_2.add(table_2);
+		tbMapChannel = new JTable();
+		tbMapChannel.setFillsViewportHeight(true);
+		tbMapChannel.setBackground(SystemColor.inactiveCaption);
+		pnMapChannel.add(tbMapChannel);
 		
 		JButton button_4 = new JButton("Exit");
 		button_4.addActionListener(new ActionListener() {
