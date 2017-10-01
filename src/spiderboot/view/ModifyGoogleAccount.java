@@ -183,7 +183,7 @@ public class ModifyGoogleAccount extends JDialog {
 				}else{
 					//update to database
 					PreparedStatement preparedStm = null;
-					String query = "UPDATE googleaccount SET UserName = ?, Password = ?, Api = ? , "
+					String query = "UPDATE google_account SET UserName = ?, Password = ?, Api = ? , "
 							+ "ClientID = ?, ClientSecret= ?, AccountType= ?, AppName = ? WHERE Id = ? " ;
 					try {
 						preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);

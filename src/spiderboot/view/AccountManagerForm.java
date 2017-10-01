@@ -79,10 +79,38 @@ public class AccountManagerForm extends JFrame {
 		panel_1.setLayout(null);
 
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(10, 21, 683, 370);
+		scrollPane_1.setBounds(10, 20, 683, 370);
 		panel_1.add(scrollPane_1);
 
-		tbSpiderHome = new JTable(tbSpiderMode);
+		tbSpiderHome = new JTable(tbSpiderMode){
+			private static final long serialVersionUID = 1L;
+
+			public boolean isCellEditable(int row, int column) {                
+				return false;               
+			};
+		};
+		tbSpiderHome.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+		tbSpiderHome.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount() == 2){
+					int rIndex =  tbSpiderHome.getSelectedRow();
+					if(rIndex == -1){
+						JOptionPane.showMessageDialog(pnSpiderApp, "Please select one row to edit !");
+						return;
+					}else{
+						int id = (Integer)tbSpiderHome.getValueAt(rIndex, tbSpiderHome.getColumn("Id").getModelIndex());
+						String userName = (String)tbSpiderHome.getValueAt(rIndex, tbSpiderHome.getColumn("UserName").getModelIndex());
+						String email = (String)tbSpiderHome.getValueAt(rIndex, tbSpiderHome.getColumn("Email").getModelIndex());
+						String password = (String)tbSpiderHome.getValueAt(rIndex, tbSpiderHome.getColumn("Password").getModelIndex());
+						ModifySpiderBootAccount modSpiderAccFrm = new ModifySpiderBootAccount(id, userName, password, email);
+						modSpiderAccFrm.setModalityType(ModalityType.APPLICATION_MODAL);
+						modSpiderAccFrm.setVisible(true);
+						loadSpiderBootAccount();
+					}
+				}
+			}
+		});
 		scrollPane_1.setViewportView(tbSpiderHome);
 		tbSpiderHome.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tbSpiderHome.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -92,7 +120,7 @@ public class AccountManagerForm extends JFrame {
 		JButton btnAddSpiderAcc = new JButton("Add new");
 		btnAddSpiderAcc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AddNewSpiderBootAccount newSpiderAccFrm = new AddNewSpiderBootAccount();
+				AddSpiderBootAccount newSpiderAccFrm = new AddSpiderBootAccount();
 				newSpiderAccFrm.setModalityType(ModalityType.APPLICATION_MODAL);
 				newSpiderAccFrm.setVisible(true);
 				loadSpiderBootAccount();
@@ -193,6 +221,7 @@ public class AccountManagerForm extends JFrame {
 				return false;               
 			};
 		};
+		tbGoogleApp.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
 		tbGoogleApp.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -228,7 +257,7 @@ public class AccountManagerForm extends JFrame {
 		JButton btnAddGoogleAcc = new JButton("Add new");
 		btnAddGoogleAcc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AddNewGoogleAccount addNewAccFrm = new AddNewGoogleAccount();
+				AddGoogleAccount addNewAccFrm = new AddGoogleAccount();
 				addNewAccFrm.setModalityType(ModalityType.APPLICATION_MODAL);
 				addNewAccFrm.setVisible(true);
 				loadGoogleAppAccount();
@@ -322,7 +351,7 @@ public class AccountManagerForm extends JFrame {
 		Statement stmt;
 		try
 		{
-			String query = "SELECT Id, UserName, Password, Email FROM spideraccount WHERE Id != 0";
+			String query = "SELECT Id, UserName, Password, Email FROM spider_account WHERE Id != 0";
 			stmt = MySqlAccess.getInstance().connect.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 			ResultSetMetaData metaData = rs.getMetaData();
@@ -358,7 +387,8 @@ public class AccountManagerForm extends JFrame {
 		tbGgAppMode = new DefaultTableModel();
 		try
 		{
-			String query = "SELECT Id, UserName, Password, Api, ClientId, ClientSecret, AccountType, AppName FROM googleaccount";
+			String query = "SELECT Id, UserName, Password, Api, ClientId, ClientSecret, AccountType, "
+					+ "AppName FROM google_account";
 			stmt = MySqlAccess.getInstance().connect.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 			ResultSetMetaData metaData = rs.getMetaData();

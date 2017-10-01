@@ -23,9 +23,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
-import spiderboot.util.*;
 
 import spiderboot.databaseconnection.MySqlAccess;
+import spiderboot.helper.*;
 
 public class MainForm extends JFrame {
 	private static final long serialVersionUID = 1L;

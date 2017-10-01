@@ -8,7 +8,10 @@ import java.awt.SystemColor;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.PreparedStatement;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -28,10 +31,6 @@ import javax.swing.border.TitledBorder;
 
 import spiderboot.configuration.ConfigProperties;
 import spiderboot.databaseconnection.MySqlAccess;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 public class LoginForm extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -109,7 +108,7 @@ public class LoginForm extends JFrame {
 						return;
 					}else{
 						Statement stm = null;
-						String query = "SELECT COUNT(*) FROM spideraccount WHERE UserName = '" 
+						String query = "SELECT COUNT(*) FROM spider_account WHERE UserName = '" 
 								+ userName + "' AND Password = '" + password +"';";
 						try{
 							stm = MySqlAccess.getInstance().connect.createStatement();
@@ -154,7 +153,7 @@ public class LoginForm extends JFrame {
 						return;
 					}else{
 						Statement stm = null;
-						String query = "SELECT COUNT(*) FROM spideraccount WHERE UserName = '" 
+						String query = "SELECT COUNT(*) FROM spider_account WHERE UserName = '" 
 								+ userName + "' AND Password = '" + password +"';";
 						try{
 							stm = MySqlAccess.getInstance().connect.createStatement();
@@ -218,7 +217,7 @@ public class LoginForm extends JFrame {
 					return;
 				}else{
 					Statement stm = null;
-					String query = "SELECT COUNT(*) FROM spideraccount WHERE UserName = '" 
+					String query = "SELECT COUNT(*) FROM spider_account WHERE UserName = '" 
 							+ userName + "' AND Password = '" + password +"';";
 					try{
 						stm = MySqlAccess.getInstance().connect.createStatement();

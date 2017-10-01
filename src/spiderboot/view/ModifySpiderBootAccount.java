@@ -131,7 +131,7 @@ public class ModifySpiderBootAccount extends JDialog {
 				}else{
 					//update to database
 					PreparedStatement preparedStm = null;
-					String query = "UPDATE spideraccount SET UserName = ?, Password = ?, Email = ? WHERE Id = ? " ;
+					String query = "UPDATE spider_account SET UserName = ?, Password = ?, Email = ? WHERE Id = ? " ;
 					try {
 						preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
 						// execute insert SQL statement
