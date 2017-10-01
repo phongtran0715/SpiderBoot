@@ -31,6 +31,9 @@ import javax.swing.border.TitledBorder;
 
 import spiderboot.configuration.ConfigProperties;
 import spiderboot.databaseconnection.MySqlAccess;
+import spiderboot.helper.ImagePanel;
+import spiderboot.helper.Util;
+import javax.swing.SwingConstants;
 
 public class LoginForm extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -47,8 +50,15 @@ public class LoginForm extends JFrame {
 			public void run() {
 				try {
 					frame = new LoginForm();
-					onStartApplication();
-					frame.setVisible(true);
+					Util util = new Util();
+					boolean isRunning  = Util.checkIfRunning();
+					if(!isRunning){
+						onStartApplication();
+						frame.setVisible(true);
+					}else{
+						JOptionPane.showMessageDialog(frame, "Application is already running!", 
+									"Information", JOptionPane.INFORMATION_MESSAGE);
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -60,6 +70,7 @@ public class LoginForm extends JFrame {
 	 * Create the frame.
 	 */
 	public LoginForm() {
+		setResizable(false);
 
 		setIconImage(Toolkit.getDefaultToolkit().getImage(LoginForm.class.getResource("/spiderboot/resources/resource/icon_32x32/user_32x32.png")));
 		setTitle("Login");
@@ -73,26 +84,29 @@ public class LoginForm extends JFrame {
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		setLocation(dim.width/2- getSize().width/2, dim.height/2- getSize().height/2);
 
-		JPanel panel = new JPanel();
+		JPanel panel = new ImagePanel(new ImageIcon(getClass().getClassLoader().getResource("banner1.png")).getImage());
 		panel.setBackground(SystemColor.activeCaption);
 		panel.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel.setBounds(5, 5, 528, 108);
 		contentPane.add(panel);
 
 		JPanel panel_1 = new JPanel();
+		panel_1.setFont(new Font("Segoe UI", Font.BOLD, 13));
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Account Information", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		panel_1.setBounds(181, 115, 352, 165);
 		contentPane.add(panel_1);
 		panel_1.setLayout(null);
 
 		JLabel lblNewLabel = new JLabel("User Name");
+		lblNewLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNewLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblNewLabel.setBounds(10, 33, 73, 14);
+		lblNewLabel.setBounds(10, 26, 73, 30);
 		panel_1.add(lblNewLabel);
 
 		JLabel lblPassword = new JLabel("Password");
+		lblPassword.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblPassword.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblPassword.setBounds(10, 79, 73, 14);
+		lblPassword.setBounds(10, 80, 73, 30);
 		panel_1.add(lblPassword);
 
 		txtUserName = new JTextField();
@@ -136,7 +150,7 @@ public class LoginForm extends JFrame {
 				}
 			}
 		});
-		txtUserName.setBounds(93, 26, 250, 30);
+		txtUserName.setBounds(93, 25, 250, 30);
 		panel_1.add(txtUserName);
 		txtUserName.setColumns(10);
 
@@ -181,17 +195,17 @@ public class LoginForm extends JFrame {
 				}
 			}
 		});
-		txtPassword.setBounds(93, 72, 250, 30);
+		txtPassword.setBounds(93, 80, 250, 30);
 		panel_1.add(txtPassword);
 
 		JCheckBox cbRemember = new JCheckBox("Remember me");
 		cbRemember.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		cbRemember.setBounds(93, 121, 147, 23);
+		cbRemember.setBounds(93, 130, 147, 23);
 		panel_1.add(cbRemember);
 
-		JPanel panel_2 = new JPanel();
+		JPanel panel_2 = new ImagePanel(new ImageIcon(getClass().getClassLoader().getResource("logo1.png")).getImage());
 		panel_2.setBackground(SystemColor.info);
-		panel_2.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_2.setBorder(null);
 		panel_2.setBounds(5, 115, 175, 165);
 		contentPane.add(panel_2);
 
@@ -203,7 +217,7 @@ public class LoginForm extends JFrame {
 		});
 		button.setIcon(new ImageIcon(LoginForm.class.getResource("/spiderboot/resources/resource/icon_16x16/delete_16x16.png")));
 		button.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		button.setBounds(413, 280, 118, 38);
+		button.setBounds(413, 285, 118, 38);
 		contentPane.add(button);
 
 		JButton btnOk = new JButton("OK");
@@ -254,7 +268,7 @@ public class LoginForm extends JFrame {
 		});
 		btnOk.setIcon(new ImageIcon(LoginForm.class.getResource("/spiderboot/resources/resource/icon_16x16/checked_16x16.png")));
 		btnOk.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		btnOk.setBounds(274, 280, 118, 38);
+		btnOk.setBounds(274, 285, 118, 38);
 		contentPane.add(btnOk);
 		
 		addWindowListener(new WindowAdapter() {

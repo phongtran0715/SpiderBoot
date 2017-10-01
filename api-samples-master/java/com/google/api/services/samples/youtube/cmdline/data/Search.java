@@ -64,7 +64,7 @@ public class Search {
     	
     }
     
-    public void executeQuery(String queryTerm) {
+    public List<SearchResult> executeQuery(String queryTerm) {
         // Read the developer key from the properties file.
         Properties properties = new Properties();
         try {
@@ -113,6 +113,10 @@ public class Search {
             SearchListResponse searchResponse = search.execute();
             List<SearchResult> searchResultList = searchResponse.getItems();
             if (searchResultList != null) {
+            	if (searchResultList != null) {
+                    //prettyPrint(searchResultList.iterator(), queryTerm);
+            		return searchResultList;
+                }
             }
         } catch (GoogleJsonResponseException e) {
             System.err.println("There was a service error: " + e.getDetails().getCode() + " : "
@@ -122,6 +126,7 @@ public class Search {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+        return null;
     }
 
     /*

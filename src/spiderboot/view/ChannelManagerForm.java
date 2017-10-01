@@ -35,14 +35,15 @@ import spiderboot.databaseconnection.MySqlAccess;
 
 public class ChannelManagerForm extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private JTable tbMapChannel;
+	private JTable tbMapChannel = new JTable();
+	private JTable tbMonitorChannel = new JTable();
+	private JTable tbHomeChannel = new JTable();
 	public DefaultTableModel tbHomeChannelMode = new DefaultTableModel();
 	public DefaultTableModel tbMonitorChanelMode = new DefaultTableModel();
 	public DefaultTableModel tbMapChanelMode = new DefaultTableModel();
-	private JTable tbMonitorChannel;
-	private JTable tbHomeChannel;
 
 	public ChannelManagerForm() {
+		
 		initialize();
 		loadHomeChannel();
 	}

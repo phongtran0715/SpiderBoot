@@ -40,20 +40,13 @@ public class MainForm extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public MainForm() {
-
-		try {
-			setContentPane(new JLabel(new ImageIcon(ImageIO.read(new File("C:\\Users\\phong.tran\\Downloads\\Image\\bg4.jpg")))));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+	public MainForm() {	
 		setExtendedState(Frame.MAXIMIZED_BOTH);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(MainForm.class.getResource("/spiderboot/resources/resource/icon_32x32/user_32x32.png")));
 		setTitle("Spider Boot V1.0");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1070, 707);
-		contentPane = new ImagePanel(new ImageIcon("C:\\Users\\phong.tran\\Downloads\\Image\\bg4.jpg").getImage());
+		contentPane = new ImagePanel(new ImageIcon(getClass().getClassLoader().getResource("bg4.jpg")).getImage());
 		contentPane.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		this.getContentPane().add(contentPane);
 		//setContentPane(contentPane);

@@ -29,7 +29,7 @@ public class LoggingForm extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(LoggingForm.class.getResource("/spiderboot/resources/resource/icon_32x32/user_32x32.png")));
 		setTitle("System Logging");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 754, 553);
+		setBounds(100, 100, 940, 659);
 		getContentPane().setLayout(null);
 		//set center screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -43,7 +43,7 @@ public class LoggingForm extends JFrame {
 			}
 		});
 		button.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		button.setBounds(610, 465, 118, 38);
+		button.setBounds(796, 571, 118, 38);
 		getContentPane().add(button);
 		
 		JPanel panel = new JPanel();
@@ -53,12 +53,12 @@ public class LoggingForm extends JFrame {
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Filter", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel_1.setBounds(201, 0, 525, 151);
+		panel_1.setBounds(201, 0, 713, 151);
 		getContentPane().add(panel_1);
 		
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new TitledBorder(null, "Result", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel_2.setBounds(5, 148, 723, 299);
+		panel_2.setBounds(5, 148, 909, 412);
 		getContentPane().add(panel_2);
 		panel_2.setLayout(null);
 		

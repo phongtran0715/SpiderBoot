@@ -36,20 +36,25 @@ public class AccountManagerForm extends JFrame {
 	private static final long serialVersionUID = 1L;
 	JTabbedPane pnAccountManager;
 	private JTable tbGoogleApp;
-	public DefaultTableModel tbGgAppMode = new DefaultTableModel();
-	public DefaultTableModel tbSpiderMode = new DefaultTableModel();
 	private JTable tbSpiderHome;
+	public DefaultTableModel tbGgAppMode;
+	public DefaultTableModel tbSpiderMode;
 
-	/**
-	 * Create the frame.
-	 */
 	public AccountManagerForm() {
+		tbGoogleApp = new JTable();
+		tbSpiderHome = new JTable();
+		tbGgAppMode = new DefaultTableModel();
+		tbSpiderMode = new DefaultTableModel();
+		initialize();
+	}
+
+	private void  initialize() {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(AccountManagerForm.class.getResource("/spiderboot/resources/resource/icon_32x32/user_32x32.png")));
 		setTitle("Account Manager");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 754, 553);
 		getContentPane().setLayout(null);
-		
+
 		//set center screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		setLocation(dim.width/2- getSize().width/2, dim.height/2- getSize().height/2);
@@ -345,8 +350,8 @@ public class AccountManagerForm extends JFrame {
 		btnExit.setBounds(585, 413, 118, 38);
 		pnGoogleApp.add(btnExit);
 	}
-
-	public void loadSpiderBootAccount(){
+	
+	private void loadSpiderBootAccount(){
 		tbSpiderMode = new DefaultTableModel();
 		Statement stmt;
 		try
@@ -373,16 +378,18 @@ public class AccountManagerForm extends JFrame {
 				data.add(vector);
 			}
 			tbSpiderMode.setDataVector(data, columnNames);
-			tbSpiderHome.setModel(tbSpiderMode);
-			//Hide password column
-			tbSpiderHome.getColumnModel().getColumn(2).setMinWidth(0);
-			tbSpiderHome.getColumnModel().getColumn(2).setMaxWidth(0);
+			if(tbSpiderMode != null){
+				tbSpiderHome.setModel(tbSpiderMode);
+				//Hide password column
+				tbSpiderHome.getColumnModel().getColumn(2).setMinWidth(0);
+				tbSpiderHome.getColumnModel().getColumn(2).setMaxWidth(0);	
+			}
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}
 	}
 
-	public void loadGoogleAppAccount(){
+	private void loadGoogleAppAccount(){
 		Statement stmt;
 		tbGgAppMode = new DefaultTableModel();
 		try
