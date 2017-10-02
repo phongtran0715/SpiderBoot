@@ -25,6 +25,7 @@ import com.google.api.services.youtube.model.PlaylistItemListResponse;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,7 +34,7 @@ import java.util.List;
  *
  * @author Jeremy Walker
  */
-public class MyUploads {
+public class ChannelInfo {
 
     /**
      * Define a global instance of a Youtube object, which will be used
@@ -80,40 +81,32 @@ public class MyUploads {
                 // The user's default channel is the first item in the list.
                 // Extract the playlist ID for the channel's videos from the
                 // API response.
-//                String uploadPlaylistId =
-//                        channelsList.get(0).getContentDetails().getRelatedPlaylists().getUploads();
-                String uploadPlaylistId = "UUgGttbDvptiImN1GJkmPdWA";
-                
+
                 // Define a list to store items in the list of uploaded videos.
-                List<PlaylistItem> playlistItemList = new ArrayList<PlaylistItem>();
+                List<Channel> channelItemList = new ArrayList<Channel>();
+                
+                HashMap<String, String> parameters = new HashMap<>();
+                parameters.put("part", "snippet,contentDetails,statistics");
+                parameters.put("id", "UCgGttbDvptiImN1GJkmPdWA");
+                YouTube.Channels.List channelsListByIdRequest = youtube.channels().list(parameters.get("part").toString());
+                if (parameters.containsKey("id") && parameters.get("id") != "") {
+                    channelsListByIdRequest.setId(parameters.get("id").toString());
+                    String nextToken = "";
 
-                // Retrieve the playlist of the channel's uploaded videos.
-                YouTube.PlaylistItems.List playlistItemRequest =
-                        youtube.playlistItems().list("id,contentDetails,snippet");
-                playlistItemRequest.setPlaylistId(uploadPlaylistId);
+                    // Call the API one or more times to retrieve all items in the
+                    // list. As long as the API response returns a nextPageToken,
+                    // there are still more items to retrieve.
+                    do {
+                    	channelsListByIdRequest.setPageToken(nextToken);
+                    	ChannelListResponse response = channelsListByIdRequest.execute();
+                    	channelItemList.addAll(response.getItems());
 
-                // Only retrieve data used in this application, thereby making
-                // the application more efficient. See:
-                // https://developers.google.com/youtube/v3/getting-started#partial
-                playlistItemRequest.setFields(
-                        "items(contentDetails/videoId,snippet/title,snippet/publishedAt),nextPageToken,pageInfo");
+                        nextToken = response.getNextPageToken();
+                    } while (nextToken != null);
 
-                String nextToken = "";
-
-                // Call the API one or more times to retrieve all items in the
-                // list. As long as the API response returns a nextPageToken,
-                // there are still more items to retrieve.
-                do {
-                    playlistItemRequest.setPageToken(nextToken);
-                    PlaylistItemListResponse playlistItemResult = playlistItemRequest.execute();
-
-                    playlistItemList.addAll(playlistItemResult.getItems());
-
-                    nextToken = playlistItemResult.getNextPageToken();
-                } while (nextToken != null);
-
-                // Prints information about the results.
-                prettyPrint(playlistItemList.size(), playlistItemList.iterator());
+                    // Prints information about the results.
+                    prettyPrint(channelItemList.size(), channelItemList.iterator());
+                }
             }
 
         } catch (GoogleJsonResponseException e) {
@@ -133,16 +126,20 @@ public class MyUploads {
      *
      * @param iterator of Playlist Items from uploaded Playlist
      */
-    private static void prettyPrint(int size, Iterator<PlaylistItem> playlistEntries) {
+    private static void prettyPrint(int size, Iterator<Channel> channelEntries) {
         System.out.println("=============================================================");
         System.out.println("\t\tTotal Videos Uploaded: " + size);
         System.out.println("=============================================================\n");
 
-        while (playlistEntries.hasNext()) {
-            PlaylistItem playlistItem = playlistEntries.next();
-            System.out.println(" video name  = " + playlistItem.getSnippet().getTitle());
-            System.out.println(" video id    = " + playlistItem.getContentDetails().getVideoId());
-            System.out.println(" upload date = " + playlistItem.getSnippet().getPublishedAt());
+        while (channelEntries.hasNext()) {
+            Channel channelItem = channelEntries.next();
+            System.out.println(" channel name  = " + channelItem.getSnippet().getTitle());
+            System.out.println(" thumbnail  = " + channelItem.getSnippet().getThumbnails().getDefault().getUrl());
+            System.out.println(" video count  = " + channelItem.getStatistics().getVideoCount());
+            System.out.println(" view count  = " + channelItem.getStatistics().getViewCount());
+            
+            System.out.println(" upload date = " + channelItem.getSnippet().getPublishedAt());
+            System.out.println(" uploaded playlist = " + channelItem.getContentDetails().getRelatedPlaylists().getUploads());
             System.out.println("\n-------------------------------------------------------------\n");
         }
     }

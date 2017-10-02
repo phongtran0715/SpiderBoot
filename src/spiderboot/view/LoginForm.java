@@ -2,7 +2,6 @@ package spiderboot.view;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
@@ -25,6 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -32,8 +32,6 @@ import javax.swing.border.TitledBorder;
 import spiderboot.configuration.ConfigProperties;
 import spiderboot.databaseconnection.MySqlAccess;
 import spiderboot.helper.ImagePanel;
-import spiderboot.helper.Util;
-import javax.swing.SwingConstants;
 
 public class LoginForm extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -42,34 +40,11 @@ public class LoginForm extends JFrame {
 	private JPasswordField txtPassword;
 	static LoginForm frame;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					frame = new LoginForm();
-					Util util = new Util();
-					boolean isRunning  = Util.checkIfRunning();
-					if(!isRunning){
-						onStartApplication();
-						frame.setVisible(true);
-					}else{
-						JOptionPane.showMessageDialog(frame, "Application is already running!", 
-									"Information", JOptionPane.INFORMATION_MESSAGE);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+	public LoginForm() {
+		initialize();
 	}
 
-	/**
-	 * Create the frame.
-	 */
-	public LoginForm() {
+	private void initialize(){
 		setResizable(false);
 
 		setIconImage(Toolkit.getDefaultToolkit().getImage(LoginForm.class.getResource("/spiderboot/resources/resource/icon_32x32/user_32x32.png")));
@@ -143,7 +118,7 @@ public class LoginForm extends JFrame {
 						}catch(SQLException ex){
 							System.out.println(ex.toString());
 						}
-						MainForm window = new MainForm();
+						HomeForm window = new HomeForm();
 						window.setVisible(true);
 						setVisible(false);
 					}
@@ -188,7 +163,7 @@ public class LoginForm extends JFrame {
 						}catch(SQLException ex){
 							System.out.println(ex.toString());
 						}
-						MainForm window = new MainForm();
+						HomeForm window = new HomeForm();
 						window.setVisible(true);
 						setVisible(false);
 					}
@@ -259,8 +234,8 @@ public class LoginForm extends JFrame {
 					}else{
 						ConfigProperties.getInstance().writeProperties("RememberMe", "No");
 					}
-					
-					MainForm window = new MainForm();
+
+					HomeForm window = new HomeForm();
 					window.setVisible(true);
 					setVisible(false);
 				}
@@ -270,12 +245,12 @@ public class LoginForm extends JFrame {
 		btnOk.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnOk.setBounds(274, 285, 118, 38);
 		contentPane.add(btnOk);
-		
+
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
-				String rememberMe = ConfigProperties.getInstance().getProperties("RememberMe");
-				String lastUserName =  ConfigProperties.getInstance().getProperties("LastUserName");
+				String rememberMe = ConfigProperties.getInstance().getProperties("RememberMe", null);
+				String lastUserName =  ConfigProperties.getInstance().getProperties("LastUserName", null);
 				if(rememberMe == null){
 					return;
 				}
@@ -287,21 +262,5 @@ public class LoginForm extends JFrame {
 				}
 			}
 		});
-	}
-
-	private static void onStartApplication() {
-		//open database connection
-		int errCode = MySqlAccess.getInstance().DBConnect();
-		if(errCode == 0){
-			System.out.println("Open connection successful");
-		}else{
-			System.out.println("Open connection false.");
-			JOptionPane.showMessageDialog(frame, "Can not connect to database server. \n "
-					+ "Please check your server configuration!",
-					"Error", JOptionPane.OK_OPTION);
-		}
-		
-		//load configuration file
-		ConfigProperties.getInstance().loadConfigFile();
 	}
 }

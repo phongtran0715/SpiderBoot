@@ -6,8 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Properties;
 
 public class ConfigProperties {
@@ -23,12 +21,14 @@ public class ConfigProperties {
 		return instance;
 	}
 
-	public void loadConfigFile() {
+	public boolean loadConfigFile() {
+		boolean isOk = false;
 		InputStream inputStream;
 		try {
 			inputStream = this.getClass().getClassLoader().getResourceAsStream("config.properties");
 			prop = new Properties();
 			prop.load(inputStream);
+			isOk = true;
 			System.out.println("Load configuration file successful!");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -36,6 +36,7 @@ public class ConfigProperties {
 		}catch (IOException e){
 			e.printStackTrace();
 		}
+		return isOk;
 	}
 
 	public void writeProperties(String key, String value) {
@@ -51,9 +52,9 @@ public class ConfigProperties {
 		}
 	}
 
-	public String getProperties(String key) {
+	public String getProperties(String key, String defaultValue) {
 		String value = "";
-		value = prop.getProperty(key);
+		value = prop.getProperty(key, defaultValue);
 		return value;
 	}
 	
