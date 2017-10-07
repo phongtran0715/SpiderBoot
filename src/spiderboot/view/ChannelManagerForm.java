@@ -43,7 +43,7 @@ public class ChannelManagerForm extends JFrame {
 	public DefaultTableModel tbMapChanelMode = new DefaultTableModel();
 
 	public ChannelManagerForm() {
-		
+
 		initialize();
 		loadHomeChannel();
 	}
@@ -58,7 +58,7 @@ public class ChannelManagerForm extends JFrame {
 		//set center screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		setLocation(dim.width/2- getSize().width/2, dim.height/2- getSize().height/2);
-		
+
 		JTabbedPane pnChannelManager = new JTabbedPane(JTabbedPane.TOP);
 		pnChannelManager.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
@@ -76,23 +76,23 @@ public class ChannelManagerForm extends JFrame {
 		});
 		pnChannelManager.setBounds(5, 5, 1012, 596);
 		getContentPane().add(pnChannelManager);
-		
+
 		JPanel pnHomeChannel = new JPanel();
 		pnChannelManager.addTab("Home Spider Channel", new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/user_16x16.png")), pnHomeChannel, null);
 		pnHomeChannel.setLayout(null);
-		
+
 		JPanel pnHomeChannelList = new JPanel();
 		pnHomeChannelList.setBorder(new TitledBorder(null, "Channel List", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		pnHomeChannelList.setBounds(5, 5, 992, 501);
 		pnHomeChannel.add(pnHomeChannelList);
 		pnHomeChannelList.setLayout(null);
-		
+
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.addKeyListener(new KeyAdapter() {
 		});
 		scrollPane_1.setBounds(10, 21, 970, 470);
 		pnHomeChannelList.add(scrollPane_1);
-		
+
 		tbHomeChannel = new JTable(){
 			private static final long serialVersionUID = 1L;
 
@@ -129,7 +129,7 @@ public class ChannelManagerForm extends JFrame {
 		});
 		scrollPane_1.setViewportView(tbHomeChannel);
 		tbHomeChannel.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		
+
 		JButton btnAddHomeChannel = new JButton("Add new");
 		btnAddHomeChannel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -143,7 +143,7 @@ public class ChannelManagerForm extends JFrame {
 		btnAddHomeChannel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnAddHomeChannel.setBounds(10, 517, 118, 38);
 		pnHomeChannel.add(btnAddHomeChannel);
-		
+
 		JButton btnModifyHomeChannel = new JButton("Edit");
 		btnModifyHomeChannel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -172,7 +172,7 @@ public class ChannelManagerForm extends JFrame {
 		btnModifyHomeChannel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnModifyHomeChannel.setBounds(170, 517, 118, 38);
 		pnHomeChannel.add(btnModifyHomeChannel);
-		
+
 		JButton btnDeleteHomeChannel = new JButton("Delete");
 		btnDeleteHomeChannel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -207,7 +207,7 @@ public class ChannelManagerForm extends JFrame {
 		btnDeleteHomeChannel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnDeleteHomeChannel.setBounds(334, 517, 118, 38);
 		pnHomeChannel.add(btnDeleteHomeChannel);
-		
+
 		JButton button_3 = new JButton("Exit");
 		button_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -218,21 +218,21 @@ public class ChannelManagerForm extends JFrame {
 		button_3.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		button_3.setBounds(879, 517, 118, 38);
 		pnHomeChannel.add(button_3);
-		
+
 		JPanel pnMonitorChannel = new JPanel();
 		pnChannelManager.addTab("Monitor Spider Channel", new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/google-plus16x16.png")), pnMonitorChannel, null);
 		pnMonitorChannel.setLayout(null);
-		
+
 		JPanel pnMonitorChannelList = new JPanel();
 		pnMonitorChannelList.setBorder(new TitledBorder(null, "Channel List", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		pnMonitorChannelList.setBounds(5, 5, 992, 500);
 		pnMonitorChannel.add(pnMonitorChannelList);
 		pnMonitorChannelList.setLayout(null);
-		
+
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 21, 970, 470);
 		pnMonitorChannelList.add(scrollPane);
-		
+
 		tbMonitorChannel = new JTable(){
 			private static final long serialVersionUID = 1L;
 
@@ -263,7 +263,7 @@ public class ChannelManagerForm extends JFrame {
 		});
 		scrollPane.setViewportView(tbMonitorChannel);
 		tbMonitorChannel.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		
+
 		JButton btnAddMonitorChannel = new JButton("Add new");
 		btnAddMonitorChannel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -277,7 +277,7 @@ public class ChannelManagerForm extends JFrame {
 		btnAddMonitorChannel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnAddMonitorChannel.setBounds(10, 517, 118, 38);
 		pnMonitorChannel.add(btnAddMonitorChannel);
-		
+
 		JButton btnModifyMonitorChannel = new JButton("Edit");
 		btnModifyMonitorChannel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -300,7 +300,7 @@ public class ChannelManagerForm extends JFrame {
 		btnModifyMonitorChannel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnModifyMonitorChannel.setBounds(170, 517, 118, 38);
 		pnMonitorChannel.add(btnModifyMonitorChannel);
-		
+
 		JButton btnDeleteMonitorChannel = new JButton("Delete");
 		btnDeleteMonitorChannel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -334,7 +334,7 @@ public class ChannelManagerForm extends JFrame {
 		btnDeleteMonitorChannel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnDeleteMonitorChannel.setBounds(334, 517, 118, 38);
 		pnMonitorChannel.add(btnDeleteMonitorChannel);
-		
+
 		JButton btnExit = new JButton("Exit");
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -345,21 +345,21 @@ public class ChannelManagerForm extends JFrame {
 		btnExit.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnExit.setBounds(879, 517, 118, 38);
 		pnMonitorChannel.add(btnExit);
-		
+
 		JPanel pnMappingChannel = new JPanel();
 		pnChannelManager.addTab("Home-Monitor Mapping", null, pnMappingChannel, null);
 		pnMappingChannel.setLayout(null);
-		
+
 		JPanel pnMapChannel = new JPanel();
 		pnMapChannel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Mapping List", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		pnMapChannel.setBounds(5, 5, 992, 506);
 		pnMappingChannel.add(pnMapChannel);
 		pnMapChannel.setLayout(null);
-		
+
 		JScrollPane scrollPane_2 = new JScrollPane();
 		scrollPane_2.setBounds(10, 21, 970, 470);
 		pnMapChannel.add(scrollPane_2);
-		
+
 		tbMapChannel = new JTable(){
 			private static final long serialVersionUID = 1L;
 
@@ -393,7 +393,7 @@ public class ChannelManagerForm extends JFrame {
 		scrollPane_2.setViewportView(tbMapChannel);
 		tbMapChannel.setFillsViewportHeight(true);
 		tbMapChannel.setBackground(UIManager.getColor("Button.disabledShadow"));
-		
+
 		JButton button_4 = new JButton("Exit");
 		button_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -403,7 +403,7 @@ public class ChannelManagerForm extends JFrame {
 		button_4.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		button_4.setBounds(879, 517, 118, 38);
 		pnMappingChannel.add(button_4);
-		
+
 		JButton btnAddMappingTable = new JButton("Add new");
 		btnAddMappingTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -416,7 +416,7 @@ public class ChannelManagerForm extends JFrame {
 		btnAddMappingTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnAddMappingTable.setBounds(5, 517, 118, 38);
 		pnMappingChannel.add(btnAddMappingTable);
-		
+
 		JButton btnEditMappingTable = new JButton("Edit");
 		btnEditMappingTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -439,7 +439,7 @@ public class ChannelManagerForm extends JFrame {
 		btnEditMappingTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnEditMappingTable.setBounds(165, 517, 118, 38);
 		pnMappingChannel.add(btnEditMappingTable);
-		
+
 		JButton btnDeleteMappingTable = new JButton("Delete");
 		btnDeleteMappingTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -473,7 +473,7 @@ public class ChannelManagerForm extends JFrame {
 		btnDeleteMappingTable.setBounds(329, 517, 118, 38);
 		pnMappingChannel.add(btnDeleteMappingTable);
 	}
-	
+
 	private void loadHomeChannel() {
 		tbHomeChannelMode = new DefaultTableModel();
 		Statement stmt;
@@ -502,13 +502,16 @@ public class ChannelManagerForm extends JFrame {
 			}
 			tbHomeChannelMode.setDataVector(data, columnNames);
 			if(tbHomeChannelMode != null){
-				tbHomeChannel.setModel(tbHomeChannelMode);	
+				tbHomeChannel.setModel(tbHomeChannelMode);
+				//Hide id column
+				tbHomeChannel.getColumnModel().getColumn(0).setMinWidth(0);
+				tbHomeChannel.getColumnModel().getColumn(0).setMaxWidth(0);	
 			}
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}
 	}
-	
+
 	private void loadMonitorChannel() {
 		tbMonitorChanelMode = new DefaultTableModel();
 		Statement stmt;
@@ -537,19 +540,26 @@ public class ChannelManagerForm extends JFrame {
 			}
 			tbMonitorChanelMode.setDataVector(data, columnNames);
 			if(tbMonitorChanelMode != null){
-				tbMonitorChannel.setModel(tbMonitorChanelMode);	
+				tbMonitorChannel.setModel(tbMonitorChanelMode);
+				//Hide id column
+				tbMonitorChannel.getColumnModel().getColumn(0).setMinWidth(0);
+				tbMonitorChannel.getColumnModel().getColumn(0).setMaxWidth(0);	
 			}
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}
 	}
-	
+
 	private void loadMappingTable() {
 		tbMapChanelMode = new DefaultTableModel();
 		Statement stmt;
 		try
 		{
-			String query = "SELECT * FROM home_monitor_channel_mapping;";
+			String query = "SELECT map .Id, map.HomeChannelId, home.ChannelName, map.MonitorChannelId, "
+					+ " monitor.ChannelName, map.TimeIntervalSync"
+					+ " FROM home_monitor_channel_mapping AS map"
+					+ " JOIN home_channel_list AS home ON(map.HomeChannelId = home.ChannelId)"
+					+ " JOIN monitor_channel_list AS monitor ON (map.MonitorChannelId = monitor.ChannelId);";
 			stmt = MySqlAccess.getInstance().connect.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 			ResultSetMetaData metaData = rs.getMetaData();
@@ -572,7 +582,10 @@ public class ChannelManagerForm extends JFrame {
 			}
 			tbMapChanelMode.setDataVector(data, columnNames);
 			if(tbMapChanelMode != null){
-				tbMapChannel.setModel(tbMapChanelMode);	
+				tbMapChannel.setModel(tbMapChanelMode);
+				//Hide id column
+				tbMapChannel.getColumnModel().getColumn(0).setMinWidth(0);
+				tbMapChannel.getColumnModel().getColumn(0).setMaxWidth(0);	
 			}
 		}catch(Exception ex){
 			ex.printStackTrace();

@@ -14,20 +14,18 @@
 
 package com.google.api.services.samples.youtube.cmdline.data;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.samples.youtube.cmdline.Auth;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.Channel;
 import com.google.api.services.youtube.model.ChannelListResponse;
-import com.google.api.services.youtube.model.PlaylistItem;
-import com.google.api.services.youtube.model.PlaylistItemListResponse;
 import com.google.common.collect.Lists;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Print a list of videos uploaded to the authenticated user's YouTube channel.
@@ -50,8 +48,9 @@ public class ChannelInfo {
      *
      * @param args command line args (not used).
      */
-    public static void main(String[] args) {
+    public List<Channel> getChannelInfor(String channelId) {
 
+    	List<Channel> cResult = null;
         // This OAuth 2.0 access scope allows for read-only access to the
         // authenticated user's account, but not other types of account access.
         List<String> scopes = Lists.newArrayList("https://www.googleapis.com/auth/youtube.readonly");
@@ -87,7 +86,7 @@ public class ChannelInfo {
                 
                 HashMap<String, String> parameters = new HashMap<>();
                 parameters.put("part", "snippet,contentDetails,statistics");
-                parameters.put("id", "UCgGttbDvptiImN1GJkmPdWA");
+                parameters.put("id", channelId);
                 YouTube.Channels.List channelsListByIdRequest = youtube.channels().list(parameters.get("part").toString());
                 if (parameters.containsKey("id") && parameters.get("id") != "") {
                     channelsListByIdRequest.setId(parameters.get("id").toString());
@@ -100,12 +99,12 @@ public class ChannelInfo {
                     	channelsListByIdRequest.setPageToken(nextToken);
                     	ChannelListResponse response = channelsListByIdRequest.execute();
                     	channelItemList.addAll(response.getItems());
-
                         nextToken = response.getNextPageToken();
                     } while (nextToken != null);
 
                     // Prints information about the results.
-                    prettyPrint(channelItemList.size(), channelItemList.iterator());
+                    //prettyPrint(channelItemList.size(), channelItemList.iterator());
+                    cResult = channelItemList;
                 }
             }
 
@@ -117,6 +116,7 @@ public class ChannelInfo {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+        return cResult;
     }
 
     /*

@@ -12,6 +12,9 @@ public class MainSpiderBoot {
 	static int ERR_LOAD_CONFIG_PROPERTIES_FALSE		=	1;
 	static int ERR_LOAD_DATABASE_FALSE				=	2;
 	
+	/**
+	 * @wbp.parser.entryPoint
+	 */
 	public static void main(String[] args) {
 		int errCode  = preLoad();
 		if(errCode == SUCCESSFUL){

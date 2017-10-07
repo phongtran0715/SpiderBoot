@@ -1,6 +1,7 @@
 package spiderboot.view;
 
 import java.awt.Color;
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
@@ -23,6 +24,8 @@ import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
 import spiderboot.helper.ImagePanel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class HomeForm extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -237,6 +240,13 @@ public class HomeForm extends JFrame {
 		menuBar.add(mnTool);
 		
 		JMenuItem mntmViewChannelInfo = new JMenuItem("View Channel Info");
+		mntmViewChannelInfo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ViewChannelInfo viewCInfoFrm = new ViewChannelInfo();
+				viewCInfoFrm.setModalityType(ModalityType.APPLICATION_MODAL);
+				viewCInfoFrm.setVisible(true);
+			}
+		});
 		mntmViewChannelInfo.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		mntmViewChannelInfo.setIcon(new ImageIcon(HomeForm.class.getResource("/spiderboot/resources/resource/icon_16x16/eye_16x16.png")));
 		mntmViewChannelInfo.setHorizontalAlignment(SwingConstants.CENTER);

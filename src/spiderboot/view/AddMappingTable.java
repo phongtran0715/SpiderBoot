@@ -27,9 +27,6 @@ public class AddMappingTable extends JDialog {
 	private JTextField txtMonitorChannelID;
 	private JTextField txtTimeSync;
 
-	/**
-	 * Create the dialog.
-	 */
 	public AddMappingTable() {
 		setTitle("Add new mapping channel");
 		setBounds(100, 100, 340, 249);

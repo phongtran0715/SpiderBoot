@@ -42,13 +42,13 @@ public class ModifyMonitorChannel extends JDialog {
 	public ModifyMonitorChannel(int id, String channelId, String channelName) {
 		initialiaze();
 		this.id = id;
-		txtChannelId.setText(channelName);
+		txtChannelId.setText(channelId);
 		txtChannelName.setText(channelName);
 	}
 
 	private void initialiaze() {
 		setTitle("Modify monitor channel");
-		setBounds(100, 100, 582, 514);
+		setBounds(100, 100, 466, 215);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -59,7 +59,7 @@ public class ModifyMonitorChannel extends JDialog {
 
 		JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel.setBounds(5, 5, 561, 412);
+		panel.setBounds(5, 5, 442, 115);
 		contentPanel.add(panel);
 		panel.setLayout(null);
 
@@ -86,7 +86,7 @@ public class ModifyMonitorChannel extends JDialog {
 		txtChannelName.setColumns(10);
 
 		JButton btnOk = new JButton("OK");
-		btnOk.setBounds(310, 428, 118, 38);
+		btnOk.setBounds(201, 131, 118, 38);
 		contentPanel.add(btnOk);
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -122,7 +122,7 @@ public class ModifyMonitorChannel extends JDialog {
 		btnOk.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
 		JButton btnExit = new JButton("Exit");
-		btnExit.setBounds(438, 428, 118, 38);
+		btnExit.setBounds(329, 131, 118, 38);
 		contentPanel.add(btnExit);
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {

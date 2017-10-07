@@ -171,7 +171,7 @@ public class AccountManagerForm extends JFrame {
 						"Question",JOptionPane.OK_CANCEL_OPTION);
 				if(result == JOptionPane.OK_OPTION){
 					int accId = (int) tbSpiderHome.getValueAt(selectedRow, 0);
-					String query = "DELETE FROM spideraccount WHERE Id = ? ;";
+					String query = "DELETE FROM spider_account WHERE Id = ? ;";
 					PreparedStatement preparedStm;
 					try {
 						preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
@@ -313,7 +313,7 @@ public class AccountManagerForm extends JFrame {
 						"Question",JOptionPane.OK_CANCEL_OPTION);
 				if(result == JOptionPane.OK_OPTION){
 					int accId = (int) tbGoogleApp.getValueAt(selectedRow, 0);
-					String query = "DELETE FROM googleaccount WHERE Id = ? ;";
+					String query = "DELETE FROM google_account WHERE Id = ? ;";
 					PreparedStatement preparedStm;
 					try {
 						preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
@@ -322,8 +322,6 @@ public class AccountManagerForm extends JFrame {
 						//reload jtable
 						//DefaultTableModel model = (DefaultTableModel)tbGoogleApp.getModel();
 						tbGgAppMode.removeRow(selectedRow);
-						//JOptionPane.showMessageDialog(pnAccountManager, "Delete item successfuly!");
-
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -350,7 +348,7 @@ public class AccountManagerForm extends JFrame {
 		btnExit.setBounds(585, 413, 118, 38);
 		pnGoogleApp.add(btnExit);
 	}
-	
+
 	private void loadSpiderBootAccount(){
 		tbSpiderMode = new DefaultTableModel();
 		Statement stmt;
@@ -378,12 +376,13 @@ public class AccountManagerForm extends JFrame {
 				data.add(vector);
 			}
 			tbSpiderMode.setDataVector(data, columnNames);
-			if(tbSpiderMode != null){
-				tbSpiderHome.setModel(tbSpiderMode);
-				//Hide password column
-				tbSpiderHome.getColumnModel().getColumn(2).setMinWidth(0);
-				tbSpiderHome.getColumnModel().getColumn(2).setMaxWidth(0);	
-			}
+			tbSpiderHome.setModel(tbSpiderMode);
+			//Hide id column
+			tbSpiderHome.getColumnModel().getColumn(0).setMinWidth(0);
+			tbSpiderHome.getColumnModel().getColumn(0).setMaxWidth(0);
+			//Hide password column
+			tbSpiderHome.getColumnModel().getColumn(2).setMinWidth(0);
+			tbSpiderHome.getColumnModel().getColumn(2).setMaxWidth(0);	
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}
@@ -418,6 +417,9 @@ public class AccountManagerForm extends JFrame {
 			}
 			tbGgAppMode.setDataVector(data, columnNames);
 			tbGoogleApp.setModel(tbGgAppMode);
+			//Hide password column
+			tbGoogleApp.getColumnModel().getColumn(0).setMinWidth(0);
+			tbGoogleApp.getColumnModel().getColumn(0).setMaxWidth(0);
 			//Hide password column
 			tbGoogleApp.getColumnModel().getColumn(2).setMinWidth(0);
 			tbGoogleApp.getColumnModel().getColumn(2).setMaxWidth(0);
