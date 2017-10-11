@@ -1,18 +1,24 @@
 package spiderboot.view;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -27,15 +33,15 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import com.google.api.services.samples.youtube.cmdline.data.ChannelInfo;
 import com.google.api.services.youtube.model.Channel;
 
 import spiderboot.databaseconnection.MySqlAccess;
-
-import javax.swing.ImageIcon;
 
 public class ViewChannelInfo extends JDialog {
 	private static final long serialVersionUID = 1L;
@@ -91,11 +97,11 @@ public class ViewChannelInfo extends JDialog {
 				tbResultMode.setRowCount(0);
 				String [] lists = cIds.split(";");
 				ChannelInfo cInfo = new ChannelInfo();
+				int count = 1;
 				for(int i = 0; i < lists.length; i++){
 					List<Channel> cResult = cInfo.getChannelInfor(lists[i].trim());
 					if(cResult != null){
 						Iterator<Channel> channelEntries = cResult.iterator();
-						int count = 1;
 						while (channelEntries.hasNext()) {
 							Channel channelItem = channelEntries.next();
 							String cId = lists[i].trim();
@@ -103,10 +109,34 @@ public class ViewChannelInfo extends JDialog {
 							String viewCount = channelItem.getStatistics().getViewCount().toString();
 							String totalSubs = channelItem.getStatistics().getSubscriberCount().toString();
 							String totalVideo = channelItem.getStatistics().getVideoCount().toString();
-							tbResultMode.addRow(new Object[]{Integer.toString(count++) , cId, cName, viewCount, totalSubs, totalVideo});
+							String fullUrlPath = channelItem.getSnippet().getThumbnails().getDefault().getUrl();
+							System.out.println(fullUrlPath);
+							URL url = null;
+							BufferedImage img = null;
+							ImageIcon cIcon = null;
+							JLabel lable = new JLabel();
+							try {
+								url = new URL(fullUrlPath);
+								img = ImageIO.read(url);
+								cIcon = new ImageIcon(img);
+								lable.setIcon(cIcon);
+							} catch (MalformedURLException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}catch (IOException e2) {
+								// TODO Auto-generated catch block
+								e2.printStackTrace();
+							}
+							if(cIcon != null){
+								tbResultMode.addRow(new Object[]{Integer.toString(count) , cId, cName, viewCount, totalSubs, totalVideo, lable});	
+							}else{
+								tbResultMode.addRow(new Object[]{Integer.toString(count) , cId, cName, viewCount, totalSubs, totalVideo, ""});
+							}
 						}
 					}
+					count ++;
 				}
+				tbResult.getColumn("Icon").setCellRenderer(new LableRenderer());
 			}
 		});
 		btnView.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -125,7 +155,7 @@ public class ViewChannelInfo extends JDialog {
 
 		tbResultMode = new DefaultTableModel(new Object[][] {
 		},new String[] {
-				"STT", "Channel ID", "Channel Name", "View Count", "Total Subscriber", "Total Video"
+				"STT", "Channel ID", "Channel Name", "View Count", "Total Subscriber", "Total Video", "Icon"
 		});
 
 		tbResult = new JTable(tbResultMode);
@@ -133,6 +163,26 @@ public class ViewChannelInfo extends JDialog {
 		tbResult.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tbResult.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		tbResult.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+		tbResult.setRowHeight(90);
+		//set column size
+		tbResult.getColumn("STT").setMaxWidth(30);
+		tbResult.getColumn("STT").setMinWidth(30);
+		tbResult.getColumn("Channel ID").setMinWidth(210);
+		tbResult.getColumn("Channel ID").setMinWidth(210);
+		tbResult.getColumn("View Count").setMaxWidth(120);
+		tbResult.getColumn("View Count").setMinWidth(120);
+		tbResult.getColumn("Total Subscriber").setMaxWidth(150);
+		tbResult.getColumn("Total Subscriber").setMinWidth(150);
+		tbResult.getColumn("Total Video").setMaxWidth(120);
+		tbResult.getColumn("Total Video").setMinWidth(120);
+		
+		//center data in jtable cell
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+		for(int i = 0; i < tbResult.getColumnCount(); i++){
+			tbResult.getColumnModel().getColumn(i).setCellRenderer( centerRenderer );	
+		}
+		
 		scrollPane.setViewportView(tbResult);
 
 		TableColumn column = null;
@@ -237,5 +287,16 @@ public class ViewChannelInfo extends JDialog {
 			ex.printStackTrace();
 		}
 		return cIdList;
+	}
+
+	class LableRenderer implements TableCellRenderer{
+		
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+				int row, int column) {
+			// TODO Auto-generated method stub
+			return (Component)value;
+		}
+		
 	}
 }
