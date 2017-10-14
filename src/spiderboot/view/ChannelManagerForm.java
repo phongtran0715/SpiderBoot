@@ -15,23 +15,32 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import spiderboot.databaseconnection.MySqlAccess;
+import spiderboot.helper.ButtonEditor;
+import spiderboot.helper.ButtonRenderer;
+import spiderboot.helper.MyTimerTask;
 
 public class ChannelManagerForm extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -41,9 +50,10 @@ public class ChannelManagerForm extends JFrame {
 	public DefaultTableModel tbHomeChannelMode = new DefaultTableModel();
 	public DefaultTableModel tbMonitorChanelMode = new DefaultTableModel();
 	public DefaultTableModel tbMapChanelMode = new DefaultTableModel();
+	DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+	HashMap<Integer, Timer> timerMap = new HashMap<Integer, Timer>();
 
 	public ChannelManagerForm() {
-
 		initialize();
 		loadHomeChannel();
 	}
@@ -60,6 +70,7 @@ public class ChannelManagerForm extends JFrame {
 		setLocation(dim.width/2- getSize().width/2, dim.height/2- getSize().height/2);
 
 		JTabbedPane pnChannelManager = new JTabbedPane(JTabbedPane.TOP);
+		pnChannelManager.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		pnChannelManager.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				int tabIndex = pnChannelManager.getSelectedIndex();
@@ -129,6 +140,13 @@ public class ChannelManagerForm extends JFrame {
 		});
 		scrollPane_1.setViewportView(tbHomeChannel);
 		tbHomeChannel.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		tbHomeChannel.setRowHeight(25);
+		//center data in jtable cell
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+		for(int i = 0; i < tbHomeChannel.getColumnCount(); i++){
+			tbHomeChannel.getColumnModel().getColumn(i).setCellRenderer( centerRenderer );	
+		}
 
 		JButton btnAddHomeChannel = new JButton("Add new");
 		btnAddHomeChannel.addActionListener(new ActionListener() {
@@ -263,6 +281,13 @@ public class ChannelManagerForm extends JFrame {
 		});
 		scrollPane.setViewportView(tbMonitorChannel);
 		tbMonitorChannel.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		tbMonitorChannel.setRowHeight(25);
+		//center data in jtable cell
+
+		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+		for(int i = 0; i < tbMonitorChannel.getColumnCount(); i++){
+			tbMonitorChannel.getColumnModel().getColumn(i).setCellRenderer( centerRenderer );	
+		}
 
 		JButton btnAddMonitorChannel = new JButton("Add new");
 		btnAddMonitorChannel.addActionListener(new ActionListener() {
@@ -363,36 +388,30 @@ public class ChannelManagerForm extends JFrame {
 		tbMapChannel = new JTable(){
 			private static final long serialVersionUID = 1L;
 
-			public boolean isCellEditable(int row, int column) {                
-				return false;               
-			};
+			//			public boolean isCellEditable(int row, int column) {                
+			//				return false;               
+			//			};
 		};
 		tbMapChannel.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				if(arg0.getClickCount() == 2){
-					int rIndex =  tbMapChannel.getSelectedRow();
-					if(rIndex == -1){
-						JOptionPane.showMessageDialog(pnHomeChannel, "Please select one row to edit !");
-						return;
-					}else{
-						int id = (int)tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("Id").getModelIndex());
-						String cHomeID = (String)tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("HomeChannelId").getModelIndex());
-						String cMonitorId = (String)tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("MonitorChannelId").getModelIndex());
-						int timeSync = (int)tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("TimeIntervalSync").getModelIndex());
-						ModifyMappingTable modMapTableFrm = new ModifyMappingTable(id, cHomeID, cMonitorId, timeSync);
-						modMapTableFrm.setModalityType(ModalityType.APPLICATION_MODAL);
-						modMapTableFrm.setVisible(true);
-						loadMappingTable();
-					}
-				}
+			public void mouseClicked(MouseEvent e) {
+				int sel = tbMapChannel.getSelectedRow();
 			}
 		});
+		tbMapChannel.setColumnSelectionAllowed(true);
+		tbMapChannel.setCellSelectionEnabled(true);
+		tbMapChannel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		tbMapChannel.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		tbMapChannel.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
 		scrollPane_2.setViewportView(tbMapChannel);
 		tbMapChannel.setFillsViewportHeight(true);
+		tbMapChannel.setRowHeight(25);
 		tbMapChannel.setBackground(UIManager.getColor("Button.disabledShadow"));
+		//center data in jtable cell
+		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+		for(int i = 0; i < tbMapChannel.getColumnCount(); i++){
+			tbMapChannel.getColumnModel().getColumn(i).setCellRenderer( centerRenderer );	
+		}
 
 		JButton button_4 = new JButton("Exit");
 		button_4.addActionListener(new ActionListener() {
@@ -555,8 +574,8 @@ public class ChannelManagerForm extends JFrame {
 		Statement stmt;
 		try
 		{
-			String query = "SELECT map .Id, map.HomeChannelId, home.ChannelName, map.MonitorChannelId, "
-					+ " monitor.ChannelName, map.TimeIntervalSync"
+			String query = "SELECT map.Id, map.HomeChannelId, home.ChannelName, map.MonitorChannelId,"
+					+ " monitor.ChannelName, map.TimeIntervalSync, map.StatusSync, map.Action"
 					+ " FROM home_monitor_channel_mapping AS map"
 					+ " JOIN home_channel_list AS home ON(map.HomeChannelId = home.ChannelId)"
 					+ " JOIN monitor_channel_list AS monitor ON (map.MonitorChannelId = monitor.ChannelId);";
@@ -576,7 +595,24 @@ public class ChannelManagerForm extends JFrame {
 			while (rs.next()) {
 				Vector<Object> vector = new Vector<Object>();
 				for (int i = 1; i <= columnCount; i++) {
-					vector.add(rs.getObject(i));	
+					String name = metaData.getColumnName(i);
+					if(name.equals("StatusSync")){
+						int value = (int)rs.getObject(i);
+						if(value == 0){
+							vector.add("Stopped");
+						}else{
+							vector.add("Running");
+						}
+					}else if(name.equals("Action")){
+						int value = (int)rs.getObject(i);
+						if(value == 1){
+							vector.add("Run");
+						}else{
+							vector.add("Stop");
+						}
+					}else{
+						vector.add(rs.getObject(i));	
+					}
 				}
 				data.add(vector);
 			}
@@ -585,10 +621,51 @@ public class ChannelManagerForm extends JFrame {
 				tbMapChannel.setModel(tbMapChanelMode);
 				//Hide id column
 				tbMapChannel.getColumnModel().getColumn(0).setMinWidth(0);
-				tbMapChannel.getColumnModel().getColumn(0).setMaxWidth(0);	
+				tbMapChannel.getColumnModel().getColumn(0).setMaxWidth(0);
+				//SET CUSTOM RENDERER TO TEAMS COLUMN
+				tbMapChannel.getColumnModel().getColumn(7).setCellRenderer(new ButtonRenderer());
+				//SET CUSTOM EDITOR TO TEAMS COLUMN
+				tbMapChannel.getColumnModel().getColumn(7).setCellEditor(new ButtonEditor(new JTextField(), this));
 			}
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}
+	}
+	public boolean startSyncThread() {
+		boolean isSuccess = false;
+		int rIndex =  tbMapChannel.getSelectedRow();
+		if(rIndex == -1){
+			return isSuccess;
+		}else{
+			int id = (Integer) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("Id").getModelIndex());
+			TimerTask timerTask = new MyTimerTask("tt " + Integer.toString(id));
+			//running timer task as daemon thread
+			Timer timer = new Timer(true);
+	        timer.scheduleAtFixedRate(timerTask, 0, 10*1000);
+			timerMap.put(id, timer);        
+			tbMapChannel.getModel().setValueAt("Running", rIndex, 6);
+			tbMapChannel.getModel().setValueAt("Stop", rIndex, 7);
+			isSuccess = true;
+		}
+		return isSuccess;
+	}
+
+	public boolean stopSyncThread() {
+		boolean isSuccess = false;
+		int rIndex =  tbMapChannel.getSelectedRow();
+		if(rIndex == -1){
+			return isSuccess;
+		}else{
+			int id = (Integer) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("Id").getModelIndex());
+			Timer timer = timerMap.get(id);
+			timer.cancel();
+			timerMap.remove(id);
+			tbMapChannel.getModel().setValueAt("Stopped", rIndex, 6);
+			tbMapChannel.getModel().setValueAt("Run", rIndex, 7);
+			//int id = (Integer)tbMapChannel.getValueAt(rIndex, tbHomeChannel.getColumn("Id").getModelIndex());
+			//String cId = (String)tbHomeChannel.getValueAt(rIndex, tbHomeChannel.getColumn("ChannelId").getModelIndex());
+			isSuccess = true;
+		}
+		return isSuccess;
 	}
 }

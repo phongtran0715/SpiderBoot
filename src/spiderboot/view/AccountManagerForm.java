@@ -120,6 +120,7 @@ public class AccountManagerForm extends JFrame {
 		tbSpiderHome.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tbSpiderHome.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		tbSpiderHome.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		tbSpiderHome.setRowHeight(25);
 		panel_1.add(tbSpiderHome.getTableHeader(),BorderLayout.NORTH);
 
 		JButton btnAddSpiderAcc = new JButton("Add new");
@@ -258,6 +259,7 @@ public class AccountManagerForm extends JFrame {
 		tbGoogleApp.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tbGoogleApp.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		tbGoogleApp.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		tbGoogleApp.setRowHeight(25);
 
 		JButton btnAddGoogleAcc = new JButton("Add new");
 		btnAddGoogleAcc.addActionListener(new ActionListener() {
