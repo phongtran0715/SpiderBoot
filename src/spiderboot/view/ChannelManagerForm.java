@@ -1,6 +1,7 @@
 package spiderboot.view;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -40,7 +41,7 @@ import javax.swing.table.DefaultTableModel;
 import spiderboot.databaseconnection.MySqlAccess;
 import spiderboot.helper.ButtonEditor;
 import spiderboot.helper.ButtonRenderer;
-import spiderboot.helper.MyTimerTask;
+import spiderboot.helper.SyncTimerTask;
 
 public class ChannelManagerForm extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -439,11 +440,19 @@ public class ChannelManagerForm extends JFrame {
 		JButton btnEditMappingTable = new JButton("Edit");
 		btnEditMappingTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
 				int rIndex =  tbMapChannel.getSelectedRow();
 				if(rIndex == -1){
 					JOptionPane.showMessageDialog(pnHomeChannel, "Please select one row to edit !");
 					return;
 				}else{
+					//Check sync task is running
+					String syncStatus = (String)tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("StatusSync").getModelIndex());
+					if(syncStatus.equals("Running")){
+						JOptionPane.showMessageDialog(pnChannelManager, "Can not modify.This task is running. Please stop it before editing.");
+						return;
+					}
+					
 					int id = (int)tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("Id").getModelIndex());
 					String cHomeID = (String)tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("HomeChannelId").getModelIndex());
 					String cMonitorId = (String)tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("MonitorChannelId").getModelIndex());
@@ -638,14 +647,22 @@ public class ChannelManagerForm extends JFrame {
 			return isSuccess;
 		}else{
 			int id = (Integer) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("Id").getModelIndex());
-			TimerTask timerTask = new MyTimerTask("tt " + Integer.toString(id));
-			//running timer task as daemon thread
-			Timer timer = new Timer(true);
-	        timer.scheduleAtFixedRate(timerTask, 0, 10*1000);
-			timerMap.put(id, timer);        
+			SyncTaskManager.getInstance().startSyncThread(Integer.toString(id), 10*1000);
 			tbMapChannel.getModel().setValueAt("Running", rIndex, 6);
 			tbMapChannel.getModel().setValueAt("Stop", rIndex, 7);
-			isSuccess = true;
+			//update database
+			String query = "UPDATE home_monitor_channel_mapping SET StatusSync = ? , Action = ? WHERE Id = ? ;";
+			try {
+				PreparedStatement preStm = MySqlAccess.getInstance().connect.prepareStatement(query);
+				preStm.setInt(1, 1);
+				preStm.setInt(2, 0);
+				preStm.setInt(3, id);
+				preStm.executeUpdate();
+				isSuccess = true;
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return isSuccess;
 	}
@@ -657,14 +674,20 @@ public class ChannelManagerForm extends JFrame {
 			return isSuccess;
 		}else{
 			int id = (Integer) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("Id").getModelIndex());
-			Timer timer = timerMap.get(id);
-			timer.cancel();
-			timerMap.remove(id);
+			SyncTaskManager.getInstance().stopSyncThread(Integer.toString(id));
 			tbMapChannel.getModel().setValueAt("Stopped", rIndex, 6);
 			tbMapChannel.getModel().setValueAt("Run", rIndex, 7);
-			//int id = (Integer)tbMapChannel.getValueAt(rIndex, tbHomeChannel.getColumn("Id").getModelIndex());
-			//String cId = (String)tbHomeChannel.getValueAt(rIndex, tbHomeChannel.getColumn("ChannelId").getModelIndex());
-			isSuccess = true;
+			//update database 
+			String query = "DELETE FROM home_monitor_channel_mapping WHERE Id = ? ;";
+			try {
+				PreparedStatement preStm = MySqlAccess.getInstance().connect.prepareStatement(query);
+				preStm.setInt(1, id);
+				preStm.executeUpdate();
+				isSuccess = true;
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return isSuccess;
 	}

@@ -3,11 +3,11 @@ package spiderboot.helper;
 import java.util.Date;
 import java.util.TimerTask;
 
-public class MyTimerTask extends TimerTask{
+public class SyncTimerTask extends TimerTask{
 	String timerName;
 	boolean isComplete = true;
 	
-	public MyTimerTask(String timerName) {
+	public SyncTimerTask(String timerName) {
 		// TODO Auto-generated constructor stub
 		this.timerName = timerName;
 	}

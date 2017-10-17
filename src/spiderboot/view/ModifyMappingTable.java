@@ -43,7 +43,7 @@ public class ModifyMappingTable extends JDialog {
 	
 	private void initialize() {
 		setTitle("Modify mapping channel");
-		setBounds(100, 100, 340, 249);
+		setBounds(100, 100, 353, 287);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -54,7 +54,7 @@ public class ModifyMappingTable extends JDialog {
 
 		JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel.setBounds(5, 5, 313, 159);
+		panel.setBounds(5, 5, 313, 200);
 		contentPanel.add(panel);
 		panel.setLayout(null);
 
@@ -133,7 +133,7 @@ public class ModifyMappingTable extends JDialog {
 			}
 		});
 		btnOK.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		btnOK.setBounds(90, 175, 100, 30);
+		btnOK.setBounds(99, 216, 100, 30);
 		contentPanel.add(btnOK);
 
 		JButton btnExit = new JButton("Exit");
@@ -143,7 +143,7 @@ public class ModifyMappingTable extends JDialog {
 			}
 		});
 		btnExit.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		btnExit.setBounds(218, 175, 100, 30);
+		btnExit.setBounds(227, 216, 100, 30);
 		contentPanel.add(btnExit);
 	}
 }

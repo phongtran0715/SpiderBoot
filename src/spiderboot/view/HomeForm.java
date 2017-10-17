@@ -24,8 +24,6 @@ import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
 import spiderboot.helper.ImagePanel;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class HomeForm extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -39,6 +37,8 @@ public class HomeForm extends JFrame {
 
 	public HomeForm() {	
 		initialize();
+		//load sync task 
+		SyncTaskManager.getInstance().initSyncTask();
 	}
 	
 	private void initialize() {
