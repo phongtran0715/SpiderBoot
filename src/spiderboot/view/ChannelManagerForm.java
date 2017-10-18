@@ -471,30 +471,30 @@ public class ChannelManagerForm extends JFrame {
 		JButton btnDeleteMappingTable = new JButton("Delete");
 		btnDeleteMappingTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int selectedRow = tbMapChannel.getSelectedRow();
-				if(selectedRow == -1){
-					return;
-				}
-				int result = JOptionPane.showConfirmDialog(pnHomeChannel, "Are you sure to delete item?",
-						"Question",JOptionPane.OK_CANCEL_OPTION);
-				if(result == JOptionPane.OK_OPTION){
-					int accId = (int) tbMapChannel.getValueAt(selectedRow, 0);
-					String query = "DELETE FROM home_monitor_channel_mapping WHERE Id = ? ;";
-					PreparedStatement preparedStm;
-					try {
-						preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
-						preparedStm.setInt(1, accId);
-						preparedStm.executeUpdate();
-						//reload jtable
-						tbMapChanelMode.removeRow(selectedRow);
-					} catch (SQLException ex) {
-						// TODO Auto-generated catch block
-						ex.printStackTrace();
-						JOptionPane.showInternalMessageDialog(pnHomeChannel, "Delete item false! \n" + e.toString());
-					}	
-				}else{
-					//do nothing
-				}
+//				int selectedRow = tbMapChannel.getSelectedRow();
+//				if(selectedRow == -1){
+//					return;
+//				}
+//				int result = JOptionPane.showConfirmDialog(pnHomeChannel, "Are you sure to delete item?",
+//						"Question",JOptionPane.OK_CANCEL_OPTION);
+//				if(result == JOptionPane.OK_OPTION){
+//					int accId = (int) tbMapChannel.getValueAt(selectedRow, 0);
+//					String query = "DELETE FROM home_monitor_channel_mapping WHERE Id = ? ;";
+//					PreparedStatement preparedStm;
+//					try {
+//						preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
+//						preparedStm.setInt(1, accId);
+//						preparedStm.executeUpdate();
+//						//reload jtable
+//						tbMapChanelMode.removeRow(selectedRow);
+//					} catch (SQLException ex) {
+//						// TODO Auto-generated catch block
+//						ex.printStackTrace();
+//						JOptionPane.showInternalMessageDialog(pnHomeChannel, "Delete item false! \n" + e.toString());
+//					}	
+//				}else{
+//					//do nothing
+//				}
 			}
 		});
 		btnDeleteMappingTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -678,10 +678,12 @@ public class ChannelManagerForm extends JFrame {
 			tbMapChannel.getModel().setValueAt("Stopped", rIndex, 6);
 			tbMapChannel.getModel().setValueAt("Run", rIndex, 7);
 			//update database 
-			String query = "DELETE FROM home_monitor_channel_mapping WHERE Id = ? ;";
+			String query = "UPDATE home_monitor_channel_mapping SET StatusSync = ? , Action = ? WHERE Id = ? ;";
 			try {
 				PreparedStatement preStm = MySqlAccess.getInstance().connect.prepareStatement(query);
-				preStm.setInt(1, id);
+				preStm.setInt(1, 0);
+				preStm.setInt(2, 1);
+				preStm.setInt(3, id);
 				preStm.executeUpdate();
 				isSuccess = true;
 			} catch (SQLException e) {

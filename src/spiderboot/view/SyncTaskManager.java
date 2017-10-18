@@ -55,13 +55,14 @@ public class SyncTaskManager {
 	
 	public void initSyncTask() {
 		Statement stmt;
-		String query = "SELECT Id, TimeIntervalSync, StatusSync FROM home_monitor_channel_mapping;";
+		String query = "SELECT Id, TimeIntervalSync, StatusSync FROM home_monitor_channel_mapping WHERE StatusSync = '1';";
 		try {
 			stmt = MySqlAccess.getInstance().connect.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 			while (rs.next()) {
 				String id = Integer.toString(rs.getInt(1));
-				int timerInterval = rs.getInt(3);
+				int timerInterval = rs.getInt(2);
+				System.out.println("timer interval " + timerInterval);
 				startSyncThread(id, timerInterval);
 				System.out.println("Start sync task : " + id + " with timer interval = " + timerInterval);
 			}

@@ -36,7 +36,7 @@ public class AddMappingTable extends JDialog {
 	JComboBox cbHomeC;
 	JComboBox cbMonitorC;
 	List<String> homeTooltips = new ArrayList<String>();
-	List<String> monitorTooltips = new ArrayList<String>();;
+	List<String> monitorTooltips = new ArrayList<String>();
 
 	public AddMappingTable() {
 		inititalize();
