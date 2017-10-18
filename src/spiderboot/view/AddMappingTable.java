@@ -28,6 +28,7 @@ import javax.swing.border.TitledBorder;
 
 import spiderboot.databaseconnection.MySqlAccess;
 import spiderboot.helper.ComboboxToolTipRenderer;
+import spiderboot.helper.Util;
 
 public class AddMappingTable extends JDialog {
 	private static final long serialVersionUID = 1L;
@@ -194,6 +195,9 @@ public class AddMappingTable extends JDialog {
 								"Error", JOptionPane.ERROR);
 						return;
 					}
+					//create folder if it does not exist
+					new Util().createFolder(cHomeId + "-" + cMonitorId);
+					
 					dispose();
 				}
 			}

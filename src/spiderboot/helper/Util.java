@@ -1,5 +1,6 @@
 package spiderboot.helper;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
@@ -7,6 +8,7 @@ import java.net.ServerSocket;
 
 public class Util {
 	private static final int PORT = 9999;
+	private final String BASE_PATH = "E:\\SpiderVideo\\"; 
 	@SuppressWarnings("unused")
 	private static ServerSocket socket;    
 
@@ -28,5 +30,49 @@ public class Util {
 			System.exit(2);
 		}
 		return isRunning;
+	}
+
+	public boolean createFolder(String dirName) {
+		boolean result = false;
+		String path =  BASE_PATH + dirName;
+		File theDir = new File(path);
+		// if the directory does not exist, create it
+		if (!theDir.exists()) {
+			try{
+				theDir.mkdir();
+				result = true;
+				System.out.println("Created directory : " + path);
+			} 
+			catch(SecurityException se){
+				System.out.println("Can not creat video directory");
+				se.printStackTrace();
+			}        
+		}
+		return result;
+	}
+
+	public void deleteFolder(String dirName) {
+		String path =  BASE_PATH + dirName;
+		File theDir = new File(path);
+		if (theDir.isDirectory()) {
+			//directory is empty, then delete it
+			if(theDir.list().length==0){
+				theDir.delete();
+				System.out.println("Directory is deleted : "
+						+ theDir.getAbsolutePath());
+
+			}else{
+				//list all the directory contents
+				String files[] = theDir.list();
+				for (String temp : files) {
+					//construct the file structure
+					//recursive delete
+					deleteFolder(dirName + "//" + temp);
+				}
+				theDir.delete();
+			}
+		}else{
+			theDir.delete();
+		}
 	}
 }

@@ -42,6 +42,7 @@ import spiderboot.databaseconnection.MySqlAccess;
 import spiderboot.helper.ButtonEditor;
 import spiderboot.helper.ButtonRenderer;
 import spiderboot.helper.SyncTimerTask;
+import spiderboot.helper.Util;
 
 public class ChannelManagerForm extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -471,30 +472,33 @@ public class ChannelManagerForm extends JFrame {
 		JButton btnDeleteMappingTable = new JButton("Delete");
 		btnDeleteMappingTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//				int selectedRow = tbMapChannel.getSelectedRow();
-//				if(selectedRow == -1){
-//					return;
-//				}
-//				int result = JOptionPane.showConfirmDialog(pnHomeChannel, "Are you sure to delete item?",
-//						"Question",JOptionPane.OK_CANCEL_OPTION);
-//				if(result == JOptionPane.OK_OPTION){
-//					int accId = (int) tbMapChannel.getValueAt(selectedRow, 0);
-//					String query = "DELETE FROM home_monitor_channel_mapping WHERE Id = ? ;";
-//					PreparedStatement preparedStm;
-//					try {
-//						preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
-//						preparedStm.setInt(1, accId);
-//						preparedStm.executeUpdate();
-//						//reload jtable
-//						tbMapChanelMode.removeRow(selectedRow);
-//					} catch (SQLException ex) {
-//						// TODO Auto-generated catch block
-//						ex.printStackTrace();
-//						JOptionPane.showInternalMessageDialog(pnHomeChannel, "Delete item false! \n" + e.toString());
-//					}	
-//				}else{
-//					//do nothing
-//				}
+				int rIndex = tbMapChannel.getSelectedRow();
+				if(rIndex == -1){
+					return;
+				}
+				int result = JOptionPane.showConfirmDialog(pnHomeChannel, "Are you sure to delete item?",
+						"Question",JOptionPane.OK_CANCEL_OPTION);
+				if(result == JOptionPane.OK_OPTION){
+					int accId = (int) tbMapChannel.getValueAt(rIndex, 0);
+					String cHomeID = (String)tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("HomeChannelId").getModelIndex());
+					String cMonitorId = (String)tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("MonitorChannelId").getModelIndex());
+					String query = "DELETE FROM home_monitor_channel_mapping WHERE Id = ? ;";
+					PreparedStatement preparedStm;
+					try {
+						preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
+						preparedStm.setInt(1, accId);
+						preparedStm.executeUpdate();
+						//reload jtable
+						tbMapChanelMode.removeRow(rIndex);
+					} catch (SQLException ex) {
+						// TODO Auto-generated catch block
+						ex.printStackTrace();
+						JOptionPane.showInternalMessageDialog(pnHomeChannel, "Delete item false! \n" + e.toString());
+						return;
+					}
+					//delete data folder
+					new Util().deleteFolder(cHomeID + "-" + cMonitorId);
+				}
 			}
 		});
 		btnDeleteMappingTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
