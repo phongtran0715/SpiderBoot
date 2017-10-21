@@ -3,7 +3,6 @@ package spiderboot.view;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Time;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;

@@ -208,9 +208,9 @@ public class AddHomeChannel extends JDialog {
 				}else {
 					//insert to database
 					PreparedStatement preparedStm = null;
-					String query = "INSERT INTO home_channel_list (ChannelId, ChannelName, GoogleAccount, VideoIntro,"
-							+ " Logo, DescriptionTemplate, TitleTemplate) "
-							+ " VALUES (?,?,?,?,?,?,?)";
+					String query = "INSERT INTO home_channel_list (ChannelId, ChannelName, GoogleAccount,"
+							+ "VideoIntro, VideoOutro, Logo, DescriptionTemplate, TitleTemplate) "
+							+ " VALUES (?,?,?,?,?,?,?,?)";
 					try {
 						preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
 						preparedStm.setString(1, txtChannelId.getText().trim());
