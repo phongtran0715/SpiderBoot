@@ -7,7 +7,9 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -22,15 +24,12 @@ import javax.swing.border.TitledBorder;
 import spiderboot.databaseconnection.MySqlAccess;
 
 public class ModifyMonitorChannel extends JDialog {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField txtChannelId;
 	private JTextField txtChannelName;
 	int id;
+	String cId;
 
 	/**
 	 * Create the dialog.
@@ -42,7 +41,8 @@ public class ModifyMonitorChannel extends JDialog {
 	public ModifyMonitorChannel(int id, String channelId, String channelName) {
 		initialiaze();
 		this.id = id;
-		txtChannelId.setText(channelId);
+		this.cId = channelId;
+		txtChannelId.setText(cId);
 		txtChannelName.setText(channelName);
 	}
 
@@ -90,12 +90,19 @@ public class ModifyMonitorChannel extends JDialog {
 		contentPanel.add(btnOk);
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String cId = txtChannelId.getText().trim();
-				if(cId.equals(null) || cId.equals("")){
+				String modifyId = txtChannelId.getText().trim();
+				if(modifyId.equals(null) || modifyId.equals("")){
 					JOptionPane.showMessageDialog(contentPanel, "Channel Id field can not be empty!", 
 							"Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}else{
+					//check channel is existed
+					boolean isExisted = checkChannelExisted(modifyId);
+					if(isExisted && !modifyId.equals(cId)){
+						JOptionPane.showMessageDialog(contentPanel, "This channel Id <" + modifyId + "> have already existed."
+								+ " Please add another channel ID");
+						return;
+					}
 					//update to database
 					PreparedStatement preparedStm = null;
 					String query = "UPDATE monitor_channel_list SET ChannelId = ?, ChannelName = ? WHERE Id = ? " ;
@@ -130,5 +137,24 @@ public class ModifyMonitorChannel extends JDialog {
 			}
 		});
 		btnExit.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+	}
+	
+	private boolean checkChannelExisted(String cId) {
+		boolean result = false;
+		String query = "SELECT COUNT(*) FROM monitor_channel_list WHERE ChannelId = '" + cId + "';";
+		Statement stmt;
+		try{
+			stmt = MySqlAccess.getInstance().connect.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				long nCount = (long)rs.getObject(1);
+				if(nCount == 1){
+					result = true;
+				}
+			}
+		}catch(Exception ex){
+			System.out.println(ex.toString());
+		}
+		return result;
 	}
 }

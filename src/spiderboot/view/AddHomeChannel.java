@@ -8,7 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -206,6 +208,13 @@ public class AddHomeChannel extends JDialog {
 					JOptionPane.showMessageDialog(contentPanel, "Channel ID field can not be empty!", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}else {
+					//Check Channel is existed
+					
+					boolean isExisted = checkChannelExisted(cId);
+					if(isExisted){
+						JOptionPane.showMessageDialog(contentPanel, "This channel have already existed. Please add another channel ID");
+						return;
+					}
 					//insert to database
 					PreparedStatement preparedStm = null;
 					String query = "INSERT INTO home_channel_list (ChannelId, ChannelName, GoogleAccount,"
@@ -246,5 +255,24 @@ public class AddHomeChannel extends JDialog {
 			}
 		});
 		btnExit.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+	}
+	
+	private boolean checkChannelExisted(String cId) {
+		boolean result = false;
+		String query = "SELECT COUNT(*) FROM home_channel_list WHERE ChannelId = '" + cId + "';";
+		Statement stmt;
+		try{
+			stmt = MySqlAccess.getInstance().connect.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				long nCount = (long)rs.getObject(1);
+				if(nCount == 1){
+					result = true;
+				}
+			}
+		}catch(Exception ex){
+			System.out.println(ex.toString());
+		}
+		return result;
 	}
 }

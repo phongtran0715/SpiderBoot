@@ -18,7 +18,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.awt.event.ActionEvent;
 import javax.swing.border.TitledBorder;
 
@@ -39,7 +41,7 @@ public class AddMonitorChannel extends JDialog {
 	 */
 	public AddMonitorChannel() {
 		setTitle("Add new monitor channel");
-		setBounds(100, 100, 582, 514);
+		setBounds(100, 100, 465, 186);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -50,7 +52,7 @@ public class AddMonitorChannel extends JDialog {
 
 		JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel.setBounds(5, 5, 561, 412);
+		panel.setBounds(5, 5, 441, 95);
 		contentPanel.add(panel);
 		panel.setLayout(null);
 
@@ -61,7 +63,7 @@ public class AddMonitorChannel extends JDialog {
 		lblNewLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
 		txtChannelId = new JTextField();
-		txtChannelId.setBounds(130, 11, 300, 25);
+		txtChannelId.setBounds(130, 11, 300, 30);
 		panel.add(txtChannelId);
 		txtChannelId.setColumns(10);
 
@@ -72,12 +74,12 @@ public class AddMonitorChannel extends JDialog {
 		lblChannelName.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
 		txtChannelName = new JTextField();
-		txtChannelName.setBounds(130, 56, 300, 25);
+		txtChannelName.setBounds(130, 56, 300, 30);
 		panel.add(txtChannelName);
 		txtChannelName.setColumns(10);
 
 		JButton btnOk = new JButton("OK");
-		btnOk.setBounds(310, 428, 118, 38);
+		btnOk.setBounds(200, 105, 118, 38);
 		contentPanel.add(btnOk);
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -86,6 +88,12 @@ public class AddMonitorChannel extends JDialog {
 					JOptionPane.showMessageDialog(contentPanel, "Channel ID field can not be empty!", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}else {
+					//check channel is existed
+					boolean isExisted = checkChannelExisted(cId);
+					if(isExisted){
+						JOptionPane.showMessageDialog(contentPanel, "This channel have already existed. Please add another channel ID");
+						return;
+					}
 					//insert to database
 					PreparedStatement preparedStm = null;
 					String query = "INSERT INTO monitor_channel_list (ChannelId, ChannelName, IntervalTimeSync)"
@@ -112,7 +120,7 @@ public class AddMonitorChannel extends JDialog {
 		btnOk.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
 		JButton btnExit = new JButton("Exit");
-		btnExit.setBounds(438, 428, 118, 38);
+		btnExit.setBounds(328, 105, 118, 38);
 		contentPanel.add(btnExit);
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -120,5 +128,24 @@ public class AddMonitorChannel extends JDialog {
 			}
 		});
 		btnExit.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+	}
+	
+	private boolean checkChannelExisted(String cId) {
+		boolean result = false;
+		String query = "SELECT COUNT(*) FROM monitor_channel_list WHERE ChannelId = '" + cId + "';";
+		Statement stmt;
+		try{
+			stmt = MySqlAccess.getInstance().connect.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				long nCount = (long)rs.getObject(1);
+				if(nCount == 1){
+					result = true;
+				}
+			}
+		}catch(Exception ex){
+			System.out.println(ex.toString());
+		}
+		return result;
 	}
 }
