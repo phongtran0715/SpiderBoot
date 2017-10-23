@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="image"/>
+	<classpathentry kind="src" path="config"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="library/mysql-connector-java-5.1.44-bin.jar"/>
+	<classpathentry kind="lib" path="C:/Users/phong.tran/Downloads/New folder/google-api-services-youtube-v3-rev182-1.22.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/phong.tran/Downloads/New folder/google-api-services-youtube-v3-rev182-1.22.0-sources.jar"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ytd2"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/samples"/>
+	<classpathentry kind="lib" path="E:/SourceCode/Java Library/vget-master/library/ytd2_20150609_src.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
