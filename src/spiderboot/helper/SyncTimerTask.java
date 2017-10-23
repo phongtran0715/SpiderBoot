@@ -7,21 +7,31 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TimerTask;
+
+import com.github.axet.vget.DirectDownload;
+import com.google.api.services.samples.youtube.cmdline.data.Search;
+import com.google.api.services.youtube.model.ResourceId;
+import com.google.api.services.youtube.model.SearchResult;
 
 import spiderboot.databaseconnection.MySqlAccess;
 
 public class SyncTimerTask extends TimerTask{
 	String timerId;
+	String cHomeId;
+	String cMonitorId;
 	boolean isComplete = true;
 	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	String storeLocation = "C:\\Users\\phong.tran\\Downloads\\Video";
 
-	public SyncTimerTask(String timerId) {
+	public SyncTimerTask(String timerId, String cHomeId, String cMonitorId) {
 		// TODO Auto-generated constructor stub
 		this.timerId = timerId;
+		this.cHomeId = cHomeId;
+		this.cMonitorId = cMonitorId;
 	}
 
 	@Override
@@ -46,29 +56,40 @@ public class SyncTimerTask extends TimerTask{
 
 	private void completeTask() {
 		if(isComplete){
-			try {
-				isComplete = false;
-				Date lastSyncTime = getLastSyncTime(timerId);
-				System.out.println("last sync time = " + dateFormat.format(lastSyncTime));
-				//assuming it takes 20 secs to complete the task
-				for(int i = 0; i< 15; i++){
-					System.out.println("Do work " + timerId + " : " +  i);
-					Thread.sleep(1000);
+			isComplete = false;
+			Date lastSyncTime = getLastSyncTime(timerId);
+			System.out.println("last sync time = " + dateFormat.format(lastSyncTime));
+			//TODO: check new video and download them
+			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(cMonitorId);
+			Iterator<SearchResult> iteratorSearchResults = result.iterator();
+			if (!iteratorSearchResults.hasNext()) {
+				System.out.println(" There aren't any results for your query.");
+				return;
+			}else{
+				while (iteratorSearchResults.hasNext()) {
+
+					SearchResult singleVideo = iteratorSearchResults.next();
+					ResourceId rId = singleVideo.getId();
+					if (rId.getKind().equals("youtube#video")) {
+						String vId = rId.getVideoId();
+						//Download video
+						//DirectDownload dowloadHandle = new DirectDownload();
+						//dowloadHandle.download(vId, storeLocation);
+					}
 				}
-				//Update last sync time
-				lastSyncTime = new Date();
-				System.out.println("Update last sync time  = " + dateFormat.format(lastSyncTime));
-				updateLastSyncTime(lastSyncTime);
-				isComplete = true;
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}	
+			}
+			//Update last sync time
+			lastSyncTime = new Date();
+			System.out.println("Update last sync time  = " + dateFormat.format(lastSyncTime));
+			updateLastSyncTime(lastSyncTime);
+			isComplete = true;	
 		}else{
 			System.out.println("Task have not yet completeed.");
 		}
 	}
 
 	private Date getLastSyncTime(String mapId){
+		@SuppressWarnings("deprecation")
 		Date lastSyncTime = null;
 		String query = "SELECT LastSyncTime FROM home_monitor_channel_mapping WHERE Id = '" + mapId + "';";
 		Statement stmt;
@@ -101,10 +122,5 @@ public class SyncTimerTask extends TimerTask{
 			System.out.println(ex.getMessage());
 			return;
 		}
-	}
-
-	private List<String> getNewVideo() {
-		List<String> vList = new ArrayList<String>();
-		return vList;
 	}
 }

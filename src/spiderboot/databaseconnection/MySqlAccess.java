@@ -43,7 +43,7 @@ public class MySqlAccess {
 		// Setup the connection with the DB
 		try {
 			connect = DriverManager
-					.getConnection("jdbc:mysql://" + dbServer + "/" + dbName, dbUserName, dbPassword);
+					.getConnection("jdbc:mysql://" + dbServer + "/" + dbName + "?zeroDateTimeBehavior=convertToNull", dbUserName, dbPassword);
 
 		} catch (SQLException e) {
 			System.out.println("Connection Failed! Check output console");

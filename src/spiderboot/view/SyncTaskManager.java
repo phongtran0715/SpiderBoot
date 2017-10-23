@@ -21,11 +21,11 @@ public class SyncTaskManager {
 		return instance;
 	}
 	
-	public boolean startSyncThread(String taskId, int timerInterval) {
+	public boolean startSyncThread(String taskId, String cHomeId, String cMonitorId, int timerInterval) {
 		boolean isSuccess = false;
-		TimerTask timerTask = new SyncTimerTask(taskId);
+		TimerTask timerTask = new SyncTimerTask(taskId, cHomeId, cMonitorId);
 		Timer timer = new Timer(true);
-		timer.scheduleAtFixedRate(timerTask, 0, timerInterval);
+		timer.scheduleAtFixedRate(timerTask, 0, timerInterval *1000);
 		timerMap.put(taskId, timer);        
 		isSuccess = true;
 		return isSuccess;
@@ -54,16 +54,18 @@ public class SyncTaskManager {
 	
 	public void initSyncTask() {
 		Statement stmt;
-		String query = "SELECT Id, TimeIntervalSync, StatusSync FROM home_monitor_channel_mapping WHERE StatusSync = '1';";
+		String query = "SELECT Id, HomeChannelId, MonitorChannelId, TimeIntervalSync, StatusSync "
+				+ "FROM home_monitor_channel_mapping WHERE StatusSync = '1';";
 		try {
 			stmt = MySqlAccess.getInstance().connect.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 			while (rs.next()) {
 				String id = Integer.toString(rs.getInt(1));
-				int timerInterval = rs.getInt(2);
-				System.out.println("timer interval " + timerInterval);
-				startSyncThread(id, timerInterval);
-				System.out.println("Start sync task : " + id + " with timer interval = " + timerInterval);
+				String cHomeId = rs.getString(2);
+				String cMonitorId = rs.getString(3);
+				int syncInterval = rs.getInt(4);
+				startSyncThread(id, cHomeId, cMonitorId, syncInterval * 1000);
+				System.out.println("Start sync task : " + id + " with timer interval = " + syncInterval);
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

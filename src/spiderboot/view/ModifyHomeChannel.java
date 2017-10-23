@@ -22,6 +22,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import spiderboot.databaseconnection.MySqlAccess;
+import javax.swing.ImageIcon;
 
 public class ModifyHomeChannel extends JDialog {
 
@@ -185,6 +186,7 @@ public class ModifyHomeChannel extends JDialog {
 		btnBrowseTitleTemp.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
 		JButton btnOk = new JButton("OK");
+		btnOk.setIcon(new ImageIcon(ModifyHomeChannel.class.getResource("/spiderboot/resources/resource/icon_16x16/checked_16x16.png")));
 		btnOk.setBounds(310, 428, 118, 38);
 		contentPanel.add(btnOk);
 		btnOk.addActionListener(new ActionListener() {
@@ -233,6 +235,7 @@ public class ModifyHomeChannel extends JDialog {
 		btnOk.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
 		JButton btnExit = new JButton("Exit");
+		btnExit.setIcon(new ImageIcon(ModifyHomeChannel.class.getResource("/spiderboot/resources/resource/icon_16x16/delete_16x16.png")));
 		btnExit.setBounds(438, 428, 118, 38);
 		contentPanel.add(btnExit);
 		btnExit.addActionListener(new ActionListener() {

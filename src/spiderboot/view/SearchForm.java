@@ -26,6 +26,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
+import com.google.api.services.samples.youtube.cmdline.data.Original_Search;
 import com.google.api.services.samples.youtube.cmdline.data.Search;
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchResult;
@@ -215,21 +216,23 @@ public class SearchForm extends JFrame{
 		JButton btnNewButton = new JButton("Search");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String keyWork = txtKeyword.getText().trim();
-				if(keyWork.equals("")){
-					JOptionPane.showMessageDialog(contentPane, "You must put keywork to search",
-							"Error", JOptionPane.OK_OPTION);
-					return;
-				}else{
-					Search search = new Search();
-					List<SearchResult> searchResult = search.executeQuery(txtKeyword.getText().trim());
-					if(searchResult != null){
-						prettyPrint(searchResult.iterator(), txtKeyword.getText().trim());
-						System.out.println("Search completed!");	
-					}else{
-						System.out.println("Search result is null");
-					}
-				}
+//				String keyWork = txtKeyword.getText().trim();
+//				if(keyWork.equals("")){
+//					JOptionPane.showMessageDialog(contentPane, "You must put keywork to search",
+//							"Error", JOptionPane.OK_OPTION);
+//					return;
+//				}else{
+//					Search search = new Search();
+//					List<SearchResult> searchResult = search.executeQuery(txtKeyword.getText().trim());
+//					if(searchResult != null){
+//						prettyPrint(searchResult.iterator(), txtKeyword.getText().trim());
+//						System.out.println("Search completed!");	
+//					}else{
+//						System.out.println("Search result is null");
+//					}
+//				}
+				Original_Search ss = new Original_Search();
+				ss.searchFunc(null);
 			}
 		});
 		btnNewButton.setIcon(new ImageIcon(SearchForm.class.getResource("/spiderboot/resources/resource/icon_32x32/search_32x32.png")));

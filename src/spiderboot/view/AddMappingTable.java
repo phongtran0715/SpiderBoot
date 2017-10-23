@@ -10,7 +10,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
@@ -33,6 +38,7 @@ import java.awt.Color;
 import java.awt.SystemColor;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import javax.swing.ImageIcon;
 
 public class AddMappingTable extends JDialog {
 	private static final long serialVersionUID = 1L;
@@ -172,6 +178,7 @@ public class AddMappingTable extends JDialog {
 		panel.add(lbMonitor);
 
 		JButton btnOK = new JButton("OK");
+		btnOK.setIcon(new ImageIcon(AddMappingTable.class.getResource("/spiderboot/resources/resource/icon_16x16/checked_16x16.png")));
 		btnOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String cHomeId = (String)cbHomeC.getSelectedItem();
@@ -216,7 +223,7 @@ public class AddMappingTable extends JDialog {
 					//insert to database
 					PreparedStatement preparedStm = null;
 					String query = "INSERT INTO home_monitor_channel_mapping (HomeChannelId, MonitorChannelId,"
-							+ " TimeIntervalSync, StatusSync, Action) VALUES (?,?,?,?,?)";
+							+ " TimeIntervalSync, StatusSync, Action, LastSyncTime) VALUES (?,?,?,?,?,?)";
 					try {
 						preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
 						preparedStm.setString(1, cHomeId);
@@ -224,15 +231,21 @@ public class AddMappingTable extends JDialog {
 						preparedStm.setInt(3, Integer.parseInt(txtTimeSync.getText().trim()));
 						preparedStm.setInt(4,cbStatus.getSelectedIndex());
 						preparedStm.setInt(5,1 - cbStatus.getSelectedIndex());
+						DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+						Date date = dateFormat.parse("2000/01/01 00:00:01");
+						long time = date.getTime();
+						Timestamp timeStamp = new Timestamp(time);
+						preparedStm.setTimestamp(6, timeStamp);
 						// execute insert SQL statement
 						preparedStm.executeUpdate();
 					} catch (SQLException ex) {
 						// TODO Auto-generated catch block
 						ex.printStackTrace();
 						System.out.println(ex.getMessage());
-						JOptionPane.showMessageDialog(contentPanel, "Add new mapping channel false " + ex.getMessage(), 
-								"Error", JOptionPane.ERROR);
 						return;
+					} catch (ParseException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}
 					//create folder if it does not exist
 					new Util().createFolder(cHomeId + "-" + cMonitorId);
@@ -246,6 +259,7 @@ public class AddMappingTable extends JDialog {
 		contentPanel.add(btnOK);
 
 		JButton btnExit = new JButton("Exit");
+		btnExit.setIcon(new ImageIcon(AddMappingTable.class.getResource("/spiderboot/resources/resource/icon_16x16/delete_16x16.png")));
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();

@@ -266,6 +266,7 @@ public class ChannelManagerForm extends JFrame {
 		pnHomeChannel.add(button_3);
 
 		JButton btnExit_1 = new JButton("Exit");
+		btnExit_1.setIcon(new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/delete_16x16.png")));
 		btnExit_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
@@ -417,6 +418,7 @@ public class ChannelManagerForm extends JFrame {
 		pnMonitorChannel.add(btnExit);
 
 		JButton btnExit_2 = new JButton("Exit");
+		btnExit_2.setIcon(new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/delete_16x16.png")));
 		btnExit_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
@@ -479,6 +481,7 @@ public class ChannelManagerForm extends JFrame {
 		pnMappingChannel.add(button_4);
 
 		JButton btnAddMappingTable = new JButton("Add new");
+		btnAddMappingTable.setIcon(new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/add_16x16.png")));
 		btnAddMappingTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				AddMappingTable addMapChannelFrm = new AddMappingTable();
@@ -492,6 +495,7 @@ public class ChannelManagerForm extends JFrame {
 		pnMappingChannel.add(btnAddMappingTable);
 
 		JButton btnEditMappingTable = new JButton("Edit");
+		btnEditMappingTable.setIcon(new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/edit_16x16.png")));
 		btnEditMappingTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -523,6 +527,7 @@ public class ChannelManagerForm extends JFrame {
 		pnMappingChannel.add(btnEditMappingTable);
 
 		JButton btnDeleteMappingTable = new JButton("Delete");
+		btnDeleteMappingTable.setIcon(new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/delete_16x16.png")));
 		btnDeleteMappingTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int rIndex = tbMapChannel.getSelectedRow();
@@ -559,6 +564,7 @@ public class ChannelManagerForm extends JFrame {
 		pnMappingChannel.add(btnDeleteMappingTable);
 
 		JButton btnExit_3 = new JButton("Exit");
+		btnExit_3.setIcon(new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_16x16/delete_16x16.png")));
 		btnExit_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
@@ -715,7 +721,10 @@ public class ChannelManagerForm extends JFrame {
 			return isSuccess;
 		}else{
 			int id = (Integer) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("Id").getModelIndex());
-			SyncTaskManager.getInstance().startSyncThread(Integer.toString(id), 10*1000);
+			String cHomeId = (String) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("HomeChannelId").getModelIndex());
+			String cMonitorId = (String) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("MonitorChannelId").getModelIndex());
+			int syncInterval = (Integer) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("TimeIntervalSync").getModelIndex());
+			SyncTaskManager.getInstance().startSyncThread(Integer.toString(id),cHomeId, cMonitorId, syncInterval);
 			tbMapChannel.getModel().setValueAt("Running", rIndex, 6);
 			tbMapChannel.getModel().setValueAt("Stop", rIndex, 7);
 			//update database
