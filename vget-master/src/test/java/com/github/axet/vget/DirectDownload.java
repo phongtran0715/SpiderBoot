@@ -8,6 +8,9 @@ import com.github.axet.vget.info.VideoInfo.VideoQuality;
 import com.github.axet.vget.info.VideoInfo.VideoType;
 
 public class DirectDownload {
+	public static void main() {
+		download("JyhTTkypni0","C:\\Users\\phong.tran\\Downloads\\Video\\spider_video\\");
+	}
     public static void download(String vId, String storeLocation) {
         try {
         	System.out.println("Begining download video id : " + vId);

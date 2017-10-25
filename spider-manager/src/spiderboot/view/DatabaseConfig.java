@@ -21,6 +21,8 @@ import javax.swing.border.TitledBorder;
 
 import spiderboot.configuration.ConfigProperties;
 import spiderboot.databaseconnection.MySqlAccess;
+import javax.swing.ImageIcon;
+import javax.swing.DefaultComboBoxModel;
 
 public class DatabaseConfig extends JDialog {
 
@@ -79,29 +81,33 @@ public class DatabaseConfig extends JDialog {
 		panel.add(lblPassword);
 
 		JComboBox cbDbSever = new JComboBox();
+		cbDbSever.setModel(new DefaultComboBoxModel(new String[] {"localhost:3306"}));
 		cbDbSever.setEditable(true);
 		cbDbSever.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		cbDbSever.setBounds(121, 9, 227, 25);
+		cbDbSever.setBounds(121, 9, 227, 30);
 		panel.add(cbDbSever);
 
 		txtServerName = new JTextField();
+		txtServerName.setText("spiderboot");
 		txtServerName.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		txtServerName.setBounds(121, 49, 227, 25);
+		txtServerName.setBounds(121, 49, 227, 30);
 		panel.add(txtServerName);
 		txtServerName.setColumns(10);
 
 		txtUserName = new JTextField();
+		txtUserName.setText("root");
 		txtUserName.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		txtUserName.setColumns(10);
-		txtUserName.setBounds(121, 86, 227, 25);
+		txtUserName.setBounds(121, 86, 227, 30);
 		panel.add(txtUserName);
 
 		txtPassword = new JPasswordField();
 		txtPassword.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		txtPassword.setBounds(121, 123, 227, 25);
+		txtPassword.setBounds(121, 123, 227, 30);
 		panel.add(txtPassword);
 
 		JButton btnExit = new JButton("Exit");
+		btnExit.setIcon(new ImageIcon(DatabaseConfig.class.getResource("/spiderboot/resources/resource/icon_16x16/delete_16x16.png")));
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				dispose();
@@ -112,6 +118,7 @@ public class DatabaseConfig extends JDialog {
 		contentPanel.add(btnExit);
 
 		JButton btnOK = new JButton("OK");
+		btnOK.setIcon(new ImageIcon(DatabaseConfig.class.getResource("/spiderboot/resources/resource/icon_16x16/checked_16x16.png")));
 		btnOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String dbServer = (String)cbDbSever.getSelectedItem();

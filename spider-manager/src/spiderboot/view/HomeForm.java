@@ -38,7 +38,7 @@ public class HomeForm extends JFrame {
 	public HomeForm() {	
 		initialize();
 		//load sync task 
-		SyncTaskManager.getInstance().initSyncTask();
+		DownloadTimerManager.getInstance().initSyncTask();
 	}
 	
 	private void initialize() {

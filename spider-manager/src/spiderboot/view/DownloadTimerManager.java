@@ -8,22 +8,22 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import spiderboot.databaseconnection.MySqlAccess;
-import spiderboot.helper.SyncTimerTask;
+import spiderboot.helper.DownloadTimer;
 
-public class SyncTaskManager {
+public class DownloadTimerManager {
 	HashMap<String, Timer> timerMap = new HashMap<String, Timer>();
-	private static SyncTaskManager instance = null;
+	private static DownloadTimerManager instance = null;
 	
-	public static SyncTaskManager getInstance(){
+	public static DownloadTimerManager getInstance(){
 		if(instance == null){
-			instance = new SyncTaskManager();
+			instance = new DownloadTimerManager();
 		}
 		return instance;
 	}
 	
 	public boolean startSyncThread(String taskId, String cHomeId, String cMonitorId, int timerInterval) {
 		boolean isSuccess = false;
-		TimerTask timerTask = new SyncTimerTask(taskId, cHomeId, cMonitorId);
+		TimerTask timerTask = new DownloadTimer(taskId, cHomeId, cMonitorId);
 		Timer timer = new Timer(true);
 		timer.scheduleAtFixedRate(timerTask, 0, timerInterval *1000);
 		timerMap.put(taskId, timer);        

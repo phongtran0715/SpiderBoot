@@ -24,6 +24,7 @@ import java.util.Properties;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.samples.youtube.cmdline.Auth;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.ResourceId;
@@ -136,7 +137,7 @@ public class Search {
 		return null;
 	}
 
-	public List<SearchResult> getVideoByPublishDate(String channelId) {
+	public List<SearchResult> getVideoByPublishDate(String channelId, DateTime publishAfter) {
 		List<SearchResult> searchResult = new ArrayList<SearchResult>();
 		try{
 			// Define the API request for retrieving search results.
@@ -147,7 +148,7 @@ public class Search {
 			search.setChannelId(channelId);
 			search.setFields("items(id/kind,id/videoId,snippet/title,snippet/description,"
 					+ "snippet/thumbnails/default/url)");
-			//search.setPublishedAfter(publishAfter);	
+			search.setPublishedAfter(publishAfter);	
 			// Call the API and print results.
 			SearchListResponse searchResponse = search.execute();
 			searchResult = searchResponse.getItems();

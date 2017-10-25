@@ -13,21 +13,22 @@ import java.util.List;
 import java.util.TimerTask;
 
 import com.github.axet.vget.DirectDownload;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.samples.youtube.cmdline.data.Search;
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchResult;
 
 import spiderboot.databaseconnection.MySqlAccess;
 
-public class SyncTimerTask extends TimerTask{
+public class DownloadTimer extends TimerTask{
 	String timerId;
 	String cHomeId;
 	String cMonitorId;
 	boolean isComplete = true;
 	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	String storeLocation = "C:\\Users\\phong.tran\\Downloads\\Video";
+	String storeLocation = "C:\\Users\\phong.tran\\Downloads\\Video\\spider_video\\";
 
-	public SyncTimerTask(String timerId, String cHomeId, String cMonitorId) {
+	public DownloadTimer(String timerId, String cHomeId, String cMonitorId) {
 		// TODO Auto-generated constructor stub
 		this.timerId = timerId;
 		this.cHomeId = cHomeId;
@@ -59,8 +60,9 @@ public class SyncTimerTask extends TimerTask{
 			isComplete = false;
 			Date lastSyncTime = getLastSyncTime(timerId);
 			System.out.println("last sync time = " + dateFormat.format(lastSyncTime));
+			DateTime ytbTime = new DateTime(lastSyncTime);
 			//TODO: check new video and download them
-			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(cMonitorId);
+			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(cMonitorId, ytbTime);
 			Iterator<SearchResult> iteratorSearchResults = result.iterator();
 			if (!iteratorSearchResults.hasNext()) {
 				System.out.println(" There aren't any results for your query.");
@@ -73,8 +75,8 @@ public class SyncTimerTask extends TimerTask{
 					if (rId.getKind().equals("youtube#video")) {
 						String vId = rId.getVideoId();
 						//Download video
-						//DirectDownload dowloadHandle = new DirectDownload();
-						//dowloadHandle.download(vId, storeLocation);
+						DirectDownload dowloadHandle = new DirectDownload();
+						dowloadHandle.execute(vId, storeLocation);
 					}
 				}
 			}

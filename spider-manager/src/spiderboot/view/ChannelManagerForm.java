@@ -724,7 +724,7 @@ public class ChannelManagerForm extends JFrame {
 			String cHomeId = (String) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("HomeChannelId").getModelIndex());
 			String cMonitorId = (String) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("MonitorChannelId").getModelIndex());
 			int syncInterval = (Integer) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("TimeIntervalSync").getModelIndex());
-			SyncTaskManager.getInstance().startSyncThread(Integer.toString(id),cHomeId, cMonitorId, syncInterval);
+			DownloadTimerManager.getInstance().startSyncThread(Integer.toString(id),cHomeId, cMonitorId, syncInterval);
 			tbMapChannel.getModel().setValueAt("Running", rIndex, 6);
 			tbMapChannel.getModel().setValueAt("Stop", rIndex, 7);
 			//update database
@@ -751,7 +751,7 @@ public class ChannelManagerForm extends JFrame {
 			return isSuccess;
 		}else{
 			int id = (Integer) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("Id").getModelIndex());
-			SyncTaskManager.getInstance().stopSyncThread(Integer.toString(id));
+			DownloadTimerManager.getInstance().stopSyncThread(Integer.toString(id));
 			tbMapChannel.getModel().setValueAt("Stopped", rIndex, 6);
 			tbMapChannel.getModel().setValueAt("Run", rIndex, 7);
 			//update database 

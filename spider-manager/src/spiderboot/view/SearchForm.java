@@ -26,6 +26,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
+import com.github.axet.vget.DirectDownload;
 import com.google.api.services.samples.youtube.cmdline.data.Original_Search;
 import com.google.api.services.samples.youtube.cmdline.data.Search;
 import com.google.api.services.youtube.model.ResourceId;
@@ -231,8 +232,9 @@ public class SearchForm extends JFrame{
 //						System.out.println("Search result is null");
 //					}
 //				}
-				Original_Search ss = new Original_Search();
-				ss.searchFunc(null);
+				//Download video
+				DirectDownload dowloadHandle = new DirectDownload();
+				dowloadHandle.execute("JyhTTkypni0", "C:\\Users\\phong.tran\\Downloads\\Video\\spider_video\\");
 			}
 		});
 		btnNewButton.setIcon(new ImageIcon(SearchForm.class.getResource("/spiderboot/resources/resource/icon_32x32/search_32x32.png")));
