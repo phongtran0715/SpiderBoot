@@ -41,6 +41,7 @@ import spiderboot.databaseconnection.MySqlAccess;
 import spiderboot.helper.ButtonEditor;
 import spiderboot.helper.ButtonRenderer;
 import spiderboot.helper.Util;
+import spiderboot.video.download.DownloadTimerManager;
 
 public class ChannelManagerForm extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -724,7 +725,7 @@ public class ChannelManagerForm extends JFrame {
 			String cHomeId = (String) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("HomeChannelId").getModelIndex());
 			String cMonitorId = (String) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("MonitorChannelId").getModelIndex());
 			int syncInterval = (Integer) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("TimeIntervalSync").getModelIndex());
-			DownloadTimerManager.getInstance().startSyncThread(Integer.toString(id),cHomeId, cMonitorId, syncInterval);
+			DownloadTimerManager.getInstance().startDownloadTimer(Integer.toString(id),cHomeId, cMonitorId, syncInterval);
 			tbMapChannel.getModel().setValueAt("Running", rIndex, 6);
 			tbMapChannel.getModel().setValueAt("Stop", rIndex, 7);
 			//update database
@@ -751,7 +752,7 @@ public class ChannelManagerForm extends JFrame {
 			return isSuccess;
 		}else{
 			int id = (Integer) tbMapChannel.getValueAt(rIndex, tbMapChannel.getColumn("Id").getModelIndex());
-			DownloadTimerManager.getInstance().stopSyncThread(Integer.toString(id));
+			DownloadTimerManager.getInstance().stopDownloadTimer(Integer.toString(id));
 			tbMapChannel.getModel().setValueAt("Stopped", rIndex, 6);
 			tbMapChannel.getModel().setValueAt("Run", rIndex, 7);
 			//update database 

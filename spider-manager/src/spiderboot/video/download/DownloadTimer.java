@@ -1,4 +1,4 @@
-package spiderboot.helper;
+package spiderboot.video.download;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +18,7 @@ import com.google.api.services.samples.youtube.cmdline.data.Search;
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchResult;
 
+import spider.video.VideoWraper;
 import spiderboot.databaseconnection.MySqlAccess;
 
 public class DownloadTimer extends TimerTask{
@@ -77,6 +78,13 @@ public class DownloadTimer extends TimerTask{
 						//Download video
 						DirectDownload dowloadHandle = new DirectDownload();
 						dowloadHandle.execute(vId, storeLocation);
+						//TODO: insert video info to data base
+						VideoWraper vWraper = getVideoInfor(singleVideo);
+						vWraper.dummyData();
+						saveVideoInfo(vWraper);
+						//Update last sync time
+						lastSyncTime = new Date();
+						updateLastSyncTime(lastSyncTime);
 					}
 				}
 			}
@@ -91,7 +99,6 @@ public class DownloadTimer extends TimerTask{
 	}
 
 	private Date getLastSyncTime(String mapId){
-		@SuppressWarnings("deprecation")
 		Date lastSyncTime = null;
 		String query = "SELECT LastSyncTime FROM home_monitor_channel_mapping WHERE Id = '" + mapId + "';";
 		Statement stmt;
@@ -122,6 +129,44 @@ public class DownloadTimer extends TimerTask{
 			// TODO Auto-generated catch block
 			ex.printStackTrace();
 			System.out.println(ex.getMessage());
+			return;
+		}
+	}
+
+	private VideoWraper getVideoInfor(SearchResult singleVideo) {
+		VideoWraper vWraper = new VideoWraper();
+		vWraper.vId = singleVideo.getId().getVideoId();
+		vWraper.title = singleVideo.getSnippet().getTitle();
+		vWraper.description = singleVideo.getSnippet().getDescription();
+		vWraper.tag = singleVideo.getEtag();
+		vWraper.thumbnail = singleVideo.getSnippet().getThumbnails().getDefault().getUrl();
+		vWraper.vLocation = storeLocation + vWraper.title + ".mp4";
+		return vWraper;
+	}
+
+	private void saveVideoInfo(VideoWraper vWraper) {
+		Timestamp timestamp = new Timestamp(new Date().getTime());
+		//insert to database
+		PreparedStatement preparedStm = null;
+		String query = "INSERT INTO video_container (VideoId, Title, Tag, Description, Thumbnail, "
+				+ "VideoLocation, TargetChannelId, DownloadDate) VALUES (?,?,?,?,?,?,?,?)";
+		try {
+			preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
+			// execute insert SQL statement
+			preparedStm.setString(1, vWraper.vId);
+			preparedStm.setString(2, vWraper.title);
+			preparedStm.setString(3, vWraper.tag);
+			preparedStm.setString(4, vWraper.description);
+			preparedStm.setString(5, vWraper.thumbnail);
+			preparedStm.setString(6, vWraper.vLocation);
+			preparedStm.setString(7, cMonitorId);
+			preparedStm.setTimestamp(8, timestamp);
+			preparedStm.executeUpdate();
+			System.out.println("Saved video " + vWraper.vId + " to database");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return;
 		}
 	}

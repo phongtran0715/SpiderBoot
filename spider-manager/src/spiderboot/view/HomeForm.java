@@ -24,6 +24,7 @@ import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
 import spiderboot.helper.ImagePanel;
+import spiderboot.video.download.DownloadTimerManager;
 
 public class HomeForm extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -38,7 +39,7 @@ public class HomeForm extends JFrame {
 	public HomeForm() {	
 		initialize();
 		//load sync task 
-		DownloadTimerManager.getInstance().initSyncTask();
+		DownloadTimerManager.getInstance().initTimerTask();
 	}
 	
 	private void initialize() {
