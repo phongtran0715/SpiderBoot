@@ -33,6 +33,8 @@ import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Thumbnail;
 
+import spiderboot.helper.SearchExecute;
+
 public class SearchForm extends JFrame{
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -217,24 +219,16 @@ public class SearchForm extends JFrame{
 		JButton btnNewButton = new JButton("Search");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-//				String keyWork = txtKeyword.getText().trim();
-//				if(keyWork.equals("")){
-//					JOptionPane.showMessageDialog(contentPane, "You must put keywork to search",
-//							"Error", JOptionPane.OK_OPTION);
-//					return;
-//				}else{
-//					Search search = new Search();
-//					List<SearchResult> searchResult = search.executeQuery(txtKeyword.getText().trim());
-//					if(searchResult != null){
-//						prettyPrint(searchResult.iterator(), txtKeyword.getText().trim());
-//						System.out.println("Search completed!");	
-//					}else{
-//						System.out.println("Search result is null");
-//					}
-//				}
-				//Download video
-				DirectDownload dowloadHandle = new DirectDownload();
-				dowloadHandle.execute("JyhTTkypni0", "C:\\Users\\phong.tran\\Downloads\\Video\\spider_video\\");
+				String keyWork = txtKeyword.getText().trim();
+				if(keyWork.equals("")){
+					JOptionPane.showMessageDialog(contentPane, "You must put keywork to search",
+							"Error", JOptionPane.OK_OPTION);
+					return;
+				}else{
+					SearchExecute searchExe = new SearchExecute(keyWork);
+					Thread searchThread = new Thread(searchExe);
+					searchThread.start();
+				}
 			}
 		});
 		btnNewButton.setIcon(new ImageIcon(SearchForm.class.getResource("/spiderboot/resources/resource/icon_32x32/search_32x32.png")));
@@ -274,30 +268,5 @@ public class SearchForm extends JFrame{
 		//table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 	}
 
-	private void prettyPrint(Iterator<SearchResult> iteratorSearchResults, String query) {
-		System.out.println("\n=============================================================");
-		System.out.println("   First " + 25 + " videos for search on \"" + query + "\".");
-		System.out.println("\n=============================================================");
-		tbResultMode.setRowCount(0);
-		if (!iteratorSearchResults.hasNext()) {
-			System.out.println(" There aren't any results for your query.");
-		}
-		int count = 1;
-		while (iteratorSearchResults.hasNext()) {
-
-			SearchResult singleVideo = iteratorSearchResults.next();
-			ResourceId rId = singleVideo.getId();
-
-			// Confirm that the result represents a video. Otherwise, the
-			// item will not contain a video ID.
-			if (rId.getKind().equals("youtube#video")) {
-				Thumbnail thumbnail = singleVideo.getSnippet().getThumbnails().getDefault();
-				System.out.println(" Video Id : " + rId.getVideoId());
-				System.out.println(" Title: " + singleVideo.getSnippet().getTitle());
-				System.out.println(" Thumbnail: " + thumbnail.getUrl());
-				System.out.println("\n-------------------------------------------------------------");
-				tbResultMode.addRow(new Object[]{Integer.toString(count++) , rId.getVideoId(),singleVideo.getSnippet().getTitle(),thumbnail.getUrl()});
-			}
-		}
-	}
+	
 }
