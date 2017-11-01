@@ -27,4 +27,8 @@ public class NewThread implements Runnable {
 		}
 		System.out.println(name + " exiting.");
 	}
+	
+	public void startThread() {
+		t.start();
+	}
 }

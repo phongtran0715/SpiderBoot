@@ -14,14 +14,6 @@
 
 package com.google.api.services.samples.youtube.cmdline.data;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
@@ -34,6 +26,11 @@ import com.google.api.services.youtube.model.VideoSnippet;
 import com.google.api.services.youtube.model.VideoStatus;
 import com.google.common.collect.Lists;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
 /**
  * Upload a video to the authenticated user's channel. Use OAuth 2.0 to
  * authorize the request. Note that you must add your video files to the
@@ -41,7 +38,7 @@ import com.google.common.collect.Lists;
  *
  * @author Jeremy Walker
  */
-public class UploadVideo {
+public class UploadVideo_Original {
 
     /**
      * Define a global instance of a Youtube object, which will be used
@@ -64,7 +61,7 @@ public class UploadVideo {
      *
      * @param args command line args (not used).
      */
-    public void execute(String title, String description, String etags, String vLocation) {
+    public static void main(String[] args) {
 
         // This OAuth 2.0 access scope allows an application to upload files
         // to the authenticated user's YouTube channel, but doesn't allow
@@ -79,13 +76,15 @@ public class UploadVideo {
             youtube = new YouTube.Builder(Auth.HTTP_TRANSPORT, Auth.JSON_FACTORY, credential).setApplicationName(
                     "youtube-cmdline-uploadvideo-sample").build();
 
+            System.out.println("Uploading: " + SAMPLE_VIDEO_FILENAME);
+
             // Add extra information to the video before uploading.
             Video videoObjectDefiningMetadata = new Video();
 
             // Set the video to be publicly visible. This is the default
             // setting. Other supporting settings are "unlisted" and "private."
             VideoStatus status = new VideoStatus();
-            status.setPrivacyStatus("private");
+            status.setPrivacyStatus("public");
             videoObjectDefiningMetadata.setStatus(status);
 
             // Most of the video's metadata is set on the VideoSnippet object.
@@ -96,8 +95,9 @@ public class UploadVideo {
             // multiple files. You should remove this code from your project
             // and use your own standard names instead.
             Calendar cal = Calendar.getInstance();
-            snippet.setTitle(title);
-            snippet.setDescription(description);
+            snippet.setTitle("Test Upload via Java on " + cal.getTime());
+            snippet.setDescription(
+                    "Video uploaded via YouTube Data API V3 using the Java library " + "on " + cal.getTime());
 
             // Set the keyword tags that you want to associate with the video.
             List<String> tags = new ArrayList<String>();
@@ -111,12 +111,8 @@ public class UploadVideo {
             // Add the completed snippet object to the video resource.
             videoObjectDefiningMetadata.setSnippet(snippet);
 
-//            InputStreamContent mediaContent = new InputStreamContent(VIDEO_FILE_FORMAT,
-//                    UploadVideo.class.getResourceAsStream("/sample-video.mp4"));
-            
-            File initialFile = new File(vLocation);
-            InputStream targetStream = new FileInputStream(initialFile);
-            InputStreamContent mediaContent = new InputStreamContent(VIDEO_FILE_FORMAT,targetStream);
+            InputStreamContent mediaContent = new InputStreamContent(VIDEO_FILE_FORMAT,
+                    UploadVideo_Original.class.getResourceAsStream("/Playboy.mp4"));
 
             // Insert the video. The command sends three arguments. The first
             // specifies which information the API request is setting and which

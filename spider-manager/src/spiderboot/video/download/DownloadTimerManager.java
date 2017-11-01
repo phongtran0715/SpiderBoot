@@ -12,7 +12,6 @@ public class DownloadTimerManager extends TimerWrapper{
 	private static DownloadTimerManager instance = null;
 	
 	public DownloadTimerManager() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public static DownloadTimerManager getInstance(){
@@ -24,10 +23,12 @@ public class DownloadTimerManager extends TimerWrapper{
 	
 	public boolean startDownloadTimer(String taskId, String cHomeId, String cMonitorId, int timerInterval) {
 		boolean isSuccess = false;
-		TimerTask timerTask = new DownloadTimer(taskId, cHomeId, cMonitorId);
+		TimerTask timerTask = new DownloadExecuteTimer(taskId, cHomeId, cMonitorId);
 		Timer timer = new Timer(true);
 		timer.scheduleAtFixedRate(timerTask, 0, timerInterval *1000);
-		timerMap.put(taskId, timer);        
+		if(timer!= null){
+			timerMap.put(taskId, timer);	
+		}
 		isSuccess = true;
 		return isSuccess;
 	}

@@ -8,7 +8,6 @@ import java.net.ServerSocket;
 
 public class Util {
 	private static final int PORT = 9999;
-	private final String BASE_PATH = "E:\\SpiderVideo\\"; 
 	@SuppressWarnings("unused")
 	private static ServerSocket socket;    
 
@@ -34,7 +33,7 @@ public class Util {
 
 	public boolean createFolder(String dirName) {
 		boolean result = false;
-		String path =  BASE_PATH + dirName;
+		String path = dirName;
 		File theDir = new File(path);
 		// if the directory does not exist, create it
 		if (!theDir.exists()) {
@@ -52,7 +51,7 @@ public class Util {
 	}
 
 	public void deleteFolder(String dirName) {
-		String path =  BASE_PATH + dirName;
+		String path = dirName;
 		File theDir = new File(path);
 		if (theDir.isDirectory()) {
 			//directory is empty, then delete it

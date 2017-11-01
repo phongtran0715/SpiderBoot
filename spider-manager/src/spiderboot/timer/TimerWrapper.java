@@ -3,7 +3,7 @@ import java.util.HashMap;
 import java.util.Timer;
 
 public class TimerWrapper {
-	public HashMap<String, Timer> timerMap ;
+	public HashMap<String, Timer> timerMap = new HashMap<String, Timer>();
 	
 	public TimerWrapper() {
 		// TODO Auto-generated constructor stub

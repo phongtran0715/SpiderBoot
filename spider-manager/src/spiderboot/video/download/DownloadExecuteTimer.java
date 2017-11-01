@@ -20,16 +20,19 @@ import com.google.api.services.youtube.model.SearchResult;
 
 import spider.video.VideoWraper;
 import spiderboot.databaseconnection.MySqlAccess;
+import spiderboot.helper.Util;
+import spiderboot.video.upload.UploadExecuteThread;
 
-public class DownloadTimer extends TimerTask{
+public class DownloadExecuteTimer extends TimerTask{
 	String timerId;
 	String cHomeId;
 	String cMonitorId;
 	boolean isComplete = true;
 	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	String storeLocation = "C:\\Users\\phong.tran\\Downloads\\Video\\spider_video\\";
+	String storeLocation = "E:\\SpiderVideo\\";
+	Util util = new Util();
 
-	public DownloadTimer(String timerId, String cHomeId, String cMonitorId) {
+	public DownloadExecuteTimer(String timerId, String cHomeId, String cMonitorId) {
 		// TODO Auto-generated constructor stub
 		this.timerId = timerId;
 		this.cHomeId = cHomeId;
@@ -70,18 +73,20 @@ public class DownloadTimer extends TimerTask{
 				return;
 			}else{
 				while (iteratorSearchResults.hasNext()) {
-
 					SearchResult singleVideo = iteratorSearchResults.next();
 					ResourceId rId = singleVideo.getId();
 					if (rId.getKind().equals("youtube#video")) {
 						String vId = rId.getVideoId();
 						//Download video
 						DirectDownload dowloadHandle = new DirectDownload();
-						dowloadHandle.execute(vId, storeLocation);
-						//TODO: insert video info to data base
+						String path = storeLocation + cHomeId + "-" + cMonitorId;
+						util.createFolder(path);
+						dowloadHandle.execute(vId, path);
+						//Insert video info to data base
 						VideoWraper vWraper = getVideoInfor(singleVideo);
-						vWraper.dummyData();
 						saveVideoInfo(vWraper);
+						//Notify to upload thread
+						new UploadExecuteThread().getInstance().addElement(vWraper);
 						//Update last sync time
 						lastSyncTime = new Date();
 						updateLastSyncTime(lastSyncTime);
@@ -137,10 +142,11 @@ public class DownloadTimer extends TimerTask{
 		VideoWraper vWraper = new VideoWraper();
 		vWraper.vId = singleVideo.getId().getVideoId();
 		vWraper.title = singleVideo.getSnippet().getTitle();
+		vWraper.title = vWraper.title.replaceAll("[!@#$%^&*(){}:|<>?]", " ");
 		vWraper.description = singleVideo.getSnippet().getDescription();
 		vWraper.tag = singleVideo.getEtag();
 		vWraper.thumbnail = singleVideo.getSnippet().getThumbnails().getDefault().getUrl();
-		vWraper.vLocation = storeLocation + vWraper.title + ".mp4";
+		vWraper.vLocation = storeLocation + cHomeId + "-" + cMonitorId + "\\" + vWraper.title + ".mp4";
 		return vWraper;
 	}
 
@@ -149,7 +155,7 @@ public class DownloadTimer extends TimerTask{
 		//insert to database
 		PreparedStatement preparedStm = null;
 		String query = "INSERT INTO video_container (VideoId, Title, Tag, Description, Thumbnail, "
-				+ "VideoLocation, TargetChannelId, DownloadDate) VALUES (?,?,?,?,?,?,?,?)";
+				+ "VideoLocation, HomeChannelId, MonitorChannelId, DownloadDate) VALUES (?,?,?,?,?,?,?,?,?)";
 		try {
 			preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
 			// execute insert SQL statement
@@ -159,8 +165,9 @@ public class DownloadTimer extends TimerTask{
 			preparedStm.setString(4, vWraper.description);
 			preparedStm.setString(5, vWraper.thumbnail);
 			preparedStm.setString(6, vWraper.vLocation);
-			preparedStm.setString(7, cMonitorId);
-			preparedStm.setTimestamp(8, timestamp);
+			preparedStm.setString(7, cHomeId);
+			preparedStm.setString(8, cMonitorId);
+			preparedStm.setTimestamp(9, timestamp);
 			preparedStm.executeUpdate();
 			System.out.println("Saved video " + vWraper.vId + " to database");
 		} catch (SQLException e) {

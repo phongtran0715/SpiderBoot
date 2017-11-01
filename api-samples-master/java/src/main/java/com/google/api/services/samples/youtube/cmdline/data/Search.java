@@ -113,7 +113,7 @@ public class Search {
 
 			// To increase efficiency, only retrieve the fields that the
 			// application uses.
-			search.setFields("items(id/kind,id/videoId,snippet/title,snippet/description,"
+			search.setFields("items(etag,id/kind,id/videoId,snippet/title,snippet/description,"
 					+ "snippet/thumbnails/default/url)");
 			search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
 
@@ -148,7 +148,8 @@ public class Search {
 			search.setChannelId(channelId);
 			search.setFields("items(id/kind,id/videoId,snippet/title,snippet/description,"
 					+ "snippet/thumbnails/default/url)");
-			search.setPublishedAfter(publishAfter);	
+			search.setPublishedAfter(publishAfter);
+			search.setMaxResults((long) 2);
 			// Call the API and print results.
 			SearchListResponse searchResponse = search.execute();
 			searchResult = searchResponse.getItems();
