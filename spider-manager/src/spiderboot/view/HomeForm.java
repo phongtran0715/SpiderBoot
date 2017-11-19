@@ -60,7 +60,7 @@ public class HomeForm extends JFrame {
 		panel.setFont(new Font("Tahoma", Font.BOLD, 11));
 		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "CHANNEL MANAGER", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
 		panel.setBackground(Color.WHITE);
-		panel.setBounds(1056, 307, 850, 229);
+		panel.setBounds(12, 12, 1894, 213);
 		contentPane.add(panel);
 
 		JButton button = new JButton("Search");
@@ -154,7 +154,7 @@ public class HomeForm extends JFrame {
 		panel_1.setOpaque(false);
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "SEO", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
 		panel_1.setBackground(Color.WHITE);
-		panel_1.setBounds(1056, 547, 850, 214);
+		panel_1.setBounds(12, 236, 1894, 213);
 		contentPane.add(panel_1);
 
 		JButton button_6 = new JButton("Playlist");
@@ -187,7 +187,7 @@ public class HomeForm extends JFrame {
 		panel_2.setForeground(Color.WHITE);
 		panel_2.setBorder(new TitledBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)), "TOOL", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(255, 255, 255)));
 		panel_2.setBackground(Color.WHITE);
-		panel_2.setBounds(1056, 772, 850, 221);
+		panel_2.setBounds(12, 459, 1894, 220);
 		contentPane.add(panel_2);
 
 		JButton button_10 = new JButton("Change MD5");

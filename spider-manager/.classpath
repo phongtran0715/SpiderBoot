@@ -8,14 +8,14 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="library/mysql-connector-java-5.1.44-bin.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ytd2"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sample"/>
 	<classpathentry exported="true" kind="lib" path="library"/>
-	<classpathentry kind="lib" path="library/google-api-services-youtube-v3-rev187-1.23.0-javadoc.jar"/>
-	<classpathentry kind="lib" path="library/google-api-services-youtube-v3-rev187-1.23.0-sources.jar"/>
-	<classpathentry kind="lib" path="library/google-api-services-youtube-v3-rev187-1.23.0.jar"/>
-	<classpathentry kind="lib" path="library/transaction-api-1.1.jar"/>
-	<classpathentry kind="lib" path="library/google-http-client-1.22.0.jar"/>
+	<classpathentry kind="lib" path="/media/phongtran0715/DOCUMENTS/SourceCode/SpiderBoot/spider-manager/library/transaction-api-1.1.jar"/>
+	<classpathentry kind="lib" path="/media/phongtran0715/DOCUMENTS/SourceCode/SpiderBoot/spider-manager/library/mysql-connector-java-5.1.44-bin.jar"/>
+	<classpathentry kind="lib" path="/media/phongtran0715/DOCUMENTS/SourceCode/SpiderBoot/spider-manager/library/google-api-client-1.23.0.jar"/>
+	<classpathentry kind="lib" path="/media/phongtran0715/DOCUMENTS/SourceCode/SpiderBoot/spider-manager/library/google-api-services-youtube-v3-rev187-1.23.0.jar"/>
+	<classpathentry kind="lib" path="/media/phongtran0715/DOCUMENTS/SourceCode/SpiderBoot/spider-manager/library/ytd2_20150609_src.jar"/>
+	<classpathentry kind="lib" path="/media/phongtran0715/DOCUMENTS/SourceCode/SpiderBoot/spider-manager/library/google-http-client-1.23.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

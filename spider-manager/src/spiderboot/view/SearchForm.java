@@ -228,12 +228,12 @@ public class SearchForm extends JFrame{
 
 		JPanel pnResult = new JPanel();
 		pnResult.setBorder(new TitledBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)), "Result", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		pnResult.setBounds(10, 254, 1888, 708);
+		pnResult.setBounds(10, 254, 770, 310);
 		contentPane.add(pnResult);
 		pnResult.setLayout(null);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 21, 1868, 676);
+		scrollPane.setBounds(10, 21, 748, 300);
 		pnResult.add(scrollPane);
 
 		tbResultMode = new DefaultTableModel(new Object[][] {
