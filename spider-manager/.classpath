@@ -9,10 +9,13 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="library/mysql-connector-java-5.1.44-bin.jar"/>
-	<classpathentry kind="lib" path="C:/Users/phong.tran/Downloads/New folder/google-api-services-youtube-v3-rev182-1.22.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/phong.tran/Downloads/New folder/google-api-services-youtube-v3-rev182-1.22.0-sources.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ytd2"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/samples"/>
-	<classpathentry kind="lib" path="E:/SourceCode/Java Library/vget-master/library/ytd2_20150609_src.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sample"/>
+	<classpathentry exported="true" kind="lib" path="library"/>
+	<classpathentry kind="lib" path="library/google-api-services-youtube-v3-rev187-1.23.0-javadoc.jar"/>
+	<classpathentry kind="lib" path="library/google-api-services-youtube-v3-rev187-1.23.0-sources.jar"/>
+	<classpathentry kind="lib" path="library/google-api-services-youtube-v3-rev187-1.23.0.jar"/>
+	<classpathentry kind="lib" path="library/transaction-api-1.1.jar"/>
+	<classpathentry kind="lib" path="library/google-http-client-1.22.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

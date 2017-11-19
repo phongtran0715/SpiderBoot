@@ -81,7 +81,7 @@ public class DownloadExecuteTimer extends TimerTask{
 						DirectDownload dowloadHandle = new DirectDownload();
 						String path = storeLocation + cHomeId + "-" + cMonitorId;
 						util.createFolder(path);
-						dowloadHandle.execute(vId, path);
+						dowloadHandle.download(vId, path);
 						//Insert video info to data base
 						VideoWraper vWraper = getVideoInfor(singleVideo);
 						saveVideoInfo(vWraper);
