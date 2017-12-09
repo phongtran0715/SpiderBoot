@@ -31,7 +31,7 @@ public class Util {
 		return isRunning;
 	}
 
-	public boolean createFolder(String dirName) {
+	public boolean createFolderIfNotExist(String dirName) {
 		boolean result = false;
 		String path = dirName;
 		File theDir = new File(path);

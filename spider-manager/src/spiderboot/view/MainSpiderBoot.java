@@ -1,11 +1,6 @@
 package spiderboot.view;
 
 import java.awt.Dialog.ModalityType;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.StringTokenizer;
 
 import spiderboot.configuration.ConfigProperties;
 import spiderboot.databaseconnection.MySqlAccess;

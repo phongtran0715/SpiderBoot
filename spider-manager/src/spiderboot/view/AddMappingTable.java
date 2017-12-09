@@ -248,7 +248,7 @@ public class AddMappingTable extends JDialog {
 						e1.printStackTrace();
 					}
 					//create folder if it does not exist
-					new Util().createFolder(cHomeId + "-" + cMonitorId);
+					new Util().createFolderIfNotExist(cHomeId + "-" + cMonitorId);
 
 					dispose();
 				}

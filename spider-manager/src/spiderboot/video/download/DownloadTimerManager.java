@@ -25,7 +25,7 @@ public class DownloadTimerManager extends TimerWrapper{
 		boolean isSuccess = false;
 		TimerTask timerTask = new DownloadExecuteTimer(taskId, cHomeId, cMonitorId);
 		Timer timer = new Timer(true);
-		timer.scheduleAtFixedRate(timerTask, 0, timerInterval *1000);
+		timer.scheduleAtFixedRate(timerTask, 0, timerInterval);
 		if(timer!= null){
 			timerMap.put(taskId, timer);	
 		}

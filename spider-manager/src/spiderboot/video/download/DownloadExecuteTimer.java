@@ -12,6 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TimerTask;
 
+import javax.security.auth.login.Configuration;
+
 import com.github.axet.vget.DirectDownload;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.samples.youtube.cmdline.data.Search;
@@ -19,6 +21,7 @@ import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchResult;
 
 import spider.video.VideoWraper;
+import spiderboot.configuration.ConfigProperties;
 import spiderboot.databaseconnection.MySqlAccess;
 import spiderboot.helper.Util;
 import spiderboot.video.upload.UploadExecuteThread;
@@ -29,14 +32,15 @@ public class DownloadExecuteTimer extends TimerTask{
 	String cMonitorId;
 	boolean isComplete = true;
 	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	String storeLocation = "E:\\SpiderVideo\\";
 	Util util = new Util();
+	String videoFolderBase;
 
 	public DownloadExecuteTimer(String timerId, String cHomeId, String cMonitorId) {
 		// TODO Auto-generated constructor stub
 		this.timerId = timerId;
 		this.cHomeId = cHomeId;
 		this.cMonitorId = cMonitorId;
+		videoFolderBase = ConfigProperties.getInstance().getProperties("VideoFolderPath", "");
 	}
 
 	@Override
@@ -79,17 +83,22 @@ public class DownloadExecuteTimer extends TimerTask{
 						String vId = rId.getVideoId();
 						//Download video
 						DirectDownload dowloadHandle = new DirectDownload();
-						String path = storeLocation + cHomeId + "-" + cMonitorId;
-						util.createFolder(path);
-						dowloadHandle.download(vId, path);
-						//Insert video info to data base
-						VideoWraper vWraper = getVideoInfor(singleVideo);
-						saveVideoInfo(vWraper);
-						//Notify to upload thread
-						new UploadExecuteThread().getInstance().addElement(vWraper);
-						//Update last sync time
-						lastSyncTime = new Date();
-						updateLastSyncTime(lastSyncTime);
+						String path = videoFolderBase + "\\" + cHomeId + "-" + cMonitorId;
+						boolean isOK = util.createFolderIfNotExist(path);
+						if(isOK)
+						{
+							dowloadHandle.download(vId, path);
+							//Insert video info to data base
+							VideoWraper vWraper = getVideoInfor(singleVideo);
+							saveVideoInfo(vWraper);
+							//Notify to upload thread
+							new UploadExecuteThread().getInstance().addElement(vWraper);
+							//Update last sync time
+							lastSyncTime = new Date();
+							updateLastSyncTime(lastSyncTime);	
+						}else {
+							System.out.println("Error! Cannot creat video folder.");
+						}
 					}
 				}
 			}
@@ -146,7 +155,7 @@ public class DownloadExecuteTimer extends TimerTask{
 		vWraper.description = singleVideo.getSnippet().getDescription();
 		vWraper.tag = singleVideo.getEtag();
 		vWraper.thumbnail = singleVideo.getSnippet().getThumbnails().getDefault().getUrl();
-		vWraper.vLocation = storeLocation + cHomeId + "-" + cMonitorId + "\\" + vWraper.title + ".mp4";
+		vWraper.vLocation =  videoFolderBase + "\\" + cHomeId + "-" + cMonitorId + "\\" + vWraper.title + ".mp4";
 		return vWraper;
 	}
 

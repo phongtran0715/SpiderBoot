@@ -49,9 +49,9 @@ public class SearchForm extends JFrame{
 		setTitle("Search");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(SearchForm.class.getResource("/spiderboot/resources/resource/icon_32x32/search_32x32.png")));
 		setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		setBounds(100, 100, 792, 578);
+		setBounds(100, 100, 1924, 1056);
 		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		//set center screen
@@ -228,12 +228,12 @@ public class SearchForm extends JFrame{
 
 		JPanel pnResult = new JPanel();
 		pnResult.setBorder(new TitledBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)), "Result", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		pnResult.setBounds(10, 254, 770, 310);
+		pnResult.setBounds(10, 254, 1888, 740);
 		contentPane.add(pnResult);
 		pnResult.setLayout(null);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 21, 748, 300);
+		scrollPane.setBounds(10, 21, 1868, 682);
 		pnResult.add(scrollPane);
 
 		tbResultMode = new DefaultTableModel(new Object[][] {

@@ -1,5 +1,6 @@
 package spiderboot.configuration;
 
+import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -42,6 +43,7 @@ public class ConfigProperties {
 	public void writeProperties(String key, String value) {
 		try {
 			String path = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+			//System.out.println("config path : " + path);
 			File configFile = new File(path + "config.properties");
 			output = new FileOutputStream(configFile);
 			prop.setProperty(key, value);
