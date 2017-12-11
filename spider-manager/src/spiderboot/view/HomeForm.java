@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -44,7 +43,7 @@ public class HomeForm extends JFrame {
 		DownloadTimerManager.getInstance().initTimerTask();
 		//UploadTimerManager.getInstance().initTimerTask();
 	}
-	
+
 	private void initialize() {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(HomeForm.class.getResource("/spiderboot/resources/resource/icon_32x32/user_32x32.png")));
 		setTitle("Spider Boot V1.0");
@@ -54,6 +53,9 @@ public class HomeForm extends JFrame {
 		contentPane.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		this.getContentPane().add(contentPane, BorderLayout.CENTER);
 		contentPane.setLayout(null);
+		//set center screen
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		setLocation(dim.width/2- getSize().width/2, dim.height/2- getSize().height/2);
 
 		JPanel panel = new JPanel();
 		panel.setOpaque(false);
@@ -231,7 +233,7 @@ public class HomeForm extends JFrame {
 		button_13.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 		button_13.setBounds(417, 106, 180, 60);
 		panel_2.add(button_13);
-		
+
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		menuBar.setLocation(new Point(2, 2));
@@ -240,14 +242,14 @@ public class HomeForm extends JFrame {
 		menuBar.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		menuBar.setBackground(UIManager.getColor("info"));
 		setJMenuBar(menuBar);
-		
+
 		JMenu mnTool = new JMenu("TOOL");
 		mnTool.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		mnTool.setIcon(new ImageIcon(HomeForm.class.getResource("/spiderboot/resources/resource/icon_16x16/settings_16x16.png")));
 		mnTool.setHorizontalAlignment(SwingConstants.CENTER);
 		mnTool.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		menuBar.add(mnTool);
-		
+
 		JMenuItem mntmViewChannelInfo = new JMenuItem("View Channel Info");
 		mntmViewChannelInfo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -261,6 +263,19 @@ public class HomeForm extends JFrame {
 		mntmViewChannelInfo.setHorizontalAlignment(SwingConstants.CENTER);
 		mntmViewChannelInfo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		mnTool.add(mntmViewChannelInfo);
+		
+		JMenuItem mntmViewConsoleLog = new JMenuItem("View Console Log");
+		mntmViewConsoleLog.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ConsoleLogForm consoleFrm = new ConsoleLogForm();
+				consoleFrm.setVisible(true);
+			}
+		});
+		mntmViewConsoleLog.setIcon(new ImageIcon(HomeForm.class.getResource("/spiderboot/resources/resource/icon_24x24/graph_24x24.png")));
+		mntmViewConsoleLog.setHorizontalAlignment(SwingConstants.CENTER);
+		mntmViewConsoleLog.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		mntmViewConsoleLog.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		mnTool.add(mntmViewConsoleLog);
 	}
 }
 

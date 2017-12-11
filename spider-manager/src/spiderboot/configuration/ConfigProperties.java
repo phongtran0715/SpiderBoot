@@ -1,7 +1,7 @@
 package spiderboot.configuration;
 
-import java.io.Console;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,7 +14,21 @@ public class ConfigProperties {
 	Properties prop = null;
 	InputStream input = null;
 	OutputStream output = null;
+	File configFile = null;
 
+	private ConfigProperties() {
+		if(configFile == null) {
+			try {
+				String path = new File(".").getCanonicalPath() + "\\config\\config.properties";
+				configFile = new File(path);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.out.println("Error! Can not load config file path.");
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public static ConfigProperties getInstance() {
 		if(instance == null){
 			instance = new ConfigProperties();
@@ -26,25 +40,24 @@ public class ConfigProperties {
 		boolean isOk = false;
 		InputStream inputStream;
 		try {
-			inputStream = this.getClass().getClassLoader().getResourceAsStream("config.properties");
+			inputStream = new FileInputStream(configFile);
 			prop = new Properties();
 			prop.load(inputStream);
 			isOk = true;
 			System.out.println("Load configuration file successful!");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
+			System.out.println("Load config file false!!!");
 			e.printStackTrace();
 		}catch (IOException e){
 			e.printStackTrace();
 		}
+		System.out.println("Load config file false!!!");
 		return isOk;
 	}
 
 	public void writeProperties(String key, String value) {
 		try {
-			String path = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-			//System.out.println("config path : " + path);
-			File configFile = new File(path + "config.properties");
 			output = new FileOutputStream(configFile);
 			prop.setProperty(key, value);
 			// save properties to project root folder

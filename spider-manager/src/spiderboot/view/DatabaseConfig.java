@@ -7,6 +7,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -21,8 +23,6 @@ import javax.swing.border.TitledBorder;
 
 import spiderboot.configuration.ConfigProperties;
 import spiderboot.databaseconnection.MySqlAccess;
-import javax.swing.ImageIcon;
-import javax.swing.DefaultComboBoxModel;
 
 public class DatabaseConfig extends JDialog {
 
@@ -31,9 +31,15 @@ public class DatabaseConfig extends JDialog {
 	private JTextField txtServerName;
 	private JTextField txtUserName;
 	private JPasswordField txtPassword;
+	boolean isOpenLoginFrm = false;
 
 	public DatabaseConfig() {
 		initialize();
+	}
+	
+	public DatabaseConfig(Boolean isOpenLoginFrm) {
+		initialize();
+		this.isOpenLoginFrm = isOpenLoginFrm;
 	}
 
 	private void initialize() {
@@ -142,9 +148,12 @@ public class DatabaseConfig extends JDialog {
 					ConfigProperties.getInstance().writeProperties("DbName", dbName);
 					ConfigProperties.getInstance().writeProperties("DbUserName", userName);
 					ConfigProperties.getInstance().writeProperties("DbPassword", password);
-					LoginForm loginFrm = new LoginForm();
-					setVisible(false);
-					loginFrm.setVisible(true);
+					if(isOpenLoginFrm) {
+						LoginForm loginFrm = new LoginForm();
+						loginFrm.setVisible(true);	
+					}else {
+						setVisible(false);
+					}
 				}else{
 					JOptionPane.showMessageDialog(contentPanel, "Error code =  " + Integer.toString(errCode) + " : "
 							+ "Can not connect to database server. "

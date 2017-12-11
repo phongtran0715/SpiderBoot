@@ -1,27 +1,30 @@
 package spiderboot.helper;
 
 import java.awt.Component;
+
 import javax.swing.JButton;
 import javax.swing.JTable;
+import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
 //BUTTON RENDERER CLASS
-public class ButtonRenderer extends JButton implements  TableCellRenderer
-{
-	private static final long serialVersionUID = -2143545396429393642L;
-	//CONSTRUCTOR
+public class ButtonRenderer extends JButton implements TableCellRenderer {
+	private static final long serialVersionUID = 1L;
+
 	public ButtonRenderer() {
-		//SET BUTTON PROPERTIES
 		setOpaque(true);
 	}
-	@Override
-	public Component getTableCellRendererComponent(JTable table, Object obj,
-			boolean selected, boolean focused, int row, int col) {
 
-		//SET PASSED OBJECT AS BUTTON TEXT
-		setText((obj==null) ? "":obj.toString());
-
+	public Component getTableCellRendererComponent(JTable table, Object value,
+			boolean isSelected, boolean hasFocus, int row, int column) {
+		if (isSelected) {
+			setForeground(table.getSelectionForeground());
+			setBackground(table.getSelectionBackground());
+		} else {
+			setForeground(table.getForeground());
+			setBackground(UIManager.getColor("Button.background"));
+		}
+		setText((value == null) ? "" : value.toString());
 		return this;
 	}
-
 }
