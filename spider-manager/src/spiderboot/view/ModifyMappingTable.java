@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
@@ -27,6 +28,7 @@ import javax.swing.border.TitledBorder;
 
 import spiderboot.databaseconnection.MySqlAccess;
 import spiderboot.helper.ComboboxToolTipRenderer;
+import javax.swing.ImageIcon;
 
 public class ModifyMappingTable extends JDialog {
 	private static final long serialVersionUID = 1L;
@@ -37,6 +39,8 @@ public class ModifyMappingTable extends JDialog {
 	List<String> monitorTooltips = new ArrayList<String>();
 	private JTextField txtTimeSync;
 	int id;
+	final int HOME_CHANNEL = 0;
+	final int MONITOR_CHANNEL = 1;
 
 	public ModifyMappingTable() {
 		initialize();
@@ -68,7 +72,7 @@ public class ModifyMappingTable extends JDialog {
 		cbMonitor.setRenderer(monitorRenderer);
 		homeRenderer.setTooltips(homeTooltips);
 		monitorRenderer.setTooltips(monitorTooltips);
-		
+
 		cbHome.getEditor().setItem(cHomeId);
 		cbMonitor.getEditor().setItem(cMonitorId);
 		txtTimeSync.setText(Integer.toString(timeSync));
@@ -103,7 +107,7 @@ public class ModifyMappingTable extends JDialog {
 		lblMoonitorChannelId.setBounds(0, 51, 121, 25);
 		panel.add(lblMoonitorChannelId);
 
-		JLabel lblTimeSync = new JLabel("Time Sync");
+		JLabel lblTimeSync = new JLabel("Time Sync (s)");
 		lblTimeSync.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblTimeSync.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		lblTimeSync.setBounds(0, 91, 121, 25);
@@ -125,22 +129,35 @@ public class ModifyMappingTable extends JDialog {
 		panel.add(cbMonitor);
 
 		JButton btnOK = new JButton("OK");
+		btnOK.setIcon(new ImageIcon(ModifyMappingTable.class.getResource("/spiderboot/resources/resource/icon_24x24/checked_24x24.png")));
 		btnOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String cHomeId = (String) cbHome.getSelectedItem();		
 				String cMonitorId = (String)cbMonitor.getSelectedItem();		
 				String timeSync = txtTimeSync.getText().trim();
 				if(cHomeId.equals(null) || cHomeId.equals("")){
-					JOptionPane.showMessageDialog(contentPanel, "Home Channel ID field can not be empty!", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
+					JOptionPane.showMessageDialog(contentPanel, "Home Channel ID field can not be empty!",
+							"Error", JOptionPane.ERROR_MESSAGE);
 				}else if(cMonitorId.equals(null) || cMonitorId.equals("")){
-					JOptionPane.showMessageDialog(contentPanel, "Monitor Channel ID field can not be empty!", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
+					JOptionPane.showMessageDialog(contentPanel, "Monitor Channel ID field can not be empty!", 
+							"Error", JOptionPane.ERROR_MESSAGE);
 				}else if(timeSync.equals(null) || timeSync.equals("")){
-					JOptionPane.showMessageDialog(contentPanel, "Time Interval Sync field can not be empty!", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				else{
+					JOptionPane.showMessageDialog(contentPanel, "Time Interval Sync field can not be empty!", 
+							"Error", JOptionPane.ERROR_MESSAGE);
+				}else{
+					//check channel is valid
+					boolean isCHomeValid = isChannelValid(cHomeId, HOME_CHANNEL);
+					if(!isCHomeValid) {
+						JOptionPane.showMessageDialog(contentPanel, "Home channel does exist in database. Please insert home channel first!", 
+								"Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					boolean isCMonitorValid = isChannelValid(cMonitorId, MONITOR_CHANNEL);
+					if(!isCMonitorValid) {
+						JOptionPane.showMessageDialog(contentPanel, "Monitor channel does exist in database. Please insert Monitor channel first!", 
+								"Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 					//insert to database
 					PreparedStatement preparedStm = null;
 					String query = "UPDATE home_monitor_channel_mapping SET HomeChannelId = ?, MonitorChannelId = ?, "
@@ -171,6 +188,7 @@ public class ModifyMappingTable extends JDialog {
 		contentPanel.add(btnOK);
 
 		JButton btnExit = new JButton("Exit");
+		btnExit.setIcon(new ImageIcon(ModifyMappingTable.class.getResource("/spiderboot/resources/resource/icon_24x24/delete_24x24.png")));
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				dispose();
@@ -180,7 +198,7 @@ public class ModifyMappingTable extends JDialog {
 		btnExit.setBounds(274, 141, 100, 30);
 		contentPanel.add(btnExit);
 	}
-	
+
 	private Vector<String> getChannelIdList(String tbName) {
 		Vector<String> vector = new Vector<String>();
 		String query = "SELECT ChannelId FROM " + tbName + ";";
@@ -211,5 +229,34 @@ public class ModifyMappingTable extends JDialog {
 			System.out.println(ex.toString());
 		}
 		return cName;
+	}
+
+	private boolean isChannelValid(String cId, int channelType) {
+		boolean isValid = false;
+		String tbName = "";
+		if(channelType == HOME_CHANNEL) {
+			tbName = "home_channel_list";
+		}else if(channelType == MONITOR_CHANNEL) {
+			tbName = "monitor_channel_list";
+		}else {
+
+		}
+		String query = "SELECT COUNT(*) FROM " + tbName +" WHERE ChannelId = '" + cId + "';";
+		Statement stmt;
+		try{
+			stmt = MySqlAccess.getInstance().connect.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				int count = rs.getInt(1);
+				if(count == 0) {
+					isValid = false;	
+				}else {
+					isValid = true;
+				}
+			}
+		}catch(Exception ex){
+			System.out.println(ex.toString());
+		}
+		return isValid;
 	}
 }

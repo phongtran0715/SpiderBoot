@@ -1,6 +1,7 @@
 package spiderboot.view;
 
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -10,6 +11,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -21,6 +24,7 @@ import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -29,7 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
@@ -38,13 +42,12 @@ import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
+import spiderboot.configuration.ConfigProperties;
 import spiderboot.databaseconnection.MySqlAccess;
 import spiderboot.helper.ButtonEditor;
 import spiderboot.helper.ButtonRenderer;
 import spiderboot.helper.Util;
 import spiderboot.video.download.DownloadTimerManager;
-import javax.swing.ListSelectionModel;
-import javax.swing.JComboBox;
 
 public class ChannelManagerForm extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -67,7 +70,7 @@ public class ChannelManagerForm extends JFrame {
 	private JTextField txtMonitorId;
 	private JTextField txtMonitorName;
 	private JTextField txtTimeInterval;
-	
+
 	public ChannelManagerForm() {
 		initialize();
 		loadHomeChannel();
@@ -166,17 +169,17 @@ public class ChannelManagerForm extends JFrame {
 					int idx = tbHomeChannel.rowAtPoint(e.getPoint());
 					if (idx >= 0 && idx < tbHomeChannel.getRowCount()) {
 						tbHomeChannel.setRowSelectionInterval(idx, idx);
-			        } else {
-			        	tbHomeChannel.clearSelection();
-			        }
+					} else {
+						tbHomeChannel.clearSelection();
+					}
 					//---
 					int rowindex = tbHomeChannel.getSelectedRow();
-			        if (rowindex < 0)
-			            return;
-			        if (e.isPopupTrigger() && e.getComponent() instanceof JTable ) {
-//			            JPopupMenu popup = createYourPopUp();
-//			            popup.show(e.getComponent(), e.getX(), e.getY());
-			        }
+					if (rowindex < 0)
+						return;
+					if (e.isPopupTrigger() && e.getComponent() instanceof JTable ) {
+						//			            JPopupMenu popup = createYourPopUp();
+						//			            popup.show(e.getComponent(), e.getX(), e.getY());
+					}
 				}
 			}
 		});
@@ -297,43 +300,43 @@ public class ChannelManagerForm extends JFrame {
 		btnExit_1.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnExit_1.setBounds(1036, 607, 118, 38);
 		pnHomeChannel.add(btnExit_1);
-		
+
 		JPanel panel_2 = new JPanel();
 		panel_2.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_2.setBorder(new TitledBorder(null, "Filter", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_2.setBounds(5, 0, 1149, 109);
 		pnHomeChannel.add(panel_2);
 		panel_2.setLayout(null);
-		
+
 		JLabel lblNewLabel = new JLabel("Channel ID");
 		lblNewLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		lblNewLabel.setBounds(10, 24, 70, 25);
 		panel_2.add(lblNewLabel);
-		
+
 		textField = new JTextField();
 		textField.setBounds(103, 20, 181, 25);
 		panel_2.add(textField);
 		textField.setColumns(10);
-		
+
 		JLabel lblChannelName = new JLabel("Channel Name");
 		lblChannelName.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		lblChannelName.setBounds(10, 60, 84, 25);
 		panel_2.add(lblChannelName);
-		
+
 		textField_1 = new JTextField();
 		textField_1.setColumns(10);
 		textField_1.setBounds(103, 56, 181, 25);
 		panel_2.add(textField_1);
-		
+
 		JLabel lblGoogleAccount = new JLabel("Google Account");
 		lblGoogleAccount.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		lblGoogleAccount.setBounds(372, 25, 90, 25);
 		panel_2.add(lblGoogleAccount);
-		
+
 		JComboBox comboBox = new JComboBox();
 		comboBox.setBounds(485, 22, 181, 25);
 		panel_2.add(comboBox);
-		
+
 		JButton btnNewButton = new JButton("Search");
 		btnNewButton.setIcon(new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_24x24/search_24x24.png")));
 		btnNewButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
@@ -496,45 +499,45 @@ public class ChannelManagerForm extends JFrame {
 		btnExit_2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnExit_2.setBounds(1036, 607, 118, 38);
 		pnMonitorChannel.add(btnExit_2);
-		
+
 		JPanel panel_1 = new JPanel();
 		panel_1.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_1.setBorder(new TitledBorder(null, "Filter", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_1.setBounds(5, 0, 1149, 98);
 		pnMonitorChannel.add(panel_1);
 		panel_1.setLayout(null);
-		
+
 		JLabel label = new JLabel("Channel ID");
 		label.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		label.setBounds(10, 24, 70, 25);
 		panel_1.add(label);
-		
+
 		txt = new JTextField();
 		txt.setColumns(10);
 		txt.setBounds(103, 20, 181, 25);
 		panel_1.add(txt);
-		
+
 		JLabel label_1 = new JLabel("Channel Name");
 		label_1.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		label_1.setBounds(10, 60, 84, 25);
 		panel_1.add(label_1);
-		
+
 		textField_3 = new JTextField();
 		textField_3.setColumns(10);
 		textField_3.setBounds(103, 56, 181, 25);
 		panel_1.add(textField_3);
-		
+
 		JLabel lblIntervalTime = new JLabel("Interval Time");
 		lblIntervalTime.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		lblIntervalTime.setBounds(372, 25, 90, 25);
 		panel_1.add(lblIntervalTime);
-		
+
 		JButton button = new JButton("Search");
 		button.setIcon(new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_24x24/search_24x24.png")));
 		button.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		button.setBounds(485, 57, 112, 30);
 		panel_1.add(button);
-		
+
 		txtIntervalTime = new JTextField();
 		txtIntervalTime.setColumns(10);
 		txtIntervalTime.setBounds(485, 27, 181, 25);
@@ -550,12 +553,12 @@ public class ChannelManagerForm extends JFrame {
 		pnMapChannel.setBounds(5, 110, 1149, 486);
 		pnMappingChannel.add(pnMapChannel);
 		pnMapChannel.setLayout(null);
-		
+
 		scrollPane_2 = new JScrollPane();
 		scrollPane_2.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		scrollPane_2.setBounds(10, 20, 1129, 454);
 		pnMapChannel.add(scrollPane_2);
-		
+
 		tbMappedChannel = new JTable() {
 		};
 		tbMappedChannel.setColumnSelectionAllowed(true);
@@ -676,78 +679,105 @@ public class ChannelManagerForm extends JFrame {
 		btnExit_3.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		btnExit_3.setBounds(1036, 607, 118, 38);
 		pnMappingChannel.add(btnExit_3);
-		
+
 		JPanel panel = new JPanel();
 		panel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel.setBorder(new TitledBorder(null, "Filter", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel.setBounds(5, 0, 1149, 104);
 		pnMappingChannel.add(panel);
 		panel.setLayout(null);
-		
+
 		JLabel lblHomeChannelId = new JLabel("Home Channel ID");
 		lblHomeChannelId.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		lblHomeChannelId.setBounds(10, 30, 100, 25);
 		panel.add(lblHomeChannelId);
-		
+
 		txtHomeId = new JTextField();
 		txtHomeId.setColumns(10);
 		txtHomeId.setBounds(132, 31, 181, 25);
 		panel.add(txtHomeId);
-		
+
 		JLabel lblHomeChannelName = new JLabel("Home Channel Name");
 		lblHomeChannelName.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		lblHomeChannelName.setBounds(10, 66, 120, 25);
 		panel.add(lblHomeChannelName);
-		
+
 		txtHomeName = new JTextField();
 		txtHomeName.setColumns(10);
 		txtHomeName.setBounds(132, 67, 181, 25);
 		panel.add(txtHomeName);
-		
+
 		JButton button_1 = new JButton("Search");
 		button_1.setIcon(new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_24x24/search_24x24.png")));
 		button_1.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		button_1.setBounds(1027, 63, 112, 30);
 		panel.add(button_1);
-		
+
 		JLabel lblMonitorChannelId = new JLabel("Monitor Channel ID");
 		lblMonitorChannelId.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		lblMonitorChannelId.setBounds(356, 29, 120, 25);
 		panel.add(lblMonitorChannelId);
-		
+
 		txtMonitorId = new JTextField();
 		txtMonitorId.setColumns(10);
 		txtMonitorId.setBounds(478, 30, 181, 25);
 		panel.add(txtMonitorId);
-		
+
 		JLabel lblMonitorChannelName = new JLabel("Monitor Channel Name");
 		lblMonitorChannelName.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		lblMonitorChannelName.setBounds(345, 65, 131, 25);
 		panel.add(lblMonitorChannelName);
-		
+
 		txtMonitorName = new JTextField();
 		txtMonitorName.setColumns(10);
 		txtMonitorName.setBounds(478, 66, 181, 25);
 		panel.add(txtMonitorName);
-		
+
 		JLabel lblTimeInterval = new JLabel("Time Interval");
 		lblTimeInterval.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		lblTimeInterval.setBounds(704, 30, 120, 25);
 		panel.add(lblTimeInterval);
-		
+
 		txtTimeInterval = new JTextField();
 		txtTimeInterval.setColumns(10);
 		txtTimeInterval.setBounds(801, 31, 181, 25);
 		panel.add(txtTimeInterval);
-		
+
 		JLabel lblSyncStatus = new JLabel("Sync Status");
 		lblSyncStatus.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		lblSyncStatus.setBounds(714, 66, 100, 25);
 		panel.add(lblSyncStatus);
-		
+
 		JComboBox cbSynStatuc = new JComboBox();
 		cbSynStatuc.setBounds(801, 66, 181, 25);
 		panel.add(cbSynStatuc);
+
+		JButton btnOpenFolder = new JButton("Open Folder");
+		btnOpenFolder.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int rIndex =  tbMappedChannel.getSelectedRow();
+				if(rIndex == -1){
+					JOptionPane.showMessageDialog(pnHomeChannel, "Please select one row to edit !");
+					return;
+				}else{
+					String basePath = ConfigProperties.getInstance().getProperties("VideoFolderPath", "");
+					String homeCId = (String)tbMappedChannel.getValueAt(rIndex, tbMappedChannel.getColumn("HomeChannelId").getModelIndex());
+					String monitorCId = (String)tbMappedChannel.getValueAt(rIndex, tbMappedChannel.getColumn("MonitorChannelId").getModelIndex());
+					String path = basePath + "\\" + homeCId + "-" + monitorCId;
+					System.out.println(path);
+					try {
+						Desktop.getDesktop().open(new File(path));
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+
+			}
+		});
+		btnOpenFolder.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		btnOpenFolder.setBounds(498, 607, 118, 38);
+		pnMappingChannel.add(btnOpenFolder);
 	}
 
 	private void loadHomeChannel() {
@@ -880,7 +910,7 @@ public class ChannelManagerForm extends JFrame {
 				data.add(vector);
 			}
 			tbMapChanelMode.setDataVector(data, columnNames);
-			
+
 			if(tbMapChanelMode != null){
 				tbMappedChannel.setModel(tbMapChanelMode);
 				//Hide id column
@@ -890,13 +920,13 @@ public class ChannelManagerForm extends JFrame {
 				tbMappedChannel.getColumnModel().getColumn(tbMappedChannel.getColumn("Action").getModelIndex()).setCellRenderer(new ButtonRenderer());
 				//SET CUSTOM EDITOR TO TEAMS COLUMN
 				tbMappedChannel.getColumnModel().getColumn(tbMappedChannel.getColumn("Action").getModelIndex()).setCellEditor(new ButtonEditor(new JTextField(), this));	
-				
+
 				//Set cell is center
-//				for(int i = 0; i < tbMappedChannel.getColumnCount(); i++) {
-//					if(i != tbMappedChannel.getColumn("Action").getModelIndex()) {
-//						tbMappedChannel.getColumnModel().getColumn(i).setCellRenderer( centerRenderer );
-//					}
-//				}
+				for(int i = 0; i < tbMappedChannel.getColumnCount(); i++) {
+					if(i != tbMappedChannel.getColumn("Action").getModelIndex()) {
+						tbMappedChannel.getColumnModel().getColumn(i).setCellRenderer( centerRenderer );
+					}
+				}
 			}
 		}catch(Exception ex){
 			ex.printStackTrace();
@@ -913,8 +943,9 @@ public class ChannelManagerForm extends JFrame {
 			String cHomeId = (String) tbMappedChannel.getValueAt(rIndex, tbMappedChannel.getColumn("HomeChannelId").getModelIndex());
 			String cMonitorId = (String) tbMappedChannel.getValueAt(rIndex, tbMappedChannel.getColumn("MonitorChannelId").getModelIndex());
 			int syncInterval = (Integer) tbMappedChannel.getValueAt(rIndex, tbMappedChannel.getColumn("TimeIntervalSync").getModelIndex());
-			
-			DownloadTimerManager.getInstance().startDownloadTimer(Integer.toString(id),cHomeId, cMonitorId, syncInterval);
+
+			DownloadTimerManager.getInstance().startDownloadTimer(Integer.toString(id),cHomeId, cMonitorId, syncInterval * 1000);
+			System.out.println("Start new timer id = " + id + " timer interval = " + syncInterval + "seconds");
 			tbMappedChannel.getModel().setValueAt("Running", rIndex, 6);
 			tbMappedChannel.getModel().setValueAt("Stop", rIndex, 7);
 			//update database
@@ -942,6 +973,7 @@ public class ChannelManagerForm extends JFrame {
 		}else{
 			int id = (Integer) tbMappedChannel.getValueAt(rIndex, tbMappedChannel.getColumn("Id").getModelIndex());
 			DownloadTimerManager.getInstance().stopDownloadTimer(Integer.toString(id));
+			System.out.println("Stop timer id = " + id);
 			tbMappedChannel.getModel().setValueAt("Stopped", rIndex, 6);
 			tbMappedChannel.getModel().setValueAt("Run", rIndex, 7);
 			//update database 

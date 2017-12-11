@@ -12,8 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TimerTask;
 
-import javax.security.auth.login.Configuration;
-
 import com.github.axet.vget.DirectDownload;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.samples.youtube.cmdline.data.Search;
@@ -58,29 +56,25 @@ public class DownloadExecuteTimer extends TimerTask{
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		System.out.println("Timer " + timerId + " started at:"+new Date());
 		completeTask();
-		System.out.println("Timer " + timerId + " finished at:"+new Date());
 	}
 
 	private void completeTask() {
 		if(isComplete){
 			isComplete = false;
 			Date lastSyncTime = getLastSyncTime(timerId);
-			System.out.println("last sync time = " + dateFormat.format(lastSyncTime));
 			DateTime ytbTime = new DateTime(lastSyncTime);
-			//TODO: check new video and download them
 			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(cMonitorId, ytbTime);
 			Iterator<SearchResult> iteratorSearchResults = result.iterator();
 			if (!iteratorSearchResults.hasNext()) {
-				System.out.println(" There aren't any results for your query.");
-				return;
+				isComplete = true;
 			}else{
 				while (iteratorSearchResults.hasNext()) {
 					SearchResult singleVideo = iteratorSearchResults.next();
 					ResourceId rId = singleVideo.getId();
 					if (rId.getKind().equals("youtube#video")) {
 						String vId = rId.getVideoId();
+						System.out.println("Timer Id  = " + this.timerId + " dectect new video id = " + vId);
 						//Download video
 						DirectDownload dowloadHandle = new DirectDownload();
 						String path = videoFolderBase + "\\" + cHomeId + "-" + cMonitorId;
@@ -92,23 +86,20 @@ public class DownloadExecuteTimer extends TimerTask{
 							VideoWraper vWraper = getVideoInfor(singleVideo);
 							saveVideoInfo(vWraper);
 							//Notify to upload thread
-							new UploadExecuteThread().getInstance().addElement(vWraper);
-							//Update last sync time
-							lastSyncTime = new Date();
-							updateLastSyncTime(lastSyncTime);	
+							//new UploadExecuteThread().getInstance().addElement(vWraper);
 						}else {
-							System.out.println("Error! Cannot creat video folder.");
 						}
 					}
 				}
 			}
 			//Update last sync time
 			lastSyncTime = new Date();
-			System.out.println("Update last sync time  = " + dateFormat.format(lastSyncTime));
 			updateLastSyncTime(lastSyncTime);
-			isComplete = true;	
+			isComplete = true;
+			System.out.println("Timer " + timerId + " is running ... ");
 		}else{
-			System.out.println("Task have not yet completeed.");
+			//do nothing
+			System.out.println("Timer " + timerId + " is still working ... ");
 		}
 	}
 
@@ -137,7 +128,6 @@ public class DownloadExecuteTimer extends TimerTask{
 			// execute insert SQL statement
 			preparedStm.setTimestamp(1, timestamp);
 			preparedStm.setInt(2, Integer.valueOf(timerId));
-			//preparedStm.executeUpdate();
 			preparedStm.executeUpdate();
 		} catch (SQLException ex) {
 			// TODO Auto-generated catch block

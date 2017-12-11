@@ -16,14 +16,18 @@ public class TimerWrapper {
 	public boolean stopDownloadTimer(String timerId) {
 		boolean isSuccess = false;
 		Timer timer = timerMap.get(timerId);
-		timer.cancel();
-		timerMap.remove(timerId);
+		if(timer != null) {
+			timer.cancel();
+			timerMap.remove(timerId);	
+		}
 		isSuccess = true;
 		return isSuccess;
 	}
 	
 	public void addNewTimer(String timerId, Timer timer) {
-		timerMap.put(timerId, timer);
+		if(timer != null) {
+			timerMap.put(timerId, timer);	
+		}
 	}
 	
 	public void removeTimerById(String timerId) {

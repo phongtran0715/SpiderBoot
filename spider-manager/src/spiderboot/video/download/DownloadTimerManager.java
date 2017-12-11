@@ -46,7 +46,7 @@ public class DownloadTimerManager extends TimerWrapper{
 				String cMonitorId = rs.getString(3);
 				int syncInterval = rs.getInt(4);
 				startDownloadTimer(id, cHomeId, cMonitorId, syncInterval * 1000);
-				System.out.println("Start sync task : " + id + " with timer interval = " + syncInterval);
+				System.out.println("Start sync task : " + id + " with timer interval = " + syncInterval + " seconds");
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

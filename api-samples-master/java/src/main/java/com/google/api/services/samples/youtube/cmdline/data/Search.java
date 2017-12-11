@@ -153,7 +153,7 @@ public class Search {
 			// Call the API and print results.
 			SearchListResponse searchResponse = search.execute();
 			searchResult = searchResponse.getItems();
-			prettyPrint(searchResult.iterator(), "");
+			//prettyPrint(searchResult.iterator(), "");
 		} catch (GoogleJsonResponseException e) {
 			System.err.println("There was a service error: " + e.getDetails().getCode() + " : "
 					+ e.getDetails().getMessage());
