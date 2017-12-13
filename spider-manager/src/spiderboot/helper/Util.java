@@ -31,15 +31,13 @@ public class Util {
 		return isRunning;
 	}
 
-	public boolean createFolderIfNotExist(String dirName) {
-		boolean result = false;
+	public void createFolderIfNotExist(String dirName) {
 		String path = dirName;
 		File theDir = new File(path);
 		// if the directory does not exist, create it
 		if (!theDir.exists()) {
 			try{
 				theDir.mkdir();
-				result = true;
 				System.out.println("Created directory : " + path);
 			} 
 			catch(SecurityException se){
@@ -47,7 +45,6 @@ public class Util {
 				se.printStackTrace();
 			}        
 		}
-		return result;
 	}
 
 	public void deleteFolder(String dirName) {

@@ -149,7 +149,7 @@ public class Search {
 			search.setFields("items(id/kind,id/videoId,snippet/title,snippet/description,"
 					+ "snippet/thumbnails/default/url)");
 			search.setPublishedAfter(publishAfter);
-			search.setMaxResults((long) 2);
+			search.setMaxResults((long) 10);
 			// Call the API and print results.
 			SearchListResponse searchResponse = search.execute();
 			searchResult = searchResponse.getItems();

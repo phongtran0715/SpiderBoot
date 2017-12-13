@@ -72,6 +72,7 @@ public class ChannelManagerForm extends JFrame {
 	private JTextField txtTimeInterval;
 
 	public ChannelManagerForm() {
+		getContentPane().setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		initialize();
 		loadHomeChannel();
 		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
@@ -544,7 +545,7 @@ public class ChannelManagerForm extends JFrame {
 		panel_1.add(txtIntervalTime);
 
 		JPanel pnMappingChannel = new JPanel();
-		pnChannelManager.addTab("Home-Monitor Mapping", null, pnMappingChannel, null);
+		pnChannelManager.addTab("Home-Monitor Mapping", new ImageIcon(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_24x24/playlist_24x24.png")), pnMappingChannel, null);
 		pnMappingChannel.setLayout(null);
 
 		JPanel pnMapChannel = new JPanel();
@@ -693,6 +694,7 @@ public class ChannelManagerForm extends JFrame {
 		panel.add(lblHomeChannelId);
 
 		txtHomeId = new JTextField();
+		txtHomeId.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		txtHomeId.setColumns(10);
 		txtHomeId.setBounds(132, 31, 181, 25);
 		panel.add(txtHomeId);
@@ -703,6 +705,7 @@ public class ChannelManagerForm extends JFrame {
 		panel.add(lblHomeChannelName);
 
 		txtHomeName = new JTextField();
+		txtHomeName.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		txtHomeName.setColumns(10);
 		txtHomeName.setBounds(132, 67, 181, 25);
 		panel.add(txtHomeName);
@@ -719,6 +722,7 @@ public class ChannelManagerForm extends JFrame {
 		panel.add(lblMonitorChannelId);
 
 		txtMonitorId = new JTextField();
+		txtMonitorId.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		txtMonitorId.setColumns(10);
 		txtMonitorId.setBounds(478, 30, 181, 25);
 		panel.add(txtMonitorId);
@@ -729,6 +733,7 @@ public class ChannelManagerForm extends JFrame {
 		panel.add(lblMonitorChannelName);
 
 		txtMonitorName = new JTextField();
+		txtMonitorName.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		txtMonitorName.setColumns(10);
 		txtMonitorName.setBounds(478, 66, 181, 25);
 		panel.add(txtMonitorName);
@@ -739,6 +744,7 @@ public class ChannelManagerForm extends JFrame {
 		panel.add(lblTimeInterval);
 
 		txtTimeInterval = new JTextField();
+		txtTimeInterval.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		txtTimeInterval.setColumns(10);
 		txtTimeInterval.setBounds(801, 31, 181, 25);
 		panel.add(txtTimeInterval);
@@ -749,6 +755,7 @@ public class ChannelManagerForm extends JFrame {
 		panel.add(lblSyncStatus);
 
 		JComboBox cbSynStatuc = new JComboBox();
+		cbSynStatuc.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		cbSynStatuc.setBounds(801, 66, 181, 25);
 		panel.add(cbSynStatuc);
 

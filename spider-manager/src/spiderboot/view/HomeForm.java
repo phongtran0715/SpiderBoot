@@ -165,9 +165,13 @@ public class HomeForm extends JFrame {
 		contentPane.add(panel_1);
 
 		JButton button_6 = new JButton("Playlist");
+		button_6.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
 		button_6.setIcon(new ImageIcon(HomeForm.class.getResource("/spiderboot/resources/resource/icon_32x32/playlist_32x32.png")));
 		button_6.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-		button_6.setBounds(10, 24, 180, 60);
+		button_6.setBounds(213, 100, 180, 60);
 		panel_1.add(button_6);
 
 		JButton button_7 = new JButton("Seeding");
@@ -187,6 +191,18 @@ public class HomeForm extends JFrame {
 		button_9.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 		button_9.setBounds(10, 100, 180, 60);
 		panel_1.add(button_9);
+		
+		JButton btnRenderTool = new JButton("Render Tool");
+		btnRenderTool.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				RenderForm renderFrm = new RenderForm();
+				renderFrm.setVisible(true);
+			}
+		});
+		btnRenderTool.setIcon(new ImageIcon(HomeForm.class.getResource("/spiderboot/resources/resource/icon_32x32/auto-flash_32x32.png")));
+		btnRenderTool.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+		btnRenderTool.setBounds(10, 24, 180, 60);
+		panel_1.add(btnRenderTool);
 
 		JPanel panel_2 = new JPanel();
 		panel_2.setFont(new Font("Segoe UI", Font.PLAIN, 13));

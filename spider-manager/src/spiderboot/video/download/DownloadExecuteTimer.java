@@ -1,5 +1,6 @@
 package spiderboot.video.download;
 
+import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -74,20 +75,20 @@ public class DownloadExecuteTimer extends TimerTask{
 					ResourceId rId = singleVideo.getId();
 					if (rId.getKind().equals("youtube#video")) {
 						String vId = rId.getVideoId();
-						System.out.println("Timer Id  = " + this.timerId + " dectect new video id = " + vId);
+						System.out.println("===========================================================");
+						System.out.println("Timer Id  = " + this.timerId + " dectected new video id = " + vId);
 						//Download video
 						DirectDownload dowloadHandle = new DirectDownload();
 						String path = videoFolderBase + "\\" + cHomeId + "-" + cMonitorId;
-						boolean isOK = util.createFolderIfNotExist(path);
-						if(isOK)
-						{
+						util.createFolderIfNotExist(path);
+						File theDir = new File(path);
+						if(theDir.exists()) {
 							dowloadHandle.download(vId, path);
 							//Insert video info to data base
 							VideoWraper vWraper = getVideoInfor(singleVideo);
 							saveVideoInfo(vWraper);
 							//Notify to upload thread
-							//new UploadExecuteThread().getInstance().addElement(vWraper);
-						}else {
+							//new UploadExecuteThread().getInstance().addElement(vWraper);	
 						}
 					}
 				}
