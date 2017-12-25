@@ -84,7 +84,7 @@ public class ChannelManagerForm extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(ChannelManagerForm.class.getResource("/spiderboot/resources/resource/icon_32x32/playlist_32x32.png")));
 		setTitle("Account Manager");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1200, 743);
+		setBounds(100, 100, 1176, 718);
 		getContentPane().setLayout(null);
 		//set center screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();

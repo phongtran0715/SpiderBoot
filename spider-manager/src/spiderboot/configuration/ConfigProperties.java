@@ -19,7 +19,7 @@ public class ConfigProperties {
 	private ConfigProperties() {
 		if(configFile == null) {
 			try {
-				String path = new File(".").getCanonicalPath() + "\\config\\config.properties";
+				String path = new File(".").getCanonicalPath() + "/config/config.properties";
 				configFile = new File(path);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

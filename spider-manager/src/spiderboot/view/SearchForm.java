@@ -40,17 +40,17 @@ public class SearchForm extends JFrame{
 	public DefaultTableModel tbResultMode = new DefaultTableModel();
 
 	public SearchForm() {
+		//setMaximumSize(new Dimension(500, 500));
 		initialize();
 	}
 
 	private void initialize() {
-		setExtendedState(Frame.MAXIMIZED_BOTH);
-		setType(Type.POPUP);
 		setTitle("Search");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(SearchForm.class.getResource("/spiderboot/resources/resource/icon_32x32/search_32x32.png")));
 		setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		setBounds(100, 100, 1924, 1056);
+		setBounds(100, 100, 1140, 800);
 		contentPane = new JPanel();
+		contentPane.setAlignmentX(1.0f);
 		contentPane.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
@@ -72,7 +72,7 @@ public class SearchForm extends JFrame{
 		JPanel pnSearchTerm = new JPanel();
 		pnSearchTerm.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		pnSearchTerm.setBorder(new TitledBorder(null, "Search Term", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		pnSearchTerm.setBounds(10, 11, 452, 232);
+		pnSearchTerm.setBounds(5, 5, 398, 235);
 		contentPane.add(pnSearchTerm);
 		pnSearchTerm.setLayout(null);
 
@@ -82,7 +82,7 @@ public class SearchForm extends JFrame{
 		pnSearchTerm.add(lblNewLabel);
 
 		txtKeyword = new JTextField();
-		txtKeyword.setBounds(8, 47, 434, 33);
+		txtKeyword.setBounds(8, 47, 372, 33);
 		pnSearchTerm.add(txtKeyword);
 		txtKeyword.setColumns(10);
 
@@ -93,7 +93,7 @@ public class SearchForm extends JFrame{
 
 		txtChannelId = new JTextField();
 		txtChannelId.setColumns(10);
-		txtChannelId.setBounds(10, 117, 434, 33);
+		txtChannelId.setBounds(10, 117, 370, 33);
 		pnSearchTerm.add(txtChannelId);
 
 		JLabel lblPlaylistId = new JLabel("Playlist ID");
@@ -103,14 +103,41 @@ public class SearchForm extends JFrame{
 
 		txtPlaylistId = new JTextField();
 		txtPlaylistId.setColumns(10);
-		txtPlaylistId.setBounds(10, 187, 434, 33);
+		txtPlaylistId.setBounds(10, 187, 372, 33);
 		pnSearchTerm.add(txtPlaylistId);
 
+		JPanel pnResult = new JPanel();
+		pnResult.setBorder(new TitledBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)), "Result", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		pnResult.setBounds(5, 241, 1123, 475);
+		contentPane.add(pnResult);
+		pnResult.setLayout(null);
+
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(5, 15, 1109, 456);
+		pnResult.add(scrollPane);
+
+		tbResultMode = new DefaultTableModel(new Object[][] {
+		},new String[] {
+				"STT", "Video ID", "Title", "Thumbnail"
+		});
+
+		table = new JTable(tbResultMode) {
+			private static final long serialVersionUID = 1L;
+
+			//			public boolean isCellEditable(int row, int column) {
+			//				return false;
+			//			}
+		};
+		scrollPane.setViewportView(table);
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		table.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
 		JPanel pnSearchOption = new JPanel();
+		pnSearchOption.setBounds(415, 5, 713, 235);
+		contentPane.add(pnSearchOption);
 		pnSearchOption.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		pnSearchOption.setBorder(new TitledBorder(null, "Search Option", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		pnSearchOption.setBounds(472, 11, 1426, 232);
-		contentPane.add(pnSearchOption);
 		pnSearchOption.setLayout(null);
 
 		JLabel lblLanguage = new JLabel("Language");
@@ -120,12 +147,12 @@ public class SearchForm extends JFrame{
 
 		JLabel lblDefinition = new JLabel("Definition");
 		lblDefinition.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblDefinition.setBounds(294, 21, 84, 24);
+		lblDefinition.setBounds(189, 21, 84, 24);
 		pnSearchOption.add(lblDefinition);
 
 		JLabel lblDimension = new JLabel("Dimension");
 		lblDimension.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblDimension.setBounds(591, 21, 84, 24);
+		lblDimension.setBounds(368, 27, 84, 24);
 		pnSearchOption.add(lblDimension);
 
 		JLabel lblDuration = new JLabel("Duration");
@@ -145,37 +172,37 @@ public class SearchForm extends JFrame{
 
 		txtMaxResult = new JTextField();
 		txtMaxResult.setColumns(10);
-		txtMaxResult.setBounds(12, 117, 200, 33);
+		txtMaxResult.setBounds(12, 117, 150, 33);
 		pnSearchOption.add(txtMaxResult);
 
 		JLabel lblPublishBefore = new JLabel("Publish Before");
 		lblPublishBefore.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblPublishBefore.setBounds(296, 91, 84, 24);
+		lblPublishBefore.setBounds(191, 91, 84, 24);
 		pnSearchOption.add(lblPublishBefore);
 
 		txtPublishBefore = new JTextField();
 		txtPublishBefore.setColumns(10);
-		txtPublishBefore.setBounds(294, 117, 200, 33);
+		txtPublishBefore.setBounds(189, 117, 150, 33);
 		pnSearchOption.add(txtPublishBefore);
 
 		JLabel lblPublishAfter = new JLabel("Publish After");
 		lblPublishAfter.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblPublishAfter.setBounds(591, 91, 84, 24);
+		lblPublishAfter.setBounds(550, 27, 84, 24);
 		pnSearchOption.add(lblPublishAfter);
 
 		txtPublishAfter = new JTextField();
 		txtPublishAfter.setColumns(10);
-		txtPublishAfter.setBounds(589, 117, 200, 33);
+		txtPublishAfter.setBounds(366, 117, 150, 33);
 		pnSearchOption.add(txtPublishAfter);
 
 		JLabel lblLicense = new JLabel("License");
 		lblLicense.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblLicense.setBounds(900, 91, 84, 24);
+		lblLicense.setBounds(550, 91, 84, 24);
 		pnSearchOption.add(lblLicense);
 
 		JLabel lblRegionCode = new JLabel("Region Code");
 		lblRegionCode.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblRegionCode.setBounds(1208, 91, 84, 24);
+		lblRegionCode.setBounds(368, 91, 84, 24);
 		pnSearchOption.add(lblRegionCode);
 
 		txtRegionCode = new JTextField();
@@ -184,19 +211,19 @@ public class SearchForm extends JFrame{
 		pnSearchOption.add(txtRegionCode);
 
 		JComboBox cbLanguage = new JComboBox();
-		cbLanguage.setBounds(10, 47, 202, 33);
+		cbLanguage.setBounds(10, 47, 150, 33);
 		pnSearchOption.add(cbLanguage);
 
 		JComboBox cbDefinition = new JComboBox();
-		cbDefinition.setBounds(294, 53, 202, 33);
+		cbDefinition.setBounds(189, 53, 150, 33);
 		pnSearchOption.add(cbDefinition);
 
 		JComboBox cbDimension = new JComboBox();
-		cbDimension.setBounds(591, 47, 202, 33);
+		cbDimension.setBounds(368, 53, 150, 33);
 		pnSearchOption.add(cbDimension);
 
 		JComboBox cbDuration = new JComboBox();
-		cbDuration.setBounds(896, 47, 202, 33);
+		cbDuration.setBounds(550, 53, 150, 33);
 		pnSearchOption.add(cbDuration);
 
 		JComboBox cbOrderBy = new JComboBox();
@@ -204,7 +231,7 @@ public class SearchForm extends JFrame{
 		pnSearchOption.add(cbOrderBy);
 
 		JComboBox cbLicense = new JComboBox();
-		cbLicense.setBounds(896, 123, 202, 33);
+		cbLicense.setBounds(550, 117, 150, 33);
 		pnSearchOption.add(cbLicense);
 
 		JButton btnNewButton = new JButton("Search");
@@ -223,41 +250,22 @@ public class SearchForm extends JFrame{
 			}
 		});
 		btnNewButton.setIcon(new ImageIcon(SearchForm.class.getResource("/spiderboot/resources/resource/icon_32x32/search_32x32.png")));
-		btnNewButton.setBounds(12, 188, 124, 33);
+		btnNewButton.setBounds(12, 190, 124, 33);
 		pnSearchOption.add(btnNewButton);
 
-		JPanel pnResult = new JPanel();
-		pnResult.setBorder(new TitledBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)), "Result", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		pnResult.setBounds(10, 254, 1888, 740);
-		contentPane.add(pnResult);
-		pnResult.setLayout(null);
-
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 21, 1868, 682);
-		pnResult.add(scrollPane);
-
-		tbResultMode = new DefaultTableModel(new Object[][] {
-		},new String[] {
-				"STT", "Video ID", "Title", "Thumbnail"
+		JButton btnExit = new JButton("Exit");
+		btnExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				dispose();
+			}
 		});
-		
-		table = new JTable(tbResultMode) {
-			private static final long serialVersionUID = 1L;
-
-//			public boolean isCellEditable(int row, int column) {
-//				return false;
-//			}
-		};
-		scrollPane.setViewportView(table);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		table.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		btnExit.setIcon(new ImageIcon(SearchForm.class.getResource("/spiderboot/resources/resource/icon_16x16/delete_16x16.png")));
+		btnExit.setBounds(1004, 728, 124, 33);
+		contentPane.add(btnExit);
 		table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
-		
+
 		//table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.getColumnModel().getColumn(0).setPreferredWidth(30);
 		//table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 	}
-
-	
 }

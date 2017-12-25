@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,9 +17,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import spiderboot.configuration.ConfigProperties;
-import javax.swing.SwingConstants;
-import javax.swing.JComboBox;
-import javax.swing.JPasswordField;
 
 public class SystemConfigForm extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -38,7 +36,7 @@ public class SystemConfigForm extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(SystemConfigForm.class.getResource("/spiderboot/resources/resource/icon_32x32/settings_32x32.png")));
 		setTitle("System Configuration");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 754, 553);
+		setBounds(100, 100, 531, 524);
 		getContentPane().setLayout(null);
 		//set center screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -46,7 +44,7 @@ public class SystemConfigForm extends JFrame {
 
 		JTabbedPane pnAccountManager = new JTabbedPane(JTabbedPane.TOP);
 		pnAccountManager.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		pnAccountManager.setBounds(10, 11, 718, 444);
+		pnAccountManager.setBounds(5, 5, 516, 444);
 		getContentPane().add(pnAccountManager);
 
 		JPanel pnSysConfig = new JPanel();
@@ -55,13 +53,13 @@ public class SystemConfigForm extends JFrame {
 
 		JLabel lblNewLabel = new JLabel("Video Folder");
 		lblNewLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		lblNewLabel.setBounds(10, 14, 85, 16);
+		lblNewLabel.setBounds(10, 14, 120, 16);
 		pnSysConfig.add(lblNewLabel);
 
 		txtVideoFolderPath = new JTextField();
 		txtVideoFolderPath.setEditable(false);
 		txtVideoFolderPath.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		txtVideoFolderPath.setBounds(154, 10, 450, 25);
+		txtVideoFolderPath.setBounds(154, 10, 223, 30);
 		pnSysConfig.add(txtVideoFolderPath);
 		txtVideoFolderPath.setColumns(10);
 
@@ -79,12 +77,12 @@ public class SystemConfigForm extends JFrame {
 			}
 		});
 		btnNewButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		btnNewButton.setBounds(614, 10, 89, 25);
+		btnNewButton.setBounds(397, 10, 100, 30);
 		pnSysConfig.add(btnNewButton);
 		
 		JLabel lblDbConfiguration = new JLabel("Db Config");
 		lblDbConfiguration.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		lblDbConfiguration.setBounds(21, 67, 63, 16);
+		lblDbConfiguration.setBounds(10, 67, 120, 16);
 		pnSysConfig.add(lblDbConfiguration);
 		
 		JButton btnConfigDatabase = new JButton("Config Database");
@@ -96,12 +94,12 @@ public class SystemConfigForm extends JFrame {
 		});
 		btnConfigDatabase.setIcon(new ImageIcon(SystemConfigForm.class.getResource("/spiderboot/resources/resource/icon_24x24/settings_24x24.png")));
 		btnConfigDatabase.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		btnConfigDatabase.setBounds(154, 63, 161, 25);
+		btnConfigDatabase.setBounds(154, 63, 161, 30);
 		pnSysConfig.add(btnConfigDatabase);
 		
 		JLabel lblSavedLogMax = new JLabel("Saved log max");
 		lblSavedLogMax.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		lblSavedLogMax.setBounds(10, 117, 85, 16);
+		lblSavedLogMax.setBounds(10, 117, 120, 16);
 		pnSysConfig.add(lblSavedLogMax);
 		
 		txtMaxLogDay = new JTextField();
@@ -109,7 +107,7 @@ public class SystemConfigForm extends JFrame {
 		txtMaxLogDay.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		txtMaxLogDay.setEditable(false);
 		txtMaxLogDay.setColumns(10);
-		txtMaxLogDay.setBounds(154, 108, 161, 25);
+		txtMaxLogDay.setBounds(154, 108, 161, 30);
 		pnSysConfig.add(txtMaxLogDay);
 		
 		JLabel lblDay = new JLabel("days");
@@ -119,7 +117,7 @@ public class SystemConfigForm extends JFrame {
 		
 		JLabel lblMaxRowTable = new JLabel("Max row table");
 		lblMaxRowTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		lblMaxRowTable.setBounds(10, 170, 85, 16);
+		lblMaxRowTable.setBounds(10, 170, 120, 16);
 		pnSysConfig.add(lblMaxRowTable);
 		
 		textField = new JTextField();
@@ -127,7 +125,7 @@ public class SystemConfigForm extends JFrame {
 		textField.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		textField.setEditable(false);
 		textField.setColumns(10);
-		textField.setBounds(154, 161, 161, 25);
+		textField.setBounds(154, 161, 161, 30);
 		pnSysConfig.add(textField);
 		
 		JLabel lblRows = new JLabel("rows");
@@ -137,12 +135,12 @@ public class SystemConfigForm extends JFrame {
 		
 		JLabel lblDateTimeFormat = new JLabel("Date time format");
 		lblDateTimeFormat.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		lblDateTimeFormat.setBounds(10, 225, 101, 16);
+		lblDateTimeFormat.setBounds(10, 225, 120, 16);
 		pnSysConfig.add(lblDateTimeFormat);
 		
 		JComboBox comboBox = new JComboBox();
 		comboBox.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		comboBox.setBounds(154, 221, 161, 25);
+		comboBox.setBounds(154, 221, 161, 30);
 		pnSysConfig.add(comboBox);
 
 		JButton button = new JButton("Exit");
@@ -153,7 +151,7 @@ public class SystemConfigForm extends JFrame {
 		});
 		button.setIcon(new ImageIcon(SystemConfigForm.class.getResource("/spiderboot/resources/resource/icon_24x24/delete_24x24.png")));
 		button.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		button.setBounds(610, 465, 118, 38);
+		button.setBounds(403, 461, 118, 30);
 		getContentPane().add(button);
 
 		JButton btnSave = new JButton("Save");
@@ -166,13 +164,13 @@ public class SystemConfigForm extends JFrame {
 		});
 		btnSave.setIcon(new ImageIcon(SystemConfigForm.class.getResource("/spiderboot/resources/resource/icon_24x24/checked_24x24.png")));
 		btnSave.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		btnSave.setBounds(470, 465, 118, 38);
+		btnSave.setBounds(263, 461, 118, 30);
 		getContentPane().add(btnSave);
 		
 		JButton btnDefaultCnig = new JButton("Default Config");
 		btnDefaultCnig.setIcon(new ImageIcon(SystemConfigForm.class.getResource("/spiderboot/resources/resource/icon_24x24/refresh_24x24.png")));
 		btnDefaultCnig.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		btnDefaultCnig.setBounds(292, 466, 152, 38);
+		btnDefaultCnig.setBounds(85, 462, 152, 30);
 		getContentPane().add(btnDefaultCnig);
 	}
 	

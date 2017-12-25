@@ -25,6 +25,7 @@ import javax.swing.JTable;
 import javax.swing.JTabbedPane;
 import javax.swing.JSpinner;
 import javax.swing.ImageIcon;
+import javax.swing.SwingConstants;
 
 public class RenderForm extends JFrame {
 
@@ -71,7 +72,7 @@ public class RenderForm extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(RenderForm.class.getResource("/spiderboot/resources/resource/icon_24x24/auto-flash_24x24.png")));
 		setTitle("Spider Render Tool");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1363, 701);
+		setBounds(100, 100, 1400, 701);
 		contentPane = new JPanel();
 		contentPane.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setContentPane(contentPane);
@@ -81,7 +82,7 @@ public class RenderForm extends JFrame {
 		setLocation(dim.width/2- getSize().width/2, dim.height/2- getSize().height/2);
 
 		JPanel panel_1 = new JPanel();
-		panel_1.setBounds(240, 11, 349, 133);
+		panel_1.setBounds(240, 5, 349, 133);
 		panel_1.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Information", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		contentPane.add(panel_1);
@@ -113,11 +114,11 @@ public class RenderForm extends JFrame {
 
 		JButton btnAddFiles = new JButton("Add Files");
 		btnAddFiles.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		btnAddFiles.setBounds(243, 32, 94, 25);
+		btnAddFiles.setBounds(243, 32, 100, 30);
 		panel_1.add(btnAddFiles);
 
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(240, 155, 349, 102);
+		panel_2.setBounds(240, 150, 349, 105);
 		panel_2.setLayout(null);
 		panel_2.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Configuration", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
@@ -135,23 +136,23 @@ public class RenderForm extends JFrame {
 			}
 		});
 		btnSave.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		btnSave.setBounds(10, 66, 94, 25);
+		btnSave.setBounds(10, 66, 100, 30);
 		panel_2.add(btnSave);
 
 		JButton btnDelete = new JButton("Delete");
 		btnDelete.setIcon(new ImageIcon(RenderForm.class.getResource("/spiderboot/resources/resource/icon_16x16/delete_16x16.png")));
 		btnDelete.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		btnDelete.setBounds(129, 66, 94, 25);
+		btnDelete.setBounds(129, 66, 100, 30);
 		panel_2.add(btnDelete);
 
 		JButton btnExport = new JButton("Export");
 		btnExport.setIcon(new ImageIcon(RenderForm.class.getResource("/spiderboot/resources/resource/icon_16x16/export_16x16.png")));
 		btnExport.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		btnExport.setBounds(245, 68, 94, 25);
+		btnExport.setBounds(245, 66, 100, 30);
 		panel_2.add(btnExport);
 
 		JPanel panel_3 = new JPanel();
-		panel_3.setBounds(599, 11, 459, 246);
+		panel_3.setBounds(599, 5, 459, 250);
 		panel_3.setLayout(null);
 		panel_3.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_3.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Features", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
@@ -160,7 +161,7 @@ public class RenderForm extends JFrame {
 		txtIntro = new JTextField();
 		txtIntro.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		txtIntro.setColumns(10);
-		txtIntro.setBounds(109, 25, 288, 25);
+		txtIntro.setBounds(115, 25, 280, 25);
 		panel_3.add(txtIntro);
 
 		JButton btnIntro = new JButton("New button");
@@ -169,18 +170,18 @@ public class RenderForm extends JFrame {
 
 		JCheckBox checkIntro = new JCheckBox("Intro");
 		checkIntro.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		checkIntro.setBounds(16, 25, 51, 25);
+		checkIntro.setBounds(10, 25, 100, 25);
 		panel_3.add(checkIntro);
 
 		JCheckBox checkOutro = new JCheckBox("Outro");
 		checkOutro.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		checkOutro.setBounds(16, 60, 65, 25);
+		checkOutro.setBounds(10, 60, 90, 25);
 		panel_3.add(checkOutro);
 
 		txtOutro = new JTextField();
 		txtOutro.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		txtOutro.setColumns(10);
-		txtOutro.setBounds(109, 61, 288, 25);
+		txtOutro.setBounds(115, 61, 280, 25);
 		panel_3.add(txtOutro);
 
 		JButton btnOutro = new JButton("New button");
@@ -189,13 +190,13 @@ public class RenderForm extends JFrame {
 
 		JCheckBox checkVideoBg = new JCheckBox("Video BG");
 		checkVideoBg.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		checkVideoBg.setBounds(16, 99, 73, 25);
+		checkVideoBg.setBounds(10, 99, 90, 25);
 		panel_3.add(checkVideoBg);
 
 		txtVideoBg = new JTextField();
 		txtVideoBg.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		txtVideoBg.setColumns(10);
-		txtVideoBg.setBounds(109, 97, 288, 25);
+		txtVideoBg.setBounds(115, 97, 280, 25);
 		panel_3.add(txtVideoBg);
 
 		JButton btnVideoBg = new JButton("New button");
@@ -204,13 +205,13 @@ public class RenderForm extends JFrame {
 
 		JCheckBox checkFilterImg = new JCheckBox("Filter Image");
 		checkFilterImg.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		checkFilterImg.setBounds(16, 138, 87, 25);
+		checkFilterImg.setBounds(10, 138, 100, 25);
 		panel_3.add(checkFilterImg);
 
 		txtFilterImg = new JTextField();
 		txtFilterImg.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		txtFilterImg.setColumns(10);
-		txtFilterImg.setBounds(109, 136, 288, 25);
+		txtFilterImg.setBounds(115, 136, 280, 25);
 		panel_3.add(txtFilterImg);
 
 		JButton button = new JButton("New button");
@@ -219,13 +220,13 @@ public class RenderForm extends JFrame {
 
 		JCheckBox checkLogo = new JCheckBox("Add Logo");
 		checkLogo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		checkLogo.setBounds(16, 175, 87, 25);
+		checkLogo.setBounds(10, 175, 90, 25);
 		panel_3.add(checkLogo);
 
 		txtLogo = new JTextField();
 		txtLogo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		txtLogo.setColumns(10);
-		txtLogo.setBounds(109, 173, 288, 25);
+		txtLogo.setBounds(115, 173, 280, 25);
 		panel_3.add(txtLogo);
 
 		JButton txtAddLogo = new JButton("New button");
@@ -234,13 +235,13 @@ public class RenderForm extends JFrame {
 
 		JLabel lblLogoSize = new JLabel("Logo Size");
 		lblLogoSize.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		lblLogoSize.setBounds(26, 207, 65, 25);
+		lblLogoSize.setBounds(15, 207, 65, 25);
 		panel_3.add(lblLogoSize);
 
 		textField_6 = new JTextField();
 		textField_6.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		textField_6.setColumns(10);
-		textField_6.setBounds(108, 209, 95, 25);
+		textField_6.setBounds(115, 209, 90, 25);
 		panel_3.add(textField_6);
 
 		JLabel lblLogoLocation = new JLabel("Logo Location");
@@ -251,11 +252,11 @@ public class RenderForm extends JFrame {
 		textField_7 = new JTextField();
 		textField_7.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		textField_7.setColumns(10);
-		textField_7.setBounds(302, 209, 95, 25);
+		textField_7.setBounds(305, 210, 90, 25);
 		panel_3.add(textField_7);
 
 		JPanel panel_4 = new JPanel();
-		panel_4.setBounds(1069, 11, 268, 246);
+		panel_4.setBounds(1069, 5, 319, 250);
 		panel_4.setLayout(null);
 		panel_4.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_4.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Render Video", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
@@ -263,76 +264,77 @@ public class RenderForm extends JFrame {
 
 		JLabel lblVideoSize = new JLabel("Video Size");
 		lblVideoSize.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		lblVideoSize.setBounds(10, 27, 70, 25);
+		lblVideoSize.setBounds(10, 27, 90, 25);
 		panel_4.add(lblVideoSize);
 
 		textField_1 = new JTextField();
 		textField_1.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		textField_1.setColumns(10);
-		textField_1.setBounds(122, 28, 136, 25);
+		textField_1.setBounds(122, 28, 175, 25);
 		panel_4.add(textField_1);
 
 		JLabel lblVideoBitrate = new JLabel("Video Bitrate");
 		lblVideoBitrate.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		lblVideoBitrate.setBounds(10, 63, 70, 25);
+		lblVideoBitrate.setBounds(10, 63, 90, 25);
 		panel_4.add(lblVideoBitrate);
 
 		textField_2 = new JTextField();
 		textField_2.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		textField_2.setColumns(10);
-		textField_2.setBounds(122, 64, 136, 25);
+		textField_2.setBounds(122, 64, 175, 25);
 		panel_4.add(textField_2);
 
 		JLabel lblFps = new JLabel("FPS");
+		lblFps.setHorizontalAlignment(SwingConstants.CENTER);
 		lblFps.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		lblFps.setBounds(37, 99, 43, 25);
+		lblFps.setBounds(10, 99, 90, 25);
 		panel_4.add(lblFps);
 
 		textField_3 = new JTextField();
 		textField_3.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		textField_3.setColumns(10);
-		textField_3.setBounds(122, 100, 136, 25);
+		textField_3.setBounds(122, 100, 175, 25);
 		panel_4.add(textField_3);
 
 		JLabel lblAudioBitrate = new JLabel("Audio Bitrate");
 		lblAudioBitrate.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		lblAudioBitrate.setBounds(10, 135, 70, 25);
+		lblAudioBitrate.setBounds(10, 135, 90, 25);
 		panel_4.add(lblAudioBitrate);
 
 		textField_4 = new JTextField();
 		textField_4.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		textField_4.setColumns(10);
-		textField_4.setBounds(122, 136, 136, 25);
+		textField_4.setBounds(122, 136, 175, 25);
 		panel_4.add(textField_4);
 
 		JLabel lblSampleBitrate = new JLabel("Sample Bitrate");
 		lblSampleBitrate.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		lblSampleBitrate.setBounds(10, 170, 102, 25);
+		lblSampleBitrate.setBounds(10, 170, 100, 25);
 		panel_4.add(lblSampleBitrate);
 
 		textField_5 = new JTextField();
 		textField_5.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		textField_5.setColumns(10);
-		textField_5.setBounds(122, 171, 136, 25);
+		textField_5.setBounds(122, 171, 175, 25);
 		panel_4.add(textField_5);
 
 		JButton btnPrievew = new JButton("Preview");
 		btnPrievew.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		btnPrievew.setBounds(10, 210, 76, 25);
+		btnPrievew.setBounds(10, 210, 90, 30);
 		panel_4.add(btnPrievew);
 
 		JButton btnStartAll = new JButton("Start All");
 		btnStartAll.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		btnStartAll.setBounds(99, 210, 76, 25);
+		btnStartAll.setBounds(115, 210, 90, 30);
 		panel_4.add(btnStartAll);
 
 		JButton btnStopAll = new JButton("Stop All");
 		btnStopAll.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		btnStopAll.setBounds(185, 210, 76, 25);
+		btnStopAll.setBounds(217, 210, 90, 30);
 		panel_4.add(btnStopAll);
 
 		JPanel panel_5 = new JPanel();
-		panel_5.setBounds(240, 268, 1097, 357);
+		panel_5.setBounds(240, 268, 1148, 357);
 		panel_5.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		panel_5.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Video Lists", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		contentPane.add(panel_5);
@@ -347,7 +349,7 @@ public class RenderForm extends JFrame {
 		scrollPane_1.setViewportView(table);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(10, 11, 220, 611);
+		tabbedPane.setBounds(5, 5, 220, 611);
 		tabbedPane.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		contentPane.add(tabbedPane);
 		
@@ -369,7 +371,7 @@ public class RenderForm extends JFrame {
 				
 				JLabel lblLocation = new JLabel("Location");
 				lblLocation.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-				lblLocation.setBounds(6, 80, 50, 25);
+				lblLocation.setBounds(6, 80, 70, 25);
 				panel_6.add(lblLocation);
 				
 				txtLocation = new JTextField();
@@ -514,7 +516,7 @@ public class RenderForm extends JFrame {
 		
 		JCheckBox chckbxVolumeAudio = new JCheckBox("Volume Audio");
 		chckbxVolumeAudio.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		chckbxVolumeAudio.setBounds(6, 18, 101, 25);
+		chckbxVolumeAudio.setBounds(6, 18, 110, 25);
 		panel_12.add(chckbxVolumeAudio);
 		
 		JLabel label_2 = new JLabel("Level");
@@ -551,7 +553,7 @@ public class RenderForm extends JFrame {
 		
 		JLabel lblOutGain = new JLabel("Out Gain");
 		lblOutGain.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		lblOutGain.setBounds(6, 86, 50, 25);
+		lblOutGain.setBounds(6, 86, 70, 25);
 		panel_13.add(lblOutGain);
 		
 		JSpinner spinner_4 = new JSpinner();
@@ -593,7 +595,7 @@ public class RenderForm extends JFrame {
 		
 		JLabel lblFrequency = new JLabel("Frequency");
 		lblFrequency.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		lblFrequency.setBounds(6, 50, 57, 25);
+		lblFrequency.setBounds(6, 50, 70, 25);
 		panel_14.add(lblFrequency);
 		
 		JSpinner spinner_7 = new JSpinner();
@@ -623,7 +625,7 @@ public class RenderForm extends JFrame {
 		
 		JLabel lblFilterType = new JLabel("Filter Type");
 		lblFilterType.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		lblFilterType.setBounds(6, 158, 57, 25);
+		lblFilterType.setBounds(6, 158, 70, 25);
 		panel_14.add(lblFilterType);
 		
 		JSpinner spinner_10 = new JSpinner();
@@ -639,7 +641,7 @@ public class RenderForm extends JFrame {
 		});
 		btnExit.setIcon(new ImageIcon(RenderForm.class.getResource("/spiderboot/resources/resource/icon_16x16/delete_16x16.png")));
 		btnExit.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		btnExit.setBounds(1261, 626, 76, 25);
+		btnExit.setBounds(1298, 637, 90, 30);
 		contentPane.add(btnExit);
 	}
 }
