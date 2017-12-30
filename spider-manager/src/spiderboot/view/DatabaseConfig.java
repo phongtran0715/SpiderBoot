@@ -32,6 +32,7 @@ public class DatabaseConfig extends JDialog {
 	private JTextField txtUserName;
 	private JPasswordField txtPassword;
 	boolean isOpenLoginFrm = false;
+	String dbServer = "";
 
 	public DatabaseConfig() {
 		initialize();
@@ -127,7 +128,7 @@ public class DatabaseConfig extends JDialog {
 		btnOK.setIcon(new ImageIcon(DatabaseConfig.class.getResource("/spiderboot/resources/resource/icon_16x16/checked_16x16.png")));
 		btnOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String dbServer = (String)cbDbSever.getSelectedItem();
+					dbServer = (String)cbDbSever.getSelectedItem();
 				if(dbServer != null && dbServer.isEmpty()){
 					JOptionPane.showMessageDialog(contentPanel, "Database server name must not be empty!",
 							"Error", JOptionPane.ERROR_MESSAGE);
@@ -141,7 +142,7 @@ public class DatabaseConfig extends JDialog {
 				}
 				String userName = txtUserName.getText().trim();
 				String password = new String(txtPassword.getPassword());
-				int errCode = MySqlAccess.getInstance().DBConnect(dbServer.trim(), dbName, userName, password);
+				int errCode = MySqlAccess.getInstance().DBConnect(dbServer, dbName, userName, password);
 				if(errCode == 0){
 					//save information to config file
 					ConfigProperties.getInstance().writeProperties("DbServer", dbServer);

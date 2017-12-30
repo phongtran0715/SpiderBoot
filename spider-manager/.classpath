@@ -44,5 +44,7 @@
 	<classpathentry kind="lib" path="/media/phongtran0715/DOCUMENTS/SourceCode/SpiderBoot/spider-manager/library/jetty-util-6.1.26.jar"/>
 	<classpathentry kind="lib" path="/media/phongtran0715/DOCUMENTS/SourceCode/SpiderBoot/spider-manager/library/jsr305-1.3.9.jar"/>
 	<classpathentry kind="lib" path="/media/phongtran0715/DOCUMENTS/SourceCode/SpiderBoot/spider-manager/library/transaction-api-1.1.jar"/>
+	<classpathentry kind="lib" path="/home/phongtran0715/Downloads/ffmpeg-0.6.3-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/home/phongtran0715/Downloads/guava-20.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
