@@ -133,9 +133,8 @@ public class VideoInfo {
 
         if (ei == null){
         	System.out.println("ei = " + null);;
-//        	throw new RuntimeException("unsupported web site");
-        }
-//            
+        	throw new RuntimeException("unsupported web site");
+        }            
 
         try {
             ei.extract(this, user, stop, notify);

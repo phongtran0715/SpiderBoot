@@ -11,7 +11,10 @@ import javax.swing.border.TitledBorder;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
+import net.bramp.ffmpeg.builder.AbstractFFmpegStreamBuilder;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
+import net.bramp.ffmpeg.builder.FFmpegOutputBuilder;
+import spiderboot.helper.Util;
 
 import javax.swing.UIManager;
 import java.awt.Color;
@@ -25,8 +28,11 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
 import javax.swing.JScrollPane;
@@ -39,7 +45,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.border.LineBorder;
 
 public class RenderForm extends JFrame {
-
+	String BASE_FOLDER = "/home/phongtran0715/Downloads/Document/test_ffmpeg";
 	private JPanel contentPane;
 	private JTextField txtOutputVideo;
 	private JTextField txtIntro;
@@ -80,6 +86,7 @@ public class RenderForm extends JFrame {
 	 * Create the frame.
 	 */
 	public RenderForm() {
+		Util spiderHelper = new Util();
 		setIconImage(Toolkit.getDefaultToolkit().getImage(RenderForm.class.getResource("/spiderboot/resources/resource/icon_24x24/auto-flash_24x24.png")));
 		setTitle("Spider Render Tool");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -307,6 +314,7 @@ public class RenderForm extends JFrame {
 		panel_3.add(checkLogo);
 
 		txtLogo = new JTextField();
+		txtLogo.setText("/home/phongtran0715/Downloads/Document/test_ffmpeg/logo.png");
 		txtLogo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		txtLogo.setColumns(10);
 		txtLogo.setBounds(115, 173, 280, 25);
@@ -415,32 +423,24 @@ public class RenderForm extends JFrame {
 		JButton btnPrievew = new JButton("Preview");
 		btnPrievew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//				try {
-				//					//Process p = Runtime.getRuntime().exec("ffplay /home/phongtran0715/Downloads/Document/test_ffmpeg/input.mp4");
-				//				} catch (IOException e) {
-				//					// TODO Auto-generated catch block
-				//					e.printStackTrace();
-				//				}
-				FFmpeg ffmpeg = null;
-				FFprobe ffprobe = null;
-				try {
-					ffmpeg =  new FFmpeg();
-					ffprobe = new FFprobe();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				FFmpegBuilder myBuilder = new FFmpegBuilder();
+				
+				myBuilder = myBuilder.addInput(BASE_FOLDER + "/input.mp4");
+				FFmpegOutputBuilder outputBuilder = myBuilder.addOutput(" - | ffplay -");
+				//check logo
+				if(checkLogo.isSelected()) {
+					myBuilder.addInput(txtLogo.getText());
+					outputBuilder.addExtraArgs("-filter_complex","'overlay=(main_w-overlay_w):(main_h-overlay_h)'");
 				}
-				if(ffmpeg != null)
-				{
-					FFmpegBuilder builder = new FFmpegBuilder();
-					builder.setInput("/home/phongtran0715/Downloads/Document/test_ffmpeg/input.mp4");
-					builder.setFormat("mp4");
-					builder.addExtraArgs("-f", "mpegts");
-					builder.addExtraArgs("-", "|");
-					builder.addExtraArgs("ffplay", "-");
-					FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
-					executor.createJob(builder).run();
+				
+				outputBuilder.addExtraArgs("-f","avi");
+				String command = "ffmpeg ";
+				List<String> result = myBuilder.build();
+				for(String str : result) {
+					command += str + " ";
 				}
+				System.out.println(command);
+				spiderHelper.executeBashCmd(command);
 			}
 		});
 		btnPrievew.setFont(new Font("Segoe UI", Font.PLAIN, 12));

@@ -28,7 +28,8 @@ public final class Preconditions {
    * @return The passed in argument if it is not blank
    */
   public static String checkNotEmpty(String arg, @Nullable Object errorMessage) {
-    boolean empty = Strings.isNullOrEmpty(arg) || CharMatcher.whitespace().matchesAllOf(arg);
+    //boolean empty = Strings.isNullOrEmpty(arg) || CharMatcher.whitespace().matchesAllOf(arg);
+	boolean empty = Strings.isNullOrEmpty(arg);
     checkArgument(!empty, errorMessage);
     return arg;
   }
