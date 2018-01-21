@@ -10,6 +10,11 @@ import org.apache.log4j.Logger;
 import com.itc.edu.database.MySqlAccess;
 import com.itc.edu.timer.TimerWrapper;
 
+/*------------------------------------------------------------------------------
+** History
+
+*/
+
 public class DownloadTimerManager extends TimerWrapper{
 	private static DownloadTimerManager instance = null;
 	private static Logger logger = Logger.getLogger(DownloadTimerManager.class);
@@ -52,7 +57,7 @@ public class DownloadTimerManager extends TimerWrapper{
 				String cHomeId = rs.getString(2);
 				String cMonitorId = rs.getString(3);
 				int syncInterval = rs.getInt(4);
-				startDownloadTimer(id, cHomeId, cMonitorId, 1 * 1000);
+				startDownloadTimer(id, cHomeId, cMonitorId, syncInterval * 1000);
 				logger.info("Start sync task : " + id + " with timer interval = " + 1 + " seconds");
 			}
 		} catch (SQLException e) {

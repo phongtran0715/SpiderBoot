@@ -31,6 +31,8 @@ import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Thumbnail;
+import com.itc.edu.dlvideo.util.Config;
+import org.apache.log4j.Logger;
 
 /**
  * Print a list of videos matching a search term.
@@ -38,6 +40,8 @@ import com.google.api.services.youtube.model.Thumbnail;
  * @author Jeremy Walker
  */
 public class Search {
+    
+        private static final Logger logger = Logger.getLogger(Search.class);
 	private static Search instance = null;
 
 	/**
@@ -46,7 +50,7 @@ public class Search {
 	 */
 	private final String PROPERTIES_FILENAME = "youtube.properties";
 
-	private final long NUMBER_OF_VIDEOS_RETURNED = 25;
+	private final long NUMBER_OF_VIDEOS_RETURNED = Config.noVideoReturn;
 	Properties properties;
 
 	/**
@@ -81,7 +85,7 @@ public class Search {
 			properties.load(in);
 
 		} catch (IOException e) {
-			System.err.println("There was an error reading " + PROPERTIES_FILENAME + ": " + e.getCause()
+			logger.error("There was an error reading " + PROPERTIES_FILENAME + ": " + e.getCause()
 			+ " : " + e.getMessage());
 			System.exit(1);
 		}
@@ -127,10 +131,10 @@ public class Search {
 				}
 			}
 		} catch (GoogleJsonResponseException e) {
-			System.err.println("There was a service error: " + e.getDetails().getCode() + " : "
+			logger.error("There was a service error: " + e.getDetails().getCode() + " : "
 					+ e.getDetails().getMessage());
 		} catch (IOException e) {
-			System.err.println("There was an IO error: " + e.getCause() + " : " + e.getMessage());
+			logger.error("There was an IO error: " + e.getCause() + " : " + e.getMessage());
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
@@ -155,12 +159,12 @@ public class Search {
 			searchResult = searchResponse.getItems();
 			//prettyPrint(searchResult.iterator(), "");
 		} catch (GoogleJsonResponseException e) {
-			System.err.println("There was a service error: " + e.getDetails().getCode() + " : "
+			logger.error("There was a service error: " + e.getDetails().getCode() + " : "
 					+ e.getDetails().getMessage());
 		} catch (IOException e) {
-			System.err.println("There was an IO error: " + e.getCause() + " : " + e.getMessage());
+			logger.error("There was an IO error: " + e.getCause() + " : " + e.getMessage());
 		} catch (Throwable t) {
-			t.printStackTrace();
+			logger.error("ERR_getVideoByPublishDate|" + t);
 		}
 		return searchResult;
 	}
@@ -174,13 +178,13 @@ public class Search {
 	 * @param query Search query (String)
 	 */
 	private void prettyPrint(Iterator<SearchResult> iteratorSearchResults, String query) {
-		System.out.println("\n=============================================================");
-		System.out.println(
+		logger.info("\n=============================================================");
+		logger.info(
 				"   First " + NUMBER_OF_VIDEOS_RETURNED + " videos for search on \"" + query + "\".");
-		System.out.println("=============================================================\n");
+		logger.info("=============================================================\n");
 
 		if (!iteratorSearchResults.hasNext()) {
-			System.out.println(" There aren't any results for your query.");
+			logger.info(" There aren't any results for your query.");
 		}
 
 		while (iteratorSearchResults.hasNext()) {
@@ -193,10 +197,10 @@ public class Search {
 			if (rId.getKind().equals("youtube#video")) {
 				Thumbnail thumbnail = singleVideo.getSnippet().getThumbnails().getDefault();
 
-				System.out.println(" Video Id" + rId.getVideoId());
-				System.out.println(" Title: " + singleVideo.getSnippet().getTitle());
-				System.out.println(" Thumbnail: " + thumbnail.getUrl());
-				System.out.println("\n-------------------------------------------------------------\n");
+				logger.info(" Video Id" + rId.getVideoId());
+				logger.info(" Title: " + singleVideo.getSnippet().getTitle());
+				logger.info(" Thumbnail: " + thumbnail.getUrl());
+				logger.info("\n-------------------------------------------------------------\n");
 			}
 		}
 	}
