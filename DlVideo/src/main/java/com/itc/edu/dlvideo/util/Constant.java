@@ -4,6 +4,8 @@
  */
 package com.itc.edu.dlvideo.util;
 
+import static com.itc.edu.dlvideo.util.Utility.prefixOS;
+
 /*------------------------------------------------------------------------------
 ** History
 21-01-2018, [CR-001] phapnd
@@ -11,10 +13,14 @@ package com.itc.edu.dlvideo.util;
 
 21-01-2018, [CR-002] phapnd
     Cap nhat them thong tin videoFolderBase
+
+21-01-2018, [CR-003] phapnd
+    Cap nhat them thong tin load file app.properties tu dong, ko phan biet OS
 */
 
 public class Constant {
-    public static final String FILE_CONFIG = "D:\\vas\\spiderboot\\SpiderBoot\\DlVideo\\target\\jsw\\dlvideo\\etc\\app.properties";
+    private static final String prefixOS = prefixOS();
+    public static final String FILE_CONFIG = System.getProperty("user.dir") + prefixOS + "etc" + prefixOS + "app.properties";
     //config system
     public static final String VIDEO_FILE_FORMAT = "VIDEO_FILE_FORMAT";
     public static final String AUTH_LINK = "AUTH_LINK";
