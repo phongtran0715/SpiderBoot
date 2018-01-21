@@ -21,7 +21,9 @@ import com.itc.edu.dlvideo.main.Search;
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchResult;
 import com.itc.edu.database.MySqlAccess;
+import com.itc.edu.dlvideo.util.Config;
 import com.itc.edu.dlvideo.util.Utility;
+import static com.itc.edu.dlvideo.util.Utility.prefixOS;
 import com.itc.edu.dlvideo.util.VideoWraper;
 import java.util.List;
 
@@ -30,8 +32,12 @@ import java.util.List;
 21-01-2018, [CR-001] phapnd
     Cap nhat func saveVideoInfo, goi procedure de luu thong tin video download
 
-*/
+21-01-2018, [CR-002] phapnd
+    Cap nhat func DownloadExecuteTimer, khoi tao folder luu video download
+    tu file cau hinh
+    Cap nhat prefix duong dan luu file video
 
+ */
 public class DownloadExecuteTimer extends TimerTask {
 
     String timerId;
@@ -42,14 +48,15 @@ public class DownloadExecuteTimer extends TimerTask {
     Utility util = new Utility();
     String videoFolderBase;
     private static final Logger logger = Logger.getLogger(DownloadExecuteTimer.class);
-
+    private static String prefixOS = prefixOS();
     public DownloadExecuteTimer(String timerId, String cHomeId, String cMonitorId) {
         // TODO Auto-generated constructor stub
         this.timerId = timerId;
         this.cHomeId = cHomeId;
         this.cMonitorId = cMonitorId;
         //TODO: set video folder base
-        videoFolderBase = "D:\\vas\\spiderboot\\SpiderBoot\\DlVideo\\target\\jsw\\dlvideo\\videos";
+        videoFolderBase = System.getProperty("user.dir") + prefixOS + Config.videoFolder;
+
     }
 
     @Override
@@ -68,7 +75,6 @@ public class DownloadExecuteTimer extends TimerTask {
             Long startTime = System.currentTimeMillis();
             List<SearchResult> result = Search.getInstance().getVideoByPublishDate(cMonitorId, ytbTime);
             logger.info("Search info: ChannelId=" + cMonitorId + "|LastSyncTime=" + ytbTime + "|take time:" + (System.currentTimeMillis() - startTime));
-            logger.info("RESULT=" + result);
             Iterator<SearchResult> iteratorSearchResults = result.iterator();
             if (!iteratorSearchResults.hasNext()) {
                 isComplete = true;
@@ -79,14 +85,17 @@ public class DownloadExecuteTimer extends TimerTask {
                     if (rId.getKind().equals("youtube#video")) {
                         String vId = rId.getVideoId();
                         logger.info("===========================================================");
-                        logger.info("Timer Id  = " + this.timerId + " dectected new video id = " + vId);
+                        logger.info("Timer Id  = " + this.timerId + "|DETECTED new VIDEOID = " + vId);
                         //Download video
                         DirectDownload dowloadHandle = new DirectDownload();
-                        String path = videoFolderBase + "\\" + cHomeId + "-" + cMonitorId;
+                        String path = videoFolderBase + prefixOS + cHomeId + "-" + cMonitorId;
                         util.createFolderIfNotExist(path);
                         File theDir = new File(path);
                         if (theDir.exists()) {
+                            startTime = System.currentTimeMillis();
+                            logger.info("Start Downloading:|VIDEOID=" + vId);
                             dowloadHandle.download(vId, path);
+                            logger.info("Download Success:|VIDEOID=" + vId + "|take time=" + (System.currentTimeMillis()-startTime));
                             //Insert video info to data base
                             VideoWraper vWraper = getVideoInfor(singleVideo);
                             saveVideoInfo(vWraper);
@@ -154,7 +163,7 @@ public class DownloadExecuteTimer extends TimerTask {
         vWraper.description = singleVideo.getSnippet().getDescription();
         vWraper.tag = singleVideo.getEtag();
         vWraper.thumbnail = singleVideo.getSnippet().getThumbnails().getDefault().getUrl();
-        vWraper.vLocation = videoFolderBase + "\\" + cHomeId + "-" + cMonitorId + "\\" + vWraper.title + ".mp4";
+        vWraper.vLocation = videoFolderBase + prefixOS + cHomeId + "-" + cMonitorId + prefixOS + vWraper.title + ".mp4";
         return vWraper;
     }
 
@@ -188,4 +197,5 @@ public class DownloadExecuteTimer extends TimerTask {
         logger.info("Insert info: MontiorChannelID=" + cMonitorId + "|VideoID=" + vWraper.vId + "|TITLE:" + vWraper.title + "|take time:" + (System.currentTimeMillis() - startTime));
 
     }
+
 }

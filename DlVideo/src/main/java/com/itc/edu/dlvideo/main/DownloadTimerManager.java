@@ -41,6 +41,7 @@ public class DownloadTimerManager extends TimerWrapper{
 		return isSuccess;
 	}
 	
+        @Override
 	public void initTimerTask(){
 		
 		long startTime = 0L;

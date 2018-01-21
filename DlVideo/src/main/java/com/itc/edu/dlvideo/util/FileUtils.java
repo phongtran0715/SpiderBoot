@@ -12,10 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
 
-/**
- *
- * @author donlv
- */
+/*------------------------------------------------------------------------------
+** History
+
+*/
+
 public class FileUtils {
 
     private static Logger logger = Logger.getLogger(FileUtils.class);

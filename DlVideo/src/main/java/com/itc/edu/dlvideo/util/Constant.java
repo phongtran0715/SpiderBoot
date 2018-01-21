@@ -9,6 +9,8 @@ package com.itc.edu.dlvideo.util;
 21-01-2018, [CR-001] phapnd
     Khoi tao class luu thong tin mac dinh
 
+21-01-2018, [CR-002] phapnd
+    Cap nhat them thong tin videoFolderBase
 */
 
 public class Constant {
@@ -18,6 +20,8 @@ public class Constant {
     public static final String AUTH_LINK = "AUTH_LINK";
     public static final String CLIENT_SCERET = "CLIENT_SCERET";
     public static final String NUMBER_OF_VIDEOS_RETURNED = "NUMBER_OF_VIDEOS_RETURNED";
+    
+    public static final String VIDEO_FOLDER = "VIDEO_FOLDER";
 
     // string ket noi DB
     public static final String DBSERVER = "DBSERVER";
