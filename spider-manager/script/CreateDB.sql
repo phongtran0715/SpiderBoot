@@ -6,6 +6,9 @@ USE `spiderboot`;
 -- ------------------------------------------------------
 -- Server version	5.7.20-log
 
+
+-- [CR-001] phapnd, cap nhat procedure INSERTNEWMO
+
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -55,17 +58,27 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GETCHANNEL` (IN `i_batchWaitTime` I
 		SELECT b.CHANNELID FROM HOME_MONITOR_CHANNEL_MAPPING a, MONITOR_CHANNEL_LIST b WHERE a.MONITORCHANNELID = b.CHANNELID AND a.action = 1 AND a.statussync = 1 AND (i_batchWaitTime>=UNIX_TIMESTAMP(a.lastsynctime));
     END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `INSERTNEWMO` (IN `i_videoID` VARCHAR(512), IN `i_processStatus` INT, OUT `o_errorCode` INT)  BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `INSERTNEWMO`(
+ IN `i_videoID` VARCHAR(15)
+ , IN `i_title` VARCHAR(100)
+ , IN `i_tag` VARCHAR(1024)
+ , IN `i_desc` VARCHAR(4096)
+ , IN `i_thumbnail` VARCHAR(250)
+ , IN `i_location` VARCHAR(250)
+ , IN `i_homeID` VARCHAR(30)
+ , IN `i_monitorID` VARCHAR(30)
+ , IN `i_datetime` DATE
+ )
+BEGIN
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
 		BEGIN
 			GET DIAGNOSTICS condition 1
 			@SQLState = RETURNED_SQLSTATE, @SQLMessage = MESSAGE_TEXT; 
 			CALL log_debug(CONCAT('INSERTNEWMO - Database error occurred, state - ',@SQLState, '; error msg - ', @SQLMessage));
-            set o_errorCode = 1;
             END;
-		INSERT INTO video_container(videoid,processstatus)
-    VALUES (i_videoID,i_processStatus);
-    commit;
+		INSERT INTO video_container (VideoId, Title, Tag, Description, Thumbnail,VideoLocation, HomeChannelId, MonitorChannelId, DownloadDate)
+        VALUES (i_videoID,i_title,i_tag,i_desc,i_thumbnail,i_location,i_homeID,i_monitorID,i_datetime);
+		commit;
     
     END$$
 
