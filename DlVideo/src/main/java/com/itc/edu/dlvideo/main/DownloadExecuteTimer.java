@@ -24,6 +24,7 @@ import com.itc.edu.database.MySqlAccess;
 import com.itc.edu.dlvideo.util.Config;
 import com.itc.edu.dlvideo.util.Utility;
 import static com.itc.edu.dlvideo.util.Utility.prefixOS;
+import static com.itc.edu.dlvideo.util.Utility.replaceBadChars;
 import com.itc.edu.dlvideo.util.VideoWraper;
 import java.util.List;
 
@@ -37,6 +38,8 @@ import java.util.List;
     tu file cau hinh
     Cap nhat prefix duong dan luu file video
 
+22-01-2018, [CR-004] phapnd
+    Modify duong dan luu file video. Ten file viet lien, phan cach dau _
  */
 public class DownloadExecuteTimer extends TimerTask {
 
@@ -156,14 +159,16 @@ public class DownloadExecuteTimer extends TimerTask {
     }
 
     private VideoWraper getVideoInfor(SearchResult singleVideo) {
+        String temp;
         VideoWraper vWraper = new VideoWraper();
         vWraper.vId = singleVideo.getId().getVideoId();
         vWraper.title = singleVideo.getSnippet().getTitle();
         vWraper.title = vWraper.title.replaceAll("[!@#$%^&*(){}:|<>?]", " ");
+        temp = replaceBadChars(vWraper.title);
         vWraper.description = singleVideo.getSnippet().getDescription();
         vWraper.tag = singleVideo.getEtag();
         vWraper.thumbnail = singleVideo.getSnippet().getThumbnails().getDefault().getUrl();
-        vWraper.vLocation = videoFolderBase + prefixOS + cHomeId + "-" + cMonitorId + prefixOS + vWraper.title + ".mp4";
+        vWraper.vLocation = videoFolderBase + prefixOS + cHomeId + "-" + cMonitorId + prefixOS + temp + ".mp4";
         return vWraper;
     }
 

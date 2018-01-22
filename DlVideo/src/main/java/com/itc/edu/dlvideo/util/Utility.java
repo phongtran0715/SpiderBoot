@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import org.apache.commons.lang3.StringUtils;
 
 import org.apache.log4j.Logger;
 
@@ -20,13 +21,44 @@ import org.apache.log4j.Logger;
 21-01-2018, [CR-002] phapnd
     Cap nhat them ham prefixOS
 
-*/
+22-01-2018, [CR-004] phapnd
+    Cap nhat them ham replaceBadChars
+ */
 public class Utility {
 
     private static final Logger logger = Logger.getLogger(Utility.class);
     private static final int PORT = 9999;
     @SuppressWarnings("unused")
     private static ServerSocket socket;
+
+    /**
+     * Drop all foribiden characters from filename
+     *
+     * @param f input file name
+     * @return normalized file name
+     */
+    public static String replaceBadChars(String f) {
+        String replace = "_";
+        f = f.replaceAll("/", replace);
+        f = f.replaceAll("\\\\", replace);
+        f = f.replaceAll(":", replace);
+        f = f.replaceAll("\\?", replace);
+        f = f.replaceAll("\\\"", replace);
+        f = f.replaceAll("\\*", replace);
+        f = f.replaceAll("<", replace);
+        f = f.replaceAll(">", replace);
+        f = f.replaceAll("\\|", replace);
+        f = f.trim();
+        f = StringUtils.removeEnd(f, ".");
+        f = f.trim();
+
+        String ff;
+        while (!(ff = f.replaceAll(" ", "_")).equals(f)) {
+            f = ff;
+        }
+
+        return f;
+    }
 
     public static String prefixOS() {
         String strPrefix = null;
