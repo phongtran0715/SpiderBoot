@@ -9,16 +9,17 @@ import com.github.axet.vget.info.VideoInfo.VideoType;
 
 public class DirectDownload {
 	
-	public static void main() {
-		//download("JyhTTkypni0","C:\\Users\\phong.tran\\Downloads\\Video\\spider_video\\");
-	}
+//	public static void main() {
+//		//download("JyhTTkypni0","C:\\Users\\phong.tran\\Downloads\\Video\\spider_video\\");
+//		//download("J2-qgXKoeKw","/home/phongtran0715/Downloads", "phongtestvideo");
+//	}
 	
-    public static void download(String vId, String storeLocation) {
+    public static void download(String vId, String storeLocation, String outputName) {
         try {
         	System.out.println("Begining download video id : " + vId);
         	String [] vUlrs= {"https://www.youtube.com/watch?v=" + vId};
         	for(String vUrl : vUlrs){
-        		VGet v = new VGet(new URL(vUrl), new File(storeLocation));
+        		VGet v = new VGet(new URL(vUrl), new File(storeLocation), outputName);
                 VideoInfoUser user = new VideoInfoUser();
                 user.setUserQuality(VideoQuality.pMaxQuality);
                 user.setUserType(VideoType.MP4);

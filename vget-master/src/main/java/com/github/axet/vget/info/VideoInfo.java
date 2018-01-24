@@ -38,6 +38,7 @@ public class VideoInfo {
     private States state;
     private Throwable exception;
     private int delay;
+    private String outputName = null;
 
     /**
      * 
@@ -53,6 +54,12 @@ public class VideoInfo {
     public VideoInfo(URL web) {
         this.setWeb(web);
 
+        reset();
+    }
+    
+    public VideoInfo(URL web, String outputName) {
+        this.setWeb(web);
+        this.outputName = outputName;
         reset();
     }
 
@@ -126,7 +133,7 @@ public class VideoInfo {
         VGetParser ei = null;
 
         if (YouTubeParser.probe(web))
-            ei = new YouTubeParser(web);
+            ei = new YouTubeParser(web, this.outputName);
 
         if (VimeoParser.probe(web))
             ei = new VimeoParser(web);

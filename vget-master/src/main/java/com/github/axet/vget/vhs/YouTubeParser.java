@@ -76,9 +76,15 @@ public class YouTubeParser extends VGetParser {
     List<VideoDownload> sNextVideoURL = new ArrayList<VideoDownload>();
 
     URL source;
+    String outputName = null;
 
     public YouTubeParser(URL input) {
         this.source = input;
+    }
+    
+    public YouTubeParser(URL input, String outputName) {
+        this.source = input;
+        this.outputName = outputName;
     }
 
     public static boolean probe(URL url) {
@@ -452,9 +458,13 @@ public class YouTubeParser extends VGetParser {
 
     @Override
     public void extract(VideoInfo info, VideoInfoUser user, AtomicBoolean stop, Runnable notify) {
-        try {
+        try {     	
+        	
             downloadone(info, stop, notify);
-
+            if(outputName != null)
+            {
+            	info.setTitle(outputName);
+            }
             getVideo(info, user, sNextVideoURL);
         } catch (RuntimeException e) {
         	System.out.println(e.getMessage());
