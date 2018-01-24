@@ -53,11 +53,7 @@ public class VGet {
         targetForce = file;
     }
 
-    /**
-     * get output file on local file system
-     * 
-     * @return
-     */
+
     public File getTarget() {
         return targetFile;
     }
@@ -90,7 +86,7 @@ public class VGet {
      * @return normalized file name
      */
     static String replaceBadChars(String f) {
-        String replace = " ";
+        String replace = "_";
         f = f.replaceAll("/", replace);
         f = f.replaceAll("\\\\", replace);
         f = f.replaceAll(":", replace);
@@ -105,7 +101,7 @@ public class VGet {
         f = f.trim();
 
         String ff;
-        while (!(ff = f.replaceAll("  ", " ")).equals(f)) {
+        while (!(ff = f.replaceAll(" ", "_")).equals(f)) {
             f = ff;
         }
 
@@ -246,11 +242,7 @@ public class VGet {
         return false;
     }
 
-    /**
-     * return status of download information. subclassing for VideoInfo.empty();
-     * 
-     * @return
-     */
+
     public boolean empty() {
         return getVideo().empty();
     }
@@ -259,12 +251,7 @@ public class VGet {
         extract(new VideoInfoUser(), stop, notify);
     }
     
-    /**
-     * extract video information, retry until success
-     * 
-     * @param stop
-     * @param notify
-     */
+
     public void extract(VideoInfoUser user, AtomicBoolean stop, Runnable notify) {
         while (!done(stop)) {
             try {

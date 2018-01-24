@@ -40,17 +40,7 @@ public class VideoInfo {
     private int delay;
     private String outputName = null;
 
-    /**
-     * 
-     * @param vq
-     *            max video quality to download
-     * @param web
-     *            user firendly url
-     * @param video
-     *            video stream url
-     * @param title
-     *            video title
-     */
+
     public VideoInfo(URL web) {
         this.setWeb(web);
 
