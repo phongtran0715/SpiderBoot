@@ -28,6 +28,7 @@ import com.itc.edu.dlvideo.util.Utility;
 import static com.itc.edu.dlvideo.util.Utility.prefixOS;
 import static com.itc.edu.dlvideo.util.Utility.replaceBadChars;
 import com.itc.edu.dlvideo.util.VideoWraper;
+import java.sql.CallableStatement;
 import java.util.List;
 
 /*------------------------------------------------------------------------------
@@ -47,6 +48,10 @@ import java.util.List;
     Modify file name video
     format: video_[video_container.id].mp4
     Modify close ket noi db sau khi thuc hien lenh
+
+25-01-2018, [CR-006] phapnd
+    Modify add ham lastSeqVideoContainer, lay filename format 
+    video_[video_container.id].mp4, goi vao ham download
 
  */
 public class DownloadExecuteTimer extends TimerTask {
@@ -106,11 +111,12 @@ public class DownloadExecuteTimer extends TimerTask {
                         if (theDir.exists()) {
                             startTime = System.currentTimeMillis();
                             logger.info("Start Downloading:|VIDEOID=" + vId);
-                            dowloadHandle.download(vId, path);
+                            dowloadHandle.download(vId, path, "video_" + lastSeqVideoContainer().toString());
                             logger.info("Download Success:|VIDEOID=" + vId + "|take time=" + (System.currentTimeMillis() - startTime));
                             //Insert video info to data base
                             VideoWraper vWraper = getVideoInfor(singleVideo);
                             Integer intVideoID = saveVideoInfo(vWraper);
+                            /*
                             if (intVideoID >= 0) {
                                 String desFile = videoFolderBase + prefixOS + cHomeId + "-" + cMonitorId + prefixOS + "video_" + intVideoID.toString() + ".mp4";
                                 String tempFile = videoFolderBase + prefixOS + cHomeId + "-" + cMonitorId + prefixOS + replaceBadChars(singleVideo.getSnippet().getTitle()) + ".mp4";
@@ -120,11 +126,11 @@ public class DownloadExecuteTimer extends TimerTask {
                                         logger.error("Error delete file " + tempFile);
                                     }
                                 }
+                            } else {
+                                logger.error("ERR_FILENAME_VIDEO|" + vWraper.monitorChannelId + "|" + vWraper.title);
+                                VideoContainerStatus(vWraper.title, intVideoID, 100);
                             }
-                            else {
-                                logger.error("ERR_FILENAME_VIDEO|" + vWraper.monitorChannelId +"|" + vWraper.title);
-                                VideoContainerStatus(vWraper.title,intVideoID,100);
-                            }
+                             */
                             //Notify to upload thread
                             //new UploadExecuteThread().getInstance().addElement(vWraper);	
                         }
@@ -226,6 +232,8 @@ public class DownloadExecuteTimer extends TimerTask {
         String query = "{ call INSERTNEWMO(?,?,?,?,?,?,?,?,?) }";
         try {
             preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
+            preparedStm.executeQuery("SET NAMES 'UTF8'");
+            preparedStm.executeQuery("SET CHARACTER SET 'UTF8'");
             // execute insert SQL statement
             preparedStm.setString(1, vWraper.vId);
             preparedStm.setString(2, vWraper.title);
@@ -309,6 +317,35 @@ public class DownloadExecuteTimer extends TimerTask {
         }
         //logger.info("Insert info: MontiorChannelID=" + cMonitorId + "|VideoID=" + vWraper.vId + "|TITLE:" + vWraper.title + "|take time:" + (System.currentTimeMillis() - startTime));
 
+    }
+
+    private Integer lastSeqVideoContainer() {
+        Integer lastSeq = 0;
+        String query = "{ call GETLASTSEQ() }";
+        CallableStatement cStmt = null;
+        try {
+            cStmt = MySqlAccess.getInstance().connect.prepareCall(query);
+            ResultSet rs = cStmt.executeQuery();
+            if (rs.next()) {
+                lastSeq = rs.getInt(1);
+
+                logger.info("Last Sequence Video_Container : " + lastSeq);
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            logger.error("ERR_GET_LASTSEQ_VIDEOS|" + e);
+        } finally {
+            if (cStmt != null) {
+                try {
+                    cStmt.close();
+                } catch (SQLException ex) {
+                    // TODO Auto-generated catch block
+                    logger.error("ERR_GET_LASTSEQ_VIDEOS|" + ex.getMessage());
+                    return lastSeq;
+                }
+            }
+        }
+        return lastSeq;
     }
 
 }
