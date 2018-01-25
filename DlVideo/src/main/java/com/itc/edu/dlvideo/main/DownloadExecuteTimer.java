@@ -10,24 +10,21 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
 import com.github.axet.vget.DirectDownload;
 import com.google.api.client.util.DateTime;
-import com.itc.edu.dlvideo.main.Search;
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchResult;
+import com.google.api.services.youtube.model.Video;
 import com.itc.edu.database.MySqlAccess;
 import com.itc.edu.dlvideo.util.Config;
-import static com.itc.edu.dlvideo.util.FileUtils.deleteFile;
-import static com.itc.edu.dlvideo.util.FileUtils.moveFile;
 import com.itc.edu.dlvideo.util.Utility;
 import static com.itc.edu.dlvideo.util.Utility.prefixOS;
-import static com.itc.edu.dlvideo.util.Utility.replaceBadChars;
 import com.itc.edu.dlvideo.util.VideoWraper;
+
 import java.sql.CallableStatement;
 import java.util.List;
 
@@ -53,6 +50,9 @@ import java.util.List;
     Modify add ham lastSeqVideoContainer, lay filename format 
     video_[video_container.id].mp4, goi vao ham download
 
+26-01-2018, [CR-007] phapnd
+    Modify get thong tin video thong qua ham getVideoID, thay vi search Video
+    Correct lai thong tin description, tag cua video
  */
 public class DownloadExecuteTimer extends TimerTask {
 
@@ -113,9 +113,23 @@ public class DownloadExecuteTimer extends TimerTask {
                             logger.info("Start Downloading:|VIDEOID=" + vId);
                             dowloadHandle.download(vId, path, "video_" + lastSeqVideoContainer().toString());
                             logger.info("Download Success:|VIDEOID=" + vId + "|take time=" + (System.currentTimeMillis() - startTime));
-                            //Insert video info to data base
-                            VideoWraper vWraper = getVideoInfor(singleVideo);
-                            Integer intVideoID = saveVideoInfo(vWraper);
+                            // Get video info
+                            List<Video> videoList = Search.getInstance().getVideoInfo(vId);
+                            Iterator<Video> iteratorSRS = videoList.iterator();
+                            // logger.info("VIDEO INFO|" + videoList);
+                            if (videoList != null) {
+                                if (!iteratorSRS.hasNext()) {
+                                    logger.error(" There aren't any results for your query.");
+                                }
+                                while (iteratorSRS.hasNext()) {
+                                    Video sgVideo = iteratorSRS.next();
+
+                                    //Insert video info to data base
+                                    VideoWraper vWraper = getVideoInfor(sgVideo);
+                                    Integer intVideoID = saveVideoInfo(vWraper);
+
+                                }
+                            }
                             /*
                             if (intVideoID >= 0) {
                                 String desFile = videoFolderBase + prefixOS + cHomeId + "-" + cMonitorId + prefixOS + "video_" + intVideoID.toString() + ".mp4";
@@ -208,13 +222,25 @@ public class DownloadExecuteTimer extends TimerTask {
         logger.info("Update info: MontiorChannelID=" + timerId + "|LastSyncTime=" + lastSyncTime + "|take time:" + (System.currentTimeMillis() - startTime));
     }
 
-    private VideoWraper getVideoInfor(SearchResult singleVideo) {
+    private VideoWraper getVideoInfor(Video singleVideo) {
         VideoWraper vWraper = new VideoWraper();
-        vWraper.vId = singleVideo.getId().getVideoId();
+        vWraper.vId = singleVideo.getId();
         vWraper.title = singleVideo.getSnippet().getTitle();
         vWraper.title = vWraper.title.replaceAll("[!@#$%^&*(){}:|<>?]", " ");
-        vWraper.description = singleVideo.getSnippet().getDescription();
-        vWraper.tag = singleVideo.getEtag();
+        logger.info("Correct Description|Video=" + vWraper.title + "|Original Desc=" + singleVideo.getSnippet().getDescription());
+        vWraper.description = correctDesc(singleVideo.getSnippet().getDescription());
+        vWraper.description = vWraper.description.replaceAll(singleVideo.getSnippet().getChannelTitle(), "Us");
+        logger.info("Description=" + vWraper.description);
+        StringBuilder tag = new StringBuilder("");
+        List<String> lstTags = singleVideo.getSnippet().getTags();
+        Iterator<String> iteratorTags = lstTags.iterator();
+        // logger.info("VIDEO INFO|" + videoList);
+        if (lstTags != null) {
+            while (iteratorTags.hasNext()) {
+                tag = tag.append(iteratorTags.next()).append(System.getProperty("line.separator"));
+            }
+        }
+        vWraper.tag = tag.toString();
         vWraper.thumbnail = singleVideo.getSnippet().getThumbnails().getDefault().getUrl();
         vWraper.vLocation = videoFolderBase + prefixOS + cHomeId + "-" + cMonitorId + prefixOS;
         return vWraper;
@@ -231,6 +257,16 @@ public class DownloadExecuteTimer extends TimerTask {
 //                + "VideoLocation, HomeChannelId, MonitorChannelId, DownloadDate) VALUES (?,?,?,?,?,?,?,?,?)";
         String query = "{ call INSERTNEWMO(?,?,?,?,?,?,?,?,?) }";
         try {
+            logger.info("\n=============V I D E O       I N F O R M A T I O N==================");
+            logger.info(" Video Id" + vWraper.vId);
+            logger.info(" Title: " + vWraper.title);
+            logger.info(" Tag: " + vWraper.tag);
+            logger.info(" Description: " + vWraper.description);
+            logger.info(" Thumbnail: " + vWraper.thumbnail);
+            logger.info(" Location: " + vWraper.vLocation);
+            logger.info(" Montior Channel: " + cMonitorId);
+            logger.info("\n=============================================================\n");
+
             preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
             preparedStm.executeQuery("SET NAMES 'UTF8'");
             preparedStm.executeQuery("SET CHARACTER SET 'UTF8'");
@@ -346,6 +382,45 @@ public class DownloadExecuteTimer extends TimerTask {
             }
         }
         return lastSeq;
+    }
+
+    private String correctDesc(String desc) {
+        Boolean bMatch = false;
+        Long startTime = System.currentTimeMillis();
+        String[] partStrs = desc.split("\\r?\\n");
+        StringBuilder returnDesc = new StringBuilder("");
+        String query = "SELECT msg FROM utblinvdesc;";
+        Statement stmt = null;
+        for (String partStr : partStrs) {
+            bMatch = false;
+            try {
+                stmt = MySqlAccess.getInstance().connect.createStatement();
+                ResultSet rs = stmt.executeQuery(query);
+                while (rs.next() && !bMatch) {
+                    String temp = rs.getString(1);
+                    if (partStr.toLowerCase().contains(temp)) {
+                        bMatch = true;
+                    }
+                }
+                if (!bMatch) {
+                    returnDesc.append(partStr).append(System.getProperty("line.separator"));
+                }
+            } catch (Exception ex) {
+                logger.info(ex.toString());
+            } finally {
+                if (stmt != null) {
+                    try {
+                        stmt.close();
+                    } catch (SQLException ex) {
+                        // TODO Auto-generated catch block
+                        logger.error("ERR_CORRECT_DESCRIPTION|" + ex.getMessage());
+                    }
+                }
+            }
+        }
+
+        logger.info("Correct Desciption IS|=" + returnDesc.toString() + "|take time:" + (System.currentTimeMillis() - startTime));
+        return returnDesc.toString();
     }
 
 }

@@ -16,6 +16,10 @@ import static com.itc.edu.dlvideo.util.Utility.prefixOS;
 
 21-01-2018, [CR-003] phapnd
     Cap nhat them thong tin load file app.properties tu dong, ko phan biet OS
+
+25-01-2018, [CR-007] phapnd
+    Cap nhat them thong tin load file youtube.properties
+
 */
 
 public class Constant {
@@ -26,7 +30,7 @@ public class Constant {
     public static final String AUTH_LINK = "AUTH_LINK";
     public static final String CLIENT_SCERET = "CLIENT_SCERET";
     public static final String NUMBER_OF_VIDEOS_RETURNED = "NUMBER_OF_VIDEOS_RETURNED";
-    
+    public static final String YOUTUBE_API_KEY = "youtube.apikey";
     public static final String VIDEO_FOLDER = "VIDEO_FOLDER";
 
     // string ket noi DB

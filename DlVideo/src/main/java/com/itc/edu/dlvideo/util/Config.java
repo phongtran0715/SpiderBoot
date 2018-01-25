@@ -9,9 +9,11 @@ import static com.itc.edu.dlvideo.util.Utility.createFolder;
 import static com.itc.edu.dlvideo.util.Utility.prefixOS;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 import org.apache.log4j.Logger;
+import org.springframework.util.ResourceUtils;
 
 /*------------------------------------------------------------------------------
 ** History
@@ -20,6 +22,9 @@ import org.apache.log4j.Logger;
 
 21-01-2018, [CR-002] phapnd
     Cap nhat cau hinh folde luu video download $HOME/VIDEO_FOLDER
+
+25-01-2018, [CR-007] phapnd
+    Cap nhat cau hinh youtube.key
 
 
  */
@@ -32,6 +37,7 @@ public class Config {
     public static String dbUserName;
     public static String dbPassword;
 
+    public static String youtubeKey="AIzaSyDGGgByVC_2oIOaqznVM03GSpIfb5Ghyuc";
     public static String videoFolder;
     public static String videoFormat;
     public static String authLink;
@@ -39,6 +45,33 @@ public class Config {
     public static Integer noVideoReturn;
 
     public static boolean loadConfig() {
+/*
+        Properties prop0;
+        FileInputStream fileReader0 = null;
+        prop0 = new Properties();
+        try {
+            //fileReader0 = new FileInputStream(fileConfig0);
+            fileReader0 = new FileInputStream(ResourceUtils.getFile("classpath:youtube.properties"));
+            prop0.load(fileReader0);
+            youtubeKey = prop0.getProperty("youtube.apikey").trim();
+            if (youtubeKey.isEmpty()) {
+                logger.error(Constant.YOUTUBE_API_KEY + " is empty");
+                return false;
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception load file config youtube.properties", e);
+            return false;
+        } finally {
+            if (null != fileReader0) {
+                try {
+                    fileReader0.close();
+                } catch (IOException ex) {
+                    logger.error("Error close file reader youtube.properties", ex);
+                }
+            }
+        }
+*/
         File fileConfig = new File(Constant.FILE_CONFIG);
         Properties prop;
         FileInputStream fileReader = null;
@@ -63,7 +96,7 @@ public class Config {
             logger.info(Constant.VIDEO_FOLDER + "|" + videoFolder);
             createFolder(System.getProperty("user.dir") + prefixOS() + videoFolder);
             logger.info("Create" + Constant.VIDEO_FOLDER + videoFolder);
-            
+
             strTemp = prop.getProperty(Constant.VIDEO_FILE_FORMAT, "").trim();
             videoFormat = strTemp;
             if (strTemp.isEmpty()) {
