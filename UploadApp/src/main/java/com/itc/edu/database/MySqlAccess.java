@@ -11,6 +11,8 @@ import org.apache.log4j.Logger;
 /*------------------------------------------------------------------------------
 ** History
 
+26-01-2018, [CR-008] phapnd
+    Modify de ho tro ket noi db UTF-8
 
 */
 
@@ -52,7 +54,7 @@ public class MySqlAccess {
         // Setup the connection with the DB
         try {
             connect = DriverManager
-                    .getConnection("jdbc:mysql://" + dbServer + "/" + dbName + "?zeroDateTimeBehavior=convertToNull", dbUserName, dbPassword);
+                    .getConnection("jdbc:mysql://" + dbServer + "/" + dbName + "?zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8", dbUserName, dbPassword);
 
         } catch (SQLException e) {
             logger.info("Connection Failed! Check output console");
@@ -79,7 +81,7 @@ public class MySqlAccess {
         // Setup the connection with the DB
         try {
             connect = DriverManager
-                    .getConnection("jdbc:mysql://" + server + "/" + dbname, user, password);
+                    .getConnection("jdbc:mysql://" + server + "/" + dbname + "?useUnicode=yes&characterEncoding=UTF-8", user, password);
 
         } catch (SQLException e) {
             logger.error("Connection Failed! Check output console" + e);

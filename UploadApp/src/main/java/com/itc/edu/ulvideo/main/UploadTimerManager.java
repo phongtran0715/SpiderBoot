@@ -13,9 +13,11 @@ import org.apache.log4j.Logger;
 
 /*------------------------------------------------------------------------------
 ** History
+26-01-2018, [CR-008] phapnd
+    Modify de ho tro ket noi db UTF-8
 
 
-*/
+ */
 public class UploadTimerManager extends TimerWrapper {
 
     private static final Logger logger = Logger.getLogger(UploadTimerManager.class);
@@ -40,10 +42,11 @@ public class UploadTimerManager extends TimerWrapper {
         java.sql.Timestamp downloadDate;
         logger.info("init Get Video");
         String query = "{ call GETVIDEO() }";
+        CallableStatement cStmt = null;
         try {
-            CallableStatement cStmt = MySqlAccess.getInstance().connect.prepareCall(query);
+            cStmt = MySqlAccess.getInstance().connect.prepareCall(query);
             ResultSet rs = cStmt.executeQuery();
-            logger.info("EXECUTE RESULT=" + rs);
+            //logger.info("EXECUTE RESULT=" + rs);
             while (rs.next()) {
                 vid = rs.getInt("id");
                 videoID = rs.getString("videoID");
@@ -65,6 +68,17 @@ public class UploadTimerManager extends TimerWrapper {
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             logger.error("ERR_GET_VIDEOS|" + e);
+            return;
+        } finally {
+            if (cStmt != null) {
+                try {
+                    cStmt.close();
+                } catch (SQLException ex) {
+                    // TODO Auto-generated catch block
+                    logger.error("ERR_GET_VIDEOS|" + ex.getMessage());
+                    return;
+                }
+            }
         }
 
     }

@@ -10,7 +10,8 @@ import org.apache.log4j.Logger;
 
 /*------------------------------------------------------------------------------
 ** History
-
+26-01-2018, [CR-008] phapnd
+    Modify close ket noi DB
 
  */
 public class UploadExecuteThread implements Runnable {
@@ -45,11 +46,16 @@ public class UploadExecuteThread implements Runnable {
                     logger.info("UploadThread : beginning upload video : " + vWrapper.title);
                     if (vWrapper != null) {
                         UploadVideo uploadVideo = new UploadVideo();
-                        uploadVideo.execute(vWrapper.title, vWrapper.description, vWrapper.tag, vWrapper.vLocation);
+                        if (!uploadVideo.execute(vWrapper.title, vWrapper.description, vWrapper.tag, vWrapper.vLocation)) {
+                            uploadStatus(vWrapper.title, vWrapper.recordId, 100);
+                            logger.info("UploadThread : upload video : " + vWrapper.title + " failed");
+                        } else {
+                            uploadStatus(vWrapper.title, vWrapper.recordId, 2);
+                            logger.info("UploadThread : upload video : " + vWrapper.title + " successfully");
+                        }
                         //delete record on data base
                         //deleteRecord(vWrapper.recordId);
-                        uploadStatus(vWrapper.title, vWrapper.recordId, 2);
-                        logger.info("UploadThread : upload video : " + vWrapper.title + " completed");
+
                     }
                 } else {
                     logger.info("upload queue empty");
@@ -79,19 +85,30 @@ public class UploadExecuteThread implements Runnable {
 
     private void deleteRecord(int recordId) {
         String query = "DELETE FROM video_container WHERE Id = ? ;";
-        PreparedStatement preparedStm;
+        PreparedStatement preparedStm = null;
         try {
             preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
             preparedStm.setInt(1, recordId);
             preparedStm.executeUpdate();
         } catch (SQLException ex) {
             logger.error("ERR_DELETERECORD|" + ex);
+            return;
+        } finally {
+            if (preparedStm != null) {
+                try {
+                    preparedStm.close();
+                } catch (SQLException ex) {
+                    // TODO Auto-generated catch block
+                    logger.error("ERR_DELETERECORD|" + ex.getMessage());
+                    return;
+                }
+            }
         }
     }
 
     private void uploadStatus(String title, int recordId, int status) {
         String query = "{ call UPLOADSTATUS(?,?) }";
-        PreparedStatement preparedStm;
+        PreparedStatement preparedStm = null;
         try {
             preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
             preparedStm.setInt(1, recordId);
@@ -102,6 +119,16 @@ public class UploadExecuteThread implements Runnable {
             // TODO Auto-generated catch block
             logger.error("ERR_UPDATE_UPLOADSTATUS|" + e.getMessage());
             return;
+        } finally {
+            if (preparedStm != null) {
+                try {
+                    preparedStm.close();
+                } catch (SQLException ex) {
+                    // TODO Auto-generated catch block
+                    logger.error("ERR_UPDATE_UPLOADSTATUS|" + ex.getMessage());
+                    return;
+                }
+            }
         }
         //logger.info("Insert info: MontiorChannelID=" + cMonitorId + "|VideoID=" + vWraper.vId + "|TITLE:" + vWraper.title + "|take time:" + (System.currentTimeMillis() - startTime));
 

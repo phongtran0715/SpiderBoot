@@ -11,7 +11,6 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package com.itc.edu.ulvideo.main;
 
 import java.io.File;
@@ -38,14 +37,14 @@ import org.apache.log4j.Logger;
 
 /*------------------------------------------------------------------------------
 ** History
+26-01-2018, [CR-008] phapnd
+    Modify tags item for upload video
 
-
-*/
-
+ */
 /**
  * Upload a video to the authenticated user's channel. Use OAuth 2.0 to
- * authorize the request. Note that you must add your video files to the
- * project folder to upload them with this application.
+ * authorize the request. Note that you must add your video files to the project
+ * folder to upload them with this application.
  *
  * @author Jeremy Walker
  */
@@ -53,14 +52,14 @@ public class UploadVideo {
 
     private static final Logger logger = Logger.getLogger(UploadVideo.class);
     /**
-     * Define a global instance of a Youtube object, which will be used
-     * to make YouTube Data API requests.
+     * Define a global instance of a Youtube object, which will be used to make
+     * YouTube Data API requests.
      */
     private static YouTube youtube;
 
     /**
-     * Define a global variable that specifies the MIME type of the video
-     * being uploaded.
+     * Define a global variable that specifies the MIME type of the video being
+     * uploaded.
      */
     private static final String VIDEO_FILE_FORMAT = Config.videoFormat;
 
@@ -71,8 +70,9 @@ public class UploadVideo {
      *
      * @param args command line args (not used).
      */
-    public void execute(String title, String description, String etags, String vLocation) {
-
+    public boolean execute(String title, String description, String etags, String vLocation) {
+        Long startTime = System.currentTimeMillis();
+        Boolean result = false;
         // This OAuth 2.0 access scope allows an application to upload files
         // to the authenticated user's YouTube channel, but doesn't allow
         // other types of access.
@@ -92,7 +92,7 @@ public class UploadVideo {
             // Set the video to be publicly visible. This is the default
             // setting. Other supporting settings are "unlisted" and "private."
             VideoStatus status = new VideoStatus();
-            status.setPrivacyStatus("private");
+            status.setPrivacyStatus("public");
             videoObjectDefiningMetadata.setStatus(status);
 
             // Most of the video's metadata is set on the VideoSnippet object.
@@ -108,11 +108,10 @@ public class UploadVideo {
 
             // Set the keyword tags that you want to associate with the video.
             List<String> tags = new ArrayList<String>();
-            tags.add("test");
-            tags.add("example");
-            tags.add("java");
-            tags.add("YouTube Data API V3");
-            tags.add("erase me");
+            String[] partStrs = etags.split("\\r?\\n");
+            for (String partStr : partStrs) {
+                tags.add(partStr);
+            }
             snippet.setTags(tags);
 
             // Add the completed snippet object to the video resource.
@@ -120,10 +119,14 @@ public class UploadVideo {
 
 //            InputStreamContent mediaContent = new InputStreamContent(VIDEO_FILE_FORMAT,
 //                    UploadVideo.class.getResourceAsStream("/sample-video.mp4"));
-            
+            logger.info("Upload video|" + vLocation);
             File initialFile = new File(vLocation);
+            if (!initialFile.exists()) {
+                logger.error("File " + title + " not Exist");
+                return false;
+            }
             InputStream targetStream = new FileInputStream(initialFile);
-            InputStreamContent mediaContent = new InputStreamContent(VIDEO_FILE_FORMAT,targetStream);
+            InputStreamContent mediaContent = new InputStreamContent(VIDEO_FILE_FORMAT, targetStream);
 
             // Insert the video. The command sends three arguments. The first
             // specifies which information the API request is setting and which
@@ -171,8 +174,10 @@ public class UploadVideo {
             uploader.setProgressListener(progressListener);
 
             // Call the API and upload the video.
+            logger.info("Call the API and upload the video.");
             Video returnedVideo = videoInsert.execute();
 
+            logger.info("Upload file|" + title + "|SUCCESSFULLY|take time:" + (System.currentTimeMillis() - startTime));
             // Print data about the newly inserted video from the API response.
             logger.info("\n================== Returned Video ==================\n");
             logger.info("  - Id: " + returnedVideo.getId());
@@ -180,7 +185,7 @@ public class UploadVideo {
             logger.info("  - Tags: " + returnedVideo.getSnippet().getTags());
             logger.info("  - Privacy Status: " + returnedVideo.getStatus().getPrivacyStatus());
             logger.info("  - Video Count: " + returnedVideo.getStatistics().getViewCount());
-
+            result = true;
         } catch (GoogleJsonResponseException e) {
             logger.error("GoogleJsonResponseException code: " + e.getDetails().getCode() + " : "
                     + e.getDetails().getMessage());
@@ -189,5 +194,7 @@ public class UploadVideo {
         } catch (Throwable t) {
             logger.error("Throwable: " + t.getMessage());
         }
+        return result;
     }
+
 }

@@ -109,6 +109,12 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.1</version>
 		</dependency>
+	 <dependency>
+	  <groupId>youtubeapi</groupId>
+	  <artifactId>youtubeapi-com</artifactId>
+	  <version>1.0.0</version>
+	  <type>jar</type>
+	 </dependency>
 	</dependencies>
 
 	<build>
@@ -121,14 +127,14 @@
 				<configuration>
 					<repositoryLayout>flat</repositoryLayout>
 					<configurationDirectory>etc</configurationDirectory>
-					<configurationSourceDirectory>src/main/resources</configurationSourceDirectory>
+					<configurationSourceDirectory>src</configurationSourceDirectory>
 					<copyConfigurationDirectory>true</copyConfigurationDirectory>
 					<includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
 					<target>${project.build.directory}</target>
 					<daemons>
 						<daemon>
 							<id>ulvideo</id>
-							<mainClass>com.itc.edu.ulvideo.main.Start</mainClass>
+							<mainClass>com.itc.edu.ulvideo.main.Main</mainClass>
 							<commandLineArguments>
 								<commandLineArguments>start</commandLineArguments>
 							</commandLineArguments>
