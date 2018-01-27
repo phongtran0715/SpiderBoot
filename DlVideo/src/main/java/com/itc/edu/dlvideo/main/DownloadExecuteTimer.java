@@ -53,7 +53,11 @@ import java.util.List;
 26-01-2018, [CR-007] phapnd
     Modify get thong tin video thong qua ham getVideoID, thay vi search Video
     Correct lai thong tin description, tag cua video
+
+27-01-2018, [CR-009] phapnd
+    Modify lay thong tin extentsion cua file videodownload. Luu DB voi ext download ve
  */
+
 public class DownloadExecuteTimer extends TimerTask {
 
     String timerId;
@@ -111,7 +115,8 @@ public class DownloadExecuteTimer extends TimerTask {
                         if (theDir.exists()) {
                             startTime = System.currentTimeMillis();
                             logger.info("Start Downloading:|VIDEOID=" + vId);
-                            dowloadHandle.download(vId, path, "video_" + lastSeqVideoContainer().toString());
+                            String lastSeq = lastSeqVideoContainer().toString();
+                            String ext = dowloadHandle.download(vId, path, "video_" + lastSeq);
                             logger.info("Download Success:|VIDEOID=" + vId + "|take time=" + (System.currentTimeMillis() - startTime));
                             // Get video info
                             List<Video> videoList = Search.getInstance().getVideoInfo(vId);
@@ -121,11 +126,11 @@ public class DownloadExecuteTimer extends TimerTask {
                                 if (!iteratorSRS.hasNext()) {
                                     logger.error(" There aren't any results for your query.");
                                 }
-                                while (iteratorSRS.hasNext()) {
+                                if (iteratorSRS.hasNext()) {
                                     Video sgVideo = iteratorSRS.next();
 
                                     //Insert video info to data base
-                                    VideoWraper vWraper = getVideoInfor(sgVideo);
+                                    VideoWraper vWraper = getVideoInfor(sgVideo, lastSeq, ext);
                                     Integer intVideoID = saveVideoInfo(vWraper);
 
                                 }
@@ -222,7 +227,7 @@ public class DownloadExecuteTimer extends TimerTask {
         logger.info("Update info: MontiorChannelID=" + timerId + "|LastSyncTime=" + lastSyncTime + "|take time:" + (System.currentTimeMillis() - startTime));
     }
 
-    private VideoWraper getVideoInfor(Video singleVideo) {
+    private VideoWraper getVideoInfor(Video singleVideo, String lastSeq, String ext) {
         VideoWraper vWraper = new VideoWraper();
         vWraper.vId = singleVideo.getId();
         vWraper.title = singleVideo.getSnippet().getTitle();
@@ -242,7 +247,7 @@ public class DownloadExecuteTimer extends TimerTask {
         }
         vWraper.tag = tag.toString();
         vWraper.thumbnail = singleVideo.getSnippet().getThumbnails().getDefault().getUrl();
-        vWraper.vLocation = videoFolderBase + prefixOS + cHomeId + "-" + cMonitorId + prefixOS;
+        vWraper.vLocation = videoFolderBase + prefixOS + cHomeId + "-" + cMonitorId + prefixOS + "video_" + lastSeq + "." + ext;
         return vWraper;
     }
 
