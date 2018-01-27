@@ -26,6 +26,14 @@ import com.github.axet.wget.info.ex.DownloadInterruptedError;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
 import com.github.axet.wget.info.ex.DownloadRetry;
 
+/*------------------------------------------------------------------------------
+** History
+
+27-01-2018, [CR-009] phapnd
+    Modify tra ra thong tin extentsion cua file videodownload
+ */
+
+
 public class VGet {
 
     VideoInfo info;
@@ -62,20 +70,22 @@ public class VGet {
         return info;
     }
 
-    public void download() {
-        download(new VideoInfoUser(), new AtomicBoolean(false), new Runnable() {
+    public String download() {
+        String ext = download(new VideoInfoUser(), new AtomicBoolean(false), new Runnable() {
             @Override
             public void run() {
             }
         });
+        return ext;
     }
 
-    public void download(VideoInfoUser user) {
-        download(user, new AtomicBoolean(false), new Runnable() {
+    public String download(VideoInfoUser user) {
+        String ext = download(user, new AtomicBoolean(false), new Runnable() {
             @Override
             public void run() {
             }
         });
+        return ext;
     }
 
     /**
@@ -178,7 +188,8 @@ public class VGet {
         }
     }
 
-    void target(DownloadInfo dinfo) {
+    String target(DownloadInfo dinfo) {
+        String ext = null;
         if (targetForce != null) {
             targetFile = targetForce;
 
@@ -207,7 +218,7 @@ public class VGet {
             if (ct == null)
                 throw new DownloadRetry("null content type");
 
-            String ext = ct.replaceFirst("video/", "").replaceAll("x-", "");
+            ext = ct.replaceFirst("video/", "").replaceAll("x-", "");
 
             do {
                 String add = idupcount > 0 ? " (".concat(idupcount.toString()).concat(")") : "";
@@ -222,6 +233,7 @@ public class VGet {
             // start over.
             dinfo.reset();
         }
+        return ext;
     }
 
     boolean retry(Throwable e) {
@@ -327,11 +339,13 @@ public class VGet {
             throw new DownloadError(f);
     }
 
-    public void download(final AtomicBoolean stop, final Runnable notify) {
-        download(new VideoInfoUser(), stop, notify);
+    public String download(final AtomicBoolean stop, final Runnable notify) {
+        String ext = download(new VideoInfoUser(), stop, notify);
+        return ext;
     }
     
-    public void download(VideoInfoUser user, final AtomicBoolean stop, final Runnable notify) {
+    public String download(VideoInfoUser user, final AtomicBoolean stop, final Runnable notify) {
+        String ext = null;
         try {
             if (empty()) {
                 extract(user, stop, notify);
@@ -341,14 +355,14 @@ public class VGet {
                 try {
                     final DownloadInfo dinfo = info.getInfo();
                     if(dinfo == null){
-                    	return;
+                    	return ext;
                     }
 
                     if (dinfo.getContentType() == null || !dinfo.getContentType().contains("video/")) {
                         throw new DownloadRetry("unable to download video, bad content");
                     }
 
-                    target(dinfo);
+                    ext = target(dinfo);
 
                     Direct direct;
 
@@ -391,7 +405,7 @@ public class VGet {
                     notify.run();
 
                     // break while()
-                    return;
+                    return ext;
                 } catch (DownloadRetry e) {
                     retry(user, stop, notify, e);
                 } catch (DownloadMultipartError e) {
@@ -418,5 +432,6 @@ public class VGet {
 
             throw e;
         }
+        return ext;
     }
 }
