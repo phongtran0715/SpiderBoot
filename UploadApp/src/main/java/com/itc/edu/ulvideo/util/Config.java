@@ -15,7 +15,8 @@ import org.apache.log4j.Logger;
 
 /*------------------------------------------------------------------------------
 ** History
-
+30-01-2018, [CR-010] phapnd
+    Modify add privacy status when uploading video
 
  */
 public class Config {
@@ -27,6 +28,7 @@ public class Config {
     public static String dbUserName;
     public static String dbPassword;
 
+    public static String privacyStatus;
     public static String videoFolder;
     public static String videoFormat;
     public static String authLink;
@@ -56,9 +58,17 @@ public class Config {
                 videoFolder = "video";
             }
             logger.info(Constant.VIDEO_FOLDER + "|" + videoFolder);
+            strTemp = prop.getProperty(Constant.PRIVACY_STATUS, "").trim();
+            privacyStatus = strTemp;
+            if (strTemp.isEmpty()) {
+                logger.warn(Constant.PRIVACY_STATUS + " is empty. Set default is private");
+                privacyStatus = "private";
+            }
+            logger.info(Constant.PRIVACY_STATUS + "|" + videoFolder);
+
             createFolder(System.getProperty("user.dir") + prefixOS() + videoFolder);
             logger.info("Create" + Constant.VIDEO_FOLDER + videoFolder);
-            
+
             strTemp = prop.getProperty(Constant.VIDEO_FILE_FORMAT, "").trim();
             videoFormat = strTemp;
             if (strTemp.isEmpty()) {

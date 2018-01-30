@@ -40,6 +40,9 @@ import org.apache.log4j.Logger;
 26-01-2018, [CR-008] phapnd
     Modify tags item for upload video
 
+30-01-2018, [CR-010] phapnd
+    Modify add privacy status when uploading video
+
  */
 /**
  * Upload a video to the authenticated user's channel. Use OAuth 2.0 to
@@ -92,7 +95,7 @@ public class UploadVideo {
             // Set the video to be publicly visible. This is the default
             // setting. Other supporting settings are "unlisted" and "private."
             VideoStatus status = new VideoStatus();
-            status.setPrivacyStatus("public");
+            status.setPrivacyStatus(Config.privacyStatus);
             videoObjectDefiningMetadata.setStatus(status);
 
             // Most of the video's metadata is set on the VideoSnippet object.

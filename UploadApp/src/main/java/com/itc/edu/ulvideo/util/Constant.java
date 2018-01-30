@@ -8,7 +8,8 @@ import static com.itc.edu.ulvideo.util.Utility.prefixOS;
 
 /*------------------------------------------------------------------------------
 ** History
-
+30-01-2018, [CR-010] phapnd
+    Modify add privacy status when uploading video
 */
 
 public class Constant {
@@ -22,6 +23,7 @@ public class Constant {
     
     public static final String VIDEO_FOLDER = "VIDEO_FOLDER";
 
+    public static final String PRIVACY_STATUS = "PRIVACY_STATUS";
     // string ket noi DB
     public static final String DBSERVER = "DBSERVER";
     public static final String DBNAME = "DBNAME";
