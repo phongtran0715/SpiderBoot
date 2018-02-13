@@ -5,11 +5,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import org.apache.log4j.Logger;
-
-import com.itc.edu.database.MySqlAccess;
-import com.itc.edu.timer.TimerWrapper;
+import spiderboot.database.MySqlAccess;	
+import spiderboot.timer.TimerWrapper;
 
 /*------------------------------------------------------------------------------
 ** History
@@ -46,9 +44,6 @@ public class DownloadTimerManager extends TimerWrapper {
 
     @Override
     public void initTimerTask() {
-
-        long startTime = 0L;
-
         logger.info("init Get MonitorChannel");
         Statement stmt = null;
         String query = "SELECT Id, HomeChannelId, MonitorChannelId, TimeIntervalSync, StatusSync "
@@ -65,7 +60,6 @@ public class DownloadTimerManager extends TimerWrapper {
                 logger.info("Start sync task : " + id + " with timer interval = " + 1 + " seconds");
             }
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
             logger.error("ERR_GET_MONITORCHANNEL|" + e);
             return;
         } finally {
@@ -73,12 +67,10 @@ public class DownloadTimerManager extends TimerWrapper {
                 try {
                     stmt.close();
                 } catch (SQLException ex) {
-                    // TODO Auto-generated catch block
                     logger.error("ERR_GET_MONITORCHANNEL|" + ex.getMessage());
                     return;
                 }
             }
         }
-
     }
 }

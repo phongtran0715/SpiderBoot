@@ -22,7 +22,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/ffmpeg"/>
-	<classpathentry kind="lib" path="/media/phongtran0715/DOCUMENTS/SourceCode/SpiderBoot/spider-manager/library/mysql-connector-java-5.1.44-bin.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

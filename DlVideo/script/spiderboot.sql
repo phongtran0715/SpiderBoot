@@ -7,6 +7,9 @@
 -- Phiên bản máy phục vụ: 10.1.28-MariaDB
 -- Phiên bản PHP: 5.6.32
 
+CREATE DATABASE  IF NOT EXISTS `spiderboot` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci */;
+USE `spiderboot`;
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
@@ -21,86 +24,6 @@ SET time_zone = "+00:00";
 --
 -- Cơ sở dữ liệu: `spiderboot`
 --
-
-DELIMITER $$
---
--- Thủ tục
---
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GETCHANNEL` (IN `i_batchWaitTime` INT(15))  BEGIN
-        DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-		BEGIN
-			GET DIAGNOSTICS condition 1
-			@SQLState = RETURNED_SQLSTATE, @SQLMessage = MESSAGE_TEXT; 
-			CALL log_debug(CONCAT('GETCHANNEL - Database error occurred, state - ',@SQLState, '; error msg - ', @SQLMessage));
-            
-		END;
-		SELECT b.CHANNELID FROM HOME_MONITOR_CHANNEL_MAPPING a, MONITOR_CHANNEL_LIST b WHERE a.MONITORCHANNELID = b.CHANNELID AND a.action = 1 AND a.statussync = 1 AND (i_batchWaitTime>=UNIX_TIMESTAMP(a.lastsynctime));
-    END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GETLASTSEQ` ()  BEGIN
-        DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-		BEGIN
-			GET DIAGNOSTICS condition 1
-			@SQLState = RETURNED_SQLSTATE, @SQLMessage = MESSAGE_TEXT; 
-			CALL log_debug(CONCAT('GETLASTSEQ - Database error occurred, state - ',@SQLState, '; error msg - ', @SQLMessage));
-            
-		END;
-		SELECT AUTO_INCREMENT FROM information_schema.TABLES
-		WHERE TABLE_SCHEMA = "spiderboot" AND TABLE_NAME = "video_container";
-    END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GETVIDEO` ()  BEGIN
-        DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-		BEGIN
-			GET DIAGNOSTICS condition 1
-			@SQLState = RETURNED_SQLSTATE, @SQLMessage = MESSAGE_TEXT; 
-			CALL log_debug(CONCAT('GETVIDEO - Database error occurred, state - ',@SQLState, '; error msg - ', @SQLMessage));
-            
-		END;
-		SELECT id, videoid, title, tag, description, thumbnail, videolocation, homechannelid, monitorchannelid, downloaddate
-        from video_container where processstatus = 1;
-    END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `INSERTNEWMO` (IN `i_videoID` VARCHAR(15), IN `i_title` VARCHAR(100), IN `i_tag` VARCHAR(1024), IN `i_desc` VARCHAR(4096), IN `i_thumbnail` VARCHAR(250), IN `i_location` VARCHAR(250), IN `i_homeID` VARCHAR(30), IN `i_monitorID` VARCHAR(30), IN `i_datetime` DATE)  BEGIN
-        DECLARE EXIT HANDLER FOR SQLEXCEPTION
-		BEGIN
-			GET DIAGNOSTICS condition 1
-			@SQLState = RETURNED_SQLSTATE, @SQLMessage = MESSAGE_TEXT; 
-			CALL log_debug(CONCAT('INSERTNEWMO - Database error occurred, state - ',@SQLState, '; error msg - ', @SQLMessage));
-            END;
-		INSERT INTO video_container (VideoId, Title, Tag, Description, Thumbnail,VideoLocation, HomeChannelId, MonitorChannelId, DownloadDate)
-        VALUES (i_videoID,i_title,i_tag,i_desc,i_thumbnail,i_location,i_homeID,i_monitorID,i_datetime);
-		commit;
-    
-    END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `log_debug` (IN `lastMsg` VARCHAR(512))  BEGIN
-		DECLARE EXIT HANDLER FOR SQLEXCEPTION
-		BEGIN
-			GET DIAGNOSTICS condition 1
-			@SQLState = RETURNED_SQLSTATE, @SQLMessage = MESSAGE_TEXT; 
-			CALL log_debug(CONCAT('Database error occurred, state - ',@SQLState, '; error msg - ', @SQLMessage));
-			CALL log_debug('Exiting now');
-		END;
-    BEGIN
-        INSERT INTO debug_log (msg)  VALUES (lastMsg);
-    END;
-    END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `UPLOADSTATUS` (IN `i_id` INT(11), IN `i_code` INT(2))  BEGIN
-        DECLARE EXIT HANDLER FOR SQLEXCEPTION 
-		BEGIN
-			GET DIAGNOSTICS condition 1
-			@SQLState = RETURNED_SQLSTATE, @SQLMessage = MESSAGE_TEXT; 
-			CALL log_debug(CONCAT('UPLOADSTATUS - Database error occurred, state - ',@SQLState, '; error msg - ', @SQLMessage));
-            
-		END;
-		UPDATE video_container set processstatus = i_code where id = i_id;
-        END$$
-
-DELIMITER ;
-
--- --------------------------------------------------------
 
 --
 -- Cấu trúc bảng cho bảng `debug_log`
@@ -473,6 +396,90 @@ ALTER TABLE `utblinvdesc`
 --
 ALTER TABLE `video_container`
   MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=159;
+
+
+
+DELIMITER $$
+--
+-- Thủ tục
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GETCHANNEL` (IN `i_batchWaitTime` INT(15))  BEGIN
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+		BEGIN
+			GET DIAGNOSTICS condition 1
+			@SQLState = RETURNED_SQLSTATE, @SQLMessage = MESSAGE_TEXT; 
+			CALL log_debug(CONCAT('GETCHANNEL - Database error occurred, state - ',@SQLState, '; error msg - ', @SQLMessage));
+            
+		END;
+		SELECT b.CHANNELID FROM HOME_MONITOR_CHANNEL_MAPPING a, MONITOR_CHANNEL_LIST b WHERE a.MONITORCHANNELID = b.CHANNELID AND a.action = 1 AND a.statussync = 1 AND (i_batchWaitTime>=UNIX_TIMESTAMP(a.lastsynctime));
+    END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GETLASTSEQ` ()  BEGIN
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+		BEGIN
+			GET DIAGNOSTICS condition 1
+			@SQLState = RETURNED_SQLSTATE, @SQLMessage = MESSAGE_TEXT; 
+			CALL log_debug(CONCAT('GETLASTSEQ - Database error occurred, state - ',@SQLState, '; error msg - ', @SQLMessage));
+            
+		END;
+		SELECT AUTO_INCREMENT FROM information_schema.TABLES
+		WHERE TABLE_SCHEMA = "spiderboot" AND TABLE_NAME = "video_container";
+    END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GETVIDEO` ()  BEGIN
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+		BEGIN
+			GET DIAGNOSTICS condition 1
+			@SQLState = RETURNED_SQLSTATE, @SQLMessage = MESSAGE_TEXT; 
+			CALL log_debug(CONCAT('GETVIDEO - Database error occurred, state - ',@SQLState, '; error msg - ', @SQLMessage));
+            
+		END;
+		SELECT id, videoid, title, tag, description, thumbnail, videolocation, homechannelid, monitorchannelid, downloaddate
+        from video_container where processstatus = 1;
+    END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `INSERTNEWMO` (IN `i_videoID` VARCHAR(15), IN `i_title` VARCHAR(100), IN `i_tag` VARCHAR(1024), IN `i_desc` VARCHAR(4096), IN `i_thumbnail` VARCHAR(250), IN `i_location` VARCHAR(250), IN `i_homeID` VARCHAR(30), IN `i_monitorID` VARCHAR(30), IN `i_datetime` DATE)  BEGIN
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+		BEGIN
+			GET DIAGNOSTICS condition 1
+			@SQLState = RETURNED_SQLSTATE, @SQLMessage = MESSAGE_TEXT; 
+			CALL log_debug(CONCAT('INSERTNEWMO - Database error occurred, state - ',@SQLState, '; error msg - ', @SQLMessage));
+            END;
+		INSERT INTO video_container (VideoId, Title, Tag, Description, Thumbnail,VideoLocation, HomeChannelId, MonitorChannelId, DownloadDate)
+        VALUES (i_videoID,i_title,i_tag,i_desc,i_thumbnail,i_location,i_homeID,i_monitorID,i_datetime);
+		commit;
+    
+    END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `log_debug` (IN `lastMsg` VARCHAR(512))  BEGIN
+		DECLARE EXIT HANDLER FOR SQLEXCEPTION
+		BEGIN
+			GET DIAGNOSTICS condition 1
+			@SQLState = RETURNED_SQLSTATE, @SQLMessage = MESSAGE_TEXT; 
+			CALL log_debug(CONCAT('Database error occurred, state - ',@SQLState, '; error msg - ', @SQLMessage));
+			CALL log_debug('Exiting now');
+		END;
+    BEGIN
+        INSERT INTO debug_log (msg)  VALUES (lastMsg);
+    END;
+    END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UPLOADSTATUS` (IN `i_id` INT(11), IN `i_code` INT(2))  BEGIN
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+		BEGIN
+			GET DIAGNOSTICS condition 1
+			@SQLState = RETURNED_SQLSTATE, @SQLMessage = MESSAGE_TEXT; 
+			CALL log_debug(CONCAT('UPLOADSTATUS - Database error occurred, state - ',@SQLState, '; error msg - ', @SQLMessage));
+            
+		END;
+		UPDATE video_container set processstatus = i_code where id = i_id;
+        END$$
+
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

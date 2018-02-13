@@ -4,8 +4,11 @@
  */
 package com.itc.edu.dlvideo.main;
 
-import com.itc.edu.database.MySqlAccess;
 import com.itc.edu.dlvideo.util.Config;
+import com.itc.edu.dlvideo.util.Constant;
+
+import spiderboot.database.MySqlAccess;
+
 import org.apache.log4j.Logger;
 
 /*------------------------------------------------------------------------------
@@ -20,7 +23,7 @@ import org.apache.log4j.Logger;
 public class Main {
 
     //private static TimerLoadBalance loadBalance = null;
-    private static final Logger logger = Logger.getLogger(Main.class);
+    private final static Logger logger = Logger.getLogger(Main.class);
 
     public static void main(String[] args) {
         start();
@@ -33,10 +36,9 @@ public class Main {
         }
         int dbResult = MySqlAccess.getInstance().DBConnect();
         if (dbResult!= 0) {
-            logger.info("Open connection database false.");
+            logger.info("Open connection database false.The DownloadApp will be exited!!!");
             return;
         }
         DownloadTimerManager.getInstance().initTimerTask();
     }
-    
 }

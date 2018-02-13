@@ -1,4 +1,4 @@
-package com.itc.edu.timer;
+package spiderboot.timer;
 import java.util.HashMap;
 import java.util.Timer;
 

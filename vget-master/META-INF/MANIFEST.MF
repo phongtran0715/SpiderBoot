@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ytd2
-Bundle-SymbolicName: ytd2
+Bundle-SymbolicName: VGetApp
 Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: ytd2.jar,
  Hector/Downloads/Java Library/ytd2_20150609_src.jar

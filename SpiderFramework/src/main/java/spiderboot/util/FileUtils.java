@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.itc.edu.dlvideo.util;
+package spiderboot.util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,7 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 
 /*------------------------------------------------------------------------------
 ** History
@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 
 public class FileUtils {
 
-    private static Logger logger = Logger.getLogger(FileUtils.class);
+    //private static Logger logger = Logger.getLogger(FileUtils.class);
 
     /**
      * Get name's file from path of File
@@ -113,7 +113,7 @@ public class FileUtils {
 			return file.delete();
 		}
 		catch (Exception ex){
-			logger.error(ex.getMessage());
+//			logger.error(ex.getMessage());
                         return false;
 		}
         //return true;
@@ -224,7 +224,7 @@ public class FileUtils {
                 lines.add(line);
             }
         } catch (Exception e) {
-            logger.error("Error while read file ".concat(file.getName()), e);
+//            logger.error("Error while read file ".concat(file.getName()), e);
         } finally {
             if (fileReader != null) {
                 try {

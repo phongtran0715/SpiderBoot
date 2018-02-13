@@ -27,8 +27,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/media/phongtran0715/DOCUMENTS/SourceCode/SpiderBoot/spider-manager/library/vget-1.1.3.jar"/>
-	<classpathentry kind="lib" path="/media/phongtran0715/DOCUMENTS/SourceCode/SpiderBoot/spider-manager/library/samples-0.0.1-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="/home/phongtran0715/Downloads/YOUTUBE/dlvideo/lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

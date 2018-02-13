@@ -5,13 +5,13 @@
  */
 package com.itc.edu.ulvideo.util;
 
-import static com.itc.edu.ulvideo.util.Utility.createFolder;
-import static com.itc.edu.ulvideo.util.Utility.prefixOS;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 import org.apache.log4j.Logger;
+
+import spiderboot.util.Utility;
 
 /*------------------------------------------------------------------------------
 ** History
@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 public class Config {
 
     private static Logger logger = Logger.getLogger(Config.class);
+    static Utility util = new Utility();
 
     public static String dbServer;
     public static String dbName;
@@ -66,7 +67,7 @@ public class Config {
             }
             logger.info(Constant.PRIVACY_STATUS + "|" + videoFolder);
 
-            createFolder(System.getProperty("user.dir") + prefixOS() + videoFolder);
+            util.createFolder(System.getProperty("user.dir") + util.prefixOS() + videoFolder);
             logger.info("Create" + Constant.VIDEO_FOLDER + videoFolder);
 
             strTemp = prop.getProperty(Constant.VIDEO_FILE_FORMAT, "").trim();

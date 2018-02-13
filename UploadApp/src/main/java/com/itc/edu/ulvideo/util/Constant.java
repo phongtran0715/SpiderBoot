@@ -4,7 +4,7 @@
  */
 package com.itc.edu.ulvideo.util;
 
-import static com.itc.edu.ulvideo.util.Utility.prefixOS;
+import spiderboot.util.Utility;
 
 /*------------------------------------------------------------------------------
 ** History
@@ -13,7 +13,8 @@ import static com.itc.edu.ulvideo.util.Utility.prefixOS;
 */
 
 public class Constant {
-    private static final String prefixOS = prefixOS();
+	static Utility util = new Utility();
+    private static final String prefixOS = util.prefixOS();
     public static final String FILE_CONFIG = System.getProperty("user.dir") + prefixOS + "etc" + prefixOS + "app.properties";
     //config system
     public static final String VIDEO_FILE_FORMAT = "VIDEO_FILE_FORMAT";

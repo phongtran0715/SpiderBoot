@@ -4,8 +4,10 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import com.itc.edu.ulvideo.util.VideoWraper;
-import com.itc.edu.database.MySqlAccess;
+
+import spiderboot.database.MySqlAccess;
+import spiderboot.util.VideoWraper;
+
 import org.apache.log4j.Logger;
 
 /*------------------------------------------------------------------------------

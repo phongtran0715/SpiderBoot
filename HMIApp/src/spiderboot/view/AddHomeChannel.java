@@ -180,6 +180,16 @@ public class AddHomeChannel extends JDialog {
 		txtDescTemp.setColumns(10);
 
 		JButton btnBrowseDescTemp = new JButton("Browse ...");
+		btnBrowseDescTemp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser fc = new JFileChooser();
+				int returnVal = fc.showOpenDialog(panel);
+				if(returnVal == JFileChooser.APPROVE_OPTION){
+					File file = fc.getSelectedFile();
+					txtDescTemp.setText(file.getPath());
+				}
+			}
+		});
 		btnBrowseDescTemp.setBounds(452, 358, 89, 25);
 		panel.add(btnBrowseDescTemp);
 		btnBrowseDescTemp.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -198,6 +208,21 @@ public class AddHomeChannel extends JDialog {
 		btnBrowseTitleTemp.setBounds(452, 278, 89, 25);
 		panel.add(btnBrowseTitleTemp);
 		btnBrowseTitleTemp.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		
+		JButton btnIntro = new JButton("Browse ...");
+		btnIntro.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fc = new JFileChooser();
+				int returnVal = fc.showOpenDialog(panel);
+				if(returnVal == JFileChooser.APPROVE_OPTION){
+					File file = fc.getSelectedFile();
+					txtVideoIntro.setText(file.getPath());
+				}
+			}
+		});
+		btnIntro.setFont(new Font("Dialog", Font.PLAIN, 13));
+		btnIntro.setBounds(452, 138, 89, 25);
+		panel.add(btnIntro);
 
 		JButton btnOk = new JButton("OK");
 		btnOk.setIcon(new ImageIcon(AddHomeChannel.class.getResource("/spiderboot/resources/resource/icon_16x16/checked_16x16.png")));

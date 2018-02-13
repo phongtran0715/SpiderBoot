@@ -5,15 +5,12 @@
  */
 package com.itc.edu.dlvideo.util;
 
-import static com.itc.edu.dlvideo.util.Utility.createFolder;
-import static com.itc.edu.dlvideo.util.Utility.prefixOS;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 import org.apache.log4j.Logger;
-import org.springframework.util.ResourceUtils;
+import spiderboot.util.Utility;
 
 /*------------------------------------------------------------------------------
 ** History
@@ -31,6 +28,7 @@ import org.springframework.util.ResourceUtils;
 public class Config {
 
     private static Logger logger = Logger.getLogger(Config.class);
+    static Utility util = new Utility();
 
     public static String dbServer;
     public static String dbName;
@@ -45,37 +43,15 @@ public class Config {
     public static Integer noVideoReturn;
 
     public static boolean loadConfig() {
-/*
-        Properties prop0;
-        FileInputStream fileReader0 = null;
-        prop0 = new Properties();
-        try {
-            //fileReader0 = new FileInputStream(fileConfig0);
-            fileReader0 = new FileInputStream(ResourceUtils.getFile("classpath:youtube.properties"));
-            prop0.load(fileReader0);
-            youtubeKey = prop0.getProperty("youtube.apikey").trim();
-            if (youtubeKey.isEmpty()) {
-                logger.error(Constant.YOUTUBE_API_KEY + " is empty");
-                return false;
-            }
-
-        } catch (Exception e) {
-            logger.error("Exception load file config youtube.properties", e);
-            return false;
-        } finally {
-            if (null != fileReader0) {
-                try {
-                    fileReader0.close();
-                } catch (IOException ex) {
-                    logger.error("Error close file reader youtube.properties", ex);
-                }
-            }
-        }
-*/
-        File fileConfig = new File(Constant.FILE_CONFIG);
+    	//Get file from resources folder
+    	ClassLoader classLoader = Config.class.getClassLoader();
+    	//TODO: load config file from resource
+    	//File fileConfig = new File(classLoader.getResource("app.properties").getFile());
+    	File fileConfig = new File("/etc/spider_config/app.properties");
+    	
+        //File fileConfig = new File(Constant.FILE_CONFIG);
         Properties prop;
         FileInputStream fileReader = null;
-        Integer intTemp;
         String strTemp;
         if (!fileConfig.exists()) {
             logger.error("File config not found");
@@ -94,7 +70,7 @@ public class Config {
                 videoFolder = "video";
             }
             logger.info(Constant.VIDEO_FOLDER + "|" + videoFolder);
-            createFolder(System.getProperty("user.dir") + prefixOS() + videoFolder);
+            util.createFolder(System.getProperty("user.dir") + util.prefixOS() + videoFolder);
             logger.info("Create" + Constant.VIDEO_FOLDER + videoFolder);
 
             strTemp = prop.getProperty(Constant.VIDEO_FILE_FORMAT, "").trim();

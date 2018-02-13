@@ -4,8 +4,10 @@
  */
 package com.itc.edu.ulvideo.main;
 
-import com.itc.edu.database.MySqlAccess;
 import com.itc.edu.ulvideo.util.Config;
+
+import spiderboot.database.MySqlAccess;
+
 import org.apache.log4j.Logger;
 
 /*------------------------------------------------------------------------------

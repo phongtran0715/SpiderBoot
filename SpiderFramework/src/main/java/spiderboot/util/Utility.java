@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.itc.edu.dlvideo.util;
+package spiderboot.util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,9 +12,8 @@ import java.io.InputStreamReader;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
-import org.apache.commons.lang3.StringUtils;
-
-import org.apache.log4j.Logger;
+//import org.apache.commons.lang3.StringUtils;
+//import org.apache.log4j.Logger;
 
 /*------------------------------------------------------------------------------
 ** History
@@ -26,7 +25,7 @@ import org.apache.log4j.Logger;
  */
 public class Utility {
 
-    private static final Logger logger = Logger.getLogger(Utility.class);
+//    private static final Logger logger = Logger.getLogger(Utility.class);
     private static final int PORT = 9999;
     @SuppressWarnings("unused")
     private static ServerSocket socket;
@@ -37,7 +36,7 @@ public class Utility {
      * @param f input file name
      * @return normalized file name
      */
-    public static String replaceBadChars(String f) {
+    public String replaceBadChars(String f) {
         String replace = "_";
         f = f.replaceAll("/", replace);
         f = f.replaceAll("\\\\", replace);
@@ -49,7 +48,7 @@ public class Utility {
         f = f.replaceAll(">", replace);
         f = f.replaceAll("\\|", replace);
         f = f.trim();
-        f = StringUtils.removeEnd(f, ".");
+//        f = StringUtils.removeEnd(f, ".");
         f = f.trim();
 
         String ff;
@@ -60,7 +59,7 @@ public class Utility {
         return f;
     }
 
-    public static String prefixOS() {
+    public String prefixOS() {
         String strPrefix = null;
         String OS = System.getProperty("os.name").toLowerCase();
         if (OS.indexOf("win") >= 0) {
@@ -71,7 +70,7 @@ public class Utility {
         return strPrefix;
     }
 
-    public static boolean existsArray(String[] array, String content) {
+    public boolean existsArray(String[] array, String content) {
         if (null == content) {
             return false;
         }
@@ -106,7 +105,7 @@ public class Utility {
         try {
             Thread.sleep(time);
         } catch (Exception e) {
-            logger.error("Error sleep", e);
+//            logger.error("Error sleep", e);
         }
     }
 
@@ -144,7 +143,7 @@ public class Utility {
         try {
             return Integer.parseInt(temp);
         } catch (NumberFormatException ex) {
-            logger.error("Msisdn invalid " + msisdn, ex);
+//            logger.error("Msisdn invalid " + msisdn, ex);
         }
         return 0;
     }

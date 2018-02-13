@@ -31,6 +31,8 @@ import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Thumbnail;
+import com.google.api.services.youtube.model.Video;
+import com.google.api.services.youtube.model.VideoListResponse;
 
 /**
  * Print a list of videos matching a search term.
@@ -200,4 +202,42 @@ public class Search {
 			}
 		}
 	}
+	
+	public List<Video> getVideoInfo(String srcFile, String key) {
+        List<Video> videoList = null;
+        try {
+            // This object is used to make YouTube Data API requests. The last
+            // argument is required, but since we don't need anything
+            // initialized when the HttpRequest is initialized, we override
+            // the interface and provide a no-op function.
+            youtube = new YouTube.Builder(Auth.HTTP_TRANSPORT, Auth.JSON_FACTORY, new HttpRequestInitializer() {
+                @Override
+                public void initialize(HttpRequest request) throws IOException {
+                }
+            }).setApplicationName("getInfo").build();
+            //Joiner stringJoiner = Joiner.on(',');
+            //String videoId = stringJoiner.join(videoIds);
+            // Call the YouTube Data API's youtube.videos.list method to
+            // retrieve the resources that represent the specified videos.
+            //YouTube.Videos.List listVideosRequest = youtube.videos().list("snippet, recordingDetails").setId(videoId);
+            YouTube.Videos.List listVideosRequest = youtube.videos().list("snippet,contentDetails").setId(srcFile);
+            listVideosRequest.setKey(key);
+            VideoListResponse listResponse = listVideosRequest.execute();
+
+            videoList = listResponse.getItems();
+            Iterator<Video> iteratorSearchResults = videoList.iterator();
+            //logger.info("VIDEO INFO|" + videoList);
+        } catch (GoogleJsonResponseException e) {
+            System.out.println("ERR_VIDEO INFO|There was a service error: " + e.getDetails().getCode() + " : "
+                    + e.getDetails().getMessage() + ":" + e.toString());
+            return videoList;
+        } catch (IOException e) {
+            System.out.println("ERR_VIDEO INFO|There was an IO error: " + e.getCause() + " : " + e.getMessage());
+            return videoList;
+        } catch (Exception ex) {
+            System.out.println("ERR_VIDEO INFO|" + ex.toString());
+            return videoList;
+        }
+        return videoList;
+    }
 }

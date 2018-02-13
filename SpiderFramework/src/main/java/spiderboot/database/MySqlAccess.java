@@ -1,4 +1,4 @@
-package processApp.processApp;
+package spiderboot.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,20 +13,26 @@ public class MySqlAccess {
 	private String dbPassword;
 
 	private MySqlAccess(){
-		//default constructor
-		dbServer = "localhost:3306";
+		dbServer = "127.0.0.1:3306";
 		dbName = "spiderboot";
-		dbUserName = "root";
-		dbPassword = "123456";
+		dbUserName = "spider";
+		dbPassword = "Spider@2018";
+	}
+	
+	private MySqlAccess(String dbServer, String dbName, String dbUserName, String dbPassword){
+		this.dbServer = dbServer;
+		this.dbName = dbName;
+		this.dbUserName = dbUserName;
+		this.dbPassword = dbPassword;
 	}
 
-	public static MySqlAccess getInstance(){
-		if(instance == null){
-			instance = new MySqlAccess();
-		}
-		return instance;
-	}
-
+    public static MySqlAccess getInstance() {
+        if (instance == null) {
+            instance = new MySqlAccess();
+        }
+        return instance;
+    }
+    
 	public int DBConnect(){
 		int errCode = 0;
 		// This will load the MySQL driver, each DB has its own driver
@@ -70,7 +76,7 @@ public class MySqlAccess {
 		// Setup the connection with the DB
 		try {
 			connect = DriverManager
-					.getConnection("jdbc:mysql://" + server + "/" + dbname, user, password);
+					.getConnection("jdbc:mysql://" + server + "/" + dbname + "?zeroDateTimeBehavior=convertToNull", user, password);
 
 		} catch (SQLException e) {
 			System.out.println("Connection Failed! Check output console");

@@ -2,13 +2,11 @@ package com.itc.edu.ulvideo.main;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import spiderboot.database.MySqlAccess;
+import spiderboot.timer.TimerWrapper;
+import spiderboot.util.VideoWraper;
 
-import com.itc.edu.ulvideo.util.VideoWraper;
-import com.itc.edu.database.MySqlAccess;
-import com.itc.edu.timer.TimerWrapper;
 import java.sql.CallableStatement;
-import java.sql.Types;
 import org.apache.log4j.Logger;
 
 /*------------------------------------------------------------------------------

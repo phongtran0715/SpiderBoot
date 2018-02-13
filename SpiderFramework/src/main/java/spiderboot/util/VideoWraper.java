@@ -1,8 +1,6 @@
-package com.itc.edu.dlvideo.util;
+package spiderboot.util;
 
 import java.sql.Timestamp;
-
-import org.apache.log4j.Logger;
 
 /*------------------------------------------------------------------------------
 ** History
@@ -11,7 +9,7 @@ import org.apache.log4j.Logger;
 
 public class VideoWraper {
 
-    private static final Logger logger = Logger.getLogger(VideoWraper.class);
+    //private static final Logger logger = Logger.getLogger(VideoWraper.class);
     public int recordId = 0;
     public String vId = "";
     public String title = "";
@@ -42,6 +40,7 @@ public class VideoWraper {
     }
 
     public void dummyData() {
+    	/*
         logger.info("Record ID = " + recordId);
         logger.info("Video ID = " + vId);
         logger.info("Title = " + title);
@@ -52,5 +51,7 @@ public class VideoWraper {
         logger.info("Home Channel Id = " + homeChannelId);
         logger.info("Monitor channel Id = " + monitorChannelId);
         //logger.info("Download Date = " + downloadDate.toString());
+         * 
+         */
     }
 }
