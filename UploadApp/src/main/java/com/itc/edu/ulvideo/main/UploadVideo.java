@@ -32,7 +32,9 @@ import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoSnippet;
 import com.google.api.services.youtube.model.VideoStatus;
 import com.google.common.collect.Lists;
-import com.itc.edu.ulvideo.util.Config;
+
+import spiderboot.configuration.Config;
+
 import org.apache.log4j.Logger;
 
 /*------------------------------------------------------------------------------
@@ -95,7 +97,7 @@ public class UploadVideo {
             // Set the video to be publicly visible. This is the default
             // setting. Other supporting settings are "unlisted" and "private."
             VideoStatus status = new VideoStatus();
-            status.setPrivacyStatus(Config.privacyStatus);
+            //status.setPrivacyStatus(Config.privacyStatus);
             videoObjectDefiningMetadata.setStatus(status);
 
             // Most of the video's metadata is set on the VideoSnippet object.

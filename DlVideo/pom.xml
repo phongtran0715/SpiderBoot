@@ -264,7 +264,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.itc.edu.dlvideo.main.Main</mainClass>
+							<mainClass>com.itc.edu.dlvideo.main.MainDownload</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

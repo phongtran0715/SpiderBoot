@@ -20,7 +20,8 @@ import com.google.api.services.samples.youtube.cmdline.data.Search;
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Video;
-import com.itc.edu.dlvideo.util.Config;
+
+import spiderboot.configuration.Config;
 import spiderboot.database.MySqlAccess;
 import spiderboot.util.Utility;
 import spiderboot.util.VideoWraper;
@@ -75,7 +76,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		this.cHomeId = cHomeId;
 		this.cMonitorId = cMonitorId;
 		//TODO: set video folder base
-		videoFolderBase = System.getProperty("user.dir") + prefixOS + Config.videoFolder;
+		videoFolderBase = Config.videoFolder;
 	}
 
 	@Override
@@ -112,19 +113,16 @@ public class DownloadExecuteTimer extends TimerTask {
 						if (theDir.exists()) {
 							startTime = System.currentTimeMillis();
 							logger.info("Start Downloading:|VIDEOID=" + vId);
-							String lastSeq = lastSeqVideoContainer().toString();
+							//String lastSeq = lastSeqVideoContainer().toString();
+							String lastSeq = genVideoName();
 							String ext = dowloadHandle.download(vId, path, "video_" + lastSeq);
 							logger.info("Download Success:|VIDEOID=" + vId + "|take time=" + (System.currentTimeMillis() - startTime));
 							// Get video info
 							List<Video> videoList = Search.getInstance().getVideoInfo(vId, Config.youtubeKey);
 							Iterator<Video> iteratorSRS = videoList.iterator();
 							if (videoList != null) {
-								if (!iteratorSRS.hasNext()) {
-									logger.error(" There aren't any results for your query.");
-								}
-								if (iteratorSRS.hasNext()) {
+								if(iteratorSRS.hasNext()) {
 									Video sgVideo = iteratorSRS.next();
-
 									//Insert video info to data base
 									VideoWraper vWraper = getVideoInfor(sgVideo, lastSeq, ext);
 									saveVideoInfo(vWraper);
@@ -228,31 +226,20 @@ public class DownloadExecuteTimer extends TimerTask {
 		}
 		vWraper.tag = tag.toString();
 		vWraper.thumbnail = singleVideo.getSnippet().getThumbnails().getDefault().getUrl();
-		vWraper.vLocation = videoFolderBase + prefixOS + cHomeId + "-" + cMonitorId + prefixOS + "video_" + lastSeq + "." + ext;
+		//vWraper.vLocation = videoFolderBase + prefixOS + cHomeId + "-" + cMonitorId + prefixOS + "video_" + lastSeq + "." + ext;
+		vWraper.vLocation = "video_" + lastSeq + "." + ext;
 		return vWraper;
 	}
 
-	private Integer saveVideoInfo(VideoWraper vWraper) {
-		Integer autoIncKeyFromFunc = -1;
-		Long startTime = System.currentTimeMillis();
+	private void saveVideoInfo(VideoWraper vWraper) {
 		Timestamp timestamp = new Timestamp(new Date().getTime());
 		//insert to database
 		PreparedStatement preparedStm = null;
 		ResultSet rs = null;
-		//        String query = "INSERT INTO video_container (VideoId, Title, Tag, Description, Thumbnail, "
-		//                + "VideoLocation, HomeChannelId, MonitorChannelId, DownloadDate) VALUES (?,?,?,?,?,?,?,?,?)";
-		String query = "{ call INSERTNEWMO(?,?,?,?,?,?,?,?,?) }";
+		String query = "INSERT INTO video_container (VideoId, Title, Tag, Thumbnail, "
+				+ "VideoLocation, HomeChannelId, MonitorChannelId, DownloadDate, ProcessStatus) "
+				+ "VALUES (?,?,?,?,?,?,?,?,?)";
 		try {
-			logger.info("\n=============V I D E O       I N F O R M A T I O N==================");
-			logger.info(" Video Id" + vWraper.vId);
-			logger.info(" Title: " + vWraper.title);
-			logger.info(" Tag: " + vWraper.tag);
-			logger.info(" Description: " + vWraper.description);
-			logger.info(" Thumbnail: " + vWraper.thumbnail);
-			logger.info(" Location: " + vWraper.vLocation);
-			logger.info(" Montior Channel: " + cMonitorId);
-			logger.info("\n=============================================================\n");
-
 			preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
 			preparedStm.executeQuery("SET NAMES 'UTF8'");
 			preparedStm.executeQuery("SET CHARACTER SET 'UTF8'");
@@ -260,57 +247,106 @@ public class DownloadExecuteTimer extends TimerTask {
 			preparedStm.setString(1, vWraper.vId);
 			preparedStm.setString(2, vWraper.title);
 			preparedStm.setString(3, vWraper.tag);
-			preparedStm.setString(4, vWraper.description);
-			preparedStm.setString(5, vWraper.thumbnail);
-			preparedStm.setString(6, vWraper.vLocation);
-			preparedStm.setString(7, cHomeId);
-			preparedStm.setString(8, cMonitorId);
-			preparedStm.setTimestamp(9, timestamp);
+			preparedStm.setString(4, vWraper.thumbnail);
+			preparedStm.setString(5, vWraper.vLocation);
+			preparedStm.setString(6, cHomeId);
+			preparedStm.setString(7, cMonitorId);
+			preparedStm.setTimestamp(8, timestamp);
+			preparedStm.setInt(9, 0);
 			preparedStm.executeUpdate();
 			logger.info("Saved video " + vWraper.vId + " to database");
 
-			//
-			// Use the MySQL LAST_INSERT_ID()
-			// function to do the same thing as getGeneratedKeys()
-			//
-			rs = preparedStm.executeQuery("SELECT LAST_INSERT_ID()");
-
-			if (rs.next()) {
-				autoIncKeyFromFunc = rs.getInt(1);
-				logger.info("Last sequence for Indexing VideoID=" + autoIncKeyFromFunc);
-			} else {
-				// TODO Auto-generated catch block
-				logger.error("ERR_LAST_SEQ_VIDEOCONTAINER|" + autoIncKeyFromFunc);
-				return autoIncKeyFromFunc;
-			}
-
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			logger.error("ERR_SAVE_VIDEOCONTAINER|" + e.getMessage());
-			return autoIncKeyFromFunc;
-		} finally {
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException ex) {
-					// TODO Auto-generated catch block
-					logger.error("ERR_SAVE_VIDEOCONTAINER|" + ex.getMessage());
-					return autoIncKeyFromFunc;
-				}
-			}
-			if (preparedStm != null) {
-				try {
-					preparedStm.close();
-				} catch (SQLException ex) {
-					// TODO Auto-generated catch block
-					logger.error("ERR_SAVE_VIDEOCONTAINER|" + ex.getMessage());
-					return autoIncKeyFromFunc;
-				}
-			}
+			logger.error("ERR_SAVE_VIDEOCONTAINER| " + e.getMessage());
 		}
-		logger.info("Insert info: MontiorChannelID=" + cMonitorId + "|VideoID=" + vWraper.vId + "|TITLE:" + vWraper.title + "|take time:" + (System.currentTimeMillis() - startTime));
+	}
 
-		return autoIncKeyFromFunc;
+	//	private Integer saveVideoInfo(VideoWraper vWraper) {
+	//		Integer autoIncKeyFromFunc = -1;
+	//		Long startTime = System.currentTimeMillis();
+	//		Timestamp timestamp = new Timestamp(new Date().getTime());
+	//		//insert to database
+	//		PreparedStatement preparedStm = null;
+	//		ResultSet rs = null;
+	//		//        String query = "INSERT INTO video_container (VideoId, Title, Tag, Description, Thumbnail, "
+	//		//                + "VideoLocation, HomeChannelId, MonitorChannelId, DownloadDate) VALUES (?,?,?,?,?,?,?,?,?)";
+	//		String query = "{ call INSERTNEWMO(?,?,?,?,?,?,?,?,?) }";
+	//		try {
+	//			logger.info("\n=============V I D E O       I N F O R M A T I O N==================");
+	//			logger.info(" Video Id: " + vWraper.vId);
+	//			logger.info(" Title: " + vWraper.title);
+	//			logger.info(" Tag: " + vWraper.tag);
+	//			logger.info(" Description: " + vWraper.description);
+	//			logger.info(" Thumbnail: " + vWraper.thumbnail);
+	//			logger.info(" Location: " + vWraper.vLocation);
+	//			logger.info(" Montior Channel: " + cMonitorId);
+	//			logger.info("\n=============================================================\n");
+	//
+	//			preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
+	//			preparedStm.executeQuery("SET NAMES 'UTF8'");
+	//			preparedStm.executeQuery("SET CHARACTER SET 'UTF8'");
+	//			// execute insert SQL statement
+	//			preparedStm.setString(1, vWraper.vId);
+	//			preparedStm.setString(2, vWraper.title);
+	//			preparedStm.setString(3, vWraper.tag);
+	//			preparedStm.setString(4, vWraper.description);
+	//			preparedStm.setString(5, vWraper.thumbnail);
+	//			preparedStm.setString(6, vWraper.vLocation);
+	//			preparedStm.setString(7, cHomeId);
+	//			preparedStm.setString(8, cMonitorId);
+	//			preparedStm.setTimestamp(9, timestamp);
+	//			preparedStm.executeUpdate();
+	//			logger.info("Saved video " + vWraper.vId + " to database");
+	//
+	//			//
+	//			// Use the MySQL LAST_INSERT_ID()
+	//			// function to do the same thing as getGeneratedKeys()
+	//			//
+	//			rs = preparedStm.executeQuery("SELECT LAST_INSERT_ID()");
+	//
+	//			if (rs.next()) {
+	//				autoIncKeyFromFunc = rs.getInt(1);
+	//				logger.info("Last sequence for Indexing VideoID=" + autoIncKeyFromFunc);
+	//			} else {
+	//				// TODO Auto-generated catch block
+	//				logger.error("ERR_LAST_SEQ_VIDEOCONTAINER|" + autoIncKeyFromFunc);
+	//				return autoIncKeyFromFunc;
+	//			}
+	//
+	//		} catch (SQLException e) {
+	//			// TODO Auto-generated catch block
+	//			logger.error("ERR_SAVE_VIDEOCONTAINER|" + e.getMessage());
+	//			return autoIncKeyFromFunc;
+	//		} finally {
+	//			if (rs != null) {
+	//				try {
+	//					rs.close();
+	//				} catch (SQLException ex) {
+	//					// TODO Auto-generated catch block
+	//					logger.error("ERR_SAVE_VIDEOCONTAINER|" + ex.getMessage());
+	//					return autoIncKeyFromFunc;
+	//				}
+	//			}
+	//			if (preparedStm != null) {
+	//				try {
+	//					preparedStm.close();
+	//				} catch (SQLException ex) {
+	//					// TODO Auto-generated catch block
+	//					logger.error("ERR_SAVE_VIDEOCONTAINER|" + ex.getMessage());
+	//					return autoIncKeyFromFunc;
+	//				}
+	//			}
+	//		}
+	//		logger.info("Insert info: MontiorChannelID=" + cMonitorId + "|VideoID=" + vWraper.vId + "|TITLE:" + vWraper.title + "|take time:" + (System.currentTimeMillis() - startTime));
+	//
+	//		return autoIncKeyFromFunc;
+	//	}
+
+	private String genVideoName()
+	{
+		String vName = Long.toString(System.currentTimeMillis());
+		return vName;
 	}
 
 	private void VideoContainerStatus(String title, int recordId, int status) {
