@@ -27,52 +27,12 @@
 	</repositories>
 
 	<dependencies>
-
-		<!-- YouTube Data V3 support -->
-		<dependency>
-			<groupId>com.google.apis</groupId>
-			<artifactId>google-api-services-youtube</artifactId>
-			<version>${project.youtube.version}</version>
-		</dependency>
-
-		<!-- Required for any code that makes calls to the YouTube Analytics API -->
-		<dependency>
-			<groupId>com.google.apis</groupId>
-			<artifactId>google-api-services-youtubeAnalytics</artifactId>
-			<version>${project.youtube.analytics.version}</version>
-		</dependency>
-
-		<!-- Required for any code that makes calls to the YouTube Reporting API -->
-		<dependency>
-			<groupId>com.google.apis</groupId>
-			<artifactId>google-api-services-youtubereporting</artifactId>
-			<version>${project.youtube.reporting.version}</version>
-		</dependency>
-
 		<!-- This dependency is only used for the Topics API sample, which requires 
 			the Jackson JSON parser -->
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>1.9.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.google.http-client</groupId>
-			<artifactId>google-http-client-jackson2</artifactId>
-			<version>${project.http.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.google.oauth-client</groupId>
-			<artifactId>google-oauth-client-jetty</artifactId>
-			<version>${project.oauth.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.google.collections</groupId>
-			<artifactId>google-collections</artifactId>
-			<version>1.0</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/log4j/log4j -->
 		<dependency>
@@ -177,17 +137,7 @@
 								<initialMemorySize>256M</initialMemorySize>
 								<maxMemorySize>1024M</maxMemorySize>
 								<systemProperties>
-									<!-- <systemProperty>java.security.policy=conf/policy.all</systemProperty> 
-										<systemProperty>com.sun.management.jmxremote</systemProperty> <systemProperty>com.sun.management.jmxremote.port=8999</systemProperty> 
-										<systemProperty>com.sun.management.jmxremote.authenticate=false</systemProperty> 
-										<systemProperty>com.sun.management.jmxremote.ssl=false</systemProperty> -->
 								</systemProperties>
-								<!--extraArguments> <extraArgument>-javaagent:../lib/mmserver-3.2.6.jar</extraArgument> 
-									<extraArgument>-Dcom.viettel.mmserver.agent.ip=localhost</extraArgument> 
-									<extraArgument>-Dcom.viettel.mmserver.agent.port=9161</extraArgument> <extraArgument>-Dcom.viettel.mmserver.log4j.port=9160</extraArgument> 
-									<extraArgument>-Dcom.viettel.mmserver.log4j.path=../etc/log4j.conf</extraArgument> 
-									<extraArgument>-Dcom.viettel.mmserver.scheduling=0</extraArgument> <extraArgument>-Dcom.viettel.mmserver.actionLog=0</extraArgument> 
-									</extraArguments -->
 							</jvmSettings>
 						</daemon>
 					</daemons>
@@ -243,6 +193,19 @@
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>com.itc.edu.ulvideo.main.MainUpload</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
 				</configuration>
 			</plugin>
 		</plugins>

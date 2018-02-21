@@ -15,8 +15,6 @@ import org.apache.log4j.Logger;
 */
 
 public class MainUpload {
-
-    //private static TimerLoadBalance loadBalance = null;
     private static final Logger logger = Logger.getLogger(MainUpload.class);
 
     public static void main(String[] args) {
@@ -29,14 +27,12 @@ public class MainUpload {
             logger.error("ERR_LOAD_FILE_CONFIG!");
             return;
         }
-        //int dbResult = MySqlAccess.getInstance().DBConnect();
         int dbResult = MySqlAccess.getInstance().DBConnect(config.dbServer, 
         		config.dbName, config.dbUserName, config.dbPassword);
         if (dbResult!= 0) {
-            logger.info("Open connection database false.The DownloadApp will be exited!!!");
+            logger.info("Open connection database false.The uploadApp will be exited!!!");
             return;
         }
         UploadTimerManager.getInstance().initTimerTask();
     }
-    
 }

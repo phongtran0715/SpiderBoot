@@ -3,14 +3,11 @@ package spiderboot.render;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
-
 import spiderboot.timer.TimerWrapper;
 
 public class RenderTimerManager extends TimerWrapper {
 
 	private static RenderTimerManager instance = null;
-	private static Logger logger = Logger.getLogger(RenderTimerManager.class);
 	public static RenderTimerManager getInstance() {
 		if (instance == null) {
 			instance = new RenderTimerManager();

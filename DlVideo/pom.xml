@@ -191,17 +191,7 @@
 								<initialMemorySize>256M</initialMemorySize>
 								<maxMemorySize>1024M</maxMemorySize>
 								<systemProperties>
-									<!-- <systemProperty>java.security.policy=conf/policy.all</systemProperty> 
-										<systemProperty>com.sun.management.jmxremote</systemProperty> <systemProperty>com.sun.management.jmxremote.port=8999</systemProperty> 
-										<systemProperty>com.sun.management.jmxremote.authenticate=false</systemProperty> 
-										<systemProperty>com.sun.management.jmxremote.ssl=false</systemProperty> -->
 								</systemProperties>
-								<!--extraArguments> <extraArgument>-javaagent:../lib/mmserver-3.2.6.jar</extraArgument> 
-									<extraArgument>-Dcom.viettel.mmserver.agent.ip=localhost</extraArgument> 
-									<extraArgument>-Dcom.viettel.mmserver.agent.port=9161</extraArgument> <extraArgument>-Dcom.viettel.mmserver.log4j.port=9160</extraArgument> 
-									<extraArgument>-Dcom.viettel.mmserver.log4j.path=../etc/log4j.conf</extraArgument> 
-									<extraArgument>-Dcom.viettel.mmserver.scheduling=0</extraArgument> <extraArgument>-Dcom.viettel.mmserver.actionLog=0</extraArgument> 
-									</extraArguments -->
 							</jvmSettings>
 						</daemon>
 					</daemons>
