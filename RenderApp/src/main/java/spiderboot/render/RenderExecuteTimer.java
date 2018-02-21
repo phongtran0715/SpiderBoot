@@ -82,7 +82,19 @@ public class RenderExecuteTimer extends TimerTask{
 
 					String vInput = vInputPath + util.prefixOS() + vName;
 					String vOutput = vRendered + util.prefixOS() + vName;
-					processVideo(vInput, vOutput);
+					//process video
+					processVideo(vInput, vInputPath + util.prefixOS() + "video_tmp1.mp4");
+					//convert video
+					convertVideo(vIntro, vInputPath + util.prefixOS() + "intro.ts");
+					convertVideo(vOutro, vInputPath + util.prefixOS() + "outro.ts");
+					convertVideo(vInputPath + util.prefixOS() + "video_tmp1.mp4", 
+							vInputPath + util.prefixOS() + "video_tmp1.ts");
+					//concast video 
+					concastVideo(vInputPath + util.prefixOS() + "intro.ts",
+							vInputPath + util.prefixOS() + "video_tmp1.ts",
+							vInputPath + util.prefixOS() + "outro.ts", 
+							vOutput);
+					//update process status 
 					updateProcessStatus(id, 1);
 				}
 			} catch (SQLException e) {
@@ -143,13 +155,14 @@ public class RenderExecuteTimer extends TimerTask{
 	{
 		System.out.println("Beginning convertVideo function");
 		String result = null;
-		FFmpegBuilder builder = new FFmpegBuilder();
-		builder.setInput(inputVideo);
-		builder.overrideOutputFiles(true);
-		builder.addOutput(outVideo);
-		builder.addExtraArgs("-c", "copy");
-		builder.addExtraArgs("-bsf:v", "h264_mp4toannexb");
-		builder.addExtraArgs("-f", "mpegts");
+		FFmpegBuilder builder = new FFmpegBuilder()
+				.setInput(inputVideo)
+				.overrideOutputFiles(true)
+				.addOutput(outVideo)
+				.addExtraArgs("-c", "copy")
+				.addExtraArgs("-bsf:v", "h264_mp4toannexb")
+				.addExtraArgs("-f", "mpegts")
+				.done();
 
 		FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
 
@@ -164,12 +177,13 @@ public class RenderExecuteTimer extends TimerTask{
 	{
 		System.out.println("Beginning concastVideo function");
 		String result = null;
-		FFmpegBuilder builder = new FFmpegBuilder();
-		builder.setInput("concat:" + vIntro + "|" + vMain + "|" +  vOutro + "");
-		builder.overrideOutputFiles(true);
-		builder.addOutput(vOutput);
-		builder.addExtraArgs("-c", "copy");
-		builder.addExtraArgs("-bsf:a", "aac_adtstoasc");
+		FFmpegBuilder builder = new FFmpegBuilder()
+				.setInput("concat:" + vIntro + "|" + vMain + "|" +  vOutro + "")
+				.overrideOutputFiles(true)
+				.addOutput(vOutput)
+				.addExtraArgs("-c", "copy")
+				.addExtraArgs("-bsf:a", "aac_adtstoasc")
+				.done();
 		FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
 
 		// Run a one-pass encode
@@ -179,21 +193,21 @@ public class RenderExecuteTimer extends TimerTask{
 		return result;
 	}
 
-	private void updateProcessStatus(int vId, int processStatus) 
+	private void updateProcessStatus(int id, int processStatus) 
 	{
+		System.out.println("Update Process Status");
 		PreparedStatement preparedStm = null;
-		String query = "UPDATE video_container SET ProcessStatus = ? WHERE VideoId = ? ";
+		String query = "UPDATE video_container SET ProcessStatus = ? WHERE Id = ? ";
 		try {
 			preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
 			// execute insert SQL statement
-			preparedStm.setInt(1, vId);
-			preparedStm.setInt(2, processStatus);
+			preparedStm.setInt(1, processStatus);
+			preparedStm.setInt(2, id);
 			preparedStm.executeUpdate();
-			logger.info("Update process status for video " + vId + "successful!");
+			logger.info("Update process status for video " + id + "successful!");
 		} catch (SQLException ex) {
 			// TODO Auto-generated catch block
 			logger.info("ERR_UPDATE_LASTSYNCTIME|" + ex.getMessage());
-			return;
 		} 
 	}
 }

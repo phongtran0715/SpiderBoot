@@ -11,21 +11,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.TimerTask;
-
 import org.apache.log4j.Logger;
-
 import com.github.axet.vget.DirectDownload;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.samples.youtube.cmdline.data.Search;
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Video;
-
 import spiderboot.configuration.Config;
 import spiderboot.database.MySqlAccess;
 import spiderboot.util.Utility;
 import spiderboot.util.VideoWraper;
-
 import java.sql.CallableStatement;
 import java.util.List;
 
@@ -60,7 +56,6 @@ import java.util.List;
  */
 
 public class DownloadExecuteTimer extends TimerTask {
-
 	String timerId;
 	String cHomeId;
 	String cMonitorId;

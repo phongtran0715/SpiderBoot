@@ -10,67 +10,65 @@ import spiderboot.database.MySqlAccess;
 import spiderboot.timer.TimerWrapper;
 
 /*------------------------------------------------------------------------------
-** History
+ ** History
 23-01-2018, [CR-005] phapnd
     Modify close ket noi db sau khi thuc hien lenh
 
  */
 public class DownloadTimerManager extends TimerWrapper {
 
-    private static DownloadTimerManager instance = null;
-    private static Logger logger = Logger.getLogger(DownloadTimerManager.class);
+	private static DownloadTimerManager instance = null;
+	private static Logger logger = Logger.getLogger(DownloadTimerManager.class);
 
-    public DownloadTimerManager() {
-    }
+	public DownloadTimerManager() {
+	}
 
-    public static DownloadTimerManager getInstance() {
-        if (instance == null) {
-            instance = new DownloadTimerManager();
-        }
-        return instance;
-    }
+	public static DownloadTimerManager getInstance() {
+		if (instance == null) {
+			instance = new DownloadTimerManager();
+		}
+		return instance;
+	}
 
-    public boolean startDownloadTimer(String taskId, String cHomeId, String cMonitorId, int timerInterval) {
-        boolean isSuccess = false;
-        TimerTask timerTask = new DownloadExecuteTimer(taskId, cHomeId, cMonitorId);
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(timerTask, 0, timerInterval);
-        if (timer != null) {
-            timerMap.put(taskId, timer);
-        }
-        isSuccess = true;
-        return isSuccess;
-    }
+	public boolean startDownloadTimer(String taskId, String cHomeId, String cMonitorId, int timerInterval) {
+		boolean isSuccess = false;
+		TimerTask timerTask = new DownloadExecuteTimer(taskId, cHomeId, cMonitorId);
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(timerTask, 0, timerInterval);
+		if (timer != null) {
+			timerMap.put(taskId, timer);
+		}
+		isSuccess = true;
+		return isSuccess;
+	}
 
-    @Override
-    public void initTimerTask() {
-        logger.info("init Get MonitorChannel");
-        Statement stmt = null;
-        String query = "SELECT Id, HomeChannelId, MonitorChannelId, TimeIntervalSync, StatusSync "
-                + "FROM home_monitor_channel_mapping WHERE StatusSync = '1';";
-        try {
-            stmt = MySqlAccess.getInstance().connect.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-            while (rs.next()) {
-                String id = Integer.toString(rs.getInt(1));
-                String cHomeId = rs.getString(2);
-                String cMonitorId = rs.getString(3);
-                int syncInterval = rs.getInt(4);
-                startDownloadTimer(id, cHomeId, cMonitorId, syncInterval * 1000);
-                logger.info("Start sync task : " + id + " with timer interval = " + 1 + " seconds");
-            }
-        } catch (SQLException e) {
-            logger.error("ERR_GET_MONITORCHANNEL|" + e);
-            return;
-        } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException ex) {
-                    logger.error("ERR_GET_MONITORCHANNEL|" + ex.getMessage());
-                    return;
-                }
-            }
-        }
-    }
+	@Override
+	public void initTimerTask() {
+		logger.info("init Get MonitorChannel");
+		Statement stmt = null;
+		String query = "SELECT Id, HomeChannelId, MonitorChannelId, TimeIntervalSync, StatusSync "
+				+ "FROM home_monitor_channel_mapping WHERE StatusSync = '1';";
+		try {
+			stmt = MySqlAccess.getInstance().connect.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				String id = Integer.toString(rs.getInt(1));
+				String cHomeId = rs.getString(2);
+				String cMonitorId = rs.getString(3);
+				int syncInterval = rs.getInt(4);
+				startDownloadTimer(id, cHomeId, cMonitorId, syncInterval * 1000);
+				logger.info("Start sync task : " + id + " with timer interval = " + syncInterval + " seconds");
+			}
+		} catch (SQLException e) {
+			logger.error("ERR_GET_MONITORCHANNEL|" + e);
+		} finally {
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (SQLException ex) {
+					logger.error("ERR_GET_MONITORCHANNEL|" + ex.getMessage());
+				}
+			}
+		}
+	}
 }
