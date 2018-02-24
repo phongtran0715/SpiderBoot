@@ -107,11 +107,10 @@ public class AccountManagerForm extends JFrame {
 						int id = (Integer)tbGoogleApp.getValueAt(rIndex, tbGoogleApp.getColumn("Id").getModelIndex());
 						String userName = (String)tbGgAppMode.getValueAt(rIndex, tbGoogleApp.getColumn("UserName").getModelIndex());
 						String api = (String)tbGgAppMode.getValueAt(rIndex, tbGoogleApp.getColumn("Api").getModelIndex());
-						String clientId = (String)tbGgAppMode.getValueAt(rIndex, tbGoogleApp.getColumn("ClientId").getModelIndex());
 						String clientSecret = (String)tbGgAppMode.getValueAt(rIndex, tbGoogleApp.getColumn("ClientSecret").getModelIndex());
 						String accountType = (String)tbGgAppMode.getValueAt(rIndex, tbGoogleApp.getColumn("AccountType").getModelIndex());
 						String appName = (String)tbGgAppMode.getValueAt(rIndex, tbGoogleApp.getColumn("AppName").getModelIndex());
-						ModifyGoogleAccount modifyFrm = new ModifyGoogleAccount(id, userName, api, clientId, 
+						ModifyGoogleAccount modifyFrm = new ModifyGoogleAccount(id, userName, api, 
 								clientSecret, accountType, appName);
 						modifyFrm.setModalityType(ModalityType.APPLICATION_MODAL);
 						modifyFrm.setVisible(true);
@@ -152,11 +151,10 @@ public class AccountManagerForm extends JFrame {
 					int id = (Integer)tbGoogleApp.getValueAt(rIndex, tbGoogleApp.getColumn("Id").getModelIndex());
 					String userName = (String)tbGgAppMode.getValueAt(rIndex, tbGoogleApp.getColumn("UserName").getModelIndex());
 					String api = (String)tbGgAppMode.getValueAt(rIndex, tbGoogleApp.getColumn("Api").getModelIndex());
-					String clientId = (String)tbGgAppMode.getValueAt(rIndex, tbGoogleApp.getColumn("ClientId").getModelIndex());
 					String clientSecret = (String)tbGgAppMode.getValueAt(rIndex, tbGoogleApp.getColumn("ClientSecret").getModelIndex());
 					String accountType = (String)tbGgAppMode.getValueAt(rIndex, tbGoogleApp.getColumn("AccountType").getModelIndex());
 					String appName = (String)tbGgAppMode.getValueAt(rIndex, tbGoogleApp.getColumn("AppName").getModelIndex());
-					ModifyGoogleAccount modifyFrm = new ModifyGoogleAccount(id, userName, api, clientId, 
+					ModifyGoogleAccount modifyFrm = new ModifyGoogleAccount(id, userName, api,
 							clientSecret, accountType, appName);
 					modifyFrm.setModalityType(ModalityType.APPLICATION_MODAL);
 					modifyFrm.setVisible(true);
@@ -393,7 +391,7 @@ public class AccountManagerForm extends JFrame {
 		tbGgAppMode = new DefaultTableModel();
 		try
 		{
-			String query = "SELECT Id, UserName, Api, ClientId, ClientSecret, AccountType, "
+			String query = "SELECT Id, UserName, Api , ClientSecret, "
 					+ "AppName FROM google_account";
 			stmt = MySqlAccess.getInstance().connect.createStatement();
 			ResultSet rs = stmt.executeQuery(query);

@@ -22,13 +22,12 @@ public class MainUpload {
     }
 
     public static void start() {
-    	Config config = new Config();
-        if (!Config.loadConfig()) {
+    	if (!Config.loadConfig()) {
             logger.error("ERR_LOAD_FILE_CONFIG!");
             return;
         }
-        int dbResult = MySqlAccess.getInstance().DBConnect(config.dbServer, 
-        		config.dbName, config.dbUserName, config.dbPassword);
+        int dbResult = MySqlAccess.getInstance().DBConnect(Config.dbServer, 
+        		Config.dbName, Config.dbUserName, Config.dbPassword);
         if (dbResult!= 0) {
             logger.info("Open connection database false.The uploadApp will be exited!!!");
             return;

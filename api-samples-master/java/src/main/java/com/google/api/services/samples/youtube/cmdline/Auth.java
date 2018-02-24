@@ -14,7 +14,9 @@ import com.google.api.client.util.store.DataStore;
 import com.google.api.client.util.store.FileDataStoreFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
@@ -38,6 +40,13 @@ public class Auth {
      * This is the directory that will be used under the user's home directory where OAuth tokens will be stored.
      */
     private static final String CREDENTIALS_DIRECTORY = ".oauth-credentials";
+    
+    private static String clientSecrectFile = null;
+    
+    public static void setClientSecrect(String filePath)
+    {
+    	clientSecrectFile = filePath;
+    }
 
     /**
      * Authorizes the installed application to access user's protected data.
@@ -48,7 +57,17 @@ public class Auth {
     public static Credential authorize(List<String> scopes, String credentialDatastore) throws IOException {
 
         // Load client secrets.
-        Reader clientSecretReader = new InputStreamReader(Auth.class.getResourceAsStream("/client_secrets.json"));
+    	Reader clientSecretReader;
+    	if(clientSecrectFile == null)
+    	{
+    		// Default client secrets file
+    		clientSecretReader = new InputStreamReader(Auth.class.getResourceAsStream("/client_secrets.json"));
+    	}
+    	else
+    	{
+    		InputStream is = new FileInputStream(clientSecrectFile);
+    		clientSecretReader = new InputStreamReader(is);
+    	}
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, clientSecretReader);
 
         // Checks that the defaults have been replaced (Default = "Enter X here").

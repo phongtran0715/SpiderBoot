@@ -26,7 +26,6 @@ public class ModifyGoogleAccount extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtEmail;
-	private JTextField txtClientId;
 	private JTextField txtClientSecret;
 	private JTextField txtApiKey;
 	private JTextField txtAppName;
@@ -40,12 +39,11 @@ public class ModifyGoogleAccount extends JDialog {
 	String accountType;
 	
 	public ModifyGoogleAccount(int id, String userName, String api, 
-			String clientId, String clientSecret, String accountType, String appName){
+			String clientSecret, String accountType, String appName){
 		initialize();
 		this.id = id;
 		txtApiKey.setText(api);
 		txtAppName.setText(appName);
-		txtClientId.setText(clientId);
 		txtClientSecret.setText(clientSecret);
 		txtEmail.setText(userName);
 	}
@@ -86,60 +84,37 @@ public class ModifyGoogleAccount extends JDialog {
 		txtEmail.setBounds(95, 10, 350, 30);
 		panel.add(txtEmail);
 		
-		JLabel label_1 = new JLabel("Client ID");
-		label_1.setHorizontalAlignment(SwingConstants.RIGHT);
-		label_1.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		label_1.setBounds(5, 48, 75, 35);
-		panel.add(label_1);
-		
-		txtClientId = new JTextField();
-		txtClientId.setColumns(10);
-		txtClientId.setBounds(95, 48, 350, 30);
-		panel.add(txtClientId);
-		
 		JLabel label_2 = new JLabel("Client Secret");
 		label_2.setHorizontalAlignment(SwingConstants.RIGHT);
 		label_2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		label_2.setBounds(5, 98, 75, 35);
+		label_2.setBounds(0, 57, 95, 35);
 		panel.add(label_2);
 		
 		txtClientSecret = new JTextField();
 		txtClientSecret.setColumns(10);
-		txtClientSecret.setBounds(95, 98, 350, 30);
+		txtClientSecret.setBounds(95, 60, 350, 30);
 		panel.add(txtClientSecret);
 		
 		JLabel label_3 = new JLabel("API Key");
 		label_3.setHorizontalAlignment(SwingConstants.RIGHT);
 		label_3.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		label_3.setBounds(5, 148, 75, 35);
+		label_3.setBounds(5, 110, 75, 35);
 		panel.add(label_3);
 		
 		txtApiKey = new JTextField();
 		txtApiKey.setColumns(10);
-		txtApiKey.setBounds(95, 148, 350, 30);
+		txtApiKey.setBounds(95, 110, 350, 30);
 		panel.add(txtApiKey);
-		
-		JLabel lblAccount = new JLabel("Account");
-		lblAccount.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblAccount.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		lblAccount.setBounds(5, 198, 75, 35);
-		panel.add(lblAccount);
-		
-		JComboBox cbAccType = new JComboBox();
-		cbAccType.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		cbAccType.setModel(new DefaultComboBoxModel(new String[] {"gmail"}));
-		cbAccType.setBounds(90, 198, 95, 30);
-		panel.add(cbAccType);
 		
 		JLabel label_4 = new JLabel("App Name");
 		label_4.setHorizontalAlignment(SwingConstants.RIGHT);
 		label_4.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		label_4.setBounds(195, 198, 75, 35);
+		label_4.setBounds(195, 160, 75, 35);
 		panel.add(label_4);
 		
 		txtAppName = new JTextField();
 		txtAppName.setColumns(10);
-		txtAppName.setBounds(280, 201, 165, 30);
+		txtAppName.setBounds(280, 163, 165, 30);
 		panel.add(txtAppName);
 		
 		JButton btnOk = new JButton("OK");
@@ -153,18 +128,15 @@ public class ModifyGoogleAccount extends JDialog {
 					//update to database
 					PreparedStatement preparedStm = null;
 					String query = "UPDATE google_account SET UserName = ?, Api = ? , "
-							+ "ClientID = ?, ClientSecret= ?, AccountType= ?, AppName = ? WHERE Id = ? " ;
+							+ " ClientSecret= ?, AppName = ? WHERE Id = ? " ;
 					try {
 						preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
 						// execute insert SQL statement
 						preparedStm.setString(1, txtEmail.getText().trim());
 						preparedStm.setString(2, txtApiKey.getText().trim());
-						preparedStm.setString(3, txtClientId.getText().trim());
-						preparedStm.setString(4, txtClientSecret.getText().trim());
-						preparedStm.setString(5, cbAccType.getSelectedItem().toString());
-						preparedStm.setString(6, txtAppName.getText().trim());
-						preparedStm.setInt(7, id);
-						//preparedStm.executeUpdate();
+						preparedStm.setString(3, txtClientSecret.getText().trim());
+						preparedStm.setString(4, txtAppName.getText().trim());
+						preparedStm.setInt(5, id);
 						preparedStm.executeUpdate();
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
@@ -200,7 +172,6 @@ public class ModifyGoogleAccount extends JDialog {
 		txtEmail.setText("");
 		txtApiKey.setText("");
 		txtAppName.setText("");
-		txtClientId.setText("");
 		txtClientSecret.setText("");
 	}
 }

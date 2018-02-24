@@ -52,7 +52,8 @@ public class UploadExecuteTimer extends TimerTask{
 				}
 				rs = stmt.executeQuery(query);
 				while (rs.next()) {
-					System.out.println("Detect new video to process");
+					System.out.println("Detect new video to upload");
+					
 					int id 				= rs.getInt("Id");
 					String vName 		= rs.getString("VideoLocation");
 					String cHomeId 		= rs.getString("HomeChannelId");
@@ -61,17 +62,35 @@ public class UploadExecuteTimer extends TimerTask{
 					String tag 			= genTags(rs.getString("Tag"));
 					String description 	= genDescription(rs.getString("Description"));
 					String vInputPath 	= videoFolderBase + util.prefixOS() + cHomeId + "-" + cMonitorId;
-					String vRendered 	= vInputPath + util.prefixOS() + "rendered";
-					String vUpload = vRendered + util.prefixOS() + vName;
+					//String vRendered 	= vInputPath + util.prefixOS() + "rendered";
+					String vUpload = vInputPath + util.prefixOS() + vName;
+					//String vUpload = vRendered + util.prefixOS() + vName;
+					//String vUpload = "/home/phongtran0715/Downloads/Video/outro.mp4";
 					//upload video
 					File uploadFile = new File(vUpload);
 					if (!uploadFile.exists()) {
-		                logger.error("File " + title + " not Exist");
-		                continue;
-		            }
+						logger.error("File " + vUpload + " not Exist");
+						continue;
+					}
+					//TODO: get store file
+					String clientFile = getAuthAtr(cHomeId,"ClientSecret");
+					String userName = getHomeAtrr(cHomeId,"GoogleAccount");
+					System.out.println("setclientSecretsFile : " + clientFile);
+					uploadVideo.setclientSecretsFile(clientFile);
+					System.out.println("setStoreFile : " + "upload_" + userName);
+					uploadVideo.setStoreFile( "upload_" + userName);
+					System.out.println("Beginning upload video " + vName);
 					uploadVideo.execute(title, description, tag, vUpload);
 					//update process status 
 					updateProcessStatus(id, 2);
+					System.out.println("Upload complete video " + vName);
+					//Pause for 60 seconds
+					try {
+						Thread.sleep(15 * 1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -122,5 +141,45 @@ public class UploadExecuteTimer extends TimerTask{
 			// TODO Auto-generated catch block
 			logger.info("ERR_UPDATE_LASTSYNCTIME|" + ex.getMessage());
 		} 
+	}
+
+	private String getHomeAtrr(String cHomeId, String key)
+	{
+		String result = null;
+		Statement stmt;
+		String query = "SELECT " + key + " FROM home_channel_list "
+				+ "WHERE ChannelId = '" + cHomeId + "'";
+		System.out.println(query);
+		try {
+			stmt = MySqlAccess.getInstance().connect.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				result = rs.getString(1);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+		return result;
+	}
+
+	private String getAuthAtr(String cHomeId, String key)
+	{
+		String result = null;
+		Statement stmt;
+		String query = "SELECT " + key + " FROM google_account WHERE UserName = " + 
+				"(SELECT GoogleAccount FROM home_channel_list WHERE ChannelId = '"+ cHomeId +"')";
+		System.out.println(query);
+		try {
+			stmt = MySqlAccess.getInstance().connect.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				result = rs.getString(1);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+		return result;
 	}
 }

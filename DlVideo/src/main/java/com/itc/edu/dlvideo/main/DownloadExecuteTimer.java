@@ -247,7 +247,7 @@ public class DownloadExecuteTimer extends TimerTask {
 			preparedStm.setString(6, cHomeId);
 			preparedStm.setString(7, cMonitorId);
 			preparedStm.setTimestamp(8, timestamp);
-			preparedStm.setInt(9, 0);
+			preparedStm.setInt(9, 1);
 			preparedStm.executeUpdate();
 			logger.info("Saved video " + vWraper.vId + " to database");
 

@@ -48,6 +48,14 @@ public class UploadVideo {
 	 * to make YouTube Data API requests.
 	 */
 	private static YouTube youtube;
+	
+	/**
+	 * Auth class
+	 */
+	Auth auth = new Auth();
+	
+	private static String storeFile = null;
+	private static String clientSecretsFile = null;
 
 	/**
 	 * Define a global variable that specifies the MIME type of the video
@@ -55,6 +63,13 @@ public class UploadVideo {
 	 */
 	private static final String VIDEO_FILE_FORMAT = "video/*";
 
+	public static void setStoreFile(String filePath) {
+		storeFile = filePath;
+	}
+	
+	public static void setclientSecretsFile(String filePath) {
+		clientSecretsFile = filePath;
+	}
 	/**
 	 * Upload the user-selected video to the user's YouTube channel. The code
 	 * looks for the video in the application's project folder and uses OAuth
@@ -67,12 +82,21 @@ public class UploadVideo {
 		// This OAuth 2.0 access scope allows an application to upload files
 		// to the authenticated user's YouTube channel, but doesn't allow
 		// other types of access.
-//		List<String> scopes = Lists.newArrayList(Config.authLink);
 		List<String> scopes = Lists.newArrayList("https://www.googleapis.com/auth/youtube.upload");
 
 		try {
 			// Authorize the request.
-			Credential credential = Auth.authorize(scopes, "uploadvideo");
+			Credential credential;
+			if(storeFile == null)
+			{
+				System.out.println("Can not found store file to get upload auth!");
+				return;
+			}
+			else
+			{
+				credential = Auth.authorize(scopes, storeFile); 
+				Auth.setClientSecrect(clientSecretsFile);
+			}
 
 			// This object is used to make YouTube Data API requests.
 			youtube = new YouTube.Builder(Auth.HTTP_TRANSPORT, Auth.JSON_FACTORY, credential).setApplicationName(

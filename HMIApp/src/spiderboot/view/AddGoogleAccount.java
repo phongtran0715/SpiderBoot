@@ -28,7 +28,6 @@ public class AddGoogleAccount extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtEmail;
-	private JTextField txtClientId;
 	private JTextField txtClientSecret;
 	private JTextField txtApiKey;
 	private JTextField txtAppName;
@@ -49,7 +48,7 @@ public class AddGoogleAccount extends JDialog {
 		
 		JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel.setBounds(0, -18, 476, 283);
+		panel.setBounds(0, -18, 476, 246);
 		contentPane.add(panel);
 		panel.setLayout(null);
 		
@@ -64,59 +63,36 @@ public class AddGoogleAccount extends JDialog {
 		txtEmail.setColumns(10);
 		panel.add(txtEmail);
 		
-		JLabel label_1 = new JLabel("Client ID");
-		label_1.setBounds(12, 76, 75, 35);
-		label_1.setHorizontalAlignment(SwingConstants.RIGHT);
-		label_1.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		panel.add(label_1);
-		
-		txtClientId = new JTextField();
-		txtClientId.setBounds(97, 76, 350, 30);
-		txtClientId.setColumns(10);
-		panel.add(txtClientId);
-		
 		JLabel label_2 = new JLabel("Client Secret");
-		label_2.setBounds(12, 126, 75, 35);
+		label_2.setBounds(0, 76, 87, 35);
 		label_2.setHorizontalAlignment(SwingConstants.RIGHT);
 		label_2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		panel.add(label_2);
 		
 		txtClientSecret = new JTextField();
-		txtClientSecret.setBounds(97, 126, 350, 30);
+		txtClientSecret.setBounds(97, 76, 350, 30);
 		txtClientSecret.setColumns(10);
 		panel.add(txtClientSecret);
 		
 		JLabel label_3 = new JLabel("API Key");
-		label_3.setBounds(12, 176, 75, 35);
+		label_3.setBounds(12, 126, 75, 35);
 		label_3.setHorizontalAlignment(SwingConstants.RIGHT);
 		label_3.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		panel.add(label_3);
 		
 		txtApiKey = new JTextField();
-		txtApiKey.setBounds(97, 176, 350, 30);
+		txtApiKey.setBounds(97, 126, 350, 30);
 		txtApiKey.setColumns(10);
 		panel.add(txtApiKey);
 		
-		JLabel lblAccount = new JLabel("Account");
-		lblAccount.setBounds(12, 222, 75, 35);
-		lblAccount.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblAccount.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		panel.add(lblAccount);
-		
-		JComboBox cbAccType = new JComboBox();
-		cbAccType.setBounds(97, 222, 95, 30);
-		cbAccType.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		cbAccType.setModel(new DefaultComboBoxModel(new String[] {"gmail"}));
-		panel.add(cbAccType);
-		
 		JLabel label_4 = new JLabel("App Name");
-		label_4.setBounds(202, 222, 75, 35);
+		label_4.setBounds(202, 172, 75, 35);
 		label_4.setHorizontalAlignment(SwingConstants.RIGHT);
 		label_4.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		panel.add(label_4);
 		
 		txtAppName = new JTextField();
-		txtAppName.setBounds(287, 225, 160, 30);
+		txtAppName.setBounds(287, 175, 160, 30);
 		txtAppName.setColumns(10);
 		panel.add(txtAppName);
 		
@@ -130,18 +106,16 @@ public class AddGoogleAccount extends JDialog {
 				}else {
 					//insert to database
 					PreparedStatement preparedStm = null;
-					String query = "INSERT INTO google_account (UserName, Api, ClientID, ClientSecret, AccountType, AppName) "
-							+ " VALUES (?,?,?,?,?,?)";
+					String query = "INSERT INTO google_account (UserName, Api, ClientSecret, AppName) "
+							+ " VALUES (?,?,?,?)";
 					
 					try {
 						preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
 						// execute insert SQL statement
 						preparedStm.setString(1, txtEmail.getText().trim());
 						preparedStm.setString(2, txtApiKey.getText().trim());
-						preparedStm.setString(3, txtClientId.getText().trim());
-						preparedStm.setString(4, txtClientSecret.getText().trim());
-						preparedStm.setString(5, cbAccType.getSelectedItem().toString());
-						preparedStm.setString(6, txtAppName.getText().trim());
+						preparedStm.setString(3, txtClientSecret.getText().trim());
+						preparedStm.setString(4, txtAppName.getText().trim());
 						preparedStm.executeUpdate();
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
@@ -159,7 +133,7 @@ public class AddGoogleAccount extends JDialog {
 		});
 		btnOk.setIcon(new ImageIcon(AddGoogleAccount.class.getResource("/spiderboot/resources/resource/icon_16x16/checked_16x16.png")));
 		btnOk.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		btnOk.setBounds(200, 277, 118, 38);
+		btnOk.setBounds(205, 240, 118, 38);
 		contentPane.add(btnOk);
 		
 		JButton btnExit = new JButton("Exit");
@@ -170,7 +144,7 @@ public class AddGoogleAccount extends JDialog {
 			}
 		});
 		btnExit.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		btnExit.setBounds(341, 277, 118, 38);
+		btnExit.setBounds(346, 240, 118, 38);
 		contentPane.add(btnExit);
 	}
 
@@ -178,7 +152,6 @@ public class AddGoogleAccount extends JDialog {
 		txtEmail.setText("");
 		txtApiKey.setText("");
 		txtAppName.setText("");
-		txtClientId.setText("");
 		txtClientSecret.setText("");
 	}
 }
