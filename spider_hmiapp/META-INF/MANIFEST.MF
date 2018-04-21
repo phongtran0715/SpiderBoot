@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: HMIApp
+Bundle-SymbolicName: HMIApp
+Bundle-Version: 1.0.0.qualifier
+Bundle-ClassPath: HMIApp.jar,
+  phongtran0715/Documents/SourceCode/SpiderBoot/spider-manager/library/mysql-connector-java-5.1.44-bin.jar
+Export-Package: spiderboot.configuration,
+ spiderboot.databaseconnection,
+ spiderboot.helper,
+ spiderboot.resources.resource.icon_16x16,
+ spiderboot.resources.resource.icon_24x24,
+ spiderboot.resources.resource.icon_32x32,
+ spiderboot.view

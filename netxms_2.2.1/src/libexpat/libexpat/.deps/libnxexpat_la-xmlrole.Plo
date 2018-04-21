@@ -1,0 +1,21 @@
+libnxexpat_la-xmlrole.lo: xmlrole.c /usr/include/stdc-predef.h \
+ /usr/lib/gcc/x86_64-linux-gnu/5/include/stddef.h ../expat_config.h \
+ ../../../config.h expat_external.h internal.h xmlrole.h xmltok.h ascii.h
+
+/usr/include/stdc-predef.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/5/include/stddef.h:
+
+../expat_config.h:
+
+../../../config.h:
+
+expat_external.h:
+
+internal.h:
+
+xmlrole.h:
+
+xmltok.h:
+
+ascii.h:

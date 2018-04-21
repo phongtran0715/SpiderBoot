@@ -1,0 +1,6 @@
+libnetxms_la-inet_pton.lo: inet_pton.c /usr/include/stdc-predef.h \
+ ../../config.h
+
+/usr/include/stdc-predef.h:
+
+../../config.h:

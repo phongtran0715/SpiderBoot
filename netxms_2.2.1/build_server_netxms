@@ -1,0 +1,1 @@
+./configure --with-server --with-agent --with-mysql --prefix=/opt/netxms/

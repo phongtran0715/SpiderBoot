@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="%product.name" uid="org.netxms.ui.eclipse.console.product" id="org.netxms.ui.eclipse.console.product" application="org.netxms.ui.eclipse.console.application" version="2.2.1" useFeatures="false" includeLaunchers="true">
+
+   <aboutInfo>
+      <image path="/Core/icons/about.png"/>
+      <text>
+         NetXMS Management Console
+
+Version 2.2.1
+Copyright (c) 2003-2017 Raden Solutions
+      </text>
+   </aboutInfo>
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+      <programArgs>-data @user.home/.nxmc/data -nl en</programArgs>
+      <vmArgs>-Xms128m -Xmx1024m</vmArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
+   </launcherArgs>
+
+   <windowImages i16="/Core/icons/launcher/16x16.png" i32="/Core/icons/launcher/32x32.png" i48="/Core/icons/launcher/48x48.png" i64="/Core/icons/launcher/64x64.png" i128="/Core/icons/launcher/128x128.png"/>
+
+   <splash
+      location="org.netxms.ui.eclipse.console"
+      startupProgressRect="0,325,500,5"
+      startupMessageRect="7,300,490,18"
+      startupForegroundColor="F18515" />
+   <launcher name="nxmc">
+      <macosx icon="/Core/icons/launcher/nxmc.icns"/>
+      <solaris/>
+      <win useIco="true">
+         <ico path="/Core/icons/launcher/nxmc.ico"/>
+         <bmp/>
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
+   <license>
+        <url>http://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html</url>
+   </license>
+
+   <plugins>
+      <plugin id="com.ibm.icu"/>
+      <plugin id="org.apache.commons.codec"/>
+      <plugin id="org.eclipse.birt.chart.device.extension"/>
+      <plugin id="org.eclipse.birt.chart.device.swt"/>
+      <plugin id="org.eclipse.birt.chart.engine"/>
+      <plugin id="org.eclipse.birt.chart.engine.extension"/>
+      <plugin id="org.eclipse.birt.core"/>
+      <plugin id="org.eclipse.compare.core"/>
+      <plugin id="org.eclipse.core.commands"/>
+      <plugin id="org.eclipse.core.contenttype"/>
+      <plugin id="org.eclipse.core.databinding"/>
+      <plugin id="org.eclipse.core.databinding.observable"/>
+      <plugin id="org.eclipse.core.databinding.property"/>
+      <plugin id="org.eclipse.core.expressions"/>
+      <plugin id="org.eclipse.core.filebuffers"/>
+      <plugin id="org.eclipse.core.filesystem"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.core.jobs"/>
+      <plugin id="org.eclipse.core.resources"/>
+      <plugin id="org.eclipse.core.runtime"/>
+      <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
+      <plugin id="org.eclipse.core.variables"/>
+      <plugin id="org.eclipse.draw2d"/>
+      <plugin id="org.eclipse.emf.common"/>
+      <plugin id="org.eclipse.emf.ecore"/>
+      <plugin id="org.eclipse.emf.ecore.xmi"/>
+      <plugin id="org.eclipse.equinox.app"/>
+      <plugin id="org.eclipse.equinox.common"/>
+      <plugin id="org.eclipse.equinox.p2.core"/>
+      <plugin id="org.eclipse.equinox.p2.engine"/>
+      <plugin id="org.eclipse.equinox.p2.metadata"/>
+      <plugin id="org.eclipse.equinox.p2.metadata.repository"/>
+      <plugin id="org.eclipse.equinox.p2.repository"/>
+      <plugin id="org.eclipse.equinox.preferences"/>
+      <plugin id="org.eclipse.equinox.registry"/>
+      <plugin id="org.eclipse.equinox.security"/>
+      <plugin id="org.eclipse.help"/>
+      <plugin id="org.eclipse.jface"/>
+      <plugin id="org.eclipse.jface.databinding"/>
+      <plugin id="org.eclipse.jface.text"/>
+      <plugin id="org.eclipse.osgi"/>
+      <plugin id="org.eclipse.swt"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.text"/>
+      <plugin id="org.eclipse.tm.terminal"/>
+      <plugin id="org.eclipse.ui"/>
+      <plugin id="org.eclipse.ui.console"/>
+      <plugin id="org.eclipse.ui.editors"/>
+      <plugin id="org.eclipse.ui.forms"/>
+      <plugin id="org.eclipse.ui.ide"/>
+      <plugin id="org.eclipse.ui.workbench"/>
+      <plugin id="org.eclipse.ui.workbench.texteditor"/>
+      <plugin id="org.hamcrest.core"/>
+      <plugin id="org.junit"/>
+      <plugin id="org.mozilla.javascript"/>
+      <plugin id="org.netxms.gef4.zest.core"/>
+      <plugin id="org.netxms.gef4.zest.jface"/>
+      <plugin id="org.netxms.gef4.zest.layouts"/>
+      <plugin id="org.netxms.nebula.widgets.gallery"/>
+      <plugin id="org.netxms.nebula.widgets.gallery.tests"/>
+      <plugin id="org.netxms.ui.base"/>
+      <plugin id="org.netxms.ui.eclipse.actionmanager"/>
+      <plugin id="org.netxms.ui.eclipse.agentmanager"/>
+      <plugin id="org.netxms.ui.eclipse.alarmviewer"/>
+      <plugin id="org.netxms.ui.eclipse.charts"/>
+      <plugin id="org.netxms.ui.eclipse.clientlibrary"/>
+      <plugin id="org.netxms.ui.eclipse.console"/>
+      <plugin id="org.netxms.ui.eclipse.dashboard"/>
+      <plugin id="org.netxms.ui.eclipse.datacollection"/>
+      <plugin id="org.netxms.ui.eclipse.epp"/>
+      <plugin id="org.netxms.ui.eclipse.eventmanager"/>
+      <plugin id="org.netxms.ui.eclipse.filemanager"/>
+      <plugin id="org.netxms.ui.eclipse.imagelibrary"/>
+      <plugin id="org.netxms.ui.eclipse.logviewer"/>
+      <plugin id="org.netxms.ui.eclipse.market"/>
+      <plugin id="org.netxms.ui.eclipse.networkmaps"/>
+      <plugin id="org.netxms.ui.eclipse.nxsl"/>
+      <plugin id="org.netxms.ui.eclipse.objectbrowser"/>
+      <plugin id="org.netxms.ui.eclipse.objectbrowser.adapterfactory" fragment="true"/>
+      <plugin id="org.netxms.ui.eclipse.objectmanager"/>
+      <plugin id="org.netxms.ui.eclipse.objecttools"/>
+      <plugin id="org.netxms.ui.eclipse.objectview"/>
+      <plugin id="org.netxms.ui.eclipse.osm"/>
+      <plugin id="org.netxms.ui.eclipse.perfview"/>
+      <plugin id="org.netxms.ui.eclipse.policymanager"/>
+      <plugin id="org.netxms.ui.eclipse.reporter"/>
+      <plugin id="org.netxms.ui.eclipse.serverconfig"/>
+      <plugin id="org.netxms.ui.eclipse.serverconsole"/>
+      <plugin id="org.netxms.ui.eclipse.serverjobmanager"/>
+      <plugin id="org.netxms.ui.eclipse.serviceview"/>
+      <plugin id="org.netxms.ui.eclipse.slm"/>
+      <plugin id="org.netxms.ui.eclipse.snmp"/>
+      <plugin id="org.netxms.ui.eclipse.switchmanager"/>
+      <plugin id="org.netxms.ui.eclipse.topology"/>
+      <plugin id="org.netxms.ui.eclipse.usermanager"/>
+      <plugin id="org.simpleframework.xml"/>
+      <plugin id="org.spider.ui.eclipse.emailmanager"/>
+      <plugin id="org.swtchart"/>
+   </plugins>
+
+
+</product>

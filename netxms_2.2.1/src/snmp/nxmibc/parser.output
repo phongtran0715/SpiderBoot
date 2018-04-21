@@ -1,0 +1,4667 @@
+Grammar
+
+    0 $accept: ModuleDefinition $end
+
+    1 ModuleDefinition: ModuleIdentifierAssignment AssignmentList End
+    2                 | ModuleIdentifierAssignment End
+
+    3 AssignmentList: AssignmentList Assignment
+    4               | Assignment
+
+    5 Assignment: ObjectIdentifierAssignment
+    6           | ObjectIdentityAssignment
+    7           | ObjectTypeAssignment
+    8           | MacroAssignment
+    9           | TypeOrValueAssignment
+   10           | SnmpNotificationTypeAssignment
+   11           | ModuleComplianceAssignment
+   12           | SnmpNotificationGroupAssignment
+   13           | SnmpObjectGroupAssignment
+   14           | SnmpKeywordAssignment
+   15           | AgentCapabilitiesAssignment
+   16           | ModuleIdentityAssignment
+   17           | ImportsAssignment
+   18           | ExportsAssignment
+
+   19 ModuleIdentifierAssignment: ModuleIdentifier
+
+   20 ModuleIdentifier: UCidentifier DEFINITIONS_SYM ASSIGNMENT_SYM Begin
+   21                 | UCidentifier DEFINITIONS_SYM ASSIGNMENT_SYM AUTOMATIC_SYM TAGS_SYM Begin
+
+   22 ObjectIdentifierAssignment: LCidentifier OBJECT_IDENTIFIER_SYM AssignedIdentifier
+   23                           | LCidentifier AssignedIdentifier
+
+   24 AssignedIdentifier: ASSIGNMENT_SYM AssignedIdentifierList
+   25                   | ASSIGNMENT_SYM Number
+
+   26 AssignedIdentifierList: LEFT_BRACE_SYM ObjectIdentifierList RIGHT_BRACE_SYM
+
+   27 ObjectIdentifierList: ObjectIdentifierList ObjectIdentifier
+   28                     | ObjectIdentifier
+
+   29 ObjectIdentifier: Number
+   30                 | DefinedValue
+   31                 | Identifier LEFT_PAREN_SYM Number RIGHT_PAREN_SYM
+
+   32 NumericValue: NumberOrMinMax
+   33             | DefinedValue
+   34             | NumberOrMinMax DOT_SYM DOT_SYM NumberOrMinMax
+   35             | Identifier LEFT_PAREN_SYM NumberOrMinMax RIGHT_PAREN_SYM
+
+   36 NumberOrMinMax: Number
+   37               | MIN_SYM
+   38               | MAX_SYM
+
+   39 DefinedValue: UCidentifier DOT_SYM LCidentifier
+   40             | LCidentifier
+
+   41 Number: NUMBER_SYM
+
+   42 ObjectIdentityAssignment: LCidentifier OBJECT_IDENTITY_SYM SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+   43 ObjectTypeAssignment: Identifier OBJECT_TYPE_SYM SnmpSyntaxPart SnmpUnitsPart SnmpAccessPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpIndexPart SnmpDefValPart AssignedIdentifier
+
+   44 ModuleIdentityAssignment: SnmpIdentityPart SnmpUpdatePart SnmpOrganisationPart SnmpContactInfoPart SnmpDescriptionPart SnmpRevisionPart AssignedIdentifier
+
+   45 ImportsAssignment: IMPORTS_SYM SymbolsFromModuleList SEMI_COLON_SYM
+
+   46 ExportsAssignment: EXPORTS_SYM SymbolList SEMI_COLON_SYM
+
+   47 SnmpRevisionPart: SnmpRevisionList
+   48                 | %empty
+
+   49 SnmpRevisionList: SnmpRevisionList SnmpRevisionObject
+   50                 | SnmpRevisionObject
+
+   51 SnmpRevisionObject: REVISION_SYM CharString SnmpDescriptionPart
+
+   52 SnmpIdentityPart: LCidentifier MODULE_IDENTITY_SYM
+
+   53 SnmpOrganisationPart: ORGANIZATION_SYM CharString
+
+   54 SnmpContactInfoPart: CONTACT_SYM CharString
+
+   55 SnmpUpdatePart: UPDATE_SYM CharString
+
+   56 SnmpDescriptionPart: DESCRIPTION_SYM CharString
+   57                    | %empty
+
+   58 ValueConstraint: LEFT_PAREN_SYM NumericValueConstraintList RIGHT_PAREN_SYM
+   59                | LEFT_PAREN_SYM SIZE_SYM LEFT_PAREN_SYM NumericValueConstraintList RIGHT_PAREN_SYM RIGHT_PAREN_SYM
+   60                | LEFT_BRACE_SYM NumericValueConstraintList RIGHT_BRACE_SYM
+
+   61 NumericValueConstraintList: NumericValue BAR_SYM NumericValueConstraintList
+   62                           | NumericValue COMMA_SYM NumericValueConstraintList
+   63                           | NumericValue
+
+   64 SnmpKeywordAssignment: SnmpKeywordName
+   65                      | SnmpKeywordName SnmpKeywordValue
+   66                      | SnmpKeywordName SnmpKeywordBinding SnmpKeywordValue
+
+   67 SnmpKeywordName: KEYWORD_SYM ASSIGNMENT_SYM CharString
+
+   68 SnmpKeywordValue: KEYWORD_VALUE_SYM ASSIGNMENT_SYM CharString
+
+   69 SnmpKeywordBinding: KEYWORD_BIND_SYM ASSIGNMENT_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+
+   70 SnmpSyntax: SYNTAX_SYM Type
+
+   71 SnmpSyntaxPart: SnmpSyntax
+   72               | %empty
+
+   73 SnmpUnitsPart: UNITS_SYM CharString
+   74              | %empty
+
+   75 SnmpWriteSyntaxPart: WRITE_SYNTAX_SYM Type
+   76                    | %empty
+
+   77 SnmpCreationPart: CREATION_REQUIRES_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+   78                 | %empty
+
+   79 TypeOrValueAssignment: BuiltInTypeAssignment
+   80                      | UCidentifier ASSIGNMENT_SYM TextualConventionAssignment
+   81                      | UCidentifier ASSIGNMENT_SYM Type
+   82                      | UCidentifier ASSIGNMENT_SYM SEQUENCE_SYM SequenceAssignment
+   83                      | LCidentifier ASSIGNMENT_SYM SEQUENCE_SYM SequenceAssignment
+   84                      | UCidentifier ASSIGNMENT_SYM CHOICE_SYM SequenceAssignment
+   85                      | UCidentifier ASSIGNMENT_SYM Value
+
+   86 Type: BuiltInType
+   87     | NamedType
+   88     | BuiltInType ValueConstraint
+   89     | NamedType ValueConstraint
+
+   90 NamedType: SnmpTypeTagPart Identifier
+
+   91 BuiltInType: SnmpTypeTagPart INTEGER_SYM
+   92            | SnmpTypeTagPart IMPLICIT_SYM INTEGER_SYM
+   93            | SnmpTypeTagPart INTEGER32_SYM
+   94            | SnmpTypeTagPart UNSIGNED32_SYM
+   95            | SnmpTypeTagPart COUNTER_SYM
+   96            | SnmpTypeTagPart COUNTER32_SYM
+   97            | SnmpTypeTagPart COUNTER64_SYM
+   98            | SnmpTypeTagPart GAUGE32_SYM
+   99            | SnmpTypeTagPart TIMETICKS_SYM
+  100            | SEQUENCE_SYM OF_SYM NamedType
+  101            | SnmpTypeTagPart OBJECT_IDENTIFIER_SYM
+  102            | SnmpTypeTagPart OctetStringType
+
+  103 BuiltInTypeAssignment: IP_ADDRESS_SYM ASSIGNMENT_SYM TypeOrTextualConvention
+  104                      | OPAQUE_SYM ASSIGNMENT_SYM TypeOrTextualConvention
+  105                      | INTEGER32_SYM ASSIGNMENT_SYM TypeOrTextualConvention
+  106                      | UNSIGNED32_SYM ASSIGNMENT_SYM TypeOrTextualConvention
+  107                      | TIMETICKS_SYM ASSIGNMENT_SYM TypeOrTextualConvention
+  108                      | COUNTER_SYM ASSIGNMENT_SYM TypeOrTextualConvention
+  109                      | COUNTER32_SYM ASSIGNMENT_SYM TypeOrTextualConvention
+  110                      | COUNTER64_SYM ASSIGNMENT_SYM TypeOrTextualConvention
+  111                      | GAUGE32_SYM ASSIGNMENT_SYM TypeOrTextualConvention
+
+  112 TypeOrTextualConvention: Type
+  113                        | TextualConventionAssignment
+
+  114 MacroAssignment: MACRO_SYM ASSIGNMENT_SYM Begin TokenList End
+
+  115 TokenList: TokenList TokenObject
+  116          | TokenObject
+
+  117 TokenObject: TOKEN_SYM
+
+  118 TextualConventionAssignment: TEXTUAL_CONVENTION_SYM SnmpDisplayHintPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpSyntaxPart
+
+  119 SnmpNotificationTypeAssignment: LCidentifier NOTIFICATION_TYPE_SYM SnmpObjectsPart SnmpAccessPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+  120                               | LCidentifier TRAP_TYPE_SYM ENTERPRISE_SYM LCidentifier SnmpTrapVariablePart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+  121 SnmpTrapVariablePart: SnmpTrapVariableList
+  122                     | %empty
+
+  123 SnmpTrapVariableList: VARIABLES_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+
+  124 SnmpMandatoryGroupPart: SnmpMandatoryGroupList
+  125                       | %empty
+
+  126 SnmpMandatoryGroupList: SnmpMandatoryGroupList SnmpMandatoryGroup
+  127                       | SnmpMandatoryGroup
+
+  128 SnmpMandatoryGroup: MANDATORY_GROUPS_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+
+  129 SnmpCompliancePart: SnmpComplianceList
+  130                   | %empty
+
+  131 SnmpComplianceList: SnmpComplianceList SnmpComplianceObject
+  132                   | SnmpComplianceObject
+
+  133 SnmpComplianceObject: OBJECT_SYM LCidentifier SnmpSyntaxPart SnmpWriteSyntaxPart SnmpAccessPart SnmpDescriptionPart
+  134                     | GROUP_SYM LCidentifier SnmpDescriptionPart
+
+  135 SnmpObjectsPart: OBJECTS_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+  136                | OBJECTS_SYM LEFT_BRACE_SYM RIGHT_BRACE_SYM
+  137                | NOTIFICATIONS_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+  138                | NOTIFICATIONS_SYM LEFT_BRACE_SYM RIGHT_BRACE_SYM
+  139                | %empty
+
+  140 SnmpObjectGroupAssignment: LCidentifier OBJECT_GROUP_SYM SnmpObjectsPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+  141 SnmpNotificationGroupAssignment: LCidentifier NOTIFICATION_GROUP_SYM SnmpObjectsPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+  142 ModuleComplianceAssignment: LCidentifier MODULE_COMPLIANCE_SYM SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpModuleComplianceList AssignedIdentifier
+
+  143 SnmpModuleComplianceList: SnmpModuleComplianceList SnmpModuleComplianceObject
+  144                         | SnmpModuleComplianceObject
+
+  145 SnmpModuleComplianceObject: MODULE_SYM OptionalModuleName SnmpMandatoryGroupPart SnmpCompliancePart
+
+  146 OptionalModuleName: UCidentifier
+  147                   | %empty
+
+  148 SnmpVariationsListPart: SnmpVariationsList
+  149                       | %empty
+
+  150 SnmpVariationsList: SnmpVariationsList SnmpVariationPart
+  151                   | SnmpVariationPart
+
+  152 SnmpVariationPart: VARIATION_SYM LCidentifier SnmpSyntaxPart SnmpWriteSyntaxPart SnmpAccessPart SnmpCreationPart SnmpDefValPart SnmpDescriptionPart
+
+  153 ModuleCapabilitiesList: ModuleCapabilitiesList ModuleCapabilitiesAssignment
+  154                       | ModuleCapabilitiesAssignment
+
+  155 ModuleCapabilitiesAssignment: SUPPORTS_SYM UCidentifier INCLUDES_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM SnmpVariationsListPart
+  156                             | ModuleIdentifier INCLUDES_SYM SymbolList SnmpVariationsListPart
+
+  157 AgentCapabilitiesAssignment: LCidentifier AGENT_CAPABILITIES_SYM PRODUCT_RELEASE_SYM CharString SnmpStatusPart SnmpDescriptionPart SnmpReferencePart ModuleCapabilitiesList AssignedIdentifier
+
+  158 SnmpAccessPart: ACCESS_SYM LCidentifier
+  159               | MAX_ACCESS_SYM LCidentifier
+  160               | MIN_ACCESS_SYM LCidentifier
+  161               | %empty
+
+  162 SnmpStatusPart: STATUS_SYM LCidentifier
+
+  163 SnmpReferencePart: REFERENCE_SYM CharString
+  164                  | %empty
+
+  165 SnmpDisplayHintPart: DISPLAY_HINT_SYM CharString
+  166                    | %empty
+
+  167 SnmpIndexPart: INDEX_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+  168              | AUGMENTS_SYM LEFT_BRACE_SYM DefinedValue RIGHT_BRACE_SYM
+  169              | %empty
+
+  170 SnmpDefValPart: DEFVAL_SYM LEFT_BRACE_SYM BinaryString RIGHT_BRACE_SYM
+  171               | DEFVAL_SYM LEFT_BRACE_SYM HexString RIGHT_BRACE_SYM
+  172               | DEFVAL_SYM LEFT_BRACE_SYM CharString RIGHT_BRACE_SYM
+  173               | DEFVAL_SYM LEFT_BRACE_SYM DefValList RIGHT_BRACE_SYM
+  174               | DEFVAL_SYM AssignedIdentifierList
+  175               | %empty
+
+  176 DefValList: DefValListElement COMMA_SYM DefValList
+  177           | DefValListElement
+
+  178 DefValListElement: LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+  179                  | LEFT_BRACE_SYM RIGHT_BRACE_SYM
+
+  180 BinaryString: BSTRING_SYM
+
+  181 HexString: HSTRING_SYM
+
+  182 CharString: CSTRING_SYM
+
+  183 SymbolsFromModuleList: SymbolsFromModuleList SymbolsFromModule
+  184                      | SymbolsFromModule
+
+  185 SymbolsFromModule: SymbolList FROM_SYM UCidentifier
+
+  186 SymbolList: SymbolList COMMA_SYM Symbol
+  187           | Symbol
+
+  188 Symbol: UCidentifier
+  189       | LCidentifier
+  190       | IMPLIED_SYM LCidentifier
+
+  191 SequenceItem: Identifier Type
+
+  192 SequenceList: SequenceItem
+  193             | SequenceList COMMA_SYM SequenceItem
+
+  194 SequenceAssignment: LEFT_BRACE_SYM SequenceList RIGHT_BRACE_SYM
+
+  195 SnmpTypeTagPart: SnmpTypeTagList
+  196                | %empty
+
+  197 SnmpTypeTagList: SnmpTypeTagList SnmpTypeTagItem
+  198                | SnmpTypeTagItem
+
+  199 SnmpTypeTagItem: LEFT_BRACKET_SYM UCidentifier Number RIGHT_BRACKET_SYM
+
+  200 OctetStringType: OCTET_SYM STRING_SYM
+  201                | EXPLICIT_SYM OCTET_SYM STRING_SYM
+  202                | IMPLICIT_SYM OCTET_SYM STRING_SYM
+  203                | IP_ADDRESS_SYM
+  204                | NETWORK_ADDRESS_SYM
+  205                | OPAQUE_SYM
+  206                | BITS_SYM
+
+  207 Value: Number
+  208      | HexString
+  209      | BinaryString
+  210      | CharString
+
+  211 Identifier: UCidentifier
+  212           | LCidentifier
+
+  213 UCidentifier: UCASEFIRST_IDENT_SYM
+
+  214 LCidentifier: LCASEFIRST_IDENT_SYM
+
+  215 End: END_SYM
+
+  216 Begin: BEGIN_SYM
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+ENTERPRISE_SYM (258) 120
+TRAP_TYPE_SYM (259) 120
+VARIABLES_SYM (260) 123
+EXPLICIT_SYM (261) 201
+IMPLICIT_SYM (262) 92 202
+IMPLIED_SYM (263) 190
+RIGHT_BRACE_SYM (264) 26 60 69 77 123 128 135 136 137 138 155 167 168
+    170 171 172 173 178 179 194
+LEFT_BRACE_SYM (265) 26 60 69 77 123 128 135 136 137 138 155 167 168
+    170 171 172 173 178 179 194
+RIGHT_BRACKET_SYM (266) 199
+LEFT_BRACKET_SYM (267) 199
+DEFINITIONS_SYM (268) 20 21
+ASSIGNMENT_SYM (269) 20 21 24 25 67 68 69 80 81 82 83 84 85 103 104
+    105 106 107 108 109 110 111 114
+BEGIN_SYM (270) 216
+END_SYM (271) 215
+FROM_SYM (272) 185
+IMPORTS_SYM (273) 45
+EXPORTS_SYM (274) 46
+COMMA_SYM (275) 62 176 186 193
+SEMI_COLON_SYM (276) 45 46
+DOT_SYM (277) 34 39
+DESCRIPTION_SYM (278) 56
+ORGANIZATION_SYM (279) 53
+CONTACT_SYM (280) 54
+UPDATE_SYM (281) 55
+MODULE_IDENTITY_SYM (282) 52
+MODULE_COMPLIANCE_SYM (283) 142
+OBJECT_IDENTIFIER_SYM (284) 22 101
+OBJECT_TYPE_SYM (285) 43
+OBJECT_GROUP_SYM (286) 140
+OBJECT_IDENTITY_SYM (287) 42
+OBJECTS_SYM (288) 135 136
+MANDATORY_GROUPS_SYM (289) 128
+GROUP_SYM (290) 134
+AGENT_CAPABILITIES_SYM (291) 157
+KEYWORD_SYM (292) 67
+KEYWORD_VALUE_SYM (293) 68
+KEYWORD_BIND_SYM (294) 69
+TOKEN_SYM (295) 117
+INTEGER_SYM (296) 91 92
+INTEGER32_SYM (297) 93 105
+UNSIGNED32_SYM (298) 94 106
+GAUGE32_SYM (299) 98 111
+COUNTER_SYM (300) 95 108
+COUNTER32_SYM (301) 96 109
+COUNTER64_SYM (302) 97 110
+BITS_SYM (303) 206
+STRING_SYM (304) 200 201 202
+OCTET_SYM (305) 200 201 202
+SEQUENCE_SYM (306) 82 83 100
+OF_SYM (307) 100
+TIMETICKS_SYM (308) 99 107
+IP_ADDRESS_SYM (309) 103 203
+NETWORK_ADDRESS_SYM (310) 204
+OPAQUE_SYM (311) 104 205
+REVISION_SYM (312) 51
+TEXTUAL_CONVENTION_SYM (313) 118
+ACCESS_SYM (314) 158
+MAX_ACCESS_SYM (315) 159
+MIN_ACCESS_SYM (316) 160
+SYNTAX_SYM (317) 70
+STATUS_SYM (318) 162
+INDEX_SYM (319) 167
+REFERENCE_SYM (320) 163
+DEFVAL_SYM (321) 170 171 172 173 174
+LEFT_PAREN_SYM (322) 31 35 58 59
+RIGHT_PAREN_SYM (323) 31 35 58 59
+NOTIFICATIONS_SYM (324) 137 138
+NOTIFICATION_GROUP_SYM (325) 141
+NOTIFICATION_TYPE_SYM (326) 119
+SIZE_SYM (327) 59
+BAR_SYM (328) 61
+VARIATION_SYM (329) 152
+WRITE_SYNTAX_SYM (330) 75
+SUPPORTS_SYM (331) 155
+INCLUDES_SYM (332) 155 156
+CREATION_REQUIRES_SYM (333) 77
+PRODUCT_RELEASE_SYM (334) 157
+CHOICE_SYM (335) 84
+UNITS_SYM (336) 73
+AUGMENTS_SYM (337) 168
+OBJECT_SYM (338) 133
+TAGS_SYM (339) 21
+AUTOMATIC_SYM (340) 21
+MIN_SYM (341) 37
+MAX_SYM (342) 38
+MODULE_SYM (343) 145
+MACRO_SYM (344) 114
+UCASEFIRST_IDENT_SYM (345) 213
+LCASEFIRST_IDENT_SYM (346) 214
+BSTRING_SYM (347) 180
+HSTRING_SYM (348) 181
+CSTRING_SYM (349) 182
+DISPLAY_HINT_SYM (350) 165
+NUMBER_SYM (351) 41
+
+
+Nonterminals, with rules where they appear
+
+$accept (97)
+    on left: 0
+ModuleDefinition (98)
+    on left: 1 2, on right: 0
+AssignmentList (99)
+    on left: 3 4, on right: 1 3
+Assignment (100)
+    on left: 5 6 7 8 9 10 11 12 13 14 15 16 17 18, on right: 3 4
+ModuleIdentifierAssignment (101)
+    on left: 19, on right: 1 2
+ModuleIdentifier (102)
+    on left: 20 21, on right: 19 156
+ObjectIdentifierAssignment (103)
+    on left: 22 23, on right: 5
+AssignedIdentifier (104)
+    on left: 24 25, on right: 22 23 42 43 44 119 120 140 141 142 157
+AssignedIdentifierList (105)
+    on left: 26, on right: 24 174
+ObjectIdentifierList (106)
+    on left: 27 28, on right: 26 27
+ObjectIdentifier (107)
+    on left: 29 30 31, on right: 27 28
+NumericValue (108)
+    on left: 32 33 34 35, on right: 61 62 63
+NumberOrMinMax (109)
+    on left: 36 37 38, on right: 32 34 35
+DefinedValue (110)
+    on left: 39 40, on right: 30 33 168
+Number (111)
+    on left: 41, on right: 25 29 31 36 199 207
+ObjectIdentityAssignment (112)
+    on left: 42, on right: 6
+ObjectTypeAssignment (113)
+    on left: 43, on right: 7
+ModuleIdentityAssignment (114)
+    on left: 44, on right: 16
+ImportsAssignment (115)
+    on left: 45, on right: 17
+ExportsAssignment (116)
+    on left: 46, on right: 18
+SnmpRevisionPart (117)
+    on left: 47 48, on right: 44
+SnmpRevisionList (118)
+    on left: 49 50, on right: 47 49
+SnmpRevisionObject (119)
+    on left: 51, on right: 49 50
+SnmpIdentityPart (120)
+    on left: 52, on right: 44
+SnmpOrganisationPart (121)
+    on left: 53, on right: 44
+SnmpContactInfoPart (122)
+    on left: 54, on right: 44
+SnmpUpdatePart (123)
+    on left: 55, on right: 44
+SnmpDescriptionPart (124)
+    on left: 56 57, on right: 42 43 44 51 118 119 120 133 134 140 141
+    142 152 157
+ValueConstraint (125)
+    on left: 58 59 60, on right: 88 89
+NumericValueConstraintList (126)
+    on left: 61 62 63, on right: 58 59 60 61 62
+SnmpKeywordAssignment (127)
+    on left: 64 65 66, on right: 14
+SnmpKeywordName (128)
+    on left: 67, on right: 64 65 66
+SnmpKeywordValue (129)
+    on left: 68, on right: 65 66
+SnmpKeywordBinding (130)
+    on left: 69, on right: 66
+SnmpSyntax (131)
+    on left: 70, on right: 71
+SnmpSyntaxPart (132)
+    on left: 71 72, on right: 43 118 133 152
+SnmpUnitsPart (133)
+    on left: 73 74, on right: 43
+SnmpWriteSyntaxPart (134)
+    on left: 75 76, on right: 133 152
+SnmpCreationPart (135)
+    on left: 77 78, on right: 152
+TypeOrValueAssignment (136)
+    on left: 79 80 81 82 83 84 85, on right: 9
+Type (137)
+    on left: 86 87 88 89, on right: 70 75 81 112 191
+NamedType (138)
+    on left: 90, on right: 87 89 100
+BuiltInType (139)
+    on left: 91 92 93 94 95 96 97 98 99 100 101 102, on right: 86 88
+BuiltInTypeAssignment (140)
+    on left: 103 104 105 106 107 108 109 110 111, on right: 79
+TypeOrTextualConvention (141)
+    on left: 112 113, on right: 103 104 105 106 107 108 109 110 111
+MacroAssignment (142)
+    on left: 114, on right: 8
+TokenList (143)
+    on left: 115 116, on right: 114 115
+TokenObject (144)
+    on left: 117, on right: 115 116
+TextualConventionAssignment (145)
+    on left: 118, on right: 80 113
+SnmpNotificationTypeAssignment (146)
+    on left: 119 120, on right: 10
+SnmpTrapVariablePart (147)
+    on left: 121 122, on right: 120
+SnmpTrapVariableList (148)
+    on left: 123, on right: 121
+SnmpMandatoryGroupPart (149)
+    on left: 124 125, on right: 145
+SnmpMandatoryGroupList (150)
+    on left: 126 127, on right: 124 126
+SnmpMandatoryGroup (151)
+    on left: 128, on right: 126 127
+SnmpCompliancePart (152)
+    on left: 129 130, on right: 145
+SnmpComplianceList (153)
+    on left: 131 132, on right: 129 131
+SnmpComplianceObject (154)
+    on left: 133 134, on right: 131 132
+SnmpObjectsPart (155)
+    on left: 135 136 137 138 139, on right: 119 140 141
+SnmpObjectGroupAssignment (156)
+    on left: 140, on right: 13
+SnmpNotificationGroupAssignment (157)
+    on left: 141, on right: 12
+ModuleComplianceAssignment (158)
+    on left: 142, on right: 11
+SnmpModuleComplianceList (159)
+    on left: 143 144, on right: 142 143
+SnmpModuleComplianceObject (160)
+    on left: 145, on right: 143 144
+OptionalModuleName (161)
+    on left: 146 147, on right: 145
+SnmpVariationsListPart (162)
+    on left: 148 149, on right: 155 156
+SnmpVariationsList (163)
+    on left: 150 151, on right: 148 150
+SnmpVariationPart (164)
+    on left: 152, on right: 150 151
+ModuleCapabilitiesList (165)
+    on left: 153 154, on right: 153 157
+ModuleCapabilitiesAssignment (166)
+    on left: 155 156, on right: 153 154
+AgentCapabilitiesAssignment (167)
+    on left: 157, on right: 15
+SnmpAccessPart (168)
+    on left: 158 159 160 161, on right: 43 119 133 152
+SnmpStatusPart (169)
+    on left: 162, on right: 42 43 118 119 140 141 142 157
+SnmpReferencePart (170)
+    on left: 163 164, on right: 42 43 118 119 120 140 141 142 157
+SnmpDisplayHintPart (171)
+    on left: 165 166, on right: 118
+SnmpIndexPart (172)
+    on left: 167 168 169, on right: 43
+SnmpDefValPart (173)
+    on left: 170 171 172 173 174 175, on right: 43 152
+DefValList (174)
+    on left: 176 177, on right: 173 176
+DefValListElement (175)
+    on left: 178 179, on right: 176 177
+BinaryString (176)
+    on left: 180, on right: 170 209
+HexString (177)
+    on left: 181, on right: 171 208
+CharString (178)
+    on left: 182, on right: 51 53 54 55 56 67 68 73 157 163 165 172
+    210
+SymbolsFromModuleList (179)
+    on left: 183 184, on right: 45 183
+SymbolsFromModule (180)
+    on left: 185, on right: 183 184
+SymbolList (181)
+    on left: 186 187, on right: 46 69 77 123 128 135 137 155 156 167
+    178 185 186
+Symbol (182)
+    on left: 188 189 190, on right: 186 187
+SequenceItem (183)
+    on left: 191, on right: 192 193
+SequenceList (184)
+    on left: 192 193, on right: 193 194
+SequenceAssignment (185)
+    on left: 194, on right: 82 83 84
+SnmpTypeTagPart (186)
+    on left: 195 196, on right: 90 91 92 93 94 95 96 97 98 99 101 102
+SnmpTypeTagList (187)
+    on left: 197 198, on right: 195 197
+SnmpTypeTagItem (188)
+    on left: 199, on right: 197 198
+OctetStringType (189)
+    on left: 200 201 202 203 204 205 206, on right: 102
+Value (190)
+    on left: 207 208 209 210, on right: 85
+Identifier (191)
+    on left: 211 212, on right: 31 35 43 90 191
+UCidentifier (192)
+    on left: 213, on right: 20 21 39 80 81 82 84 85 146 155 185 188
+    199 211
+LCidentifier (193)
+    on left: 214, on right: 22 23 39 40 42 52 83 119 120 133 134 140
+    141 142 152 157 158 159 160 162 189 190 212
+End (194)
+    on left: 215, on right: 1 2 114
+Begin (195)
+    on left: 216, on right: 20 21 114
+
+
+State 0
+
+    0 $accept: . ModuleDefinition $end
+
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+
+    ModuleDefinition            go to state 2
+    ModuleIdentifierAssignment  go to state 3
+    ModuleIdentifier            go to state 4
+    UCidentifier                go to state 5
+
+
+State 1
+
+  213 UCidentifier: UCASEFIRST_IDENT_SYM .
+
+    $default  reduce using rule 213 (UCidentifier)
+
+
+State 2
+
+    0 $accept: ModuleDefinition . $end
+
+    $end  shift, and go to state 6
+
+
+State 3
+
+    1 ModuleDefinition: ModuleIdentifierAssignment . AssignmentList End
+    2                 | ModuleIdentifierAssignment . End
+
+    END_SYM               shift, and go to state 7
+    IMPORTS_SYM           shift, and go to state 8
+    EXPORTS_SYM           shift, and go to state 9
+    KEYWORD_SYM           shift, and go to state 10
+    INTEGER32_SYM         shift, and go to state 11
+    UNSIGNED32_SYM        shift, and go to state 12
+    GAUGE32_SYM           shift, and go to state 13
+    COUNTER_SYM           shift, and go to state 14
+    COUNTER32_SYM         shift, and go to state 15
+    COUNTER64_SYM         shift, and go to state 16
+    TIMETICKS_SYM         shift, and go to state 17
+    IP_ADDRESS_SYM        shift, and go to state 18
+    OPAQUE_SYM            shift, and go to state 19
+    MACRO_SYM             shift, and go to state 20
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    AssignmentList                   go to state 22
+    Assignment                       go to state 23
+    ObjectIdentifierAssignment       go to state 24
+    ObjectIdentityAssignment         go to state 25
+    ObjectTypeAssignment             go to state 26
+    ModuleIdentityAssignment         go to state 27
+    ImportsAssignment                go to state 28
+    ExportsAssignment                go to state 29
+    SnmpIdentityPart                 go to state 30
+    SnmpKeywordAssignment            go to state 31
+    SnmpKeywordName                  go to state 32
+    TypeOrValueAssignment            go to state 33
+    BuiltInTypeAssignment            go to state 34
+    MacroAssignment                  go to state 35
+    SnmpNotificationTypeAssignment   go to state 36
+    SnmpObjectGroupAssignment        go to state 37
+    SnmpNotificationGroupAssignment  go to state 38
+    ModuleComplianceAssignment       go to state 39
+    AgentCapabilitiesAssignment      go to state 40
+    Identifier                       go to state 41
+    UCidentifier                     go to state 42
+    LCidentifier                     go to state 43
+    End                              go to state 44
+
+
+State 4
+
+   19 ModuleIdentifierAssignment: ModuleIdentifier .
+
+    $default  reduce using rule 19 (ModuleIdentifierAssignment)
+
+
+State 5
+
+   20 ModuleIdentifier: UCidentifier . DEFINITIONS_SYM ASSIGNMENT_SYM Begin
+   21                 | UCidentifier . DEFINITIONS_SYM ASSIGNMENT_SYM AUTOMATIC_SYM TAGS_SYM Begin
+
+    DEFINITIONS_SYM  shift, and go to state 45
+
+
+State 6
+
+    0 $accept: ModuleDefinition $end .
+
+    $default  accept
+
+
+State 7
+
+  215 End: END_SYM .
+
+    $default  reduce using rule 215 (End)
+
+
+State 8
+
+   45 ImportsAssignment: IMPORTS_SYM . SymbolsFromModuleList SEMI_COLON_SYM
+
+    IMPLIED_SYM           shift, and go to state 46
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    SymbolsFromModuleList  go to state 47
+    SymbolsFromModule      go to state 48
+    SymbolList             go to state 49
+    Symbol                 go to state 50
+    UCidentifier           go to state 51
+    LCidentifier           go to state 52
+
+
+State 9
+
+   46 ExportsAssignment: EXPORTS_SYM . SymbolList SEMI_COLON_SYM
+
+    IMPLIED_SYM           shift, and go to state 46
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    SymbolList    go to state 53
+    Symbol        go to state 50
+    UCidentifier  go to state 51
+    LCidentifier  go to state 52
+
+
+State 10
+
+   67 SnmpKeywordName: KEYWORD_SYM . ASSIGNMENT_SYM CharString
+
+    ASSIGNMENT_SYM  shift, and go to state 54
+
+
+State 11
+
+  105 BuiltInTypeAssignment: INTEGER32_SYM . ASSIGNMENT_SYM TypeOrTextualConvention
+
+    ASSIGNMENT_SYM  shift, and go to state 55
+
+
+State 12
+
+  106 BuiltInTypeAssignment: UNSIGNED32_SYM . ASSIGNMENT_SYM TypeOrTextualConvention
+
+    ASSIGNMENT_SYM  shift, and go to state 56
+
+
+State 13
+
+  111 BuiltInTypeAssignment: GAUGE32_SYM . ASSIGNMENT_SYM TypeOrTextualConvention
+
+    ASSIGNMENT_SYM  shift, and go to state 57
+
+
+State 14
+
+  108 BuiltInTypeAssignment: COUNTER_SYM . ASSIGNMENT_SYM TypeOrTextualConvention
+
+    ASSIGNMENT_SYM  shift, and go to state 58
+
+
+State 15
+
+  109 BuiltInTypeAssignment: COUNTER32_SYM . ASSIGNMENT_SYM TypeOrTextualConvention
+
+    ASSIGNMENT_SYM  shift, and go to state 59
+
+
+State 16
+
+  110 BuiltInTypeAssignment: COUNTER64_SYM . ASSIGNMENT_SYM TypeOrTextualConvention
+
+    ASSIGNMENT_SYM  shift, and go to state 60
+
+
+State 17
+
+  107 BuiltInTypeAssignment: TIMETICKS_SYM . ASSIGNMENT_SYM TypeOrTextualConvention
+
+    ASSIGNMENT_SYM  shift, and go to state 61
+
+
+State 18
+
+  103 BuiltInTypeAssignment: IP_ADDRESS_SYM . ASSIGNMENT_SYM TypeOrTextualConvention
+
+    ASSIGNMENT_SYM  shift, and go to state 62
+
+
+State 19
+
+  104 BuiltInTypeAssignment: OPAQUE_SYM . ASSIGNMENT_SYM TypeOrTextualConvention
+
+    ASSIGNMENT_SYM  shift, and go to state 63
+
+
+State 20
+
+  114 MacroAssignment: MACRO_SYM . ASSIGNMENT_SYM Begin TokenList End
+
+    ASSIGNMENT_SYM  shift, and go to state 64
+
+
+State 21
+
+  214 LCidentifier: LCASEFIRST_IDENT_SYM .
+
+    $default  reduce using rule 214 (LCidentifier)
+
+
+State 22
+
+    1 ModuleDefinition: ModuleIdentifierAssignment AssignmentList . End
+    3 AssignmentList: AssignmentList . Assignment
+
+    END_SYM               shift, and go to state 7
+    IMPORTS_SYM           shift, and go to state 8
+    EXPORTS_SYM           shift, and go to state 9
+    KEYWORD_SYM           shift, and go to state 10
+    INTEGER32_SYM         shift, and go to state 11
+    UNSIGNED32_SYM        shift, and go to state 12
+    GAUGE32_SYM           shift, and go to state 13
+    COUNTER_SYM           shift, and go to state 14
+    COUNTER32_SYM         shift, and go to state 15
+    COUNTER64_SYM         shift, and go to state 16
+    TIMETICKS_SYM         shift, and go to state 17
+    IP_ADDRESS_SYM        shift, and go to state 18
+    OPAQUE_SYM            shift, and go to state 19
+    MACRO_SYM             shift, and go to state 20
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    Assignment                       go to state 65
+    ObjectIdentifierAssignment       go to state 24
+    ObjectIdentityAssignment         go to state 25
+    ObjectTypeAssignment             go to state 26
+    ModuleIdentityAssignment         go to state 27
+    ImportsAssignment                go to state 28
+    ExportsAssignment                go to state 29
+    SnmpIdentityPart                 go to state 30
+    SnmpKeywordAssignment            go to state 31
+    SnmpKeywordName                  go to state 32
+    TypeOrValueAssignment            go to state 33
+    BuiltInTypeAssignment            go to state 34
+    MacroAssignment                  go to state 35
+    SnmpNotificationTypeAssignment   go to state 36
+    SnmpObjectGroupAssignment        go to state 37
+    SnmpNotificationGroupAssignment  go to state 38
+    ModuleComplianceAssignment       go to state 39
+    AgentCapabilitiesAssignment      go to state 40
+    Identifier                       go to state 41
+    UCidentifier                     go to state 42
+    LCidentifier                     go to state 43
+    End                              go to state 66
+
+
+State 23
+
+    4 AssignmentList: Assignment .
+
+    $default  reduce using rule 4 (AssignmentList)
+
+
+State 24
+
+    5 Assignment: ObjectIdentifierAssignment .
+
+    $default  reduce using rule 5 (Assignment)
+
+
+State 25
+
+    6 Assignment: ObjectIdentityAssignment .
+
+    $default  reduce using rule 6 (Assignment)
+
+
+State 26
+
+    7 Assignment: ObjectTypeAssignment .
+
+    $default  reduce using rule 7 (Assignment)
+
+
+State 27
+
+   16 Assignment: ModuleIdentityAssignment .
+
+    $default  reduce using rule 16 (Assignment)
+
+
+State 28
+
+   17 Assignment: ImportsAssignment .
+
+    $default  reduce using rule 17 (Assignment)
+
+
+State 29
+
+   18 Assignment: ExportsAssignment .
+
+    $default  reduce using rule 18 (Assignment)
+
+
+State 30
+
+   44 ModuleIdentityAssignment: SnmpIdentityPart . SnmpUpdatePart SnmpOrganisationPart SnmpContactInfoPart SnmpDescriptionPart SnmpRevisionPart AssignedIdentifier
+
+    UPDATE_SYM  shift, and go to state 67
+
+    SnmpUpdatePart  go to state 68
+
+
+State 31
+
+   14 Assignment: SnmpKeywordAssignment .
+
+    $default  reduce using rule 14 (Assignment)
+
+
+State 32
+
+   64 SnmpKeywordAssignment: SnmpKeywordName .
+   65                      | SnmpKeywordName . SnmpKeywordValue
+   66                      | SnmpKeywordName . SnmpKeywordBinding SnmpKeywordValue
+
+    KEYWORD_VALUE_SYM  shift, and go to state 69
+    KEYWORD_BIND_SYM   shift, and go to state 70
+
+    $default  reduce using rule 64 (SnmpKeywordAssignment)
+
+    SnmpKeywordValue    go to state 71
+    SnmpKeywordBinding  go to state 72
+
+
+State 33
+
+    9 Assignment: TypeOrValueAssignment .
+
+    $default  reduce using rule 9 (Assignment)
+
+
+State 34
+
+   79 TypeOrValueAssignment: BuiltInTypeAssignment .
+
+    $default  reduce using rule 79 (TypeOrValueAssignment)
+
+
+State 35
+
+    8 Assignment: MacroAssignment .
+
+    $default  reduce using rule 8 (Assignment)
+
+
+State 36
+
+   10 Assignment: SnmpNotificationTypeAssignment .
+
+    $default  reduce using rule 10 (Assignment)
+
+
+State 37
+
+   13 Assignment: SnmpObjectGroupAssignment .
+
+    $default  reduce using rule 13 (Assignment)
+
+
+State 38
+
+   12 Assignment: SnmpNotificationGroupAssignment .
+
+    $default  reduce using rule 12 (Assignment)
+
+
+State 39
+
+   11 Assignment: ModuleComplianceAssignment .
+
+    $default  reduce using rule 11 (Assignment)
+
+
+State 40
+
+   15 Assignment: AgentCapabilitiesAssignment .
+
+    $default  reduce using rule 15 (Assignment)
+
+
+State 41
+
+   43 ObjectTypeAssignment: Identifier . OBJECT_TYPE_SYM SnmpSyntaxPart SnmpUnitsPart SnmpAccessPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpIndexPart SnmpDefValPart AssignedIdentifier
+
+    OBJECT_TYPE_SYM  shift, and go to state 73
+
+
+State 42
+
+   80 TypeOrValueAssignment: UCidentifier . ASSIGNMENT_SYM TextualConventionAssignment
+   81                      | UCidentifier . ASSIGNMENT_SYM Type
+   82                      | UCidentifier . ASSIGNMENT_SYM SEQUENCE_SYM SequenceAssignment
+   84                      | UCidentifier . ASSIGNMENT_SYM CHOICE_SYM SequenceAssignment
+   85                      | UCidentifier . ASSIGNMENT_SYM Value
+  211 Identifier: UCidentifier .
+
+    ASSIGNMENT_SYM  shift, and go to state 74
+
+    $default  reduce using rule 211 (Identifier)
+
+
+State 43
+
+   22 ObjectIdentifierAssignment: LCidentifier . OBJECT_IDENTIFIER_SYM AssignedIdentifier
+   23                           | LCidentifier . AssignedIdentifier
+   42 ObjectIdentityAssignment: LCidentifier . OBJECT_IDENTITY_SYM SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+   52 SnmpIdentityPart: LCidentifier . MODULE_IDENTITY_SYM
+   83 TypeOrValueAssignment: LCidentifier . ASSIGNMENT_SYM SEQUENCE_SYM SequenceAssignment
+  119 SnmpNotificationTypeAssignment: LCidentifier . NOTIFICATION_TYPE_SYM SnmpObjectsPart SnmpAccessPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+  120                               | LCidentifier . TRAP_TYPE_SYM ENTERPRISE_SYM LCidentifier SnmpTrapVariablePart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+  140 SnmpObjectGroupAssignment: LCidentifier . OBJECT_GROUP_SYM SnmpObjectsPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+  141 SnmpNotificationGroupAssignment: LCidentifier . NOTIFICATION_GROUP_SYM SnmpObjectsPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+  142 ModuleComplianceAssignment: LCidentifier . MODULE_COMPLIANCE_SYM SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpModuleComplianceList AssignedIdentifier
+  157 AgentCapabilitiesAssignment: LCidentifier . AGENT_CAPABILITIES_SYM PRODUCT_RELEASE_SYM CharString SnmpStatusPart SnmpDescriptionPart SnmpReferencePart ModuleCapabilitiesList AssignedIdentifier
+  212 Identifier: LCidentifier .
+
+    TRAP_TYPE_SYM           shift, and go to state 75
+    ASSIGNMENT_SYM          shift, and go to state 76
+    MODULE_IDENTITY_SYM     shift, and go to state 77
+    MODULE_COMPLIANCE_SYM   shift, and go to state 78
+    OBJECT_IDENTIFIER_SYM   shift, and go to state 79
+    OBJECT_GROUP_SYM        shift, and go to state 80
+    OBJECT_IDENTITY_SYM     shift, and go to state 81
+    AGENT_CAPABILITIES_SYM  shift, and go to state 82
+    NOTIFICATION_GROUP_SYM  shift, and go to state 83
+    NOTIFICATION_TYPE_SYM   shift, and go to state 84
+
+    $default  reduce using rule 212 (Identifier)
+
+    AssignedIdentifier  go to state 85
+
+
+State 44
+
+    2 ModuleDefinition: ModuleIdentifierAssignment End .
+
+    $default  reduce using rule 2 (ModuleDefinition)
+
+
+State 45
+
+   20 ModuleIdentifier: UCidentifier DEFINITIONS_SYM . ASSIGNMENT_SYM Begin
+   21                 | UCidentifier DEFINITIONS_SYM . ASSIGNMENT_SYM AUTOMATIC_SYM TAGS_SYM Begin
+
+    ASSIGNMENT_SYM  shift, and go to state 86
+
+
+State 46
+
+  190 Symbol: IMPLIED_SYM . LCidentifier
+
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    LCidentifier  go to state 87
+
+
+State 47
+
+   45 ImportsAssignment: IMPORTS_SYM SymbolsFromModuleList . SEMI_COLON_SYM
+  183 SymbolsFromModuleList: SymbolsFromModuleList . SymbolsFromModule
+
+    IMPLIED_SYM           shift, and go to state 46
+    SEMI_COLON_SYM        shift, and go to state 88
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    SymbolsFromModule  go to state 89
+    SymbolList         go to state 49
+    Symbol             go to state 50
+    UCidentifier       go to state 51
+    LCidentifier       go to state 52
+
+
+State 48
+
+  184 SymbolsFromModuleList: SymbolsFromModule .
+
+    $default  reduce using rule 184 (SymbolsFromModuleList)
+
+
+State 49
+
+  185 SymbolsFromModule: SymbolList . FROM_SYM UCidentifier
+  186 SymbolList: SymbolList . COMMA_SYM Symbol
+
+    FROM_SYM   shift, and go to state 90
+    COMMA_SYM  shift, and go to state 91
+
+
+State 50
+
+  187 SymbolList: Symbol .
+
+    $default  reduce using rule 187 (SymbolList)
+
+
+State 51
+
+  188 Symbol: UCidentifier .
+
+    $default  reduce using rule 188 (Symbol)
+
+
+State 52
+
+  189 Symbol: LCidentifier .
+
+    $default  reduce using rule 189 (Symbol)
+
+
+State 53
+
+   46 ExportsAssignment: EXPORTS_SYM SymbolList . SEMI_COLON_SYM
+  186 SymbolList: SymbolList . COMMA_SYM Symbol
+
+    COMMA_SYM       shift, and go to state 91
+    SEMI_COLON_SYM  shift, and go to state 92
+
+
+State 54
+
+   67 SnmpKeywordName: KEYWORD_SYM ASSIGNMENT_SYM . CharString
+
+    CSTRING_SYM  shift, and go to state 93
+
+    CharString  go to state 94
+
+
+State 55
+
+  105 BuiltInTypeAssignment: INTEGER32_SYM ASSIGNMENT_SYM . TypeOrTextualConvention
+
+    LEFT_BRACKET_SYM        shift, and go to state 95
+    SEQUENCE_SYM            shift, and go to state 96
+    TEXTUAL_CONVENTION_SYM  shift, and go to state 97
+
+    $default  reduce using rule 196 (SnmpTypeTagPart)
+
+    Type                         go to state 98
+    NamedType                    go to state 99
+    BuiltInType                  go to state 100
+    TypeOrTextualConvention      go to state 101
+    TextualConventionAssignment  go to state 102
+    SnmpTypeTagPart              go to state 103
+    SnmpTypeTagList              go to state 104
+    SnmpTypeTagItem              go to state 105
+
+
+State 56
+
+  106 BuiltInTypeAssignment: UNSIGNED32_SYM ASSIGNMENT_SYM . TypeOrTextualConvention
+
+    LEFT_BRACKET_SYM        shift, and go to state 95
+    SEQUENCE_SYM            shift, and go to state 96
+    TEXTUAL_CONVENTION_SYM  shift, and go to state 97
+
+    $default  reduce using rule 196 (SnmpTypeTagPart)
+
+    Type                         go to state 98
+    NamedType                    go to state 99
+    BuiltInType                  go to state 100
+    TypeOrTextualConvention      go to state 106
+    TextualConventionAssignment  go to state 102
+    SnmpTypeTagPart              go to state 103
+    SnmpTypeTagList              go to state 104
+    SnmpTypeTagItem              go to state 105
+
+
+State 57
+
+  111 BuiltInTypeAssignment: GAUGE32_SYM ASSIGNMENT_SYM . TypeOrTextualConvention
+
+    LEFT_BRACKET_SYM        shift, and go to state 95
+    SEQUENCE_SYM            shift, and go to state 96
+    TEXTUAL_CONVENTION_SYM  shift, and go to state 97
+
+    $default  reduce using rule 196 (SnmpTypeTagPart)
+
+    Type                         go to state 98
+    NamedType                    go to state 99
+    BuiltInType                  go to state 100
+    TypeOrTextualConvention      go to state 107
+    TextualConventionAssignment  go to state 102
+    SnmpTypeTagPart              go to state 103
+    SnmpTypeTagList              go to state 104
+    SnmpTypeTagItem              go to state 105
+
+
+State 58
+
+  108 BuiltInTypeAssignment: COUNTER_SYM ASSIGNMENT_SYM . TypeOrTextualConvention
+
+    LEFT_BRACKET_SYM        shift, and go to state 95
+    SEQUENCE_SYM            shift, and go to state 96
+    TEXTUAL_CONVENTION_SYM  shift, and go to state 97
+
+    $default  reduce using rule 196 (SnmpTypeTagPart)
+
+    Type                         go to state 98
+    NamedType                    go to state 99
+    BuiltInType                  go to state 100
+    TypeOrTextualConvention      go to state 108
+    TextualConventionAssignment  go to state 102
+    SnmpTypeTagPart              go to state 103
+    SnmpTypeTagList              go to state 104
+    SnmpTypeTagItem              go to state 105
+
+
+State 59
+
+  109 BuiltInTypeAssignment: COUNTER32_SYM ASSIGNMENT_SYM . TypeOrTextualConvention
+
+    LEFT_BRACKET_SYM        shift, and go to state 95
+    SEQUENCE_SYM            shift, and go to state 96
+    TEXTUAL_CONVENTION_SYM  shift, and go to state 97
+
+    $default  reduce using rule 196 (SnmpTypeTagPart)
+
+    Type                         go to state 98
+    NamedType                    go to state 99
+    BuiltInType                  go to state 100
+    TypeOrTextualConvention      go to state 109
+    TextualConventionAssignment  go to state 102
+    SnmpTypeTagPart              go to state 103
+    SnmpTypeTagList              go to state 104
+    SnmpTypeTagItem              go to state 105
+
+
+State 60
+
+  110 BuiltInTypeAssignment: COUNTER64_SYM ASSIGNMENT_SYM . TypeOrTextualConvention
+
+    LEFT_BRACKET_SYM        shift, and go to state 95
+    SEQUENCE_SYM            shift, and go to state 96
+    TEXTUAL_CONVENTION_SYM  shift, and go to state 97
+
+    $default  reduce using rule 196 (SnmpTypeTagPart)
+
+    Type                         go to state 98
+    NamedType                    go to state 99
+    BuiltInType                  go to state 100
+    TypeOrTextualConvention      go to state 110
+    TextualConventionAssignment  go to state 102
+    SnmpTypeTagPart              go to state 103
+    SnmpTypeTagList              go to state 104
+    SnmpTypeTagItem              go to state 105
+
+
+State 61
+
+  107 BuiltInTypeAssignment: TIMETICKS_SYM ASSIGNMENT_SYM . TypeOrTextualConvention
+
+    LEFT_BRACKET_SYM        shift, and go to state 95
+    SEQUENCE_SYM            shift, and go to state 96
+    TEXTUAL_CONVENTION_SYM  shift, and go to state 97
+
+    $default  reduce using rule 196 (SnmpTypeTagPart)
+
+    Type                         go to state 98
+    NamedType                    go to state 99
+    BuiltInType                  go to state 100
+    TypeOrTextualConvention      go to state 111
+    TextualConventionAssignment  go to state 102
+    SnmpTypeTagPart              go to state 103
+    SnmpTypeTagList              go to state 104
+    SnmpTypeTagItem              go to state 105
+
+
+State 62
+
+  103 BuiltInTypeAssignment: IP_ADDRESS_SYM ASSIGNMENT_SYM . TypeOrTextualConvention
+
+    LEFT_BRACKET_SYM        shift, and go to state 95
+    SEQUENCE_SYM            shift, and go to state 96
+    TEXTUAL_CONVENTION_SYM  shift, and go to state 97
+
+    $default  reduce using rule 196 (SnmpTypeTagPart)
+
+    Type                         go to state 98
+    NamedType                    go to state 99
+    BuiltInType                  go to state 100
+    TypeOrTextualConvention      go to state 112
+    TextualConventionAssignment  go to state 102
+    SnmpTypeTagPart              go to state 103
+    SnmpTypeTagList              go to state 104
+    SnmpTypeTagItem              go to state 105
+
+
+State 63
+
+  104 BuiltInTypeAssignment: OPAQUE_SYM ASSIGNMENT_SYM . TypeOrTextualConvention
+
+    LEFT_BRACKET_SYM        shift, and go to state 95
+    SEQUENCE_SYM            shift, and go to state 96
+    TEXTUAL_CONVENTION_SYM  shift, and go to state 97
+
+    $default  reduce using rule 196 (SnmpTypeTagPart)
+
+    Type                         go to state 98
+    NamedType                    go to state 99
+    BuiltInType                  go to state 100
+    TypeOrTextualConvention      go to state 113
+    TextualConventionAssignment  go to state 102
+    SnmpTypeTagPart              go to state 103
+    SnmpTypeTagList              go to state 104
+    SnmpTypeTagItem              go to state 105
+
+
+State 64
+
+  114 MacroAssignment: MACRO_SYM ASSIGNMENT_SYM . Begin TokenList End
+
+    BEGIN_SYM  shift, and go to state 114
+
+    Begin  go to state 115
+
+
+State 65
+
+    3 AssignmentList: AssignmentList Assignment .
+
+    $default  reduce using rule 3 (AssignmentList)
+
+
+State 66
+
+    1 ModuleDefinition: ModuleIdentifierAssignment AssignmentList End .
+
+    $default  reduce using rule 1 (ModuleDefinition)
+
+
+State 67
+
+   55 SnmpUpdatePart: UPDATE_SYM . CharString
+
+    CSTRING_SYM  shift, and go to state 93
+
+    CharString  go to state 116
+
+
+State 68
+
+   44 ModuleIdentityAssignment: SnmpIdentityPart SnmpUpdatePart . SnmpOrganisationPart SnmpContactInfoPart SnmpDescriptionPart SnmpRevisionPart AssignedIdentifier
+
+    ORGANIZATION_SYM  shift, and go to state 117
+
+    SnmpOrganisationPart  go to state 118
+
+
+State 69
+
+   68 SnmpKeywordValue: KEYWORD_VALUE_SYM . ASSIGNMENT_SYM CharString
+
+    ASSIGNMENT_SYM  shift, and go to state 119
+
+
+State 70
+
+   69 SnmpKeywordBinding: KEYWORD_BIND_SYM . ASSIGNMENT_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+
+    ASSIGNMENT_SYM  shift, and go to state 120
+
+
+State 71
+
+   65 SnmpKeywordAssignment: SnmpKeywordName SnmpKeywordValue .
+
+    $default  reduce using rule 65 (SnmpKeywordAssignment)
+
+
+State 72
+
+   66 SnmpKeywordAssignment: SnmpKeywordName SnmpKeywordBinding . SnmpKeywordValue
+
+    KEYWORD_VALUE_SYM  shift, and go to state 69
+
+    SnmpKeywordValue  go to state 121
+
+
+State 73
+
+   43 ObjectTypeAssignment: Identifier OBJECT_TYPE_SYM . SnmpSyntaxPart SnmpUnitsPart SnmpAccessPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpIndexPart SnmpDefValPart AssignedIdentifier
+
+    SYNTAX_SYM  shift, and go to state 122
+
+    $default  reduce using rule 72 (SnmpSyntaxPart)
+
+    SnmpSyntax      go to state 123
+    SnmpSyntaxPart  go to state 124
+
+
+State 74
+
+   80 TypeOrValueAssignment: UCidentifier ASSIGNMENT_SYM . TextualConventionAssignment
+   81                      | UCidentifier ASSIGNMENT_SYM . Type
+   82                      | UCidentifier ASSIGNMENT_SYM . SEQUENCE_SYM SequenceAssignment
+   84                      | UCidentifier ASSIGNMENT_SYM . CHOICE_SYM SequenceAssignment
+   85                      | UCidentifier ASSIGNMENT_SYM . Value
+
+    LEFT_BRACKET_SYM        shift, and go to state 95
+    SEQUENCE_SYM            shift, and go to state 125
+    TEXTUAL_CONVENTION_SYM  shift, and go to state 97
+    CHOICE_SYM              shift, and go to state 126
+    BSTRING_SYM             shift, and go to state 127
+    HSTRING_SYM             shift, and go to state 128
+    CSTRING_SYM             shift, and go to state 93
+    NUMBER_SYM              shift, and go to state 129
+
+    $default  reduce using rule 196 (SnmpTypeTagPart)
+
+    Number                       go to state 130
+    Type                         go to state 131
+    NamedType                    go to state 99
+    BuiltInType                  go to state 100
+    TextualConventionAssignment  go to state 132
+    BinaryString                 go to state 133
+    HexString                    go to state 134
+    CharString                   go to state 135
+    SnmpTypeTagPart              go to state 103
+    SnmpTypeTagList              go to state 104
+    SnmpTypeTagItem              go to state 105
+    Value                        go to state 136
+
+
+State 75
+
+  120 SnmpNotificationTypeAssignment: LCidentifier TRAP_TYPE_SYM . ENTERPRISE_SYM LCidentifier SnmpTrapVariablePart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    ENTERPRISE_SYM  shift, and go to state 137
+
+
+State 76
+
+   24 AssignedIdentifier: ASSIGNMENT_SYM . AssignedIdentifierList
+   25                   | ASSIGNMENT_SYM . Number
+   83 TypeOrValueAssignment: LCidentifier ASSIGNMENT_SYM . SEQUENCE_SYM SequenceAssignment
+
+    LEFT_BRACE_SYM  shift, and go to state 138
+    SEQUENCE_SYM    shift, and go to state 139
+    NUMBER_SYM      shift, and go to state 129
+
+    AssignedIdentifierList  go to state 140
+    Number                  go to state 141
+
+
+State 77
+
+   52 SnmpIdentityPart: LCidentifier MODULE_IDENTITY_SYM .
+
+    $default  reduce using rule 52 (SnmpIdentityPart)
+
+
+State 78
+
+  142 ModuleComplianceAssignment: LCidentifier MODULE_COMPLIANCE_SYM . SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpModuleComplianceList AssignedIdentifier
+
+    STATUS_SYM  shift, and go to state 142
+
+    SnmpStatusPart  go to state 143
+
+
+State 79
+
+   22 ObjectIdentifierAssignment: LCidentifier OBJECT_IDENTIFIER_SYM . AssignedIdentifier
+
+    ASSIGNMENT_SYM  shift, and go to state 144
+
+    AssignedIdentifier  go to state 145
+
+
+State 80
+
+  140 SnmpObjectGroupAssignment: LCidentifier OBJECT_GROUP_SYM . SnmpObjectsPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    OBJECTS_SYM        shift, and go to state 146
+    NOTIFICATIONS_SYM  shift, and go to state 147
+
+    $default  reduce using rule 139 (SnmpObjectsPart)
+
+    SnmpObjectsPart  go to state 148
+
+
+State 81
+
+   42 ObjectIdentityAssignment: LCidentifier OBJECT_IDENTITY_SYM . SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    STATUS_SYM  shift, and go to state 142
+
+    SnmpStatusPart  go to state 149
+
+
+State 82
+
+  157 AgentCapabilitiesAssignment: LCidentifier AGENT_CAPABILITIES_SYM . PRODUCT_RELEASE_SYM CharString SnmpStatusPart SnmpDescriptionPart SnmpReferencePart ModuleCapabilitiesList AssignedIdentifier
+
+    PRODUCT_RELEASE_SYM  shift, and go to state 150
+
+
+State 83
+
+  141 SnmpNotificationGroupAssignment: LCidentifier NOTIFICATION_GROUP_SYM . SnmpObjectsPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    OBJECTS_SYM        shift, and go to state 146
+    NOTIFICATIONS_SYM  shift, and go to state 147
+
+    $default  reduce using rule 139 (SnmpObjectsPart)
+
+    SnmpObjectsPart  go to state 151
+
+
+State 84
+
+  119 SnmpNotificationTypeAssignment: LCidentifier NOTIFICATION_TYPE_SYM . SnmpObjectsPart SnmpAccessPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    OBJECTS_SYM        shift, and go to state 146
+    NOTIFICATIONS_SYM  shift, and go to state 147
+
+    $default  reduce using rule 139 (SnmpObjectsPart)
+
+    SnmpObjectsPart  go to state 152
+
+
+State 85
+
+   23 ObjectIdentifierAssignment: LCidentifier AssignedIdentifier .
+
+    $default  reduce using rule 23 (ObjectIdentifierAssignment)
+
+
+State 86
+
+   20 ModuleIdentifier: UCidentifier DEFINITIONS_SYM ASSIGNMENT_SYM . Begin
+   21                 | UCidentifier DEFINITIONS_SYM ASSIGNMENT_SYM . AUTOMATIC_SYM TAGS_SYM Begin
+
+    BEGIN_SYM      shift, and go to state 114
+    AUTOMATIC_SYM  shift, and go to state 153
+
+    Begin  go to state 154
+
+
+State 87
+
+  190 Symbol: IMPLIED_SYM LCidentifier .
+
+    $default  reduce using rule 190 (Symbol)
+
+
+State 88
+
+   45 ImportsAssignment: IMPORTS_SYM SymbolsFromModuleList SEMI_COLON_SYM .
+
+    $default  reduce using rule 45 (ImportsAssignment)
+
+
+State 89
+
+  183 SymbolsFromModuleList: SymbolsFromModuleList SymbolsFromModule .
+
+    $default  reduce using rule 183 (SymbolsFromModuleList)
+
+
+State 90
+
+  185 SymbolsFromModule: SymbolList FROM_SYM . UCidentifier
+
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+
+    UCidentifier  go to state 155
+
+
+State 91
+
+  186 SymbolList: SymbolList COMMA_SYM . Symbol
+
+    IMPLIED_SYM           shift, and go to state 46
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    Symbol        go to state 156
+    UCidentifier  go to state 51
+    LCidentifier  go to state 52
+
+
+State 92
+
+   46 ExportsAssignment: EXPORTS_SYM SymbolList SEMI_COLON_SYM .
+
+    $default  reduce using rule 46 (ExportsAssignment)
+
+
+State 93
+
+  182 CharString: CSTRING_SYM .
+
+    $default  reduce using rule 182 (CharString)
+
+
+State 94
+
+   67 SnmpKeywordName: KEYWORD_SYM ASSIGNMENT_SYM CharString .
+
+    $default  reduce using rule 67 (SnmpKeywordName)
+
+
+State 95
+
+  199 SnmpTypeTagItem: LEFT_BRACKET_SYM . UCidentifier Number RIGHT_BRACKET_SYM
+
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+
+    UCidentifier  go to state 157
+
+
+State 96
+
+  100 BuiltInType: SEQUENCE_SYM . OF_SYM NamedType
+
+    OF_SYM  shift, and go to state 158
+
+
+State 97
+
+  118 TextualConventionAssignment: TEXTUAL_CONVENTION_SYM . SnmpDisplayHintPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpSyntaxPart
+
+    DISPLAY_HINT_SYM  shift, and go to state 159
+
+    $default  reduce using rule 166 (SnmpDisplayHintPart)
+
+    SnmpDisplayHintPart  go to state 160
+
+
+State 98
+
+  112 TypeOrTextualConvention: Type .
+
+    $default  reduce using rule 112 (TypeOrTextualConvention)
+
+
+State 99
+
+   87 Type: NamedType .
+   89     | NamedType . ValueConstraint
+
+    LEFT_BRACE_SYM  shift, and go to state 161
+    LEFT_PAREN_SYM  shift, and go to state 162
+
+    $default  reduce using rule 87 (Type)
+
+    ValueConstraint  go to state 163
+
+
+State 100
+
+   86 Type: BuiltInType .
+   88     | BuiltInType . ValueConstraint
+
+    LEFT_BRACE_SYM  shift, and go to state 161
+    LEFT_PAREN_SYM  shift, and go to state 162
+
+    $default  reduce using rule 86 (Type)
+
+    ValueConstraint  go to state 164
+
+
+State 101
+
+  105 BuiltInTypeAssignment: INTEGER32_SYM ASSIGNMENT_SYM TypeOrTextualConvention .
+
+    $default  reduce using rule 105 (BuiltInTypeAssignment)
+
+
+State 102
+
+  113 TypeOrTextualConvention: TextualConventionAssignment .
+
+    $default  reduce using rule 113 (TypeOrTextualConvention)
+
+
+State 103
+
+   90 NamedType: SnmpTypeTagPart . Identifier
+   91 BuiltInType: SnmpTypeTagPart . INTEGER_SYM
+   92            | SnmpTypeTagPart . IMPLICIT_SYM INTEGER_SYM
+   93            | SnmpTypeTagPart . INTEGER32_SYM
+   94            | SnmpTypeTagPart . UNSIGNED32_SYM
+   95            | SnmpTypeTagPart . COUNTER_SYM
+   96            | SnmpTypeTagPart . COUNTER32_SYM
+   97            | SnmpTypeTagPart . COUNTER64_SYM
+   98            | SnmpTypeTagPart . GAUGE32_SYM
+   99            | SnmpTypeTagPart . TIMETICKS_SYM
+  101            | SnmpTypeTagPart . OBJECT_IDENTIFIER_SYM
+  102            | SnmpTypeTagPart . OctetStringType
+
+    EXPLICIT_SYM           shift, and go to state 165
+    IMPLICIT_SYM           shift, and go to state 166
+    OBJECT_IDENTIFIER_SYM  shift, and go to state 167
+    INTEGER_SYM            shift, and go to state 168
+    INTEGER32_SYM          shift, and go to state 169
+    UNSIGNED32_SYM         shift, and go to state 170
+    GAUGE32_SYM            shift, and go to state 171
+    COUNTER_SYM            shift, and go to state 172
+    COUNTER32_SYM          shift, and go to state 173
+    COUNTER64_SYM          shift, and go to state 174
+    BITS_SYM               shift, and go to state 175
+    OCTET_SYM              shift, and go to state 176
+    TIMETICKS_SYM          shift, and go to state 177
+    IP_ADDRESS_SYM         shift, and go to state 178
+    NETWORK_ADDRESS_SYM    shift, and go to state 179
+    OPAQUE_SYM             shift, and go to state 180
+    UCASEFIRST_IDENT_SYM   shift, and go to state 1
+    LCASEFIRST_IDENT_SYM   shift, and go to state 21
+
+    OctetStringType  go to state 181
+    Identifier       go to state 182
+    UCidentifier     go to state 183
+    LCidentifier     go to state 184
+
+
+State 104
+
+  195 SnmpTypeTagPart: SnmpTypeTagList .
+  197 SnmpTypeTagList: SnmpTypeTagList . SnmpTypeTagItem
+
+    LEFT_BRACKET_SYM  shift, and go to state 95
+
+    $default  reduce using rule 195 (SnmpTypeTagPart)
+
+    SnmpTypeTagItem  go to state 185
+
+
+State 105
+
+  198 SnmpTypeTagList: SnmpTypeTagItem .
+
+    $default  reduce using rule 198 (SnmpTypeTagList)
+
+
+State 106
+
+  106 BuiltInTypeAssignment: UNSIGNED32_SYM ASSIGNMENT_SYM TypeOrTextualConvention .
+
+    $default  reduce using rule 106 (BuiltInTypeAssignment)
+
+
+State 107
+
+  111 BuiltInTypeAssignment: GAUGE32_SYM ASSIGNMENT_SYM TypeOrTextualConvention .
+
+    $default  reduce using rule 111 (BuiltInTypeAssignment)
+
+
+State 108
+
+  108 BuiltInTypeAssignment: COUNTER_SYM ASSIGNMENT_SYM TypeOrTextualConvention .
+
+    $default  reduce using rule 108 (BuiltInTypeAssignment)
+
+
+State 109
+
+  109 BuiltInTypeAssignment: COUNTER32_SYM ASSIGNMENT_SYM TypeOrTextualConvention .
+
+    $default  reduce using rule 109 (BuiltInTypeAssignment)
+
+
+State 110
+
+  110 BuiltInTypeAssignment: COUNTER64_SYM ASSIGNMENT_SYM TypeOrTextualConvention .
+
+    $default  reduce using rule 110 (BuiltInTypeAssignment)
+
+
+State 111
+
+  107 BuiltInTypeAssignment: TIMETICKS_SYM ASSIGNMENT_SYM TypeOrTextualConvention .
+
+    $default  reduce using rule 107 (BuiltInTypeAssignment)
+
+
+State 112
+
+  103 BuiltInTypeAssignment: IP_ADDRESS_SYM ASSIGNMENT_SYM TypeOrTextualConvention .
+
+    $default  reduce using rule 103 (BuiltInTypeAssignment)
+
+
+State 113
+
+  104 BuiltInTypeAssignment: OPAQUE_SYM ASSIGNMENT_SYM TypeOrTextualConvention .
+
+    $default  reduce using rule 104 (BuiltInTypeAssignment)
+
+
+State 114
+
+  216 Begin: BEGIN_SYM .
+
+    $default  reduce using rule 216 (Begin)
+
+
+State 115
+
+  114 MacroAssignment: MACRO_SYM ASSIGNMENT_SYM Begin . TokenList End
+
+    TOKEN_SYM  shift, and go to state 186
+
+    TokenList    go to state 187
+    TokenObject  go to state 188
+
+
+State 116
+
+   55 SnmpUpdatePart: UPDATE_SYM CharString .
+
+    $default  reduce using rule 55 (SnmpUpdatePart)
+
+
+State 117
+
+   53 SnmpOrganisationPart: ORGANIZATION_SYM . CharString
+
+    CSTRING_SYM  shift, and go to state 93
+
+    CharString  go to state 189
+
+
+State 118
+
+   44 ModuleIdentityAssignment: SnmpIdentityPart SnmpUpdatePart SnmpOrganisationPart . SnmpContactInfoPart SnmpDescriptionPart SnmpRevisionPart AssignedIdentifier
+
+    CONTACT_SYM  shift, and go to state 190
+
+    SnmpContactInfoPart  go to state 191
+
+
+State 119
+
+   68 SnmpKeywordValue: KEYWORD_VALUE_SYM ASSIGNMENT_SYM . CharString
+
+    CSTRING_SYM  shift, and go to state 93
+
+    CharString  go to state 192
+
+
+State 120
+
+   69 SnmpKeywordBinding: KEYWORD_BIND_SYM ASSIGNMENT_SYM . LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+
+    LEFT_BRACE_SYM  shift, and go to state 193
+
+
+State 121
+
+   66 SnmpKeywordAssignment: SnmpKeywordName SnmpKeywordBinding SnmpKeywordValue .
+
+    $default  reduce using rule 66 (SnmpKeywordAssignment)
+
+
+State 122
+
+   70 SnmpSyntax: SYNTAX_SYM . Type
+
+    LEFT_BRACKET_SYM  shift, and go to state 95
+    SEQUENCE_SYM      shift, and go to state 96
+
+    $default  reduce using rule 196 (SnmpTypeTagPart)
+
+    Type             go to state 194
+    NamedType        go to state 99
+    BuiltInType      go to state 100
+    SnmpTypeTagPart  go to state 103
+    SnmpTypeTagList  go to state 104
+    SnmpTypeTagItem  go to state 105
+
+
+State 123
+
+   71 SnmpSyntaxPart: SnmpSyntax .
+
+    $default  reduce using rule 71 (SnmpSyntaxPart)
+
+
+State 124
+
+   43 ObjectTypeAssignment: Identifier OBJECT_TYPE_SYM SnmpSyntaxPart . SnmpUnitsPart SnmpAccessPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpIndexPart SnmpDefValPart AssignedIdentifier
+
+    UNITS_SYM  shift, and go to state 195
+
+    $default  reduce using rule 74 (SnmpUnitsPart)
+
+    SnmpUnitsPart  go to state 196
+
+
+State 125
+
+   82 TypeOrValueAssignment: UCidentifier ASSIGNMENT_SYM SEQUENCE_SYM . SequenceAssignment
+  100 BuiltInType: SEQUENCE_SYM . OF_SYM NamedType
+
+    LEFT_BRACE_SYM  shift, and go to state 197
+    OF_SYM          shift, and go to state 158
+
+    SequenceAssignment  go to state 198
+
+
+State 126
+
+   84 TypeOrValueAssignment: UCidentifier ASSIGNMENT_SYM CHOICE_SYM . SequenceAssignment
+
+    LEFT_BRACE_SYM  shift, and go to state 197
+
+    SequenceAssignment  go to state 199
+
+
+State 127
+
+  180 BinaryString: BSTRING_SYM .
+
+    $default  reduce using rule 180 (BinaryString)
+
+
+State 128
+
+  181 HexString: HSTRING_SYM .
+
+    $default  reduce using rule 181 (HexString)
+
+
+State 129
+
+   41 Number: NUMBER_SYM .
+
+    $default  reduce using rule 41 (Number)
+
+
+State 130
+
+  207 Value: Number .
+
+    $default  reduce using rule 207 (Value)
+
+
+State 131
+
+   81 TypeOrValueAssignment: UCidentifier ASSIGNMENT_SYM Type .
+
+    $default  reduce using rule 81 (TypeOrValueAssignment)
+
+
+State 132
+
+   80 TypeOrValueAssignment: UCidentifier ASSIGNMENT_SYM TextualConventionAssignment .
+
+    $default  reduce using rule 80 (TypeOrValueAssignment)
+
+
+State 133
+
+  209 Value: BinaryString .
+
+    $default  reduce using rule 209 (Value)
+
+
+State 134
+
+  208 Value: HexString .
+
+    $default  reduce using rule 208 (Value)
+
+
+State 135
+
+  210 Value: CharString .
+
+    $default  reduce using rule 210 (Value)
+
+
+State 136
+
+   85 TypeOrValueAssignment: UCidentifier ASSIGNMENT_SYM Value .
+
+    $default  reduce using rule 85 (TypeOrValueAssignment)
+
+
+State 137
+
+  120 SnmpNotificationTypeAssignment: LCidentifier TRAP_TYPE_SYM ENTERPRISE_SYM . LCidentifier SnmpTrapVariablePart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    LCidentifier  go to state 200
+
+
+State 138
+
+   26 AssignedIdentifierList: LEFT_BRACE_SYM . ObjectIdentifierList RIGHT_BRACE_SYM
+
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+    NUMBER_SYM            shift, and go to state 129
+
+    ObjectIdentifierList  go to state 201
+    ObjectIdentifier      go to state 202
+    DefinedValue          go to state 203
+    Number                go to state 204
+    Identifier            go to state 205
+    UCidentifier          go to state 206
+    LCidentifier          go to state 207
+
+
+State 139
+
+   83 TypeOrValueAssignment: LCidentifier ASSIGNMENT_SYM SEQUENCE_SYM . SequenceAssignment
+
+    LEFT_BRACE_SYM  shift, and go to state 197
+
+    SequenceAssignment  go to state 208
+
+
+State 140
+
+   24 AssignedIdentifier: ASSIGNMENT_SYM AssignedIdentifierList .
+
+    $default  reduce using rule 24 (AssignedIdentifier)
+
+
+State 141
+
+   25 AssignedIdentifier: ASSIGNMENT_SYM Number .
+
+    $default  reduce using rule 25 (AssignedIdentifier)
+
+
+State 142
+
+  162 SnmpStatusPart: STATUS_SYM . LCidentifier
+
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    LCidentifier  go to state 209
+
+
+State 143
+
+  142 ModuleComplianceAssignment: LCidentifier MODULE_COMPLIANCE_SYM SnmpStatusPart . SnmpDescriptionPart SnmpReferencePart SnmpModuleComplianceList AssignedIdentifier
+
+    DESCRIPTION_SYM  shift, and go to state 210
+
+    $default  reduce using rule 57 (SnmpDescriptionPart)
+
+    SnmpDescriptionPart  go to state 211
+
+
+State 144
+
+   24 AssignedIdentifier: ASSIGNMENT_SYM . AssignedIdentifierList
+   25                   | ASSIGNMENT_SYM . Number
+
+    LEFT_BRACE_SYM  shift, and go to state 138
+    NUMBER_SYM      shift, and go to state 129
+
+    AssignedIdentifierList  go to state 140
+    Number                  go to state 141
+
+
+State 145
+
+   22 ObjectIdentifierAssignment: LCidentifier OBJECT_IDENTIFIER_SYM AssignedIdentifier .
+
+    $default  reduce using rule 22 (ObjectIdentifierAssignment)
+
+
+State 146
+
+  135 SnmpObjectsPart: OBJECTS_SYM . LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+  136                | OBJECTS_SYM . LEFT_BRACE_SYM RIGHT_BRACE_SYM
+
+    LEFT_BRACE_SYM  shift, and go to state 212
+
+
+State 147
+
+  137 SnmpObjectsPart: NOTIFICATIONS_SYM . LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+  138                | NOTIFICATIONS_SYM . LEFT_BRACE_SYM RIGHT_BRACE_SYM
+
+    LEFT_BRACE_SYM  shift, and go to state 213
+
+
+State 148
+
+  140 SnmpObjectGroupAssignment: LCidentifier OBJECT_GROUP_SYM SnmpObjectsPart . SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    STATUS_SYM  shift, and go to state 142
+
+    SnmpStatusPart  go to state 214
+
+
+State 149
+
+   42 ObjectIdentityAssignment: LCidentifier OBJECT_IDENTITY_SYM SnmpStatusPart . SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    DESCRIPTION_SYM  shift, and go to state 210
+
+    $default  reduce using rule 57 (SnmpDescriptionPart)
+
+    SnmpDescriptionPart  go to state 215
+
+
+State 150
+
+  157 AgentCapabilitiesAssignment: LCidentifier AGENT_CAPABILITIES_SYM PRODUCT_RELEASE_SYM . CharString SnmpStatusPart SnmpDescriptionPart SnmpReferencePart ModuleCapabilitiesList AssignedIdentifier
+
+    CSTRING_SYM  shift, and go to state 93
+
+    CharString  go to state 216
+
+
+State 151
+
+  141 SnmpNotificationGroupAssignment: LCidentifier NOTIFICATION_GROUP_SYM SnmpObjectsPart . SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    STATUS_SYM  shift, and go to state 142
+
+    SnmpStatusPart  go to state 217
+
+
+State 152
+
+  119 SnmpNotificationTypeAssignment: LCidentifier NOTIFICATION_TYPE_SYM SnmpObjectsPart . SnmpAccessPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    ACCESS_SYM      shift, and go to state 218
+    MAX_ACCESS_SYM  shift, and go to state 219
+    MIN_ACCESS_SYM  shift, and go to state 220
+
+    $default  reduce using rule 161 (SnmpAccessPart)
+
+    SnmpAccessPart  go to state 221
+
+
+State 153
+
+   21 ModuleIdentifier: UCidentifier DEFINITIONS_SYM ASSIGNMENT_SYM AUTOMATIC_SYM . TAGS_SYM Begin
+
+    TAGS_SYM  shift, and go to state 222
+
+
+State 154
+
+   20 ModuleIdentifier: UCidentifier DEFINITIONS_SYM ASSIGNMENT_SYM Begin .
+
+    $default  reduce using rule 20 (ModuleIdentifier)
+
+
+State 155
+
+  185 SymbolsFromModule: SymbolList FROM_SYM UCidentifier .
+
+    $default  reduce using rule 185 (SymbolsFromModule)
+
+
+State 156
+
+  186 SymbolList: SymbolList COMMA_SYM Symbol .
+
+    $default  reduce using rule 186 (SymbolList)
+
+
+State 157
+
+  199 SnmpTypeTagItem: LEFT_BRACKET_SYM UCidentifier . Number RIGHT_BRACKET_SYM
+
+    NUMBER_SYM  shift, and go to state 129
+
+    Number  go to state 223
+
+
+State 158
+
+  100 BuiltInType: SEQUENCE_SYM OF_SYM . NamedType
+
+    LEFT_BRACKET_SYM  shift, and go to state 95
+
+    $default  reduce using rule 196 (SnmpTypeTagPart)
+
+    NamedType        go to state 224
+    SnmpTypeTagPart  go to state 225
+    SnmpTypeTagList  go to state 104
+    SnmpTypeTagItem  go to state 105
+
+
+State 159
+
+  165 SnmpDisplayHintPart: DISPLAY_HINT_SYM . CharString
+
+    CSTRING_SYM  shift, and go to state 93
+
+    CharString  go to state 226
+
+
+State 160
+
+  118 TextualConventionAssignment: TEXTUAL_CONVENTION_SYM SnmpDisplayHintPart . SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpSyntaxPart
+
+    STATUS_SYM  shift, and go to state 142
+
+    SnmpStatusPart  go to state 227
+
+
+State 161
+
+   60 ValueConstraint: LEFT_BRACE_SYM . NumericValueConstraintList RIGHT_BRACE_SYM
+
+    MIN_SYM               shift, and go to state 228
+    MAX_SYM               shift, and go to state 229
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+    NUMBER_SYM            shift, and go to state 129
+
+    NumericValue                go to state 230
+    NumberOrMinMax              go to state 231
+    DefinedValue                go to state 232
+    Number                      go to state 233
+    NumericValueConstraintList  go to state 234
+    Identifier                  go to state 235
+    UCidentifier                go to state 206
+    LCidentifier                go to state 207
+
+
+State 162
+
+   58 ValueConstraint: LEFT_PAREN_SYM . NumericValueConstraintList RIGHT_PAREN_SYM
+   59                | LEFT_PAREN_SYM . SIZE_SYM LEFT_PAREN_SYM NumericValueConstraintList RIGHT_PAREN_SYM RIGHT_PAREN_SYM
+
+    SIZE_SYM              shift, and go to state 236
+    MIN_SYM               shift, and go to state 228
+    MAX_SYM               shift, and go to state 229
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+    NUMBER_SYM            shift, and go to state 129
+
+    NumericValue                go to state 230
+    NumberOrMinMax              go to state 231
+    DefinedValue                go to state 232
+    Number                      go to state 233
+    NumericValueConstraintList  go to state 237
+    Identifier                  go to state 235
+    UCidentifier                go to state 206
+    LCidentifier                go to state 207
+
+
+State 163
+
+   89 Type: NamedType ValueConstraint .
+
+    $default  reduce using rule 89 (Type)
+
+
+State 164
+
+   88 Type: BuiltInType ValueConstraint .
+
+    $default  reduce using rule 88 (Type)
+
+
+State 165
+
+  201 OctetStringType: EXPLICIT_SYM . OCTET_SYM STRING_SYM
+
+    OCTET_SYM  shift, and go to state 238
+
+
+State 166
+
+   92 BuiltInType: SnmpTypeTagPart IMPLICIT_SYM . INTEGER_SYM
+  202 OctetStringType: IMPLICIT_SYM . OCTET_SYM STRING_SYM
+
+    INTEGER_SYM  shift, and go to state 239
+    OCTET_SYM    shift, and go to state 240
+
+
+State 167
+
+  101 BuiltInType: SnmpTypeTagPart OBJECT_IDENTIFIER_SYM .
+
+    $default  reduce using rule 101 (BuiltInType)
+
+
+State 168
+
+   91 BuiltInType: SnmpTypeTagPart INTEGER_SYM .
+
+    $default  reduce using rule 91 (BuiltInType)
+
+
+State 169
+
+   93 BuiltInType: SnmpTypeTagPart INTEGER32_SYM .
+
+    $default  reduce using rule 93 (BuiltInType)
+
+
+State 170
+
+   94 BuiltInType: SnmpTypeTagPart UNSIGNED32_SYM .
+
+    $default  reduce using rule 94 (BuiltInType)
+
+
+State 171
+
+   98 BuiltInType: SnmpTypeTagPart GAUGE32_SYM .
+
+    $default  reduce using rule 98 (BuiltInType)
+
+
+State 172
+
+   95 BuiltInType: SnmpTypeTagPart COUNTER_SYM .
+
+    $default  reduce using rule 95 (BuiltInType)
+
+
+State 173
+
+   96 BuiltInType: SnmpTypeTagPart COUNTER32_SYM .
+
+    $default  reduce using rule 96 (BuiltInType)
+
+
+State 174
+
+   97 BuiltInType: SnmpTypeTagPart COUNTER64_SYM .
+
+    $default  reduce using rule 97 (BuiltInType)
+
+
+State 175
+
+  206 OctetStringType: BITS_SYM .
+
+    $default  reduce using rule 206 (OctetStringType)
+
+
+State 176
+
+  200 OctetStringType: OCTET_SYM . STRING_SYM
+
+    STRING_SYM  shift, and go to state 241
+
+
+State 177
+
+   99 BuiltInType: SnmpTypeTagPart TIMETICKS_SYM .
+
+    $default  reduce using rule 99 (BuiltInType)
+
+
+State 178
+
+  203 OctetStringType: IP_ADDRESS_SYM .
+
+    $default  reduce using rule 203 (OctetStringType)
+
+
+State 179
+
+  204 OctetStringType: NETWORK_ADDRESS_SYM .
+
+    $default  reduce using rule 204 (OctetStringType)
+
+
+State 180
+
+  205 OctetStringType: OPAQUE_SYM .
+
+    $default  reduce using rule 205 (OctetStringType)
+
+
+State 181
+
+  102 BuiltInType: SnmpTypeTagPart OctetStringType .
+
+    $default  reduce using rule 102 (BuiltInType)
+
+
+State 182
+
+   90 NamedType: SnmpTypeTagPart Identifier .
+
+    $default  reduce using rule 90 (NamedType)
+
+
+State 183
+
+  211 Identifier: UCidentifier .
+
+    $default  reduce using rule 211 (Identifier)
+
+
+State 184
+
+  212 Identifier: LCidentifier .
+
+    $default  reduce using rule 212 (Identifier)
+
+
+State 185
+
+  197 SnmpTypeTagList: SnmpTypeTagList SnmpTypeTagItem .
+
+    $default  reduce using rule 197 (SnmpTypeTagList)
+
+
+State 186
+
+  117 TokenObject: TOKEN_SYM .
+
+    $default  reduce using rule 117 (TokenObject)
+
+
+State 187
+
+  114 MacroAssignment: MACRO_SYM ASSIGNMENT_SYM Begin TokenList . End
+  115 TokenList: TokenList . TokenObject
+
+    END_SYM    shift, and go to state 7
+    TOKEN_SYM  shift, and go to state 186
+
+    TokenObject  go to state 242
+    End          go to state 243
+
+
+State 188
+
+  116 TokenList: TokenObject .
+
+    $default  reduce using rule 116 (TokenList)
+
+
+State 189
+
+   53 SnmpOrganisationPart: ORGANIZATION_SYM CharString .
+
+    $default  reduce using rule 53 (SnmpOrganisationPart)
+
+
+State 190
+
+   54 SnmpContactInfoPart: CONTACT_SYM . CharString
+
+    CSTRING_SYM  shift, and go to state 93
+
+    CharString  go to state 244
+
+
+State 191
+
+   44 ModuleIdentityAssignment: SnmpIdentityPart SnmpUpdatePart SnmpOrganisationPart SnmpContactInfoPart . SnmpDescriptionPart SnmpRevisionPart AssignedIdentifier
+
+    DESCRIPTION_SYM  shift, and go to state 210
+
+    $default  reduce using rule 57 (SnmpDescriptionPart)
+
+    SnmpDescriptionPart  go to state 245
+
+
+State 192
+
+   68 SnmpKeywordValue: KEYWORD_VALUE_SYM ASSIGNMENT_SYM CharString .
+
+    $default  reduce using rule 68 (SnmpKeywordValue)
+
+
+State 193
+
+   69 SnmpKeywordBinding: KEYWORD_BIND_SYM ASSIGNMENT_SYM LEFT_BRACE_SYM . SymbolList RIGHT_BRACE_SYM
+
+    IMPLIED_SYM           shift, and go to state 46
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    SymbolList    go to state 246
+    Symbol        go to state 50
+    UCidentifier  go to state 51
+    LCidentifier  go to state 52
+
+
+State 194
+
+   70 SnmpSyntax: SYNTAX_SYM Type .
+
+    $default  reduce using rule 70 (SnmpSyntax)
+
+
+State 195
+
+   73 SnmpUnitsPart: UNITS_SYM . CharString
+
+    CSTRING_SYM  shift, and go to state 93
+
+    CharString  go to state 247
+
+
+State 196
+
+   43 ObjectTypeAssignment: Identifier OBJECT_TYPE_SYM SnmpSyntaxPart SnmpUnitsPart . SnmpAccessPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpIndexPart SnmpDefValPart AssignedIdentifier
+
+    ACCESS_SYM      shift, and go to state 218
+    MAX_ACCESS_SYM  shift, and go to state 219
+    MIN_ACCESS_SYM  shift, and go to state 220
+
+    $default  reduce using rule 161 (SnmpAccessPart)
+
+    SnmpAccessPart  go to state 248
+
+
+State 197
+
+  194 SequenceAssignment: LEFT_BRACE_SYM . SequenceList RIGHT_BRACE_SYM
+
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    SequenceItem  go to state 249
+    SequenceList  go to state 250
+    Identifier    go to state 251
+    UCidentifier  go to state 183
+    LCidentifier  go to state 184
+
+
+State 198
+
+   82 TypeOrValueAssignment: UCidentifier ASSIGNMENT_SYM SEQUENCE_SYM SequenceAssignment .
+
+    $default  reduce using rule 82 (TypeOrValueAssignment)
+
+
+State 199
+
+   84 TypeOrValueAssignment: UCidentifier ASSIGNMENT_SYM CHOICE_SYM SequenceAssignment .
+
+    $default  reduce using rule 84 (TypeOrValueAssignment)
+
+
+State 200
+
+  120 SnmpNotificationTypeAssignment: LCidentifier TRAP_TYPE_SYM ENTERPRISE_SYM LCidentifier . SnmpTrapVariablePart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    VARIABLES_SYM  shift, and go to state 252
+
+    $default  reduce using rule 122 (SnmpTrapVariablePart)
+
+    SnmpTrapVariablePart  go to state 253
+    SnmpTrapVariableList  go to state 254
+
+
+State 201
+
+   26 AssignedIdentifierList: LEFT_BRACE_SYM ObjectIdentifierList . RIGHT_BRACE_SYM
+   27 ObjectIdentifierList: ObjectIdentifierList . ObjectIdentifier
+
+    RIGHT_BRACE_SYM       shift, and go to state 255
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+    NUMBER_SYM            shift, and go to state 129
+
+    ObjectIdentifier  go to state 256
+    DefinedValue      go to state 203
+    Number            go to state 204
+    Identifier        go to state 205
+    UCidentifier      go to state 206
+    LCidentifier      go to state 207
+
+
+State 202
+
+   28 ObjectIdentifierList: ObjectIdentifier .
+
+    $default  reduce using rule 28 (ObjectIdentifierList)
+
+
+State 203
+
+   30 ObjectIdentifier: DefinedValue .
+
+    $default  reduce using rule 30 (ObjectIdentifier)
+
+
+State 204
+
+   29 ObjectIdentifier: Number .
+
+    $default  reduce using rule 29 (ObjectIdentifier)
+
+
+State 205
+
+   31 ObjectIdentifier: Identifier . LEFT_PAREN_SYM Number RIGHT_PAREN_SYM
+
+    LEFT_PAREN_SYM  shift, and go to state 257
+
+
+State 206
+
+   39 DefinedValue: UCidentifier . DOT_SYM LCidentifier
+  211 Identifier: UCidentifier .
+
+    DOT_SYM  shift, and go to state 258
+
+    $default  reduce using rule 211 (Identifier)
+
+
+State 207
+
+   40 DefinedValue: LCidentifier .
+  212 Identifier: LCidentifier .
+
+    LEFT_PAREN_SYM  reduce using rule 212 (Identifier)
+    $default        reduce using rule 40 (DefinedValue)
+
+
+State 208
+
+   83 TypeOrValueAssignment: LCidentifier ASSIGNMENT_SYM SEQUENCE_SYM SequenceAssignment .
+
+    $default  reduce using rule 83 (TypeOrValueAssignment)
+
+
+State 209
+
+  162 SnmpStatusPart: STATUS_SYM LCidentifier .
+
+    $default  reduce using rule 162 (SnmpStatusPart)
+
+
+State 210
+
+   56 SnmpDescriptionPart: DESCRIPTION_SYM . CharString
+
+    CSTRING_SYM  shift, and go to state 93
+
+    CharString  go to state 259
+
+
+State 211
+
+  142 ModuleComplianceAssignment: LCidentifier MODULE_COMPLIANCE_SYM SnmpStatusPart SnmpDescriptionPart . SnmpReferencePart SnmpModuleComplianceList AssignedIdentifier
+
+    REFERENCE_SYM  shift, and go to state 260
+
+    $default  reduce using rule 164 (SnmpReferencePart)
+
+    SnmpReferencePart  go to state 261
+
+
+State 212
+
+  135 SnmpObjectsPart: OBJECTS_SYM LEFT_BRACE_SYM . SymbolList RIGHT_BRACE_SYM
+  136                | OBJECTS_SYM LEFT_BRACE_SYM . RIGHT_BRACE_SYM
+
+    IMPLIED_SYM           shift, and go to state 46
+    RIGHT_BRACE_SYM       shift, and go to state 262
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    SymbolList    go to state 263
+    Symbol        go to state 50
+    UCidentifier  go to state 51
+    LCidentifier  go to state 52
+
+
+State 213
+
+  137 SnmpObjectsPart: NOTIFICATIONS_SYM LEFT_BRACE_SYM . SymbolList RIGHT_BRACE_SYM
+  138                | NOTIFICATIONS_SYM LEFT_BRACE_SYM . RIGHT_BRACE_SYM
+
+    IMPLIED_SYM           shift, and go to state 46
+    RIGHT_BRACE_SYM       shift, and go to state 264
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    SymbolList    go to state 265
+    Symbol        go to state 50
+    UCidentifier  go to state 51
+    LCidentifier  go to state 52
+
+
+State 214
+
+  140 SnmpObjectGroupAssignment: LCidentifier OBJECT_GROUP_SYM SnmpObjectsPart SnmpStatusPart . SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    DESCRIPTION_SYM  shift, and go to state 210
+
+    $default  reduce using rule 57 (SnmpDescriptionPart)
+
+    SnmpDescriptionPart  go to state 266
+
+
+State 215
+
+   42 ObjectIdentityAssignment: LCidentifier OBJECT_IDENTITY_SYM SnmpStatusPart SnmpDescriptionPart . SnmpReferencePart AssignedIdentifier
+
+    REFERENCE_SYM  shift, and go to state 260
+
+    $default  reduce using rule 164 (SnmpReferencePart)
+
+    SnmpReferencePart  go to state 267
+
+
+State 216
+
+  157 AgentCapabilitiesAssignment: LCidentifier AGENT_CAPABILITIES_SYM PRODUCT_RELEASE_SYM CharString . SnmpStatusPart SnmpDescriptionPart SnmpReferencePart ModuleCapabilitiesList AssignedIdentifier
+
+    STATUS_SYM  shift, and go to state 142
+
+    SnmpStatusPart  go to state 268
+
+
+State 217
+
+  141 SnmpNotificationGroupAssignment: LCidentifier NOTIFICATION_GROUP_SYM SnmpObjectsPart SnmpStatusPart . SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    DESCRIPTION_SYM  shift, and go to state 210
+
+    $default  reduce using rule 57 (SnmpDescriptionPart)
+
+    SnmpDescriptionPart  go to state 269
+
+
+State 218
+
+  158 SnmpAccessPart: ACCESS_SYM . LCidentifier
+
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    LCidentifier  go to state 270
+
+
+State 219
+
+  159 SnmpAccessPart: MAX_ACCESS_SYM . LCidentifier
+
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    LCidentifier  go to state 271
+
+
+State 220
+
+  160 SnmpAccessPart: MIN_ACCESS_SYM . LCidentifier
+
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    LCidentifier  go to state 272
+
+
+State 221
+
+  119 SnmpNotificationTypeAssignment: LCidentifier NOTIFICATION_TYPE_SYM SnmpObjectsPart SnmpAccessPart . SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    STATUS_SYM  shift, and go to state 142
+
+    SnmpStatusPart  go to state 273
+
+
+State 222
+
+   21 ModuleIdentifier: UCidentifier DEFINITIONS_SYM ASSIGNMENT_SYM AUTOMATIC_SYM TAGS_SYM . Begin
+
+    BEGIN_SYM  shift, and go to state 114
+
+    Begin  go to state 274
+
+
+State 223
+
+  199 SnmpTypeTagItem: LEFT_BRACKET_SYM UCidentifier Number . RIGHT_BRACKET_SYM
+
+    RIGHT_BRACKET_SYM  shift, and go to state 275
+
+
+State 224
+
+  100 BuiltInType: SEQUENCE_SYM OF_SYM NamedType .
+
+    $default  reduce using rule 100 (BuiltInType)
+
+
+State 225
+
+   90 NamedType: SnmpTypeTagPart . Identifier
+
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    Identifier    go to state 182
+    UCidentifier  go to state 183
+    LCidentifier  go to state 184
+
+
+State 226
+
+  165 SnmpDisplayHintPart: DISPLAY_HINT_SYM CharString .
+
+    $default  reduce using rule 165 (SnmpDisplayHintPart)
+
+
+State 227
+
+  118 TextualConventionAssignment: TEXTUAL_CONVENTION_SYM SnmpDisplayHintPart SnmpStatusPart . SnmpDescriptionPart SnmpReferencePart SnmpSyntaxPart
+
+    DESCRIPTION_SYM  shift, and go to state 210
+
+    $default  reduce using rule 57 (SnmpDescriptionPart)
+
+    SnmpDescriptionPart  go to state 276
+
+
+State 228
+
+   37 NumberOrMinMax: MIN_SYM .
+
+    $default  reduce using rule 37 (NumberOrMinMax)
+
+
+State 229
+
+   38 NumberOrMinMax: MAX_SYM .
+
+    $default  reduce using rule 38 (NumberOrMinMax)
+
+
+State 230
+
+   61 NumericValueConstraintList: NumericValue . BAR_SYM NumericValueConstraintList
+   62                           | NumericValue . COMMA_SYM NumericValueConstraintList
+   63                           | NumericValue .
+
+    COMMA_SYM  shift, and go to state 277
+    BAR_SYM    shift, and go to state 278
+
+    $default  reduce using rule 63 (NumericValueConstraintList)
+
+
+State 231
+
+   32 NumericValue: NumberOrMinMax .
+   34             | NumberOrMinMax . DOT_SYM DOT_SYM NumberOrMinMax
+
+    DOT_SYM  shift, and go to state 279
+
+    $default  reduce using rule 32 (NumericValue)
+
+
+State 232
+
+   33 NumericValue: DefinedValue .
+
+    $default  reduce using rule 33 (NumericValue)
+
+
+State 233
+
+   36 NumberOrMinMax: Number .
+
+    $default  reduce using rule 36 (NumberOrMinMax)
+
+
+State 234
+
+   60 ValueConstraint: LEFT_BRACE_SYM NumericValueConstraintList . RIGHT_BRACE_SYM
+
+    RIGHT_BRACE_SYM  shift, and go to state 280
+
+
+State 235
+
+   35 NumericValue: Identifier . LEFT_PAREN_SYM NumberOrMinMax RIGHT_PAREN_SYM
+
+    LEFT_PAREN_SYM  shift, and go to state 281
+
+
+State 236
+
+   59 ValueConstraint: LEFT_PAREN_SYM SIZE_SYM . LEFT_PAREN_SYM NumericValueConstraintList RIGHT_PAREN_SYM RIGHT_PAREN_SYM
+
+    LEFT_PAREN_SYM  shift, and go to state 282
+
+
+State 237
+
+   58 ValueConstraint: LEFT_PAREN_SYM NumericValueConstraintList . RIGHT_PAREN_SYM
+
+    RIGHT_PAREN_SYM  shift, and go to state 283
+
+
+State 238
+
+  201 OctetStringType: EXPLICIT_SYM OCTET_SYM . STRING_SYM
+
+    STRING_SYM  shift, and go to state 284
+
+
+State 239
+
+   92 BuiltInType: SnmpTypeTagPart IMPLICIT_SYM INTEGER_SYM .
+
+    $default  reduce using rule 92 (BuiltInType)
+
+
+State 240
+
+  202 OctetStringType: IMPLICIT_SYM OCTET_SYM . STRING_SYM
+
+    STRING_SYM  shift, and go to state 285
+
+
+State 241
+
+  200 OctetStringType: OCTET_SYM STRING_SYM .
+
+    $default  reduce using rule 200 (OctetStringType)
+
+
+State 242
+
+  115 TokenList: TokenList TokenObject .
+
+    $default  reduce using rule 115 (TokenList)
+
+
+State 243
+
+  114 MacroAssignment: MACRO_SYM ASSIGNMENT_SYM Begin TokenList End .
+
+    $default  reduce using rule 114 (MacroAssignment)
+
+
+State 244
+
+   54 SnmpContactInfoPart: CONTACT_SYM CharString .
+
+    $default  reduce using rule 54 (SnmpContactInfoPart)
+
+
+State 245
+
+   44 ModuleIdentityAssignment: SnmpIdentityPart SnmpUpdatePart SnmpOrganisationPart SnmpContactInfoPart SnmpDescriptionPart . SnmpRevisionPart AssignedIdentifier
+
+    REVISION_SYM  shift, and go to state 286
+
+    $default  reduce using rule 48 (SnmpRevisionPart)
+
+    SnmpRevisionPart    go to state 287
+    SnmpRevisionList    go to state 288
+    SnmpRevisionObject  go to state 289
+
+
+State 246
+
+   69 SnmpKeywordBinding: KEYWORD_BIND_SYM ASSIGNMENT_SYM LEFT_BRACE_SYM SymbolList . RIGHT_BRACE_SYM
+  186 SymbolList: SymbolList . COMMA_SYM Symbol
+
+    RIGHT_BRACE_SYM  shift, and go to state 290
+    COMMA_SYM        shift, and go to state 91
+
+
+State 247
+
+   73 SnmpUnitsPart: UNITS_SYM CharString .
+
+    $default  reduce using rule 73 (SnmpUnitsPart)
+
+
+State 248
+
+   43 ObjectTypeAssignment: Identifier OBJECT_TYPE_SYM SnmpSyntaxPart SnmpUnitsPart SnmpAccessPart . SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpIndexPart SnmpDefValPart AssignedIdentifier
+
+    STATUS_SYM  shift, and go to state 142
+
+    SnmpStatusPart  go to state 291
+
+
+State 249
+
+  192 SequenceList: SequenceItem .
+
+    $default  reduce using rule 192 (SequenceList)
+
+
+State 250
+
+  193 SequenceList: SequenceList . COMMA_SYM SequenceItem
+  194 SequenceAssignment: LEFT_BRACE_SYM SequenceList . RIGHT_BRACE_SYM
+
+    RIGHT_BRACE_SYM  shift, and go to state 292
+    COMMA_SYM        shift, and go to state 293
+
+
+State 251
+
+  191 SequenceItem: Identifier . Type
+
+    LEFT_BRACKET_SYM  shift, and go to state 95
+    SEQUENCE_SYM      shift, and go to state 96
+
+    $default  reduce using rule 196 (SnmpTypeTagPart)
+
+    Type             go to state 294
+    NamedType        go to state 99
+    BuiltInType      go to state 100
+    SnmpTypeTagPart  go to state 103
+    SnmpTypeTagList  go to state 104
+    SnmpTypeTagItem  go to state 105
+
+
+State 252
+
+  123 SnmpTrapVariableList: VARIABLES_SYM . LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+
+    LEFT_BRACE_SYM  shift, and go to state 295
+
+
+State 253
+
+  120 SnmpNotificationTypeAssignment: LCidentifier TRAP_TYPE_SYM ENTERPRISE_SYM LCidentifier SnmpTrapVariablePart . SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    DESCRIPTION_SYM  shift, and go to state 210
+
+    $default  reduce using rule 57 (SnmpDescriptionPart)
+
+    SnmpDescriptionPart  go to state 296
+
+
+State 254
+
+  121 SnmpTrapVariablePart: SnmpTrapVariableList .
+
+    $default  reduce using rule 121 (SnmpTrapVariablePart)
+
+
+State 255
+
+   26 AssignedIdentifierList: LEFT_BRACE_SYM ObjectIdentifierList RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 26 (AssignedIdentifierList)
+
+
+State 256
+
+   27 ObjectIdentifierList: ObjectIdentifierList ObjectIdentifier .
+
+    $default  reduce using rule 27 (ObjectIdentifierList)
+
+
+State 257
+
+   31 ObjectIdentifier: Identifier LEFT_PAREN_SYM . Number RIGHT_PAREN_SYM
+
+    NUMBER_SYM  shift, and go to state 129
+
+    Number  go to state 297
+
+
+State 258
+
+   39 DefinedValue: UCidentifier DOT_SYM . LCidentifier
+
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    LCidentifier  go to state 298
+
+
+State 259
+
+   56 SnmpDescriptionPart: DESCRIPTION_SYM CharString .
+
+    $default  reduce using rule 56 (SnmpDescriptionPart)
+
+
+State 260
+
+  163 SnmpReferencePart: REFERENCE_SYM . CharString
+
+    CSTRING_SYM  shift, and go to state 93
+
+    CharString  go to state 299
+
+
+State 261
+
+  142 ModuleComplianceAssignment: LCidentifier MODULE_COMPLIANCE_SYM SnmpStatusPart SnmpDescriptionPart SnmpReferencePart . SnmpModuleComplianceList AssignedIdentifier
+
+    MODULE_SYM  shift, and go to state 300
+
+    SnmpModuleComplianceList    go to state 301
+    SnmpModuleComplianceObject  go to state 302
+
+
+State 262
+
+  136 SnmpObjectsPart: OBJECTS_SYM LEFT_BRACE_SYM RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 136 (SnmpObjectsPart)
+
+
+State 263
+
+  135 SnmpObjectsPart: OBJECTS_SYM LEFT_BRACE_SYM SymbolList . RIGHT_BRACE_SYM
+  186 SymbolList: SymbolList . COMMA_SYM Symbol
+
+    RIGHT_BRACE_SYM  shift, and go to state 303
+    COMMA_SYM        shift, and go to state 91
+
+
+State 264
+
+  138 SnmpObjectsPart: NOTIFICATIONS_SYM LEFT_BRACE_SYM RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 138 (SnmpObjectsPart)
+
+
+State 265
+
+  137 SnmpObjectsPart: NOTIFICATIONS_SYM LEFT_BRACE_SYM SymbolList . RIGHT_BRACE_SYM
+  186 SymbolList: SymbolList . COMMA_SYM Symbol
+
+    RIGHT_BRACE_SYM  shift, and go to state 304
+    COMMA_SYM        shift, and go to state 91
+
+
+State 266
+
+  140 SnmpObjectGroupAssignment: LCidentifier OBJECT_GROUP_SYM SnmpObjectsPart SnmpStatusPart SnmpDescriptionPart . SnmpReferencePart AssignedIdentifier
+
+    REFERENCE_SYM  shift, and go to state 260
+
+    $default  reduce using rule 164 (SnmpReferencePart)
+
+    SnmpReferencePart  go to state 305
+
+
+State 267
+
+   42 ObjectIdentityAssignment: LCidentifier OBJECT_IDENTITY_SYM SnmpStatusPart SnmpDescriptionPart SnmpReferencePart . AssignedIdentifier
+
+    ASSIGNMENT_SYM  shift, and go to state 144
+
+    AssignedIdentifier  go to state 306
+
+
+State 268
+
+  157 AgentCapabilitiesAssignment: LCidentifier AGENT_CAPABILITIES_SYM PRODUCT_RELEASE_SYM CharString SnmpStatusPart . SnmpDescriptionPart SnmpReferencePart ModuleCapabilitiesList AssignedIdentifier
+
+    DESCRIPTION_SYM  shift, and go to state 210
+
+    $default  reduce using rule 57 (SnmpDescriptionPart)
+
+    SnmpDescriptionPart  go to state 307
+
+
+State 269
+
+  141 SnmpNotificationGroupAssignment: LCidentifier NOTIFICATION_GROUP_SYM SnmpObjectsPart SnmpStatusPart SnmpDescriptionPart . SnmpReferencePart AssignedIdentifier
+
+    REFERENCE_SYM  shift, and go to state 260
+
+    $default  reduce using rule 164 (SnmpReferencePart)
+
+    SnmpReferencePart  go to state 308
+
+
+State 270
+
+  158 SnmpAccessPart: ACCESS_SYM LCidentifier .
+
+    $default  reduce using rule 158 (SnmpAccessPart)
+
+
+State 271
+
+  159 SnmpAccessPart: MAX_ACCESS_SYM LCidentifier .
+
+    $default  reduce using rule 159 (SnmpAccessPart)
+
+
+State 272
+
+  160 SnmpAccessPart: MIN_ACCESS_SYM LCidentifier .
+
+    $default  reduce using rule 160 (SnmpAccessPart)
+
+
+State 273
+
+  119 SnmpNotificationTypeAssignment: LCidentifier NOTIFICATION_TYPE_SYM SnmpObjectsPart SnmpAccessPart SnmpStatusPart . SnmpDescriptionPart SnmpReferencePart AssignedIdentifier
+
+    DESCRIPTION_SYM  shift, and go to state 210
+
+    $default  reduce using rule 57 (SnmpDescriptionPart)
+
+    SnmpDescriptionPart  go to state 309
+
+
+State 274
+
+   21 ModuleIdentifier: UCidentifier DEFINITIONS_SYM ASSIGNMENT_SYM AUTOMATIC_SYM TAGS_SYM Begin .
+
+    $default  reduce using rule 21 (ModuleIdentifier)
+
+
+State 275
+
+  199 SnmpTypeTagItem: LEFT_BRACKET_SYM UCidentifier Number RIGHT_BRACKET_SYM .
+
+    $default  reduce using rule 199 (SnmpTypeTagItem)
+
+
+State 276
+
+  118 TextualConventionAssignment: TEXTUAL_CONVENTION_SYM SnmpDisplayHintPart SnmpStatusPart SnmpDescriptionPart . SnmpReferencePart SnmpSyntaxPart
+
+    REFERENCE_SYM  shift, and go to state 260
+
+    $default  reduce using rule 164 (SnmpReferencePart)
+
+    SnmpReferencePart  go to state 310
+
+
+State 277
+
+   62 NumericValueConstraintList: NumericValue COMMA_SYM . NumericValueConstraintList
+
+    MIN_SYM               shift, and go to state 228
+    MAX_SYM               shift, and go to state 229
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+    NUMBER_SYM            shift, and go to state 129
+
+    NumericValue                go to state 230
+    NumberOrMinMax              go to state 231
+    DefinedValue                go to state 232
+    Number                      go to state 233
+    NumericValueConstraintList  go to state 311
+    Identifier                  go to state 235
+    UCidentifier                go to state 206
+    LCidentifier                go to state 207
+
+
+State 278
+
+   61 NumericValueConstraintList: NumericValue BAR_SYM . NumericValueConstraintList
+
+    MIN_SYM               shift, and go to state 228
+    MAX_SYM               shift, and go to state 229
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+    NUMBER_SYM            shift, and go to state 129
+
+    NumericValue                go to state 230
+    NumberOrMinMax              go to state 231
+    DefinedValue                go to state 232
+    Number                      go to state 233
+    NumericValueConstraintList  go to state 312
+    Identifier                  go to state 235
+    UCidentifier                go to state 206
+    LCidentifier                go to state 207
+
+
+State 279
+
+   34 NumericValue: NumberOrMinMax DOT_SYM . DOT_SYM NumberOrMinMax
+
+    DOT_SYM  shift, and go to state 313
+
+
+State 280
+
+   60 ValueConstraint: LEFT_BRACE_SYM NumericValueConstraintList RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 60 (ValueConstraint)
+
+
+State 281
+
+   35 NumericValue: Identifier LEFT_PAREN_SYM . NumberOrMinMax RIGHT_PAREN_SYM
+
+    MIN_SYM     shift, and go to state 228
+    MAX_SYM     shift, and go to state 229
+    NUMBER_SYM  shift, and go to state 129
+
+    NumberOrMinMax  go to state 314
+    Number          go to state 233
+
+
+State 282
+
+   59 ValueConstraint: LEFT_PAREN_SYM SIZE_SYM LEFT_PAREN_SYM . NumericValueConstraintList RIGHT_PAREN_SYM RIGHT_PAREN_SYM
+
+    MIN_SYM               shift, and go to state 228
+    MAX_SYM               shift, and go to state 229
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+    NUMBER_SYM            shift, and go to state 129
+
+    NumericValue                go to state 230
+    NumberOrMinMax              go to state 231
+    DefinedValue                go to state 232
+    Number                      go to state 233
+    NumericValueConstraintList  go to state 315
+    Identifier                  go to state 235
+    UCidentifier                go to state 206
+    LCidentifier                go to state 207
+
+
+State 283
+
+   58 ValueConstraint: LEFT_PAREN_SYM NumericValueConstraintList RIGHT_PAREN_SYM .
+
+    $default  reduce using rule 58 (ValueConstraint)
+
+
+State 284
+
+  201 OctetStringType: EXPLICIT_SYM OCTET_SYM STRING_SYM .
+
+    $default  reduce using rule 201 (OctetStringType)
+
+
+State 285
+
+  202 OctetStringType: IMPLICIT_SYM OCTET_SYM STRING_SYM .
+
+    $default  reduce using rule 202 (OctetStringType)
+
+
+State 286
+
+   51 SnmpRevisionObject: REVISION_SYM . CharString SnmpDescriptionPart
+
+    CSTRING_SYM  shift, and go to state 93
+
+    CharString  go to state 316
+
+
+State 287
+
+   44 ModuleIdentityAssignment: SnmpIdentityPart SnmpUpdatePart SnmpOrganisationPart SnmpContactInfoPart SnmpDescriptionPart SnmpRevisionPart . AssignedIdentifier
+
+    ASSIGNMENT_SYM  shift, and go to state 144
+
+    AssignedIdentifier  go to state 317
+
+
+State 288
+
+   47 SnmpRevisionPart: SnmpRevisionList .
+   49 SnmpRevisionList: SnmpRevisionList . SnmpRevisionObject
+
+    REVISION_SYM  shift, and go to state 286
+
+    $default  reduce using rule 47 (SnmpRevisionPart)
+
+    SnmpRevisionObject  go to state 318
+
+
+State 289
+
+   50 SnmpRevisionList: SnmpRevisionObject .
+
+    $default  reduce using rule 50 (SnmpRevisionList)
+
+
+State 290
+
+   69 SnmpKeywordBinding: KEYWORD_BIND_SYM ASSIGNMENT_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 69 (SnmpKeywordBinding)
+
+
+State 291
+
+   43 ObjectTypeAssignment: Identifier OBJECT_TYPE_SYM SnmpSyntaxPart SnmpUnitsPart SnmpAccessPart SnmpStatusPart . SnmpDescriptionPart SnmpReferencePart SnmpIndexPart SnmpDefValPart AssignedIdentifier
+
+    DESCRIPTION_SYM  shift, and go to state 210
+
+    $default  reduce using rule 57 (SnmpDescriptionPart)
+
+    SnmpDescriptionPart  go to state 319
+
+
+State 292
+
+  194 SequenceAssignment: LEFT_BRACE_SYM SequenceList RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 194 (SequenceAssignment)
+
+
+State 293
+
+  193 SequenceList: SequenceList COMMA_SYM . SequenceItem
+
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    SequenceItem  go to state 320
+    Identifier    go to state 251
+    UCidentifier  go to state 183
+    LCidentifier  go to state 184
+
+
+State 294
+
+  191 SequenceItem: Identifier Type .
+
+    $default  reduce using rule 191 (SequenceItem)
+
+
+State 295
+
+  123 SnmpTrapVariableList: VARIABLES_SYM LEFT_BRACE_SYM . SymbolList RIGHT_BRACE_SYM
+
+    IMPLIED_SYM           shift, and go to state 46
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    SymbolList    go to state 321
+    Symbol        go to state 50
+    UCidentifier  go to state 51
+    LCidentifier  go to state 52
+
+
+State 296
+
+  120 SnmpNotificationTypeAssignment: LCidentifier TRAP_TYPE_SYM ENTERPRISE_SYM LCidentifier SnmpTrapVariablePart SnmpDescriptionPart . SnmpReferencePart AssignedIdentifier
+
+    REFERENCE_SYM  shift, and go to state 260
+
+    $default  reduce using rule 164 (SnmpReferencePart)
+
+    SnmpReferencePart  go to state 322
+
+
+State 297
+
+   31 ObjectIdentifier: Identifier LEFT_PAREN_SYM Number . RIGHT_PAREN_SYM
+
+    RIGHT_PAREN_SYM  shift, and go to state 323
+
+
+State 298
+
+   39 DefinedValue: UCidentifier DOT_SYM LCidentifier .
+
+    $default  reduce using rule 39 (DefinedValue)
+
+
+State 299
+
+  163 SnmpReferencePart: REFERENCE_SYM CharString .
+
+    $default  reduce using rule 163 (SnmpReferencePart)
+
+
+State 300
+
+  145 SnmpModuleComplianceObject: MODULE_SYM . OptionalModuleName SnmpMandatoryGroupPart SnmpCompliancePart
+
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+
+    $default  reduce using rule 147 (OptionalModuleName)
+
+    OptionalModuleName  go to state 324
+    UCidentifier        go to state 325
+
+
+State 301
+
+  142 ModuleComplianceAssignment: LCidentifier MODULE_COMPLIANCE_SYM SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpModuleComplianceList . AssignedIdentifier
+  143 SnmpModuleComplianceList: SnmpModuleComplianceList . SnmpModuleComplianceObject
+
+    ASSIGNMENT_SYM  shift, and go to state 144
+    MODULE_SYM      shift, and go to state 300
+
+    AssignedIdentifier          go to state 326
+    SnmpModuleComplianceObject  go to state 327
+
+
+State 302
+
+  144 SnmpModuleComplianceList: SnmpModuleComplianceObject .
+
+    $default  reduce using rule 144 (SnmpModuleComplianceList)
+
+
+State 303
+
+  135 SnmpObjectsPart: OBJECTS_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 135 (SnmpObjectsPart)
+
+
+State 304
+
+  137 SnmpObjectsPart: NOTIFICATIONS_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 137 (SnmpObjectsPart)
+
+
+State 305
+
+  140 SnmpObjectGroupAssignment: LCidentifier OBJECT_GROUP_SYM SnmpObjectsPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart . AssignedIdentifier
+
+    ASSIGNMENT_SYM  shift, and go to state 144
+
+    AssignedIdentifier  go to state 328
+
+
+State 306
+
+   42 ObjectIdentityAssignment: LCidentifier OBJECT_IDENTITY_SYM SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier .
+
+    $default  reduce using rule 42 (ObjectIdentityAssignment)
+
+
+State 307
+
+  157 AgentCapabilitiesAssignment: LCidentifier AGENT_CAPABILITIES_SYM PRODUCT_RELEASE_SYM CharString SnmpStatusPart SnmpDescriptionPart . SnmpReferencePart ModuleCapabilitiesList AssignedIdentifier
+
+    REFERENCE_SYM  shift, and go to state 260
+
+    $default  reduce using rule 164 (SnmpReferencePart)
+
+    SnmpReferencePart  go to state 329
+
+
+State 308
+
+  141 SnmpNotificationGroupAssignment: LCidentifier NOTIFICATION_GROUP_SYM SnmpObjectsPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart . AssignedIdentifier
+
+    ASSIGNMENT_SYM  shift, and go to state 144
+
+    AssignedIdentifier  go to state 330
+
+
+State 309
+
+  119 SnmpNotificationTypeAssignment: LCidentifier NOTIFICATION_TYPE_SYM SnmpObjectsPart SnmpAccessPart SnmpStatusPart SnmpDescriptionPart . SnmpReferencePart AssignedIdentifier
+
+    REFERENCE_SYM  shift, and go to state 260
+
+    $default  reduce using rule 164 (SnmpReferencePart)
+
+    SnmpReferencePart  go to state 331
+
+
+State 310
+
+  118 TextualConventionAssignment: TEXTUAL_CONVENTION_SYM SnmpDisplayHintPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart . SnmpSyntaxPart
+
+    SYNTAX_SYM  shift, and go to state 122
+
+    $default  reduce using rule 72 (SnmpSyntaxPart)
+
+    SnmpSyntax      go to state 123
+    SnmpSyntaxPart  go to state 332
+
+
+State 311
+
+   62 NumericValueConstraintList: NumericValue COMMA_SYM NumericValueConstraintList .
+
+    $default  reduce using rule 62 (NumericValueConstraintList)
+
+
+State 312
+
+   61 NumericValueConstraintList: NumericValue BAR_SYM NumericValueConstraintList .
+
+    $default  reduce using rule 61 (NumericValueConstraintList)
+
+
+State 313
+
+   34 NumericValue: NumberOrMinMax DOT_SYM DOT_SYM . NumberOrMinMax
+
+    MIN_SYM     shift, and go to state 228
+    MAX_SYM     shift, and go to state 229
+    NUMBER_SYM  shift, and go to state 129
+
+    NumberOrMinMax  go to state 333
+    Number          go to state 233
+
+
+State 314
+
+   35 NumericValue: Identifier LEFT_PAREN_SYM NumberOrMinMax . RIGHT_PAREN_SYM
+
+    RIGHT_PAREN_SYM  shift, and go to state 334
+
+
+State 315
+
+   59 ValueConstraint: LEFT_PAREN_SYM SIZE_SYM LEFT_PAREN_SYM NumericValueConstraintList . RIGHT_PAREN_SYM RIGHT_PAREN_SYM
+
+    RIGHT_PAREN_SYM  shift, and go to state 335
+
+
+State 316
+
+   51 SnmpRevisionObject: REVISION_SYM CharString . SnmpDescriptionPart
+
+    DESCRIPTION_SYM  shift, and go to state 210
+
+    $default  reduce using rule 57 (SnmpDescriptionPart)
+
+    SnmpDescriptionPart  go to state 336
+
+
+State 317
+
+   44 ModuleIdentityAssignment: SnmpIdentityPart SnmpUpdatePart SnmpOrganisationPart SnmpContactInfoPart SnmpDescriptionPart SnmpRevisionPart AssignedIdentifier .
+
+    $default  reduce using rule 44 (ModuleIdentityAssignment)
+
+
+State 318
+
+   49 SnmpRevisionList: SnmpRevisionList SnmpRevisionObject .
+
+    $default  reduce using rule 49 (SnmpRevisionList)
+
+
+State 319
+
+   43 ObjectTypeAssignment: Identifier OBJECT_TYPE_SYM SnmpSyntaxPart SnmpUnitsPart SnmpAccessPart SnmpStatusPart SnmpDescriptionPart . SnmpReferencePart SnmpIndexPart SnmpDefValPart AssignedIdentifier
+
+    REFERENCE_SYM  shift, and go to state 260
+
+    $default  reduce using rule 164 (SnmpReferencePart)
+
+    SnmpReferencePart  go to state 337
+
+
+State 320
+
+  193 SequenceList: SequenceList COMMA_SYM SequenceItem .
+
+    $default  reduce using rule 193 (SequenceList)
+
+
+State 321
+
+  123 SnmpTrapVariableList: VARIABLES_SYM LEFT_BRACE_SYM SymbolList . RIGHT_BRACE_SYM
+  186 SymbolList: SymbolList . COMMA_SYM Symbol
+
+    RIGHT_BRACE_SYM  shift, and go to state 338
+    COMMA_SYM        shift, and go to state 91
+
+
+State 322
+
+  120 SnmpNotificationTypeAssignment: LCidentifier TRAP_TYPE_SYM ENTERPRISE_SYM LCidentifier SnmpTrapVariablePart SnmpDescriptionPart SnmpReferencePart . AssignedIdentifier
+
+    ASSIGNMENT_SYM  shift, and go to state 144
+
+    AssignedIdentifier  go to state 339
+
+
+State 323
+
+   31 ObjectIdentifier: Identifier LEFT_PAREN_SYM Number RIGHT_PAREN_SYM .
+
+    $default  reduce using rule 31 (ObjectIdentifier)
+
+
+State 324
+
+  145 SnmpModuleComplianceObject: MODULE_SYM OptionalModuleName . SnmpMandatoryGroupPart SnmpCompliancePart
+
+    MANDATORY_GROUPS_SYM  shift, and go to state 340
+
+    $default  reduce using rule 125 (SnmpMandatoryGroupPart)
+
+    SnmpMandatoryGroupPart  go to state 341
+    SnmpMandatoryGroupList  go to state 342
+    SnmpMandatoryGroup      go to state 343
+
+
+State 325
+
+  146 OptionalModuleName: UCidentifier .
+
+    $default  reduce using rule 146 (OptionalModuleName)
+
+
+State 326
+
+  142 ModuleComplianceAssignment: LCidentifier MODULE_COMPLIANCE_SYM SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpModuleComplianceList AssignedIdentifier .
+
+    $default  reduce using rule 142 (ModuleComplianceAssignment)
+
+
+State 327
+
+  143 SnmpModuleComplianceList: SnmpModuleComplianceList SnmpModuleComplianceObject .
+
+    $default  reduce using rule 143 (SnmpModuleComplianceList)
+
+
+State 328
+
+  140 SnmpObjectGroupAssignment: LCidentifier OBJECT_GROUP_SYM SnmpObjectsPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier .
+
+    $default  reduce using rule 140 (SnmpObjectGroupAssignment)
+
+
+State 329
+
+  157 AgentCapabilitiesAssignment: LCidentifier AGENT_CAPABILITIES_SYM PRODUCT_RELEASE_SYM CharString SnmpStatusPart SnmpDescriptionPart SnmpReferencePart . ModuleCapabilitiesList AssignedIdentifier
+
+    SUPPORTS_SYM          shift, and go to state 344
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+
+    ModuleIdentifier              go to state 345
+    ModuleCapabilitiesList        go to state 346
+    ModuleCapabilitiesAssignment  go to state 347
+    UCidentifier                  go to state 5
+
+
+State 330
+
+  141 SnmpNotificationGroupAssignment: LCidentifier NOTIFICATION_GROUP_SYM SnmpObjectsPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier .
+
+    $default  reduce using rule 141 (SnmpNotificationGroupAssignment)
+
+
+State 331
+
+  119 SnmpNotificationTypeAssignment: LCidentifier NOTIFICATION_TYPE_SYM SnmpObjectsPart SnmpAccessPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart . AssignedIdentifier
+
+    ASSIGNMENT_SYM  shift, and go to state 144
+
+    AssignedIdentifier  go to state 348
+
+
+State 332
+
+  118 TextualConventionAssignment: TEXTUAL_CONVENTION_SYM SnmpDisplayHintPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpSyntaxPart .
+
+    $default  reduce using rule 118 (TextualConventionAssignment)
+
+
+State 333
+
+   34 NumericValue: NumberOrMinMax DOT_SYM DOT_SYM NumberOrMinMax .
+
+    $default  reduce using rule 34 (NumericValue)
+
+
+State 334
+
+   35 NumericValue: Identifier LEFT_PAREN_SYM NumberOrMinMax RIGHT_PAREN_SYM .
+
+    $default  reduce using rule 35 (NumericValue)
+
+
+State 335
+
+   59 ValueConstraint: LEFT_PAREN_SYM SIZE_SYM LEFT_PAREN_SYM NumericValueConstraintList RIGHT_PAREN_SYM . RIGHT_PAREN_SYM
+
+    RIGHT_PAREN_SYM  shift, and go to state 349
+
+
+State 336
+
+   51 SnmpRevisionObject: REVISION_SYM CharString SnmpDescriptionPart .
+
+    $default  reduce using rule 51 (SnmpRevisionObject)
+
+
+State 337
+
+   43 ObjectTypeAssignment: Identifier OBJECT_TYPE_SYM SnmpSyntaxPart SnmpUnitsPart SnmpAccessPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart . SnmpIndexPart SnmpDefValPart AssignedIdentifier
+
+    INDEX_SYM     shift, and go to state 350
+    AUGMENTS_SYM  shift, and go to state 351
+
+    $default  reduce using rule 169 (SnmpIndexPart)
+
+    SnmpIndexPart  go to state 352
+
+
+State 338
+
+  123 SnmpTrapVariableList: VARIABLES_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 123 (SnmpTrapVariableList)
+
+
+State 339
+
+  120 SnmpNotificationTypeAssignment: LCidentifier TRAP_TYPE_SYM ENTERPRISE_SYM LCidentifier SnmpTrapVariablePart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier .
+
+    $default  reduce using rule 120 (SnmpNotificationTypeAssignment)
+
+
+State 340
+
+  128 SnmpMandatoryGroup: MANDATORY_GROUPS_SYM . LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+
+    LEFT_BRACE_SYM  shift, and go to state 353
+
+
+State 341
+
+  145 SnmpModuleComplianceObject: MODULE_SYM OptionalModuleName SnmpMandatoryGroupPart . SnmpCompliancePart
+
+    GROUP_SYM   shift, and go to state 354
+    OBJECT_SYM  shift, and go to state 355
+
+    $default  reduce using rule 130 (SnmpCompliancePart)
+
+    SnmpCompliancePart    go to state 356
+    SnmpComplianceList    go to state 357
+    SnmpComplianceObject  go to state 358
+
+
+State 342
+
+  124 SnmpMandatoryGroupPart: SnmpMandatoryGroupList .
+  126 SnmpMandatoryGroupList: SnmpMandatoryGroupList . SnmpMandatoryGroup
+
+    MANDATORY_GROUPS_SYM  shift, and go to state 340
+
+    $default  reduce using rule 124 (SnmpMandatoryGroupPart)
+
+    SnmpMandatoryGroup  go to state 359
+
+
+State 343
+
+  127 SnmpMandatoryGroupList: SnmpMandatoryGroup .
+
+    $default  reduce using rule 127 (SnmpMandatoryGroupList)
+
+
+State 344
+
+  155 ModuleCapabilitiesAssignment: SUPPORTS_SYM . UCidentifier INCLUDES_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM SnmpVariationsListPart
+
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+
+    UCidentifier  go to state 360
+
+
+State 345
+
+  156 ModuleCapabilitiesAssignment: ModuleIdentifier . INCLUDES_SYM SymbolList SnmpVariationsListPart
+
+    INCLUDES_SYM  shift, and go to state 361
+
+
+State 346
+
+  153 ModuleCapabilitiesList: ModuleCapabilitiesList . ModuleCapabilitiesAssignment
+  157 AgentCapabilitiesAssignment: LCidentifier AGENT_CAPABILITIES_SYM PRODUCT_RELEASE_SYM CharString SnmpStatusPart SnmpDescriptionPart SnmpReferencePart ModuleCapabilitiesList . AssignedIdentifier
+
+    ASSIGNMENT_SYM        shift, and go to state 144
+    SUPPORTS_SYM          shift, and go to state 344
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+
+    ModuleIdentifier              go to state 345
+    AssignedIdentifier            go to state 362
+    ModuleCapabilitiesAssignment  go to state 363
+    UCidentifier                  go to state 5
+
+
+State 347
+
+  154 ModuleCapabilitiesList: ModuleCapabilitiesAssignment .
+
+    $default  reduce using rule 154 (ModuleCapabilitiesList)
+
+
+State 348
+
+  119 SnmpNotificationTypeAssignment: LCidentifier NOTIFICATION_TYPE_SYM SnmpObjectsPart SnmpAccessPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart AssignedIdentifier .
+
+    $default  reduce using rule 119 (SnmpNotificationTypeAssignment)
+
+
+State 349
+
+   59 ValueConstraint: LEFT_PAREN_SYM SIZE_SYM LEFT_PAREN_SYM NumericValueConstraintList RIGHT_PAREN_SYM RIGHT_PAREN_SYM .
+
+    $default  reduce using rule 59 (ValueConstraint)
+
+
+State 350
+
+  167 SnmpIndexPart: INDEX_SYM . LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+
+    LEFT_BRACE_SYM  shift, and go to state 364
+
+
+State 351
+
+  168 SnmpIndexPart: AUGMENTS_SYM . LEFT_BRACE_SYM DefinedValue RIGHT_BRACE_SYM
+
+    LEFT_BRACE_SYM  shift, and go to state 365
+
+
+State 352
+
+   43 ObjectTypeAssignment: Identifier OBJECT_TYPE_SYM SnmpSyntaxPart SnmpUnitsPart SnmpAccessPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpIndexPart . SnmpDefValPart AssignedIdentifier
+
+    DEFVAL_SYM  shift, and go to state 366
+
+    $default  reduce using rule 175 (SnmpDefValPart)
+
+    SnmpDefValPart  go to state 367
+
+
+State 353
+
+  128 SnmpMandatoryGroup: MANDATORY_GROUPS_SYM LEFT_BRACE_SYM . SymbolList RIGHT_BRACE_SYM
+
+    IMPLIED_SYM           shift, and go to state 46
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    SymbolList    go to state 368
+    Symbol        go to state 50
+    UCidentifier  go to state 51
+    LCidentifier  go to state 52
+
+
+State 354
+
+  134 SnmpComplianceObject: GROUP_SYM . LCidentifier SnmpDescriptionPart
+
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    LCidentifier  go to state 369
+
+
+State 355
+
+  133 SnmpComplianceObject: OBJECT_SYM . LCidentifier SnmpSyntaxPart SnmpWriteSyntaxPart SnmpAccessPart SnmpDescriptionPart
+
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    LCidentifier  go to state 370
+
+
+State 356
+
+  145 SnmpModuleComplianceObject: MODULE_SYM OptionalModuleName SnmpMandatoryGroupPart SnmpCompliancePart .
+
+    $default  reduce using rule 145 (SnmpModuleComplianceObject)
+
+
+State 357
+
+  129 SnmpCompliancePart: SnmpComplianceList .
+  131 SnmpComplianceList: SnmpComplianceList . SnmpComplianceObject
+
+    GROUP_SYM   shift, and go to state 354
+    OBJECT_SYM  shift, and go to state 355
+
+    $default  reduce using rule 129 (SnmpCompliancePart)
+
+    SnmpComplianceObject  go to state 371
+
+
+State 358
+
+  132 SnmpComplianceList: SnmpComplianceObject .
+
+    $default  reduce using rule 132 (SnmpComplianceList)
+
+
+State 359
+
+  126 SnmpMandatoryGroupList: SnmpMandatoryGroupList SnmpMandatoryGroup .
+
+    $default  reduce using rule 126 (SnmpMandatoryGroupList)
+
+
+State 360
+
+  155 ModuleCapabilitiesAssignment: SUPPORTS_SYM UCidentifier . INCLUDES_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM SnmpVariationsListPart
+
+    INCLUDES_SYM  shift, and go to state 372
+
+
+State 361
+
+  156 ModuleCapabilitiesAssignment: ModuleIdentifier INCLUDES_SYM . SymbolList SnmpVariationsListPart
+
+    IMPLIED_SYM           shift, and go to state 46
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    SymbolList    go to state 373
+    Symbol        go to state 50
+    UCidentifier  go to state 51
+    LCidentifier  go to state 52
+
+
+State 362
+
+  157 AgentCapabilitiesAssignment: LCidentifier AGENT_CAPABILITIES_SYM PRODUCT_RELEASE_SYM CharString SnmpStatusPart SnmpDescriptionPart SnmpReferencePart ModuleCapabilitiesList AssignedIdentifier .
+
+    $default  reduce using rule 157 (AgentCapabilitiesAssignment)
+
+
+State 363
+
+  153 ModuleCapabilitiesList: ModuleCapabilitiesList ModuleCapabilitiesAssignment .
+
+    $default  reduce using rule 153 (ModuleCapabilitiesList)
+
+
+State 364
+
+  167 SnmpIndexPart: INDEX_SYM LEFT_BRACE_SYM . SymbolList RIGHT_BRACE_SYM
+
+    IMPLIED_SYM           shift, and go to state 46
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    SymbolList    go to state 374
+    Symbol        go to state 50
+    UCidentifier  go to state 51
+    LCidentifier  go to state 52
+
+
+State 365
+
+  168 SnmpIndexPart: AUGMENTS_SYM LEFT_BRACE_SYM . DefinedValue RIGHT_BRACE_SYM
+
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    DefinedValue  go to state 375
+    UCidentifier  go to state 376
+    LCidentifier  go to state 377
+
+
+State 366
+
+  170 SnmpDefValPart: DEFVAL_SYM . LEFT_BRACE_SYM BinaryString RIGHT_BRACE_SYM
+  171               | DEFVAL_SYM . LEFT_BRACE_SYM HexString RIGHT_BRACE_SYM
+  172               | DEFVAL_SYM . LEFT_BRACE_SYM CharString RIGHT_BRACE_SYM
+  173               | DEFVAL_SYM . LEFT_BRACE_SYM DefValList RIGHT_BRACE_SYM
+  174               | DEFVAL_SYM . AssignedIdentifierList
+
+    LEFT_BRACE_SYM  shift, and go to state 378
+
+    AssignedIdentifierList  go to state 379
+
+
+State 367
+
+   43 ObjectTypeAssignment: Identifier OBJECT_TYPE_SYM SnmpSyntaxPart SnmpUnitsPart SnmpAccessPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpIndexPart SnmpDefValPart . AssignedIdentifier
+
+    ASSIGNMENT_SYM  shift, and go to state 144
+
+    AssignedIdentifier  go to state 380
+
+
+State 368
+
+  128 SnmpMandatoryGroup: MANDATORY_GROUPS_SYM LEFT_BRACE_SYM SymbolList . RIGHT_BRACE_SYM
+  186 SymbolList: SymbolList . COMMA_SYM Symbol
+
+    RIGHT_BRACE_SYM  shift, and go to state 381
+    COMMA_SYM        shift, and go to state 91
+
+
+State 369
+
+  134 SnmpComplianceObject: GROUP_SYM LCidentifier . SnmpDescriptionPart
+
+    DESCRIPTION_SYM  shift, and go to state 210
+
+    $default  reduce using rule 57 (SnmpDescriptionPart)
+
+    SnmpDescriptionPart  go to state 382
+
+
+State 370
+
+  133 SnmpComplianceObject: OBJECT_SYM LCidentifier . SnmpSyntaxPart SnmpWriteSyntaxPart SnmpAccessPart SnmpDescriptionPart
+
+    SYNTAX_SYM  shift, and go to state 122
+
+    $default  reduce using rule 72 (SnmpSyntaxPart)
+
+    SnmpSyntax      go to state 123
+    SnmpSyntaxPart  go to state 383
+
+
+State 371
+
+  131 SnmpComplianceList: SnmpComplianceList SnmpComplianceObject .
+
+    $default  reduce using rule 131 (SnmpComplianceList)
+
+
+State 372
+
+  155 ModuleCapabilitiesAssignment: SUPPORTS_SYM UCidentifier INCLUDES_SYM . LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM SnmpVariationsListPart
+
+    LEFT_BRACE_SYM  shift, and go to state 384
+
+
+State 373
+
+  156 ModuleCapabilitiesAssignment: ModuleIdentifier INCLUDES_SYM SymbolList . SnmpVariationsListPart
+  186 SymbolList: SymbolList . COMMA_SYM Symbol
+
+    COMMA_SYM      shift, and go to state 91
+    VARIATION_SYM  shift, and go to state 385
+
+    $default  reduce using rule 149 (SnmpVariationsListPart)
+
+    SnmpVariationsListPart  go to state 386
+    SnmpVariationsList      go to state 387
+    SnmpVariationPart       go to state 388
+
+
+State 374
+
+  167 SnmpIndexPart: INDEX_SYM LEFT_BRACE_SYM SymbolList . RIGHT_BRACE_SYM
+  186 SymbolList: SymbolList . COMMA_SYM Symbol
+
+    RIGHT_BRACE_SYM  shift, and go to state 389
+    COMMA_SYM        shift, and go to state 91
+
+
+State 375
+
+  168 SnmpIndexPart: AUGMENTS_SYM LEFT_BRACE_SYM DefinedValue . RIGHT_BRACE_SYM
+
+    RIGHT_BRACE_SYM  shift, and go to state 390
+
+
+State 376
+
+   39 DefinedValue: UCidentifier . DOT_SYM LCidentifier
+
+    DOT_SYM  shift, and go to state 258
+
+
+State 377
+
+   40 DefinedValue: LCidentifier .
+
+    $default  reduce using rule 40 (DefinedValue)
+
+
+State 378
+
+   26 AssignedIdentifierList: LEFT_BRACE_SYM . ObjectIdentifierList RIGHT_BRACE_SYM
+  170 SnmpDefValPart: DEFVAL_SYM LEFT_BRACE_SYM . BinaryString RIGHT_BRACE_SYM
+  171               | DEFVAL_SYM LEFT_BRACE_SYM . HexString RIGHT_BRACE_SYM
+  172               | DEFVAL_SYM LEFT_BRACE_SYM . CharString RIGHT_BRACE_SYM
+  173               | DEFVAL_SYM LEFT_BRACE_SYM . DefValList RIGHT_BRACE_SYM
+
+    LEFT_BRACE_SYM        shift, and go to state 391
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+    BSTRING_SYM           shift, and go to state 127
+    HSTRING_SYM           shift, and go to state 128
+    CSTRING_SYM           shift, and go to state 93
+    NUMBER_SYM            shift, and go to state 129
+
+    ObjectIdentifierList  go to state 201
+    ObjectIdentifier      go to state 202
+    DefinedValue          go to state 203
+    Number                go to state 204
+    DefValList            go to state 392
+    DefValListElement     go to state 393
+    BinaryString          go to state 394
+    HexString             go to state 395
+    CharString            go to state 396
+    Identifier            go to state 205
+    UCidentifier          go to state 206
+    LCidentifier          go to state 207
+
+
+State 379
+
+  174 SnmpDefValPart: DEFVAL_SYM AssignedIdentifierList .
+
+    $default  reduce using rule 174 (SnmpDefValPart)
+
+
+State 380
+
+   43 ObjectTypeAssignment: Identifier OBJECT_TYPE_SYM SnmpSyntaxPart SnmpUnitsPart SnmpAccessPart SnmpStatusPart SnmpDescriptionPart SnmpReferencePart SnmpIndexPart SnmpDefValPart AssignedIdentifier .
+
+    $default  reduce using rule 43 (ObjectTypeAssignment)
+
+
+State 381
+
+  128 SnmpMandatoryGroup: MANDATORY_GROUPS_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 128 (SnmpMandatoryGroup)
+
+
+State 382
+
+  134 SnmpComplianceObject: GROUP_SYM LCidentifier SnmpDescriptionPart .
+
+    $default  reduce using rule 134 (SnmpComplianceObject)
+
+
+State 383
+
+  133 SnmpComplianceObject: OBJECT_SYM LCidentifier SnmpSyntaxPart . SnmpWriteSyntaxPart SnmpAccessPart SnmpDescriptionPart
+
+    WRITE_SYNTAX_SYM  shift, and go to state 397
+
+    $default  reduce using rule 76 (SnmpWriteSyntaxPart)
+
+    SnmpWriteSyntaxPart  go to state 398
+
+
+State 384
+
+  155 ModuleCapabilitiesAssignment: SUPPORTS_SYM UCidentifier INCLUDES_SYM LEFT_BRACE_SYM . SymbolList RIGHT_BRACE_SYM SnmpVariationsListPart
+
+    IMPLIED_SYM           shift, and go to state 46
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    SymbolList    go to state 399
+    Symbol        go to state 50
+    UCidentifier  go to state 51
+    LCidentifier  go to state 52
+
+
+State 385
+
+  152 SnmpVariationPart: VARIATION_SYM . LCidentifier SnmpSyntaxPart SnmpWriteSyntaxPart SnmpAccessPart SnmpCreationPart SnmpDefValPart SnmpDescriptionPart
+
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    LCidentifier  go to state 400
+
+
+State 386
+
+  156 ModuleCapabilitiesAssignment: ModuleIdentifier INCLUDES_SYM SymbolList SnmpVariationsListPart .
+
+    $default  reduce using rule 156 (ModuleCapabilitiesAssignment)
+
+
+State 387
+
+  148 SnmpVariationsListPart: SnmpVariationsList .
+  150 SnmpVariationsList: SnmpVariationsList . SnmpVariationPart
+
+    VARIATION_SYM  shift, and go to state 385
+
+    $default  reduce using rule 148 (SnmpVariationsListPart)
+
+    SnmpVariationPart  go to state 401
+
+
+State 388
+
+  151 SnmpVariationsList: SnmpVariationPart .
+
+    $default  reduce using rule 151 (SnmpVariationsList)
+
+
+State 389
+
+  167 SnmpIndexPart: INDEX_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 167 (SnmpIndexPart)
+
+
+State 390
+
+  168 SnmpIndexPart: AUGMENTS_SYM LEFT_BRACE_SYM DefinedValue RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 168 (SnmpIndexPart)
+
+
+State 391
+
+  178 DefValListElement: LEFT_BRACE_SYM . SymbolList RIGHT_BRACE_SYM
+  179                  | LEFT_BRACE_SYM . RIGHT_BRACE_SYM
+
+    IMPLIED_SYM           shift, and go to state 46
+    RIGHT_BRACE_SYM       shift, and go to state 402
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    SymbolList    go to state 403
+    Symbol        go to state 50
+    UCidentifier  go to state 51
+    LCidentifier  go to state 52
+
+
+State 392
+
+  173 SnmpDefValPart: DEFVAL_SYM LEFT_BRACE_SYM DefValList . RIGHT_BRACE_SYM
+
+    RIGHT_BRACE_SYM  shift, and go to state 404
+
+
+State 393
+
+  176 DefValList: DefValListElement . COMMA_SYM DefValList
+  177           | DefValListElement .
+
+    COMMA_SYM  shift, and go to state 405
+
+    $default  reduce using rule 177 (DefValList)
+
+
+State 394
+
+  170 SnmpDefValPart: DEFVAL_SYM LEFT_BRACE_SYM BinaryString . RIGHT_BRACE_SYM
+
+    RIGHT_BRACE_SYM  shift, and go to state 406
+
+
+State 395
+
+  171 SnmpDefValPart: DEFVAL_SYM LEFT_BRACE_SYM HexString . RIGHT_BRACE_SYM
+
+    RIGHT_BRACE_SYM  shift, and go to state 407
+
+
+State 396
+
+  172 SnmpDefValPart: DEFVAL_SYM LEFT_BRACE_SYM CharString . RIGHT_BRACE_SYM
+
+    RIGHT_BRACE_SYM  shift, and go to state 408
+
+
+State 397
+
+   75 SnmpWriteSyntaxPart: WRITE_SYNTAX_SYM . Type
+
+    LEFT_BRACKET_SYM  shift, and go to state 95
+    SEQUENCE_SYM      shift, and go to state 96
+
+    $default  reduce using rule 196 (SnmpTypeTagPart)
+
+    Type             go to state 409
+    NamedType        go to state 99
+    BuiltInType      go to state 100
+    SnmpTypeTagPart  go to state 103
+    SnmpTypeTagList  go to state 104
+    SnmpTypeTagItem  go to state 105
+
+
+State 398
+
+  133 SnmpComplianceObject: OBJECT_SYM LCidentifier SnmpSyntaxPart SnmpWriteSyntaxPart . SnmpAccessPart SnmpDescriptionPart
+
+    ACCESS_SYM      shift, and go to state 218
+    MAX_ACCESS_SYM  shift, and go to state 219
+    MIN_ACCESS_SYM  shift, and go to state 220
+
+    $default  reduce using rule 161 (SnmpAccessPart)
+
+    SnmpAccessPart  go to state 410
+
+
+State 399
+
+  155 ModuleCapabilitiesAssignment: SUPPORTS_SYM UCidentifier INCLUDES_SYM LEFT_BRACE_SYM SymbolList . RIGHT_BRACE_SYM SnmpVariationsListPart
+  186 SymbolList: SymbolList . COMMA_SYM Symbol
+
+    RIGHT_BRACE_SYM  shift, and go to state 411
+    COMMA_SYM        shift, and go to state 91
+
+
+State 400
+
+  152 SnmpVariationPart: VARIATION_SYM LCidentifier . SnmpSyntaxPart SnmpWriteSyntaxPart SnmpAccessPart SnmpCreationPart SnmpDefValPart SnmpDescriptionPart
+
+    SYNTAX_SYM  shift, and go to state 122
+
+    $default  reduce using rule 72 (SnmpSyntaxPart)
+
+    SnmpSyntax      go to state 123
+    SnmpSyntaxPart  go to state 412
+
+
+State 401
+
+  150 SnmpVariationsList: SnmpVariationsList SnmpVariationPart .
+
+    $default  reduce using rule 150 (SnmpVariationsList)
+
+
+State 402
+
+  179 DefValListElement: LEFT_BRACE_SYM RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 179 (DefValListElement)
+
+
+State 403
+
+  178 DefValListElement: LEFT_BRACE_SYM SymbolList . RIGHT_BRACE_SYM
+  186 SymbolList: SymbolList . COMMA_SYM Symbol
+
+    RIGHT_BRACE_SYM  shift, and go to state 413
+    COMMA_SYM        shift, and go to state 91
+
+
+State 404
+
+  173 SnmpDefValPart: DEFVAL_SYM LEFT_BRACE_SYM DefValList RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 173 (SnmpDefValPart)
+
+
+State 405
+
+  176 DefValList: DefValListElement COMMA_SYM . DefValList
+
+    LEFT_BRACE_SYM  shift, and go to state 391
+
+    DefValList         go to state 414
+    DefValListElement  go to state 393
+
+
+State 406
+
+  170 SnmpDefValPart: DEFVAL_SYM LEFT_BRACE_SYM BinaryString RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 170 (SnmpDefValPart)
+
+
+State 407
+
+  171 SnmpDefValPart: DEFVAL_SYM LEFT_BRACE_SYM HexString RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 171 (SnmpDefValPart)
+
+
+State 408
+
+  172 SnmpDefValPart: DEFVAL_SYM LEFT_BRACE_SYM CharString RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 172 (SnmpDefValPart)
+
+
+State 409
+
+   75 SnmpWriteSyntaxPart: WRITE_SYNTAX_SYM Type .
+
+    $default  reduce using rule 75 (SnmpWriteSyntaxPart)
+
+
+State 410
+
+  133 SnmpComplianceObject: OBJECT_SYM LCidentifier SnmpSyntaxPart SnmpWriteSyntaxPart SnmpAccessPart . SnmpDescriptionPart
+
+    DESCRIPTION_SYM  shift, and go to state 210
+
+    $default  reduce using rule 57 (SnmpDescriptionPart)
+
+    SnmpDescriptionPart  go to state 415
+
+
+State 411
+
+  155 ModuleCapabilitiesAssignment: SUPPORTS_SYM UCidentifier INCLUDES_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM . SnmpVariationsListPart
+
+    VARIATION_SYM  shift, and go to state 385
+
+    $default  reduce using rule 149 (SnmpVariationsListPart)
+
+    SnmpVariationsListPart  go to state 416
+    SnmpVariationsList      go to state 387
+    SnmpVariationPart       go to state 388
+
+
+State 412
+
+  152 SnmpVariationPart: VARIATION_SYM LCidentifier SnmpSyntaxPart . SnmpWriteSyntaxPart SnmpAccessPart SnmpCreationPart SnmpDefValPart SnmpDescriptionPart
+
+    WRITE_SYNTAX_SYM  shift, and go to state 397
+
+    $default  reduce using rule 76 (SnmpWriteSyntaxPart)
+
+    SnmpWriteSyntaxPart  go to state 417
+
+
+State 413
+
+  178 DefValListElement: LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 178 (DefValListElement)
+
+
+State 414
+
+  176 DefValList: DefValListElement COMMA_SYM DefValList .
+
+    $default  reduce using rule 176 (DefValList)
+
+
+State 415
+
+  133 SnmpComplianceObject: OBJECT_SYM LCidentifier SnmpSyntaxPart SnmpWriteSyntaxPart SnmpAccessPart SnmpDescriptionPart .
+
+    $default  reduce using rule 133 (SnmpComplianceObject)
+
+
+State 416
+
+  155 ModuleCapabilitiesAssignment: SUPPORTS_SYM UCidentifier INCLUDES_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM SnmpVariationsListPart .
+
+    $default  reduce using rule 155 (ModuleCapabilitiesAssignment)
+
+
+State 417
+
+  152 SnmpVariationPart: VARIATION_SYM LCidentifier SnmpSyntaxPart SnmpWriteSyntaxPart . SnmpAccessPart SnmpCreationPart SnmpDefValPart SnmpDescriptionPart
+
+    ACCESS_SYM      shift, and go to state 218
+    MAX_ACCESS_SYM  shift, and go to state 219
+    MIN_ACCESS_SYM  shift, and go to state 220
+
+    $default  reduce using rule 161 (SnmpAccessPart)
+
+    SnmpAccessPart  go to state 418
+
+
+State 418
+
+  152 SnmpVariationPart: VARIATION_SYM LCidentifier SnmpSyntaxPart SnmpWriteSyntaxPart SnmpAccessPart . SnmpCreationPart SnmpDefValPart SnmpDescriptionPart
+
+    CREATION_REQUIRES_SYM  shift, and go to state 419
+
+    $default  reduce using rule 78 (SnmpCreationPart)
+
+    SnmpCreationPart  go to state 420
+
+
+State 419
+
+   77 SnmpCreationPart: CREATION_REQUIRES_SYM . LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM
+
+    LEFT_BRACE_SYM  shift, and go to state 421
+
+
+State 420
+
+  152 SnmpVariationPart: VARIATION_SYM LCidentifier SnmpSyntaxPart SnmpWriteSyntaxPart SnmpAccessPart SnmpCreationPart . SnmpDefValPart SnmpDescriptionPart
+
+    DEFVAL_SYM  shift, and go to state 366
+
+    $default  reduce using rule 175 (SnmpDefValPart)
+
+    SnmpDefValPart  go to state 422
+
+
+State 421
+
+   77 SnmpCreationPart: CREATION_REQUIRES_SYM LEFT_BRACE_SYM . SymbolList RIGHT_BRACE_SYM
+
+    IMPLIED_SYM           shift, and go to state 46
+    UCASEFIRST_IDENT_SYM  shift, and go to state 1
+    LCASEFIRST_IDENT_SYM  shift, and go to state 21
+
+    SymbolList    go to state 423
+    Symbol        go to state 50
+    UCidentifier  go to state 51
+    LCidentifier  go to state 52
+
+
+State 422
+
+  152 SnmpVariationPart: VARIATION_SYM LCidentifier SnmpSyntaxPart SnmpWriteSyntaxPart SnmpAccessPart SnmpCreationPart SnmpDefValPart . SnmpDescriptionPart
+
+    DESCRIPTION_SYM  shift, and go to state 210
+
+    $default  reduce using rule 57 (SnmpDescriptionPart)
+
+    SnmpDescriptionPart  go to state 424
+
+
+State 423
+
+   77 SnmpCreationPart: CREATION_REQUIRES_SYM LEFT_BRACE_SYM SymbolList . RIGHT_BRACE_SYM
+  186 SymbolList: SymbolList . COMMA_SYM Symbol
+
+    RIGHT_BRACE_SYM  shift, and go to state 425
+    COMMA_SYM        shift, and go to state 91
+
+
+State 424
+
+  152 SnmpVariationPart: VARIATION_SYM LCidentifier SnmpSyntaxPart SnmpWriteSyntaxPart SnmpAccessPart SnmpCreationPart SnmpDefValPart SnmpDescriptionPart .
+
+    $default  reduce using rule 152 (SnmpVariationPart)
+
+
+State 425
+
+   77 SnmpCreationPart: CREATION_REQUIRES_SYM LEFT_BRACE_SYM SymbolList RIGHT_BRACE_SYM .
+
+    $default  reduce using rule 77 (SnmpCreationPart)

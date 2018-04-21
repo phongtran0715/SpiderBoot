@@ -1,0 +1,22 @@
+agent.conn  Agent connections
+agent.tunnel    Agent tunnels
+
+crypto.*	Encryption functions
+crypto.cert	Certificate related messages
+
+db.*		Database related
+db.query	SQL query trace
+db.conn		DB connections
+db.cpool	DB connection pool
+
+housekeeper	Housekeeper messages
+
+obj.*		Object related trace
+obj.dc.*	Data collection related
+obj.locks.*	Locks
+obj.netmap	Network maps
+obj.sync	Object synchronization
+
+sync		Syncer messages
+
+threads.*	Thread related
