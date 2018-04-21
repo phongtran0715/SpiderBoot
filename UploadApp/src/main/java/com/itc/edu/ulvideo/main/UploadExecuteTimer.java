@@ -25,14 +25,12 @@ public class UploadExecuteTimer extends TimerTask{
 	UploadVideo uploadVideo = new UploadVideo();
 
 	public UploadExecuteTimer(String timerId) {
-		// TODO Auto-generated constructor stub
 		this.timerId = timerId;
 		videoFolderBase = Config.videoFolder;
 	}
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		System.out.println("Timer task started at:" + new Date());
 		completeTask();
 		System.out.println("Timer task finished at:" + new Date());
@@ -53,16 +51,15 @@ public class UploadExecuteTimer extends TimerTask{
 				rs = stmt.executeQuery(query);
 				while (rs.next()) {
 					System.out.println("Detect new video to upload");
-					
+
 					int id 				= rs.getInt("Id");
 					String vName 		= rs.getString("VideoLocation");
 					String cHomeId 		= rs.getString("HomeChannelId");
 					String cMonitorId 	= rs.getString("MonitorChannelId");
-					String title 		= genTitle(rs.getString("Title"));
-					String tag 			= genTags(rs.getString("Tag"));
-					String description 	= genDescription(rs.getString("Description"));
+					String title 		= standardizeTitle(rs.getString("Title"));
+					String tag 			= standardizeTags(rs.getString("Tag"));
+					String description 	= standardizeDesc(rs.getString("Description"));
 					String vInputPath 	= videoFolderBase + util.prefixOS() + cHomeId + "-" + cMonitorId;
-					//String vRendered 	= vInputPath + util.prefixOS() + "rendered";
 					String vUpload = vInputPath + util.prefixOS() + vName;
 					//String vUpload = vRendered + util.prefixOS() + vName;
 					//String vUpload = "/home/phongtran0715/Downloads/Video/outro.mp4";
@@ -104,27 +101,56 @@ public class UploadExecuteTimer extends TimerTask{
 		}
 	}
 
-	String genTitle(String originTitle)
-	{
-		String result = originTitle;
-		//TODO: create title
-		return result;
+	private String standardizeTitle(String originTitle) {
+		String outputTitle = originTitle;
+		outputTitle = originTitle.replaceAll("[!@#$%^&*(){}:|<>?]", " ");
+		return outputTitle;
+
 	}
 
-	String genTags(String originTags)
-	{
-		String result = originTags;
-		//TODO: create tags
-		return result;
+	private String standardizeTags(String originTags) {
+		String outputTags = originTags;
+		return outputTags;
 	}
 
-	String genDescription(String originDesc)
-	{
-		String result = originDesc;
-		//TODO: create description
-		return result;
-	}
+	private String standardizeDesc(String originDesc) {
+		Boolean bMatch = false;
+		Long startTime = System.currentTimeMillis();
+		String[] partStrs = originDesc.split("\\r?\\n");
+		StringBuilder returnDesc = new StringBuilder("");
+		String query = "SELECT msg FROM utblinvdesc;";
+		Statement stmt = null;
+		for (String partStr : partStrs) {
+			bMatch = false;
+			try {
+				stmt = MySqlAccess.getInstance().connect.createStatement();
+				ResultSet rs = stmt.executeQuery(query);
+				while (rs.next() && !bMatch) {
+					String temp = rs.getString(1);
+					if (partStr.toLowerCase().contains(temp)) {
+						bMatch = true;
+					}
+				}
+				if (!bMatch) {
+					returnDesc.append(partStr).append(System.getProperty("line.separator"));
+				}
+			} catch (Exception ex) {
+				logger.info(ex.toString());
+			} finally {
+				if (stmt != null) {
+					try {
+						stmt.close();
+					} catch (SQLException ex) {
+						// TODO Auto-generated catch block
+						logger.error("ERR_CORRECT_DESCRIPTION|" + ex.getMessage());
+					}
+				}
+			}
+		}
 
+		logger.info("Correct Desciption IS|=" + returnDesc.toString() + "|take time:" + (System.currentTimeMillis() - startTime));
+		return returnDesc.toString();
+	}
 	private void updateProcessStatus(int id, int processStatus) 
 	{
 		System.out.println("Update Process Status");
@@ -157,7 +183,6 @@ public class UploadExecuteTimer extends TimerTask{
 				result = rs.getString(1);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
 		return result;
@@ -177,7 +202,6 @@ public class UploadExecuteTimer extends TimerTask{
 				result = rs.getString(1);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
 		return result;

@@ -2,7 +2,7 @@ spiderboot/util/Util.class
 spiderboot/configuration/ConfigProperties.class
 spiderboot/util/VideoWraper.class
 spiderboot/timer/TimerWrapper.class
-spiderboot/util/FileUtils.class
 spiderboot/util/WriteToFileExample.class
+spiderboot/util/FileUtils.class
 spiderboot/database/MySqlAccess.class
 spiderboot/util/Utility.class

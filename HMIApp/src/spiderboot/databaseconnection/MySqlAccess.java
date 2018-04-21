@@ -16,10 +16,14 @@ public class MySqlAccess {
 
 	private MySqlAccess(){
 		//default constructor
-		dbServer = ConfigProperties.getInstance().getProperties("DbServer", "localhost:3306");
-		dbName = ConfigProperties.getInstance().getProperties("DbName", "spiderboot");
-		dbUserName = ConfigProperties.getInstance().getProperties("DbUserName","root");
-		dbPassword = ConfigProperties.getInstance().getProperties("DbPassword","123456");
+//		dbServer = ConfigProperties.getInstance().getProperties("DbServer", "localhost:3306");
+//		dbName = ConfigProperties.getInstance().getProperties("DbName", "spiderboot");
+//		dbUserName = ConfigProperties.getInstance().getProperties("DbUserName","root");
+//		dbPassword = ConfigProperties.getInstance().getProperties("DbPassword","123456");
+		dbServer = "localhost:3306";
+		dbName = "spiderboot";
+		dbUserName = "root";
+		dbPassword = "123456";
 	}
 
 	public static MySqlAccess getInstance(){

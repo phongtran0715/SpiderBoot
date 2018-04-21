@@ -39,12 +39,12 @@ public class MainSpiderBoot {
 	private static int preLoad() {
 		int errorCode = -1;
 		//load configuration file
-		boolean configResult = ConfigProperties.getInstance().loadConfigFile();
-		if(!configResult){
-			System.out.println("Can not load configuration file");
-			errorCode = 1;
-			return errorCode;
-		}
+//		boolean configResult = ConfigProperties.getInstance().loadConfigFile();
+//		if(!configResult){
+//			System.out.println("Can not load configuration file");
+//			errorCode = 1;
+//			return errorCode;
+//		}
 		//open database connection
 		int dbResult = MySqlAccess.getInstance().DBConnect();
 		if(dbResult == 0){
