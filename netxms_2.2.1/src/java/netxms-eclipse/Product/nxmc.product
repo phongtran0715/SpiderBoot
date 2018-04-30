@@ -142,7 +142,7 @@ Copyright (c) 2003-2017 Raden Solutions
       <plugin id="org.netxms.ui.eclipse.topology"/>
       <plugin id="org.netxms.ui.eclipse.usermanager"/>
       <plugin id="org.simpleframework.xml"/>
-      <plugin id="org.spider.ui.eclipse.emailmanager"/>
+      <plugin id="org.spider.ui.eclipse.spidermanager"/>
       <plugin id="org.swtchart"/>
    </plugins>
 

@@ -186,6 +186,11 @@ import org.netxms.client.users.User;
 import org.netxms.client.users.UserGroup;
 import org.netxms.client.zeromq.ZmqSubscription;
 import org.netxms.client.zeromq.ZmqSubscriptionType;
+import org.spider.object.GoogleAccount;
+import org.spider.object.HomeChannel;
+import org.spider.object.MappingChannel;
+import org.spider.object.MonitorChannel;
+
 import com.jcraft.jzlib.Deflater;
 import com.jcraft.jzlib.JZlib;
 
@@ -338,7 +343,7 @@ public class NXCSession {
 
 	// Message of the day
 	private String messageOfTheDay;
-
+	
 	/**
 	 * Message subscription class
 	 */
@@ -3737,6 +3742,63 @@ public class NXCSession {
 			list = values.toArray(new AbstractUserObject[values.size()]);
 		}
 		return list;
+	}
+	
+	/**
+	 * Get list google account
+	 * @return 
+	 * @throws NXCException 
+	 * @throws IOException 
+	 */
+	public Object [] getGoogleAccount() throws IOException, NXCException
+	{
+		
+		NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_ALL_ALARMS);
+		final long rqId = msg.getMessageId();
+		sendMessage(msg);
+
+		final Map<Integer, GoogleAccount> googleAccountList = new HashMap<Integer, GoogleAccount>();
+		while (true) {
+			msg = waitForMessage(NXCPCodes.CMD_ALARM_DATA, rqId);
+			int id = msg.getFieldAsInt32(NXCPCodes.VID_ALARM_ID);
+			String userName = "user name";
+			String api = "api ";
+			String clientSecret = "client secret";
+			String accountType = "account type";
+			String appname = "app name";
+			if (id == -1)
+				break; // ID == -1 indicates end of list
+			googleAccountList.put(id, new GoogleAccount(id, userName, api, clientSecret, accountType, appname));
+		}
+		return googleAccountList.entrySet().toArray();
+	}
+	
+	/**
+	 * Get home channel list
+	 */
+	public Object [] getHomeChannel()
+	{
+		final Map<Integer, HomeChannel> homeChannleList = new HashMap<Integer, HomeChannel>();
+		return homeChannleList.entrySet().toArray();
+	}
+	
+	/**
+	 * Get monitor channel list
+	 */
+	
+	public Object [] getMonitorChannelList()
+	{
+		final Map<Integer, MonitorChannel> monitorChannleList = new HashMap<Integer, MonitorChannel>();
+		return monitorChannleList.entrySet().toArray();
+	}
+	
+	/**
+	 * Get mapping channel list
+	 */
+	public Object [] getMappingChannelList()
+	{
+		final Map<Integer, MappingChannel> mappingChannleList = new HashMap<Integer, MappingChannel>();
+		return mappingChannleList.entrySet().toArray();
 	}
 
 	/**

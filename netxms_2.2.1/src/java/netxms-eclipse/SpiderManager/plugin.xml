@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="Spider Manager"
+            id="org.spider.ui.eclipse.spidermanager.commands.category">
+      </category>
+      <command
+            name="Spider Manager"
+            categoryId="org.spider.ui.eclipse.spidermanager.commands.category"
+            id="org.spider.ui.eclipse.spidermanager.commands.spidermanager">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.spider.ui.eclipse.spidermanager.commands.spidermanager"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+6"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="Spider Action Set"
+            visible="true"
+            id="org.spider.ui.eclipse.spidermanager.actionSet">
+         <menu
+               icon="icons/settings_16x16.png"
+               id="spiderMenu"
+               label="Spider &amp;Menu">
+            <separator
+                  name="googleAccountGroup">
+            </separator>
+            <separator
+                  name="channelGroup">
+            </separator>
+         </menu>
+         <action
+               class="org.spider.ui.eclipse.spidermanager.actions.OpenGoogleAccountManager"
+               icon="icons/gmail_16x16.png"
+               id="SpiderManager.action1"
+               label="&amp;Google Account"
+               menubarPath="spiderMenu/googleAccountGroup"
+               tooltip="Google Account Manager">
+         </action>
+         <action
+               class="org.spider.ui.eclipse.spidermanager.actions.OpenHomeChannelManager"
+               icon="icons/playlist_16x16.png"
+               id="SpiderManager.action2"
+               label="&amp;Home Channel"
+               menubarPath="spiderMenu/channelGroup"
+               style="push">
+         </action>
+         <action
+               class="org.spider.ui.eclipse.spidermanager.actions.OpenMonitorChannelManager"
+               icon="icons/eye_16x16.png"
+               id="SpiderManager.action3"
+               label="&amp; Monitor Channel"
+               menubarPath="spiderMenu/channelGroup"
+               style="push">
+         </action>
+         <action
+               class="org.spider.ui.eclipse.spidermanager.actions.OpenMappingChannelManager"
+               icon="icons/settings_16x16.png"
+               id="SpiderManager.action5"
+               label="&amp;Mapping Channel"
+               menubarPath="spiderMenu/channelGroup"
+               style="push">
+         </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Google Account"
+            id="org.spider.ui.eclipse.google_account_manager">
+      </category>
+      <view
+            name="Google Account"
+            icon="icons/gmail_16x16.png"
+            category="org.spider.ui.eclipse.google_account_manager"
+            class="org.spider.ui.eclipse.spidermanager.views.GoogleAccountManagerView"
+            id="org.spider.ui.eclipse.spidermanager.views.GoogleAccountManager">
+      </view>
+      <category
+            id="org.spider.ui.eclipse.channel_manager"
+            name="Channel Manager">
+      </category>
+      <view
+            category="org.spider.ui.eclipse.channel_manager"
+            class="org.spider.ui.eclipse.spidermanager.views.HomeChannelManagerView"
+            icon="icons/playlist_16x16.png"
+            id="org.spider.ui.eclipse.spidermanager.views.HomeChannelManager"
+            name="Home Channle"
+            restorable="true">
+      </view>
+      <view
+            category="org.spider.ui.eclipse.channel_manager"
+            class="org.spider.ui.eclipse.spidermanager.views.MonitorChannelManagerView"
+            icon="icons/eye_16x16.png"
+            id="org.spider.ui.eclipse.spidermanager.views.MonitorChannelManager"
+            name="Monitor Channel"
+            restorable="true">
+      </view>
+      <view
+            category="org.spider.ui.eclipse.channel_manager"
+            class="org.spider.ui.eclipse.spidermanager.views.MappingChannelManagerView"
+            icon="icons/settings_16x16.png"
+            id="org.spider.ui.eclipse.spidermanager.views.MappingChannelManager"
+            name="Mapping Channel"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+
+</plugin>
