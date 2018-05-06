@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Group;
+import org.spider.client.MonitorChannelObject;
 
 /**
  * User database object creation dialog
@@ -36,9 +37,17 @@ import org.eclipse.swt.widgets.Group;
 public class EditMonitorChannelDialog extends Dialog {
 	private Text txtChannelId;
 	private Text txtChannelName;
+	
+	private int id;
+	private String channelId;
+	private String channelName;
+	MonitorChannelObject object;
 
-	public EditMonitorChannelDialog(Shell parentShell) {
+	public EditMonitorChannelDialog(Shell parentShell, MonitorChannelObject object) 
+	{
 		super(parentShell);
+		this.object = object;
+		id = object.getId();
 	}
 
 	/*
@@ -83,6 +92,10 @@ public class EditMonitorChannelDialog extends Dialog {
 		txtChannelName.setTextLimit(150);
 		txtChannelName.setBounds(131, 59, 290, 27);
 		
+		//initial data
+		txtChannelId.setText(object.getChannelId());
+		txtChannelName.setText(object.getChannelName());
+		
 		return dialogArea;
 	}
 
@@ -105,8 +118,9 @@ public class EditMonitorChannelDialog extends Dialog {
 	 */
 	@Override
 	protected void okPressed() {
-		String channelID = txtChannelId.getText();
-		if(channelID == null || channelID.isEmpty())
+		channelId = txtChannelId.getText();
+		channelName = txtChannelName.getText();
+		if(channelId == null || channelId.isEmpty())
 		{
 			MessageBox dialog =
 					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
@@ -116,5 +130,17 @@ public class EditMonitorChannelDialog extends Dialog {
 			return;
 		}
 		super.okPressed();
+	}
+
+	public String getChannelId() {
+		return channelId;
+	}
+
+	public String getChannelName() {
+		return channelName;
+	}
+	
+	public int getId() {
+		return id;
 	}
 }

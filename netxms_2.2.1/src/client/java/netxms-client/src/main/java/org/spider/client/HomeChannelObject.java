@@ -1,6 +1,6 @@
-package org.spider.object;
+package org.spider.client;
 
-public class HomeChannel {
+public class HomeChannelObject {
 	int id;
 	String channelId;
 	String channelName;
@@ -11,12 +11,12 @@ public class HomeChannel {
 	String descTemp;
 	String titleTemp;
 	
-	public HomeChannel()
+	public HomeChannelObject()
 	{
 		
 	}
 	
-	public HomeChannel(int id, String channelId, String channelName, String googleAccount, 
+	public HomeChannelObject(int id, String channelId, String channelName, String googleAccount, 
 			String vIntro, String vOutro, String logo, String desctemp, String titletemp)
 	{
 		this.id = id;

@@ -17,12 +17,15 @@ import org.netxms.client.NXCException;
 import org.netxms.client.NXCSession;
 import org.netxms.client.SessionListener;
 import org.netxms.client.SessionNotification;
+import org.netxms.ui.eclipse.actions.RefreshAction;
 import org.netxms.ui.eclipse.jobs.ConsoleJob;
 import org.netxms.ui.eclipse.shared.ConsoleSharedData;
 import org.netxms.ui.eclipse.spidermanager.dialogs.CreateGoogleAccoutDialog;
-import org.netxms.ui.eclipse.spidermanager.dialogs.EditGoocleAccountDialog;
+import org.netxms.ui.eclipse.spidermanager.dialogs.EditGoogleAccountDialog;
 import org.netxms.ui.eclipse.widgets.SortableTableViewer;
+import org.spider.client.GoogleAccountObject;
 import org.spider.ui.eclipse.spidermanager.Activator;
+import org.spider.ui.eclipse.spidermanager.helper.GoogleAccountLabelProvider;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -50,8 +53,17 @@ public class GoogleAccountManagerView extends ViewPart {
 	private Action addNewAccount;
 	private Action editAccount;
 	private Action deleteAccount;
+	private RefreshAction actionRefresh;
 	private NXCSession session;
 	private SessionListener sessionListener;
+
+	// Columns
+	public static final int COLUMN_ID = 0;
+	public static final int COLUMN_USER_NAME = 1;
+	public static final int COLUMN_API = 2;
+	public static final int COLUMN_CLIENT_SECRET = 3;
+	public static final int COLUMN_ACCOUNT_TYPE = 4;
+	public static final int COLUMN_APPNAME = 5;
 
 	class ViewLabelProvider extends LabelProvider implements
 	ITableLabelProvider {
@@ -94,8 +106,14 @@ public class GoogleAccountManagerView extends ViewPart {
 		viewer = new SortableTableViewer(parent, names, widths, 0, SWT.UP, SortableTableViewer.DEFAULT_STYLE);
 
 		viewer.setContentProvider(new ArrayContentProvider());
-		viewer.setLabelProvider(new ViewLabelProvider());
-		viewer.setSorter(new NameSorter());
+		viewer.setLabelProvider(new GoogleAccountLabelProvider());
+		//viewer.setSorter(new NameSorter());
+		try {
+			viewer.setInput(session.getGoogleAccount());
+		} catch (IOException | NXCException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
 
 		// Create the help context id for the viewer's control
 		PlatformUI
@@ -111,23 +129,58 @@ public class GoogleAccountManagerView extends ViewPart {
 		sessionListener = new SessionListener() {
 			@Override
 			public void notificationHandler(final SessionNotification n) {
-				if (n.getCode() == SessionNotification.USER_DB_CHANGED) {
+				if (n.getCode() == SessionNotification.GOOGLE_ACCOUNT_CHANGED) {
 					viewer.getControl().getDisplay().asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							//TODO : implement to handle server information
 							try {
 								viewer.setInput(session.getGoogleAccount());
 							} catch (IOException | NXCException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-							session.addListener(sessionListener);
 						}
 					});
 				}
 			}
 		};
+		
+		// Request server to lock user database, and on success refresh view
+		new ConsoleJob("", this,
+				Activator.PLUGIN_ID, null) {
+			@Override
+			protected void runInternal(IProgressMonitor monitor)
+					throws Exception {
+				runInUIThread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							viewer.setInput(session.getGoogleAccount());
+						} catch (IOException | NXCException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						session.addListener(sessionListener);
+					}
+				});
+			}
+
+			@Override
+			protected void jobFailureHandler() {
+				runInUIThread(new Runnable() {
+					@Override
+					public void run() {
+						GoogleAccountManagerView.this.getViewSite().getPage()
+								.hideView(GoogleAccountManagerView.this);
+					}
+				});
+			}
+
+			@Override
+			protected String getErrorMessage() {
+				return "Open google account error!";
+			}
+		}.start();
 	}
 
 	private void hookContextMenu() {
@@ -155,12 +208,15 @@ public class GoogleAccountManagerView extends ViewPart {
 		manager.add(editAccount);
 		manager.add(new Separator());
 		manager.add(deleteAccount);
+		manager.add(new Separator());
+		manager.add(actionRefresh);
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
 		manager.add(addNewAccount);
 		manager.add(editAccount);
 		manager.add(deleteAccount);
+		manager.add(actionRefresh);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -169,6 +225,7 @@ public class GoogleAccountManagerView extends ViewPart {
 		manager.add(addNewAccount);
 		manager.add(editAccount);
 		manager.add(deleteAccount);
+		manager.add(actionRefresh);
 	}
 
 	private void makeActions() {
@@ -183,7 +240,7 @@ public class GoogleAccountManagerView extends ViewPart {
 		editAccount = new Action("edit_account", 
 				Activator.getImageDescriptor("icons/account_edit.png")) {
 			public void run() {
-				editAccount();
+				modifyAccount();
 			}
 		};
 		editAccount.setToolTipText("Edit account");
@@ -191,10 +248,27 @@ public class GoogleAccountManagerView extends ViewPart {
 		deleteAccount = new Action("delete_account", 
 				Activator.getImageDescriptor("icons/account_delete.png")) {
 			public void run() {
-				deleteAccount();
+				try {
+					deleteAccount();
+				} catch (NXCException | IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		};
 		deleteAccount.setToolTipText("Delete account");
+		
+		actionRefresh = new RefreshAction(this) {
+			@Override
+			public void run() {
+				try {
+					viewer.setInput(session.getGoogleAccount());
+				} catch (IOException | NXCException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		};
 	}
 
 	/**
@@ -215,12 +289,13 @@ public class GoogleAccountManagerView extends ViewPart {
 				@Override
 				protected void runInternal(IProgressMonitor monitor)
 						throws Exception {
-					//TODO : implement to send information to server
-					//session.createUser(dlg.getLoginName());
+					session.createGoogleAccount(dlg.getUserName(), dlg.getApiKey(), 
+							dlg.getClientSecret(), 0, dlg.getAppName());
 				}
 
 				@Override
 				protected String getErrorMessage() {
+					System.out.println("Can not create user");
 					return "Can not create user";
 				}
 			}.start();
@@ -230,7 +305,7 @@ public class GoogleAccountManagerView extends ViewPart {
 	/**
 	 * Edit account
 	 */
-	private void editAccount() {
+	private void modifyAccount() {
 		final IStructuredSelection selection = (IStructuredSelection) viewer
 				.getSelection();
 		if(selection.size() <= 0)
@@ -242,30 +317,28 @@ public class GoogleAccountManagerView extends ViewPart {
 			dialog.open();
 			return;
 		}
-
-		final EditGoocleAccountDialog dlg = new EditGoocleAccountDialog(getViewSite().getShell());	
+		final Object firstElement = selection.getFirstElement();
+		final EditGoogleAccountDialog dlg = new EditGoogleAccountDialog(getViewSite().getShell(), firstElement);	
 		if (dlg.open() == Window.OK) {
-			new ConsoleJob("Edit google account",
+			new ConsoleJob("Modify google account",
 					this, Activator.PLUGIN_ID, null) {
 				@Override
 				protected void runInternal(IProgressMonitor monitor)
 						throws Exception {
-					//TODO : implement to send information to server
-					//session.createUser(dlg.getLoginName());
+					session.modifyGoogleAccount(dlg.getId(), dlg.getUserName(), dlg.getApi(), 
+							dlg.getClientSecret(), dlg.getAccountType(),dlg.getAppName());
 				}
 
 				@Override
 				protected String getErrorMessage() {
-					return "Cannot edit user";
+					System.out.println("Cannot modify google account");
+					return "Cannot modify google account";
 				}
 			}.start();
 		}
 	}
 
-	/**
-	 * Delete account
-	 */
-	private void deleteAccount()
+	private void deleteAccount() throws NXCException, IOException
 	{
 		final IStructuredSelection selection = (IStructuredSelection) viewer
 				.getSelection();
@@ -282,7 +355,14 @@ public class GoogleAccountManagerView extends ViewPart {
 				new MessageBox(getViewSite().getShell(), SWT.ICON_QUESTION | SWT.OK| SWT.CANCEL);
 		dialog.setText("Confirm to delete item");
 		dialog.setMessage("Do you really want to do delete this item?");
-		if (dialog.open() == Window.OK) {
+		if (dialog.open() == SWT.OK) {
+			final Object firstElement = selection.getFirstElement();
+			if(firstElement instanceof GoogleAccountObject)
+			{
+				GoogleAccountObject gObject = (GoogleAccountObject)firstElement;
+				int id = gObject.getId();
+				session.deleteGoogleAccount(gObject.getId());
+			}
 		}
 	}
 }

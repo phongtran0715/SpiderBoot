@@ -1,5 +1,7 @@
 package org.spider.ui.eclipse.spidermanager.views;
 
+import java.io.IOException;
+
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.part.*;
@@ -11,13 +13,19 @@ import org.eclipse.jface.action.*;
 import org.eclipse.ui.*;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.SWT;
+import org.netxms.client.NXCException;
 import org.netxms.client.NXCSession;
+import org.netxms.client.SessionListener;
+import org.netxms.client.SessionNotification;
+import org.netxms.ui.eclipse.actions.RefreshAction;
 import org.netxms.ui.eclipse.jobs.ConsoleJob;
 import org.netxms.ui.eclipse.shared.ConsoleSharedData;
 import org.netxms.ui.eclipse.spidermanager.dialogs.CreateMonitorChannelDialog;
 import org.netxms.ui.eclipse.spidermanager.dialogs.EditMonitorChannelDialog;
 import org.netxms.ui.eclipse.widgets.SortableTableViewer;
+import org.spider.client.MonitorChannelObject;
 import org.spider.ui.eclipse.spidermanager.Activator;
+import org.spider.ui.eclipse.spidermanager.helper.MonitorChannelLabelProvider;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -45,7 +53,13 @@ public class MonitorChannelManagerView extends ViewPart {
 	private Action actAddMonitorChannel;
 	private Action actEditMonitorChannel;
 	private Action actDeleteMonitorChannel;
+	private RefreshAction actionRefresh;
 	private NXCSession session;
+	private SessionListener sessionListener;
+
+	public static final int COLUMN_ID 				= 0;
+	public static final int COLUMN_CHANNEL_ID 		= 1;
+	public static final int COLUMN_CHANNEL_NAME 	= 2;
 
 	/*
 	 * The content provider class is responsible for providing objects to the
@@ -56,7 +70,7 @@ public class MonitorChannelManagerView extends ViewPart {
 	 */
 
 	class ViewLabelProvider extends LabelProvider implements
-			ITableLabelProvider {
+	ITableLabelProvider {
 		public String getColumnText(Object obj, int index) {
 			return getText(obj);
 		}
@@ -86,26 +100,88 @@ public class MonitorChannelManagerView extends ViewPart {
 	 */
 	public void createPartControl(Composite parent) {
 		session = ConsoleSharedData.getSession();
-		final String[] names = { "ChannelID",
-				"Channel Name"};
-		final int[] widths = { 120, 120};
+		final String[] names = { "Id",
+				"ChannelID",
+		"Channel Name"};
+		final int[] widths = { 60, 120, 120};
 		viewer = new SortableTableViewer(parent, names, widths, 0, SWT.UP, SortableTableViewer.DEFAULT_STYLE);
 		viewer.setContentProvider(new ArrayContentProvider());
-		viewer.setLabelProvider(new ViewLabelProvider());
+		viewer.setLabelProvider(new MonitorChannelLabelProvider());
 		viewer.setSorter(new NameSorter());
 		viewer.setInput(getViewSite());
-		viewer.setInput(session.getMonitorChannelList());
+		try {
+			viewer.setInput(session.getMonitorChannelList());
+		} catch (IOException | NXCException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		// Create the help context id for the viewer's control
 		PlatformUI
-				.getWorkbench()
-				.getHelpSystem()
-				.setHelp(viewer.getControl(),
-						"org.spider.ui.eclipse.spider.viewer");
+		.getWorkbench()
+		.getHelpSystem()
+		.setHelp(viewer.getControl(),
+				"org.spider.ui.eclipse.spider.viewer");
 		makeActions();
 		hookContextMenu();
 		hookDoubleClickAction();
 		contributeToActionBars();
+		// Listener for server's notifications
+		sessionListener = new SessionListener() {
+			@Override
+			public void notificationHandler(final SessionNotification n) {
+				if (n.getCode() == SessionNotification.MONITOR_CHANNEL_CHANGED) {
+					viewer.getControl().getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								viewer.setInput(session.getMonitorChannelList());
+							} catch (IOException | NXCException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					});
+				}
+			}
+		};
+
+		// Request server to lock user database, and on success refresh view
+		new ConsoleJob("Refresh monitor channel list", this,
+				Activator.PLUGIN_ID, null) {
+			@Override
+			protected void runInternal(IProgressMonitor monitor)
+					throws Exception {
+				runInUIThread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							viewer.setInput(session.getMonitorChannelList());
+						} catch (IOException | NXCException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						session.addListener(sessionListener);
+					}
+				});
+			}
+
+			@Override
+			protected void jobFailureHandler() {
+				runInUIThread(new Runnable() {
+					@Override
+					public void run() {
+						MonitorChannelManagerView.this.getViewSite().getPage()
+						.hideView(MonitorChannelManagerView.this);
+					}
+				});
+			}
+
+			@Override
+			protected String getErrorMessage() {
+				return "Open monitor channel error!";
+			}
+		}.start();
 	}
 
 	private void hookContextMenu() {
@@ -133,12 +209,15 @@ public class MonitorChannelManagerView extends ViewPart {
 		manager.add(actEditMonitorChannel);
 		manager.add(new Separator());
 		manager.add(actDeleteMonitorChannel);
+		manager.add(new Separator());
+		manager.add(actionRefresh);
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
 		manager.add(actAddMonitorChannel);
 		manager.add(actEditMonitorChannel);
 		manager.add(actDeleteMonitorChannel);
+		manager.add(actionRefresh);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -147,6 +226,7 @@ public class MonitorChannelManagerView extends ViewPart {
 		manager.add(actAddMonitorChannel);
 		manager.add(actEditMonitorChannel);
 		manager.add(actDeleteMonitorChannel);
+		manager.add(actionRefresh);
 	}
 
 	private void makeActions() {
@@ -161,7 +241,7 @@ public class MonitorChannelManagerView extends ViewPart {
 		actEditMonitorChannel = new Action("Edit monitor channel", 
 				Activator.getImageDescriptor("icons/account_edit.png")) {
 			public void run() {
-				editMonitorChannel();
+				modifyMonitorChannel();
 			}
 		};
 		actEditMonitorChannel.setToolTipText("Edit monitor channel");
@@ -169,11 +249,27 @@ public class MonitorChannelManagerView extends ViewPart {
 		actDeleteMonitorChannel = new Action("Delete monitor channel", 
 				Activator.getImageDescriptor("icons/account_delete.png")) {
 			public void run() {
-				deleteMonitorChannel();
-				
+				try {
+					deleteMonitorChannel();
+				} catch (IOException | NXCException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		};
 		actDeleteMonitorChannel.setToolTipText("Delete monitor channel");
+		
+		actionRefresh = new RefreshAction(this) {
+			@Override
+			public void run() {
+				try {
+					viewer.setInput(session.getMonitorChannelList());
+				} catch (IOException | NXCException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		};
 	}
 
 	private void hookDoubleClickAction() {
@@ -183,16 +279,10 @@ public class MonitorChannelManagerView extends ViewPart {
 		});
 	}
 
-	/**
-	 * Passing the focus request to the viewer's control.
-	 */
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
-	
-	/**
-	 * Create new monitor channel
-	 */
+
 	private void addMonitorChannel()
 	{
 		final CreateMonitorChannelDialog dlg = new CreateMonitorChannelDialog(getViewSite().getShell());
@@ -202,8 +292,7 @@ public class MonitorChannelManagerView extends ViewPart {
 				@Override
 				protected void runInternal(IProgressMonitor monitor)
 						throws Exception {
-					//TODO : implement to send information to server
-					//session.createUser(dlg.getLoginName());
+					session.createMonitorChannel(dlg.getChannelId(), dlg.getChannelName());
 				}
 
 				@Override
@@ -213,11 +302,8 @@ public class MonitorChannelManagerView extends ViewPart {
 			}.start();
 		}
 	}
-	
-	/**
-	 * Edit monitor channel
-	 */
-	private void editMonitorChannel()
+
+	private void modifyMonitorChannel()
 	{
 		final IStructuredSelection selection = (IStructuredSelection) viewer
 				.getSelection();
@@ -230,29 +316,32 @@ public class MonitorChannelManagerView extends ViewPart {
 			dialog.open();
 			return;
 		}
-		final EditMonitorChannelDialog dlg = new EditMonitorChannelDialog(getViewSite().getShell());
-		if (dlg.open() == Window.OK) {
-			new ConsoleJob("Edit monitor channel",
-					this, Activator.PLUGIN_ID, null) {
-				@Override
-				protected void runInternal(IProgressMonitor monitor)
-						throws Exception {
-					//TODO : implement to send information to server
-					//session.createUser(dlg.getLoginName());
-				}
+		Object firstElement = selection.getFirstElement();
+		if(firstElement instanceof MonitorChannelObject)
+		{
 
-				@Override
-				protected String getErrorMessage() {
-					return "Can not edit monitor channel";
-				}
-			}.start();
+			final EditMonitorChannelDialog dlg = new EditMonitorChannelDialog(getViewSite().getShell(), 
+					(MonitorChannelObject)firstElement);
+			if (dlg.open() == Window.OK) {
+				new ConsoleJob("Edit monitor channel",
+						this, Activator.PLUGIN_ID, null) {
+					@Override
+					protected void runInternal(IProgressMonitor monitor)
+							throws Exception {
+						session.modifyMonitorChannel(dlg.getId(), dlg.getChannelId(), dlg.getChannelName());
+					}
+
+					@Override
+					protected String getErrorMessage() {
+						return "Can not edit monitor channel";
+					}
+				}.start();
+			}	
 		}
+
 	}
-	
-	/**
-	 * Delete monitor channel
-	 */
-	private void deleteMonitorChannel()
+
+	private void deleteMonitorChannel() throws IOException, NXCException
 	{
 		final IStructuredSelection selection = (IStructuredSelection) viewer
 				.getSelection();
@@ -269,7 +358,13 @@ public class MonitorChannelManagerView extends ViewPart {
 				new MessageBox(getViewSite().getShell(), SWT.ICON_QUESTION | SWT.OK| SWT.CANCEL);
 		dialog.setText("Confirm to delete item");
 		dialog.setMessage("Do you really want to do delete this item?");
-		if (dialog.open() == Window.OK) {
+		if (dialog.open() == SWT.OK) {
+			Object firstElement = selection.getFirstElement();
+			if(firstElement instanceof MonitorChannelObject)
+			{
+				MonitorChannelObject object = (MonitorChannelObject)firstElement;
+				session.deleteMonitorChannel(object.getId());
+			}
 		}
 	}
 }

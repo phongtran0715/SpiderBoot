@@ -18,6 +18,8 @@
  */
 package org.netxms.ui.eclipse.spidermanager.dialogs;
 
+import java.io.IOException;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -29,6 +31,16 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Combo;
+import org.netxms.client.NXCException;
+import org.netxms.client.NXCSession;
+import org.netxms.ui.eclipse.shared.ConsoleSharedData;
+import org.spider.client.HomeChannelObject;
+import org.spider.client.MonitorChannelObject;
+import org.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.MouseTrackAdapter;
+import org.eclipse.swt.events.MouseEvent;
 
 /**
  * User database object creation dialog
@@ -39,9 +51,20 @@ public class CreateMappingChannelDialog extends Dialog {
 	private Combo cbHome;
 	private Combo cbMonitor;
 	private Combo cbStatus;
+	Label lbHome;
+	Label lbMonitor;
+	Object [] cHomeObject;
+	Object [] cMoniorObject;
+	private NXCSession session;
+	private String homeChannelId;
+	private String monitorChannelId;
+	private int status;
+	private long timeSync;
+
 
 	public CreateMappingChannelDialog(Shell parentShell) {
 		super(parentShell);
+		session = ConsoleSharedData.getSession();
 	}
 
 	/*
@@ -66,7 +89,7 @@ public class CreateMappingChannelDialog extends Dialog {
 
 		Group grpCreateNewAccount = new Group(dialogArea, SWT.NONE);
 		grpCreateNewAccount.setText("Create new mapping channel");
-		grpCreateNewAccount.setBounds(5, 10, 432, 166);
+		grpCreateNewAccount.setBounds(5, 10, 432, 256);
 
 		Label lblChannelId = new Label(grpCreateNewAccount, SWT.NONE);
 		lblChannelId.setAlignment(SWT.RIGHT);
@@ -76,36 +99,61 @@ public class CreateMappingChannelDialog extends Dialog {
 		Label lblChannelName = new Label(grpCreateNewAccount, SWT.NONE);
 		lblChannelName.setAlignment(SWT.RIGHT);
 		lblChannelName.setText("C Monitor ID");
-		lblChannelName.setBounds(10, 64, 109, 17);
+		lblChannelName.setBounds(10, 88, 109, 17);
 
 		Label lblGoogleAccount = new Label(grpCreateNewAccount, SWT.NONE);
 		lblGoogleAccount.setAlignment(SWT.RIGHT);
 		lblGoogleAccount.setText("Time Sync");
-		lblGoogleAccount.setBounds(10, 97, 109, 17);
+		lblGoogleAccount.setBounds(10, 140, 109, 17);
 
 		txtTimeSync = new Text(grpCreateNewAccount, SWT.BORDER);
+		txtTimeSync.setText("600");
 		txtTimeSync.setTextLimit(150);
-		txtTimeSync.setBounds(131, 92, 290, 27);
+		txtTimeSync.setBounds(131, 135, 290, 27);
 
 		Label lblVideoIntro = new Label(grpCreateNewAccount, SWT.NONE);
 		lblVideoIntro.setAlignment(SWT.RIGHT);
 		lblVideoIntro.setText("Sync Status");
-		lblVideoIntro.setBounds(10, 130, 109, 17);
+		lblVideoIntro.setBounds(10, 200, 109, 17);
+
+		lbHome = new Label(grpCreateNewAccount, SWT.NONE);
+		lbHome.setAlignment(SWT.CENTER);
+		lbHome.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
+		lbHome.setBounds(131, 54, 290, 17);
+
+		lbMonitor = new Label(grpCreateNewAccount, SWT.NONE);
+		lbMonitor.setAlignment(SWT.CENTER);
+		lbMonitor.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
+		lbMonitor.setBounds(131, 113, 290, 17);
 
 		cbHome = new Combo(grpCreateNewAccount, SWT.NONE);
-		cbHome.setItems(new String[] {"None"});
+		cbHome.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String cName = getHomeChannelName(cbHome.getText());
+				lbHome.setText(cName);
+			}
+		});
+		cbHome.setItems(new String[] {});
 		cbHome.setBounds(132, 19, 289, 29);
 
 		cbStatus = new Combo(grpCreateNewAccount, SWT.NONE);
 		cbStatus.setItems(new String[] {"disable", "enable"});
-		cbStatus.setBounds(132, 125, 289, 29);
+		cbStatus.setBounds(132, 195, 289, 29);
 		cbStatus.select(0);
 
 		cbMonitor = new Combo(grpCreateNewAccount, SWT.NONE);
-		cbMonitor.setItems(new String[] {"None"});
-		cbMonitor.setBounds(132, 54, 289, 29);
-		//txtAppName.setLayoutData(gridData);
+		cbMonitor.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String cName = getMonitorChannelName(cbMonitor.getText());
+				lbMonitor.setText(cName);
+			}
+		});
+		cbMonitor.setItems(new String[] {});
+		cbMonitor.setBounds(132, 78, 289, 29);
 
+		initialData();
 		return dialogArea;
 	}
 
@@ -128,8 +176,8 @@ public class CreateMappingChannelDialog extends Dialog {
 	 */
 	@Override
 	protected void okPressed() {
-		String cHomeId = cbHome.getText();
-		if(cHomeId == null || cHomeId.isEmpty())
+		homeChannelId = cbHome.getText();
+		if(homeChannelId == null || homeChannelId.isEmpty())
 		{
 			MessageBox dialog =
 					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
@@ -138,8 +186,9 @@ public class CreateMappingChannelDialog extends Dialog {
 			dialog.open();
 			return;
 		}
-		String cMonitorId = cbMonitor.getText();
-		if(cMonitorId == null || cMonitorId.isEmpty())
+		
+		monitorChannelId = cbMonitor.getText();
+		if(monitorChannelId == null || monitorChannelId.isEmpty())
 		{
 			MessageBox dialog =
 					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
@@ -148,8 +197,9 @@ public class CreateMappingChannelDialog extends Dialog {
 			dialog.open();
 			return;
 		}
-		String timeSync = txtTimeSync.getText();
-		if(timeSync == null || timeSync.isEmpty())
+		
+		String strTime = txtTimeSync.getText();
+		if(strTime == null || strTime.isEmpty())
 		{
 			MessageBox dialog =
 					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
@@ -158,6 +208,117 @@ public class CreateMappingChannelDialog extends Dialog {
 			dialog.open();
 			return;
 		}
+		timeSync = Integer.parseInt(strTime);
+		
+		if(cbStatus.getText().equals("disable"))
+		{
+			status = 0;
+		}
+		else{
+			status = 1;
+		}
 		super.okPressed();
+	}
+
+	private void initialData()
+	{
+		//Initial data
+		try {
+			if(cHomeObject == null)
+			{
+				cHomeObject = session.getHomeChannel();
+				setHomeChannelData();
+			}
+		} catch (IOException | NXCException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		if(cMoniorObject == null)
+		{
+			try {
+				cMoniorObject = session.getMonitorChannelList();
+				setMonitorChannelData();
+			} catch (IOException | NXCException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+	}
+
+	private void setHomeChannelData()
+	{
+		if(cHomeObject != null)
+		{
+			for(int i = 0; i < cHomeObject.length; i++)
+			{
+				Object homeObj = cHomeObject[i];
+				if(homeObj instanceof HomeChannelObject)
+				{
+					cbHome.add(((HomeChannelObject) homeObj).getChannelId());
+				}
+			}
+		}
+	}
+
+	private void setMonitorChannelData()
+	{
+		if(cMoniorObject != null)
+		{
+			for(int i = 0; i < cMoniorObject.length; i++)
+			{
+				Object monitorObj = cMoniorObject[i];
+				if(monitorObj instanceof MonitorChannelObject)
+				{
+					cbMonitor.add(((MonitorChannelObject) monitorObj).getChannelId());
+				}
+			}
+		}
+	}
+
+	private String getHomeChannelName(String cHomeID)
+	{
+		String result = "";
+		for (Object it : cHomeObject) {
+			if(it instanceof HomeChannelObject)
+			{
+				if(((HomeChannelObject) it).getChannelId().equals(cHomeID))
+				{
+					result = ((HomeChannelObject) it).getChannelName();
+				}
+			}
+		}
+		return result;
+	}
+
+	private String getMonitorChannelName(String cMonitorID)
+	{
+		String result = "";
+		for (Object it : cMoniorObject) {
+			if(it instanceof MonitorChannelObject)
+			{
+				if(((MonitorChannelObject) it).getChannelId().equals(cMonitorID))
+				{
+					result = ((MonitorChannelObject) it).getChannelName();
+				}
+			}
+		}
+		return result;
+	}
+	
+	public String getHomeChannelId() {
+		return homeChannelId;
+	}
+
+	public String getMonitorChannelId() {
+		return monitorChannelId;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public long getTimeSync() {
+		return timeSync;
 	}
 }

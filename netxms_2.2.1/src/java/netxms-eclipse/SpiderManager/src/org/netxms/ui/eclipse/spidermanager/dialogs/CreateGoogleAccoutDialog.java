@@ -38,10 +38,15 @@ import org.eclipse.swt.events.SelectionEvent;
  * 
  */
 public class CreateGoogleAccoutDialog extends Dialog {
-	private Text txtEmail;
+	private Text txtUserName;
 	private Text txtClientSecret;
 	private Text txtAppName;
 	private Text txtApiKey;
+	
+	private String userName;
+	private String clientSecret;
+	private String appName;
+	private String apiKey;
 
 	public CreateGoogleAccoutDialog(Shell parentShell) {
 		super(parentShell);
@@ -75,9 +80,9 @@ public class CreateGoogleAccoutDialog extends Dialog {
 		label.setText("Email");
 		label.setBounds(10, 31, 38, 17);
 
-		txtEmail = new Text(grpCreateNewAccount, SWT.BORDER);
-		txtEmail.setTextLimit(150);
-		txtEmail.setBounds(101, 26, 320, 27);
+		txtUserName = new Text(grpCreateNewAccount, SWT.BORDER);
+		txtUserName.setTextLimit(150);
+		txtUserName.setBounds(101, 26, 320, 27);
 
 		Label label_1 = new Label(grpCreateNewAccount, SWT.NONE);
 		label_1.setText("Client Secret");
@@ -142,16 +147,36 @@ public class CreateGoogleAccoutDialog extends Dialog {
 	 */
 	@Override
 	protected void okPressed() {
-		String email = txtEmail.getText();
-		if(email == null || email.isEmpty())
+		userName = txtUserName.getText();
+		clientSecret = txtClientSecret.getText();
+		appName = txtAppName.getText();
+		apiKey = txtApiKey.getText();
+		
+		if(userName == null || userName.isEmpty())
 		{
 			MessageBox dialog =
 					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
 			dialog.setText("Error");
-			dialog.setMessage("Email field must not empty!");
+			dialog.setMessage("User name must not empty!");
 			dialog.open();
 			return;	
 		}
 		super.okPressed();
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public String getClientSecret() {
+		return clientSecret;
+	}
+
+	public String getAppName() {
+		return appName;
+	}
+
+	public String getApiKey() {
+		return apiKey;
 	}
 }

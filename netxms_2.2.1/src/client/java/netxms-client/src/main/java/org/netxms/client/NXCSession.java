@@ -186,13 +186,14 @@ import org.netxms.client.users.User;
 import org.netxms.client.users.UserGroup;
 import org.netxms.client.zeromq.ZmqSubscription;
 import org.netxms.client.zeromq.ZmqSubscriptionType;
-import org.spider.object.GoogleAccount;
-import org.spider.object.HomeChannel;
-import org.spider.object.MappingChannel;
-import org.spider.object.MonitorChannel;
+import org.spider.client.GoogleAccountObject;
+import org.spider.client.HomeChannelObject;
+import org.spider.client.MappingChannelObject;
+import org.spider.client.MonitorChannelObject;
 
 import com.jcraft.jzlib.Deflater;
 import com.jcraft.jzlib.JZlib;
+import org.spider.base.SpiderCodes;
 
 /**
  * Communication session with NetXMS server.
@@ -343,7 +344,7 @@ public class NXCSession {
 
 	// Message of the day
 	private String messageOfTheDay;
-	
+
 	/**
 	 * Message subscription class
 	 */
@@ -417,7 +418,7 @@ public class NXCSession {
 				in = socket.getInputStream();
 			} catch (IOException e) {
 				return; // Stop receiver thread if input stream cannot be
-						// obtained
+				// obtained
 			}
 
 			while (socket.isConnected()) {
@@ -430,7 +431,7 @@ public class NXCSession {
 						break;
 					case NXCPCodes.CMD_KEEPALIVE:
 						serverTime = msg
-								.getFieldAsInt64(NXCPCodes.VID_TIMESTAMP) * 1000;
+						.getFieldAsInt64(NXCPCodes.VID_TIMESTAMP) * 1000;
 						serverTimeRecvTime = System.currentTimeMillis();
 						break;
 					case NXCPCodes.CMD_OBJECT:
@@ -500,7 +501,7 @@ public class NXCSession {
 					case NXCPCodes.CMD_ALARM_UPDATE:
 						sendNotification(new SessionNotification(
 								msg.getFieldAsInt32(NXCPCodes.VID_NOTIFICATION_CODE)
-										+ SessionNotification.NOTIFY_BASE,
+								+ SessionNotification.NOTIFY_BASE,
 								new Alarm(msg)));
 						break;
 					case NXCPCodes.CMD_BULK_ALARM_STATE_CHANGE:
@@ -552,8 +553,8 @@ public class NXCSession {
 						break;
 					case NXCPCodes.CMD_GRAPH_UPDATE:
 						GraphSettings graph = GraphSettings
-								.createGraphSettings(msg,
-										NXCPCodes.VID_GRAPH_LIST_BASE);
+						.createGraphSettings(msg,
+								NXCPCodes.VID_GRAPH_LIST_BASE);
 						sendNotification(new SessionNotification(
 								SessionNotification.PREDEFINED_GRAPHS_CHANGED,
 								graph.getId(), graph));
@@ -706,7 +707,7 @@ public class NXCSession {
 			case SessionNotification.CONNECTION_BROKEN:
 				backgroundDisconnect(code);
 				return; // backgroundDisconnect will send disconnect
-						// notification
+				// notification
 			}
 
 			sendNotification(new SessionNotification(code, data));
@@ -790,7 +791,7 @@ public class NXCSession {
 			case SessionNotification.USER_DB_OBJECT_CREATED:
 			case SessionNotification.USER_DB_OBJECT_MODIFIED:
 				object = ((id & 0x80000000) != 0) ? new UserGroup(msg)
-						: new User(msg);
+				: new User(msg);
 				synchronized (userDB) {
 					userDB.put(id, object);
 				}
@@ -825,7 +826,7 @@ public class NXCSession {
 			long id = msg.getFieldAsInt64(NXCPCodes.VID_TRAP_ID);
 			SnmpTrap trap = (code != SessionNotification.TRAP_CONFIGURATION_DELETED) ? new SnmpTrap(
 					msg) : null;
-			sendNotification(new SessionNotification(code, id, trap));
+					sendNotification(new SessionNotification(code, id, trap));
 		}
 
 		/**
@@ -840,7 +841,7 @@ public class NXCSession {
 			long id = msg.getFieldAsInt64(NXCPCodes.VID_ACTION_ID);
 			ServerAction action = (code != SessionNotification.ACTION_DELETED) ? new ServerAction(
 					msg) : null;
-			sendNotification(new SessionNotification(code, id, action));
+					sendNotification(new SessionNotification(code, id, action));
 		}
 
 		/**
@@ -855,16 +856,16 @@ public class NXCSession {
 			long eventCode = msg.getFieldAsInt64(NXCPCodes.VID_EVENT_CODE);
 			EventTemplate et = (code != SessionNotification.EVENT_TEMPLATE_DELETED) ? new EventTemplate(
 					msg) : null;
-			if (eventTemplatesNeedSync) {
-				synchronized (eventTemplates) {
-					if (code == SessionNotification.EVENT_TEMPLATE_DELETED) {
-						eventTemplates.remove(eventCode);
-					} else {
-						eventTemplates.put(eventCode, et);
+					if (eventTemplatesNeedSync) {
+						synchronized (eventTemplates) {
+							if (code == SessionNotification.EVENT_TEMPLATE_DELETED) {
+								eventTemplates.remove(eventCode);
+							} else {
+								eventTemplates.put(eventCode, et);
+							}
+						}
 					}
-				}
-			}
-			sendNotification(new SessionNotification(code, eventCode, et));
+					sendNotification(new SessionNotification(code, eventCode, et));
 		}
 
 		/**
@@ -895,16 +896,16 @@ public class NXCSession {
 					.getFieldAsInt64(NXCPCodes.VID_ELEMENT_LIST_BASE);
 			AlarmCategory ac = (code != SessionNotification.ALARM_CATEGORY_DELETED) ? new AlarmCategory(
 					msg, NXCPCodes.VID_ELEMENT_LIST_BASE) : null;
-			if (alarmCategoriesNeedSync) {
-				synchronized (alarmCategories) {
-					if (code == SessionNotification.ALARM_CATEGORY_DELETED) {
-						alarmCategories.remove(categoryId);
-					} else {
-						alarmCategories.put(categoryId, ac);
+					if (alarmCategoriesNeedSync) {
+						synchronized (alarmCategories) {
+							if (code == SessionNotification.ALARM_CATEGORY_DELETED) {
+								alarmCategories.remove(categoryId);
+							} else {
+								alarmCategories.put(categoryId, ac);
+							}
+						}
 					}
-				}
-			}
-			sendNotification(new SessionNotification(code, categoryId, ac));
+					sendNotification(new SessionNotification(code, categoryId, ac));
 		}
 	}
 
@@ -1220,7 +1221,7 @@ public class NXCSession {
 	 * @throws NXCException
 	 */
 	private void setupEncryption(NXCPMessage msg) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage response = new NXCPMessage(NXCPCodes.CMD_SESSION_KEY,
 				msg.getMessageId());
 		response.setEncryptionDisabled(true);
@@ -1440,7 +1441,7 @@ public class NXCSession {
 	 */
 	protected void sendFile(final long requestId, final File file,
 			ProgressListener listener, boolean allowStreamCompression)
-			throws IOException, NXCException {
+					throws IOException, NXCException {
 		if (listener != null)
 			listener.setTotalWorkAmount(file.length());
 		final InputStream inputStream = new BufferedInputStream(
@@ -1467,7 +1468,7 @@ public class NXCSession {
 	 */
 	protected void sendFile(final long requestId, final byte[] data,
 			ProgressListener listener, boolean allowStreamCompression)
-			throws IOException, NXCException {
+					throws IOException, NXCException {
 		if (listener != null)
 			listener.setTotalWorkAmount(data.length);
 		final InputStream inputStream = new ByteArrayInputStream(data);
@@ -1512,7 +1513,7 @@ public class NXCSession {
 
 			if ((compressor != null) && (bytesRead > 0)) {
 				byte[] compressedData = new byte[compressor
-						.deflateBound(bytesRead) + 4];
+				                                 .deflateBound(bytesRead) + 4];
 				compressor.setInput(buffer, 0, bytesRead, false);
 				compressor.setOutput(compressedData, 4,
 						compressedData.length - 4);
@@ -1523,10 +1524,10 @@ public class NXCSession {
 				payload[0] = 2; // DEFLATE method
 				payload[1] = 0; // reserved
 				payload[2] = (byte) ((bytesRead >> 8) & 0xFF); // uncompressed
-																// length, high
-																// bits
+				// length, high
+				// bits
 				payload[3] = (byte) (bytesRead & 0xFF); // uncompressed length,
-														// low bits
+				// low bits
 				msg.setBinaryData(payload);
 			} else {
 				msg.setBinaryData((bytesRead == -1) ? new byte[0] : Arrays
@@ -1738,7 +1739,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	protected void executeSimpleCommand(int command) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(command);
 		sendMessage(msg);
 		waitForRCC(msg.getMessageId());
@@ -1781,7 +1782,7 @@ public class NXCSession {
 	 *             if the state is illegal
 	 */
 	public void connect() throws IOException, UnknownHostException,
-			NXCException, IllegalStateException {
+	NXCException, IllegalStateException {
 		connect(null);
 	}
 
@@ -1803,7 +1804,7 @@ public class NXCSession {
 	 *             if the state is illegal
 	 */
 	public void connect(int[] componentVersions) throws IOException,
-			UnknownHostException, NXCException, IllegalStateException {
+	UnknownHostException, NXCException, IllegalStateException {
 		if (connected)
 			throw new IllegalStateException("Session already connected");
 
@@ -1912,7 +1913,7 @@ public class NXCSession {
 	 *             if the state is illegal
 	 */
 	public void login(String login, String password) throws NXCException,
-			IOException, IllegalStateException {
+	IOException, IllegalStateException {
 		login(AuthenticationType.PASSWORD, login, password, null, null);
 	}
 
@@ -1960,7 +1961,7 @@ public class NXCSession {
 	 */
 	public void login(AuthenticationType authType, String login,
 			String password, Certificate certificate, Signature signature)
-			throws NXCException, IOException, IllegalStateException {
+					throws NXCException, IOException, IllegalStateException {
 		if (!connected)
 			throw new IllegalStateException("Session not connected");
 
@@ -3011,7 +3012,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public List<EventInfo> getAlarmEvents(long alarmId) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_ALARM_EVENTS);
 		msg.setFieldInt32(NXCPCodes.VID_ALARM_ID, (int) alarmId);
 		sendMessage(msg);
@@ -3074,7 +3075,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void acknowledgeAlarm(final long alarmId) throws IOException,
-			NXCException {
+	NXCException {
 		acknowledgeAlarm(alarmId, false, 0);
 	}
 
@@ -3089,7 +3090,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void acknowledgeAlarm(String helpdeskReference) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_ACK_ALARM);
 		msg.setField(NXCPCodes.VID_HELPDESK_REF, helpdeskReference);
 		sendMessage(msg);
@@ -3107,7 +3108,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void resolveAlarm(final long alarmId) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_RESOLVE_ALARM);
 		msg.setFieldInt32(NXCPCodes.VID_ALARM_ID, (int) alarmId);
 		sendMessage(msg);
@@ -3143,7 +3144,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void terminateAlarm(final long alarmId) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_TERMINATE_ALARM);
 		msg.setFieldInt32(NXCPCodes.VID_ALARM_ID, (int) alarmId);
 		sendMessage(msg);
@@ -3184,11 +3185,11 @@ public class NXCSession {
 			for (int i = 0; i < response
 					.getFieldAsUInt32ArrayEx(NXCPCodes.VID_ALARM_ID_LIST).length; i++) {
 				operationFails
-						.put(response
-								.getFieldAsUInt32ArrayEx(NXCPCodes.VID_ALARM_ID_LIST)[i],
-								(Integer) response
-										.getFieldAsUInt32ArrayEx(NXCPCodes.VID_FAIL_CODE_LIST)[i]
-										.intValue());
+				.put(response
+						.getFieldAsUInt32ArrayEx(NXCPCodes.VID_ALARM_ID_LIST)[i],
+						(Integer) response
+						.getFieldAsUInt32ArrayEx(NXCPCodes.VID_FAIL_CODE_LIST)[i]
+								.intValue());
 			}
 		}
 
@@ -3240,7 +3241,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void deleteAlarm(final long alarmId) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_DELETE_ALARM);
 		msg.setFieldInt32(NXCPCodes.VID_ALARM_ID, (int) alarmId);
 		sendMessage(msg);
@@ -3259,7 +3260,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public String openHelpdeskIssue(long alarmId) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_OPEN_HELPDESK_ISSUE);
 		msg.setFieldInt32(NXCPCodes.VID_ALARM_ID, (int) alarmId);
 		sendMessage(msg);
@@ -3279,7 +3280,7 @@ public class NXCSession {
 	 * @return URL of helpdesk issue
 	 */
 	public String getHelpdeskIssueUrl(long alarmId) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_HELPDESK_URL);
 		msg.setFieldInt32(NXCPCodes.VID_ALARM_ID, (int) alarmId);
 		sendMessage(msg);
@@ -3320,7 +3321,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void unlinkHelpdeskIssue(long alarmId) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_UNLINK_HELPDESK_ISSUE);
 		msg.setFieldInt32(NXCPCodes.VID_ALARM_ID, (int) alarmId);
 		sendMessage(msg);
@@ -3467,7 +3468,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public Map<String, ServerVariable> getServerVariables() throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage request = newMessage(NXCPCodes.CMD_GET_CONFIG_VARLIST);
 		sendMessage(request);
 
@@ -3506,7 +3507,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public String getPublicServerVariable(String name) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_PUBLIC_CONFIG_VAR);
 		msg.setField(NXCPCodes.VID_NAME, name);
 		sendMessage(msg);
@@ -3526,7 +3527,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public int getPublicServerVariableAsInt(String name) throws IOException,
-			NXCException {
+	NXCException {
 		return Integer.parseInt(getPublicServerVariable(name));
 	}
 
@@ -3588,7 +3589,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void deleteServerVariable(final String name) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_DELETE_CONFIG_VARIABLE);
 		msg.setField(NXCPCodes.VID_NAME, name);
 		sendMessage(msg);
@@ -3628,7 +3629,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public String getServerConfigClob(final String name) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_CONFIG_GET_CLOB);
 		msg.setField(NXCPCodes.VID_NAME, name);
 		sendMessage(msg);
@@ -3743,7 +3744,7 @@ public class NXCSession {
 		}
 		return list;
 	}
-	
+
 	/**
 	 * Get list google account
 	 * @return 
@@ -3751,54 +3752,346 @@ public class NXCSession {
 	 * @throws IOException 
 	 */
 	public Object [] getGoogleAccount() throws IOException, NXCException
-	{
-		
-		NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_ALL_ALARMS);
+	{	
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_GET_GOOGLE_ACCOUNT);
 		final long rqId = msg.getMessageId();
 		sendMessage(msg);
 
-		final Map<Integer, GoogleAccount> googleAccountList = new HashMap<Integer, GoogleAccount>();
-		while (true) {
-			msg = waitForMessage(NXCPCodes.CMD_ALARM_DATA, rqId);
-			int id = msg.getFieldAsInt32(NXCPCodes.VID_ALARM_ID);
-			String userName = "user name";
-			String api = "api ";
-			String clientSecret = "client secret";
-			String accountType = "account type";
-			String appname = "app name";
-			if (id == -1)
-				break; // ID == -1 indicates end of list
-			googleAccountList.put(id, new GoogleAccount(id, userName, api, clientSecret, accountType, appname));
+		final Map<Integer, GoogleAccountObject> googleAccountList = new HashMap<Integer, GoogleAccountObject>();
+		msg = waitForRCC(rqId);
+		int count = msg.getFieldAsInt32(NXCPCodes.VID_NUM_VARIABLES);
+		long baseIndex = NXCPCodes.VID_VARLIST_BASE;
+		for (int i = 0; i < count; i++, baseIndex += 10) 
+		{
+			int id = msg.getFieldAsInt32(baseIndex);
+			String userName = msg.getFieldAsString(baseIndex + 1);
+			String api = msg.getFieldAsString(baseIndex + 2);
+			String clientSecret = msg.getFieldAsString(baseIndex + 3);
+			String accountType = msg.getFieldAsString(baseIndex + 4);
+			String appname = msg.getFieldAsString(baseIndex + 5);
+			googleAccountList.put(id, new GoogleAccountObject(id, userName, api, clientSecret, accountType, appname));
 		}
-		return googleAccountList.entrySet().toArray();
+		return googleAccountList.values().toArray();
 	}
-	
+
 	/**
 	 * Get home channel list
+	 * @throws NXCException 
+	 * @throws IOException 
 	 */
-	public Object [] getHomeChannel()
+	public Object [] getHomeChannel() throws IOException, NXCException
 	{
-		final Map<Integer, HomeChannel> homeChannleList = new HashMap<Integer, HomeChannel>();
-		return homeChannleList.entrySet().toArray();
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_GET_HOME_CHANNEL);
+		final long rqId = msg.getMessageId();
+		sendMessage(msg);
+		final Map<Integer, HomeChannelObject> homeChannelList = new HashMap<Integer, HomeChannelObject>();
+		msg = waitForRCC(rqId);
+		int count = msg.getFieldAsInt32(NXCPCodes.VID_NUM_VARIABLES);
+		long baseIndex = NXCPCodes.VID_VARLIST_BASE;
+		for (int i = 0; i < count; i++, baseIndex += 10) 
+		{
+			int id = msg.getFieldAsInt32(baseIndex);
+			String  cId = msg.getFieldAsString(baseIndex + 1);
+			String  cName = msg.getFieldAsString(baseIndex + 2);
+			String  gAccount = msg.getFieldAsString(baseIndex + 3);
+			String  vIntro = msg.getFieldAsString(baseIndex + 4);
+			String  vOutro = msg.getFieldAsString(baseIndex + 5);
+			String  logo = msg.getFieldAsString(baseIndex + 6);
+			String  desc = msg.getFieldAsString(baseIndex + 7);
+			String  title = msg.getFieldAsString(baseIndex + 8);
+			homeChannelList.put(id , new HomeChannelObject(id, cId, cName, gAccount, vIntro, vOutro, logo, desc, title));
+		}
+		return homeChannelList.values().toArray();
 	}
-	
+
 	/**
 	 * Get monitor channel list
+	 * @throws NXCException 
+	 * @throws IOException 
 	 */
-	
-	public Object [] getMonitorChannelList()
+
+	public Object [] getMonitorChannelList() throws IOException, NXCException
 	{
-		final Map<Integer, MonitorChannel> monitorChannleList = new HashMap<Integer, MonitorChannel>();
-		return monitorChannleList.entrySet().toArray();
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_GET_MONITOR_CHANNEL);
+		final long rqId = msg.getMessageId();
+		sendMessage(msg);
+
+		final Map<Integer, MonitorChannelObject> monitorChannleList = new HashMap<Integer, MonitorChannelObject>();
+		msg = waitForRCC(rqId);
+		int count = msg.getFieldAsInt32(NXCPCodes.VID_NUM_VARIABLES);
+		long baseIndex = NXCPCodes.VID_VARLIST_BASE;
+		for (int i = 0; i < count; i++, baseIndex += 10) 
+		{
+			int id = msg.getFieldAsInt32(baseIndex);
+			String  cId = msg.getFieldAsString(baseIndex + 1);
+			String  cName = msg.getFieldAsString(baseIndex + 2);
+			monitorChannleList.put(id , new MonitorChannelObject(id, cId, cName));
+		}
+
+		return monitorChannleList.values().toArray();
 	}
-	
-	/**
-	 * Get mapping channel list
-	 */
-	public Object [] getMappingChannelList()
+
+	public Object [] getMappingChannelList() throws IOException, NXCException
 	{
-		final Map<Integer, MappingChannel> mappingChannleList = new HashMap<Integer, MappingChannel>();
-		return mappingChannleList.entrySet().toArray();
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_GET_MAPPING_CHANNEL);
+		final long rqId = msg.getMessageId();
+		sendMessage(msg);
+
+		final Map<Integer, MappingChannelObject> mappingChannleList = new HashMap<Integer, MappingChannelObject>();
+		msg = waitForRCC(rqId);
+		int count = msg.getFieldAsInt32(NXCPCodes.VID_NUM_VARIABLES);
+		long baseIndex = NXCPCodes.VID_VARLIST_BASE;
+		for (int i = 0; i < count; i++, baseIndex += 10) 
+		{
+			int  id = msg.getFieldAsInt32(baseIndex);
+			String  cHomeId = msg.getFieldAsString(baseIndex + 1);
+			String  cMonitorId = msg.getFieldAsString(baseIndex + 2);
+			long  timeSync = msg.getFieldAsInt64(baseIndex + 3);
+			int  statusSync = msg.getFieldAsInt32(baseIndex + 4);
+			int  action = msg.getFieldAsInt32(baseIndex + 5);
+			String  lastSyncTime = msg.getFieldAsString(baseIndex + 6);
+			String  downloadCusterID = msg.getFieldAsString(baseIndex + 7);
+			String  renderClusterId = msg.getFieldAsString(baseIndex + 8);
+			String  uploadClusterId = msg.getFieldAsString(baseIndex + 9);
+
+			mappingChannleList.put(id , new MappingChannelObject(id, cHomeId, cMonitorId, timeSync, statusSync, 
+					action, lastSyncTime, downloadCusterID, renderClusterId, uploadClusterId));
+
+		}
+		return mappingChannleList.values().toArray();
+	}
+
+	public void createGoogleAccount(String userName, String api, 
+			String clientSecret, int accountType, String appName) throws IOException, NXCException
+			{
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_CREATE_GOOGLE_ACCOUNT);
+		msg.setField(SpiderCodes.VID_GOOGLE_USER_NAME, userName);
+		msg.setField(SpiderCodes.VID_GOOGLE_API, api);
+		msg.setField(SpiderCodes.VID_GOOGLE_CLIENT_SECRET, clientSecret);
+		msg.setFieldInt32(SpiderCodes.VID_GOOGLE_ACCOUNT_TYPE, accountType);
+		msg.setField(SpiderCodes.VID_GOOGLE_APP_NAME, appName);
+		sendMessage(msg);
+		msg = waitForRCC(msg.getMessageId());
+		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+		// Send notification if changed object was found in local database
+		// copy
+		// or added to it and notification code was known
+		if (code == 0) //RCC_SUCCESS
+			sendNotification(new SessionNotification(
+					SessionNotification.GOOGLE_ACCOUNT_CHANGED, code));
+			}
+
+	public void modifyGoogleAccount(int id, String userName, String api, 
+			String clientSecret, int accountType, String appName) throws IOException, NXCException
+			{
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_MOD_GOOGLE_ACCOUNT);
+		msg.setFieldInt32(SpiderCodes.VID_GOOGLE_RECORD_ID, id);
+		msg.setField(SpiderCodes.VID_GOOGLE_USER_NAME, userName);
+		msg.setField(SpiderCodes.VID_GOOGLE_API, api);
+		msg.setField(SpiderCodes.VID_GOOGLE_CLIENT_SECRET, clientSecret);
+		msg.setFieldInt32(SpiderCodes.VID_GOOGLE_ACCOUNT_TYPE, accountType);
+		msg.setField(SpiderCodes.VID_GOOGLE_APP_NAME, appName);
+		sendMessage(msg);
+		System.out.println("Send modify google account message to server ");
+		msg = waitForRCC(msg.getMessageId());
+		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+		// Send notification if changed object was found in local database
+		// copy
+		// or added to it and notification code was known
+		if (code == 0) //RCC_SUCCESS
+			sendNotification(new SessionNotification(
+					SessionNotification.GOOGLE_ACCOUNT_CHANGED, code));
+			}
+
+	public void createHomeCHannel(String cId, String cName, String gAccount, 
+			String vIntro, String vOutro, String logo, String desc, String title) throws IOException, NXCException
+			{
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_CREATE_HOME_CHANNEL);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_ID, cId);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_NAME, cName);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_GACCOUNT, gAccount);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_VINTRO, vIntro);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_VOUTRO, vOutro);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_LOGO, logo);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_DESC, desc);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_TITLE, title);
+		sendMessage(msg);
+		msg = waitForRCC(msg.getMessageId());
+		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+		// Send notification if changed object was found in local database
+		// copy
+		// or added to it and notification code was known
+		if (code == 0) //RCC_SUCCESS
+			sendNotification(new SessionNotification(
+					SessionNotification.HOME_CHANNEL_CHANGED, code));
+			}
+
+	public void modifyHomeCHannel(int id, String cId, String cName, String gAccount, 
+			String vIntro, String vOutro, String logo, String desc, String title) throws IOException, NXCException
+			{
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_MOD_HOME_CHANNEL);
+		msg.setFieldInt32(SpiderCodes.VID_HOME_CHANNEL_RECORD_ID, id);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_ID, cId);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_NAME, cName);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_GACCOUNT, gAccount);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_VINTRO, vIntro);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_VOUTRO, vOutro);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_LOGO, logo);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_DESC, desc);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_TITLE, title);
+		sendMessage(msg);
+		msg = waitForRCC(msg.getMessageId());
+		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+		// Send notification if changed object was found in local database
+		// copy
+		// or added to it and notification code was known
+		if (code == 0) //RCC_SUCCESS
+			sendNotification(new SessionNotification(
+					SessionNotification.HOME_CHANNEL_CHANGED, code));
+			}
+
+	public void createMonitorChannel(String cId, String cName) throws IOException, NXCException
+	{
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_CREATE_MONITOR_CHANNEL);
+		msg.setField(SpiderCodes.VID_MONITOR_CHANNEL_ID, cId);
+		msg.setField(SpiderCodes.VID_MONITOR_CHANNEL_NAME, cName);
+		sendMessage(msg);
+		msg = waitForRCC(msg.getMessageId());
+		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+		// Send notification if changed object was found in local database
+		// copy
+		// or added to it and notification code was known
+		if (code == 0) //RCC_SUCCESS
+			sendNotification(new SessionNotification(
+					SessionNotification.MONITOR_CHANNEL_CHANGED, code));
+	}
+
+	public void modifyMonitorChannel(int id, String cId, String cName) throws IOException, NXCException
+	{
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_MOD_MONITOR_CHANNEL);
+		msg.setFieldInt32(SpiderCodes.VID_MONITOR_CHANNEL_RECORD_ID, id);
+		msg.setField(SpiderCodes.VID_MONITOR_CHANNEL_ID, cId);
+		msg.setField(SpiderCodes.VID_MONITOR_CHANNEL_NAME, cName);
+		sendMessage(msg);
+		msg = waitForRCC(msg.getMessageId());
+		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+		// Send notification if changed object was found in local database
+		// copy
+		// or added to it and notification code was known
+		if (code == 0) //RCC_SUCCESS
+			sendNotification(new SessionNotification(
+					SessionNotification.MONITOR_CHANNEL_CHANGED, code));
+	}
+
+
+	public void createMappingChannel(String cHomeId, String cMonitorId, int timeSync, int statusSync, 
+			String lastSyncTime, String downloadCluster, String renderCluster, String uploadCluster) 
+					throws IOException, NXCException
+					{
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_CREATE_MAPPING_CHANNEL);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_HOME_ID, cHomeId);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_MONITOR_ID, cMonitorId);
+		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_TIME_SYNC, timeSync);
+		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_STATUS_SYNC, statusSync);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_LAST_SYNC_TIME, lastSyncTime);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID, downloadCluster);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID, renderCluster);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID, uploadCluster);
+		sendMessage(msg);
+		msg = waitForRCC(msg.getMessageId());
+		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+		// Send notification if changed object was found in local database
+		// copy
+		// or added to it and notification code was known
+		if (code == 0) //RCC_SUCCESS
+			sendNotification(new SessionNotification(
+					SessionNotification.MAPPING_CHANNEL_CHANGED, code));
+					}
+
+	public void modifyMappingChannel(int id, String cHomeId, String cMonitorId, int timeSync, int statusSync, 
+			int action, String lastSyncTime, String downloadCluster, String renderCluster, String uploadCluster) 
+					throws IOException, NXCException
+					{
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_MOD_MAPPING_CHANNEL);
+		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_RECORD_ID, id);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_HOME_ID, cHomeId);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_MONITOR_ID, cMonitorId);
+		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_TIME_SYNC, timeSync);
+		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_STATUS_SYNC, statusSync);
+		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_ACTION, action);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_LAST_SYNC_TIME, lastSyncTime);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID, downloadCluster);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID, renderCluster);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID, uploadCluster);
+		sendMessage(msg);
+		msg = waitForRCC(msg.getMessageId());
+		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+		// Send notification if changed object was found in local database
+		// copy
+		// or added to it and notification code was known
+		if (code == 0) //RCC_SUCCESS
+			sendNotification(new SessionNotification(SessionNotification.MAPPING_CHANNEL_CHANGED, code));
+					}
+
+	public void deleteGoogleAccount(int id) throws NXCException, IOException
+	{
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_DEL_GOOGLE_ACCOUNT);
+		msg.setFieldInt32(SpiderCodes.VID_GOOGLE_RECORD_ID, id);
+		sendMessage(msg);
+		msg = waitForRCC(msg.getMessageId());
+
+		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+		// Send notification if changed object was found in local database
+		// copy
+		// or added to it and notification code was known
+		if (code == 0) //RCC_SUCCESS
+			sendNotification(new SessionNotification(
+					SessionNotification.GOOGLE_ACCOUNT_CHANGED, code));
+	}
+
+	public void deleteHomeChannel(int id) throws IOException, NXCException
+	{
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_DEL_HOME_CHANNEL);
+		msg.setFieldInt32(SpiderCodes.VID_HOME_CHANNEL_RECORD_ID, id);
+		sendMessage(msg);
+		msg = waitForRCC(msg.getMessageId());
+		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+		// Send notification if changed object was found in local database
+		// copy
+		// or added to it and notification code was known
+		if (code == 0) //RCC_SUCCESS
+			sendNotification(new SessionNotification(
+					SessionNotification.HOME_CHANNEL_CHANGED, code));
+	}
+
+	public void deleteMonitorChannel(int id) throws IOException, NXCException
+	{
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_DEL_MONITOR_CHANNEL);
+		msg.setFieldInt32(SpiderCodes.VID_MONITOR_CHANNEL_RECORD_ID, id);
+		sendMessage(msg);
+		msg = waitForRCC(msg.getMessageId());
+		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+		// Send notification if changed object was found in local database
+		// copy
+		// or added to it and notification code was known
+		if (code == 0) //RCC_SUCCESS
+			sendNotification(new SessionNotification(
+					SessionNotification.MONITOR_CHANNEL_CHANGED, code));
+	}
+
+	public void deleteMappingChannel(int id) throws IOException, NXCException
+	{
+		NXCPMessage msg = newMessage(SpiderCodes.CMD_DEL_MAPPING_CHANNEL);
+		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_RECORD_ID, id);
+		sendMessage(msg);
+		msg = waitForRCC(msg.getMessageId());
+		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+		// Send notification if changed object was found in local database
+		// copy
+		// or added to it and notification code was known
+		if (code == 0) //RCC_SUCCESS
+			sendNotification(new SessionNotification(
+					SessionNotification.MAPPING_CHANNEL_CHANGED, code));
 	}
 
 	/**
@@ -3850,7 +4143,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public long createUserGroup(final String name) throws IOException,
-			NXCException {
+	NXCException {
 		return createUserDBObject(name, true);
 	}
 
@@ -3865,7 +4158,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void deleteUserDBObject(final long id) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_DELETE_USER);
 		msg.setFieldInt32(NXCPCodes.VID_USER_ID, (int) id);
 		sendMessage(msg);
@@ -3909,7 +4202,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public boolean validateUserPassword(String password) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_VALIDATE_PASSWORD);
 		msg.setField(NXCPCodes.VID_PASSWORD, password);
 		sendMessage(msg);
@@ -4097,7 +4390,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public DciValue[] getLastValues(final long nodeId) throws IOException,
-			NXCException {
+	NXCException {
 		return getLastValues(nodeId, false, false, false);
 	}
 
@@ -4161,7 +4454,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public DciValue[] sendLastValuesMsg(NXCPMessage msg) throws IOException,
-			NXCException {
+	NXCException {
 		sendMessage(msg);
 		final NXCPMessage response = waitForRCC(msg.getMessageId());
 
@@ -4212,7 +4505,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public PerfTabDci[] getPerfTabItems(final long nodeId) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_PERFTAB_DCI_LIST);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) nodeId);
 		sendMessage(msg);
@@ -4287,7 +4580,7 @@ public class NXCSession {
 
 			for (int i = 0; i < rows; i++) {
 				long timestamp = inputStream.readUnsignedInt() * 1000; // convert
-																		// to
+				// to
 				// milliseconds
 
 				switch (dataType) {
@@ -4360,7 +4653,7 @@ public class NXCSession {
 	 */
 	private DciData getCollectedDataInternal(long nodeId, long dciId,
 			String instance, String dataColumn, Date from, Date to, int maxRows)
-			throws IOException, NXCException {
+					throws IOException, NXCException {
 		NXCPMessage msg;
 		if (instance != null) // table DCI
 		{
@@ -4468,7 +4761,7 @@ public class NXCSession {
 	 */
 	public DciData getCollectedTableData(long nodeId, long dciId,
 			String instance, String dataColumn, Date from, Date to, int maxRows)
-			throws IOException, NXCException {
+					throws IOException, NXCException {
 		if (instance == null || dataColumn == null)
 			throw new NXCException(RCC.INVALID_ARGUMENT);
 		return getCollectedDataInternal(nodeId, dciId, instance, dataColumn,
@@ -4488,7 +4781,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void clearCollectedData(long nodeId, long dciId) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_CLEAR_DCI_DATA);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) nodeId);
 		msg.setFieldInt32(NXCPCodes.VID_DCI_ID, (int) dciId);
@@ -4509,7 +4802,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void forceDCIPoll(long nodeId, long dciId) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_FORCE_DCI_POLL);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) nodeId);
 		msg.setFieldInt32(NXCPCodes.VID_DCI_ID, (int) dciId);
@@ -4622,7 +4915,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public long dciNameToId(long nodeId, String dciName) throws IOException,
-			NXCException {
+	NXCException {
 		if (nodeId == 0 || dciName == null || dciName.isEmpty())
 			return 0;
 
@@ -4679,7 +4972,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public Table queryAgentTable(long nodeId, String name) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_QUERY_TABLE);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) nodeId);
 		msg.setField(NXCPCodes.VID_NAME, name);
@@ -4832,7 +5125,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void deleteObject(final long objectId) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_DELETE_OBJECT);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) objectId);
 		sendMessage(msg);
@@ -5431,7 +5724,7 @@ public class NXCSession {
 	 */
 	public void setObjectACL(final long objectId,
 			final AccessListElement[] acl, final boolean inheritAccessRights)
-			throws IOException, NXCException {
+					throws IOException, NXCException {
 		NXCObjectModificationData data = new NXCObjectModificationData(objectId);
 		data.setACL(acl);
 		data.setInheritAccessRights(inheritAccessRights);
@@ -5514,7 +5807,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public int getEffectiveRights(final long objectId) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_EFFECTIVE_RIGHTS);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) objectId);
 		sendMessage(msg);
@@ -5617,7 +5910,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void applyTemplate(long templateId, long nodeId) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_APPLY_TEMPLATE);
 		msg.setFieldInt32(NXCPCodes.VID_SOURCE_OBJECT_ID, (int) templateId);
 		msg.setFieldInt32(NXCPCodes.VID_DESTINATION_OBJECT_ID, (int) nodeId);
@@ -5821,7 +6114,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void wakeupNode(final long objectId) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_WAKEUP_NODE);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) objectId);
 		sendMessage(msg);
@@ -6056,7 +6349,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public EventProcessingPolicy getEventProcessingPolicy() throws IOException,
-			NXCException {
+	NXCException {
 		return getEventProcessingPolicyInternal(true);
 	}
 
@@ -6291,7 +6584,7 @@ public class NXCSession {
 	 */
 	public void executeLibraryScript(long nodeId, String script,
 			Map<String, String> inputFields, final TextOutputListener listener)
-			throws IOException, NXCException {
+					throws IOException, NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_EXECUTE_LIBRARY_SCRIPT);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) nodeId);
 		msg.setField(NXCPCodes.VID_SCRIPT, script);
@@ -6366,7 +6659,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public Log openServerLog(final String logName) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_OPEN_SERVER_LOG);
 		msg.setField(NXCPCodes.VID_LOG_NAME, logName);
 		sendMessage(msg);
@@ -6385,7 +6678,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public List<AlarmCategory> getAlarmCategories() throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_ALARM_CATEGORIES);
 		sendMessage(msg);
 		final NXCPMessage response = waitForRCC(msg.getMessageId());
@@ -6411,7 +6704,7 @@ public class NXCSession {
 	 * @return The ID of the category
 	 */
 	public long modifyAlarmCategory(AlarmCategory object) throws IOException,
-			NXCException {
+	NXCException {
 		if (object.getName().isEmpty())
 			return 0;
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_MODIFY_ALARM_CATEGORY);
@@ -6676,7 +6969,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public List<EventTemplate> getEventTemplates() throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_LOAD_EVENT_DB);
 		sendMessage(msg);
 		waitForRCC(msg.getMessageId());
@@ -6718,7 +7011,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void deleteEventTemplate(long eventCode) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_DELETE_EVENT_TEMPLATE);
 		msg.setFieldInt32(NXCPCodes.VID_EVENT_CODE, (int) eventCode);
 		sendMessage(msg);
@@ -6736,7 +7029,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void modifyEventTemplate(EventTemplate evt) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_SET_EVENT_INFO);
 		msg.setFieldInt32(NXCPCodes.VID_EVENT_CODE, (int) evt.getCode());
 		msg.setFieldInt32(NXCPCodes.VID_SEVERITY, evt.getSeverity().getValue());
@@ -6883,7 +7176,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public List<SnmpUsmCredential> getSnmpUsmCredentials() throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_USM_CREDENTIALS);
 		sendMessage(msg);
 		final NXCPMessage response = waitForRCC(msg.getMessageId());
@@ -6984,7 +7277,7 @@ public class NXCSession {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_PARAMETER_LIST);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) nodeId);
 		msg.setFieldInt16(NXCPCodes.VID_FLAGS, 0x01); // Indicates request for
-														// parameters list
+		// parameters list
 		sendMessage(msg);
 		final NXCPMessage response = waitForRCC(msg.getMessageId());
 
@@ -7010,11 +7303,11 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public List<AgentTable> getSupportedTables(long nodeId) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_PARAMETER_LIST);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) nodeId);
 		msg.setFieldInt16(NXCPCodes.VID_FLAGS, 0x02); // Indicates request for
-														// table list
+		// table list
 		sendMessage(msg);
 		final NXCPMessage response = waitForRCC(msg.getMessageId());
 
@@ -7041,7 +7334,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public long[] getDataCollectionEvents(long objectId) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_DCI_EVENTS_LIST);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) objectId);
 		sendMessage(msg);
@@ -7109,7 +7402,7 @@ public class NXCSession {
 	public String exportConfiguration(String description, long[] events,
 			long[] traps, long[] templates, UUID[] rules, long[] scripts,
 			long[] objectTools, long[] dciSummaryTables, long[] actions)
-			throws IOException, NXCException {
+					throws IOException, NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_EXPORT_CONFIGURATION);
 		msg.setField(NXCPCodes.VID_DESCRIPTION, description);
 		msg.setFieldInt32(NXCPCodes.VID_NUM_EVENTS, events.length);
@@ -7176,7 +7469,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public Map<String, Object> getServerStats() throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_SERVER_STATS);
 		sendMessage(msg);
 		final NXCPMessage response = waitForRCC(msg.getMessageId());
@@ -7268,7 +7561,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public long createAction(final String name) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_CREATE_ACTION);
 		msg.setField(NXCPCodes.VID_ACTION_NAME, name);
 		sendMessage(msg);
@@ -7287,7 +7580,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void modifyAction(ServerAction action) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_MODIFY_ACTION);
 		action.fillMessage(msg);
 		sendMessage(msg);
@@ -7321,7 +7614,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public List<AuthCertificate> getCertificateList() throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_CERT_LIST);
 		sendMessage(msg);
 
@@ -7391,7 +7684,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void updateCertificate(long id, String comment) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_UPDATE_CERT_COMMENTS);
 		msg.setFieldInt32(NXCPCodes.VID_CERTIFICATE_ID, (int) id);
 		msg.setField(NXCPCodes.VID_COMMENTS, comment);
@@ -7474,7 +7767,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void modifyObjectTool(ObjectToolDetails tool) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_UPDATE_OBJECT_TOOL);
 		tool.fillMessage(msg);
 		sendMessage(msg);
@@ -7533,7 +7826,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public Table executeTableTool(long toolId, long nodeId) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_EXEC_TABLE_TOOL);
 		msg.setFieldInt32(NXCPCodes.VID_TOOL_ID, (int) toolId);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) nodeId);
@@ -7589,7 +7882,7 @@ public class NXCSession {
 	public void executeServerCommand(long objectId, String command,
 			Map<String, String> inputFields, boolean receiveOutput,
 			final TextOutputListener listener, final Writer writer)
-			throws IOException, NXCException {
+					throws IOException, NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_EXECUTE_SERVER_COMMAND);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) objectId);
 		msg.setField(NXCPCodes.VID_COMMAND, command);
@@ -7659,7 +7952,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void stopServerCommand(long commandId) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_STOP_SERVER_COMMAND);
 		msg.setFieldInt32(NXCPCodes.VID_COMMAND_ID, (int) commandId);
 		sendMessage(msg);
@@ -7703,7 +7996,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public List<SnmpTrap> getSnmpTrapsConfiguration() throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_LOAD_TRAP_CFG);
 		sendMessage(msg);
 
@@ -7746,7 +8039,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void deleteSnmpTrapConfiguration(long trapId) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_DELETE_TRAP);
 		msg.setFieldInt32(NXCPCodes.VID_TRAP_ID, (int) trapId);
 		sendMessage(msg);
@@ -7764,7 +8057,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void modifySnmpTrapConfiguration(SnmpTrap trap) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_MODIFY_TRAP);
 		trap.fillMessage(msg);
 		sendMessage(msg);
@@ -7902,7 +8195,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void deletePredefinedGraph(long graphId) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_DELETE_GRAPH);
 		msg.setFieldInt32(NXCPCodes.VID_GRAPH_ID, (int) graphId);
 		sendMessage(msg);
@@ -7989,7 +8282,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void renameScript(long scriptId, String name) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_RENAME_SCRIPT);
 		msg.setFieldInt32(NXCPCodes.VID_SCRIPT_ID, (int) scriptId);
 		msg.setField(NXCPCodes.VID_NAME, name);
@@ -8152,7 +8445,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public List<LibraryImage> getImageLibrary() throws IOException,
-			NXCException {
+	NXCException {
 		return getImageLibrary(null);
 	}
 
@@ -8257,7 +8550,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void deleteImage(LibraryImage image) throws IOException,
-			NXCException {
+	NXCException {
 		if (image.isProtected()) {
 			throw new NXCException(RCC.INVALID_REQUEST);
 		}
@@ -8405,7 +8698,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void deletePersistentStorageValue(String key) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_DELETE_PSTORAGE_VALUE);
 		msg.setField(NXCPCodes.VID_PSTORAGE_KEY, key);
 		sendMessage(msg);
@@ -8437,7 +8730,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public ServerFile[] listServerFiles(String[] filter) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_LIST_SERVER_FILES);
 		if (filter != null) {
 			msg.setFieldInt32(NXCPCodes.VID_EXTENSION_COUNT, filter.length);
@@ -8497,7 +8790,7 @@ public class NXCSession {
 			}
 			if (!response.getFieldAsBoolean(NXCPCodes.VID_ALLOW_MULTIPART))
 				return files; // old version of server or agent without
-								// multipart support
+			// multipart support
 			if (response.isEndOfSequence())
 				break;
 		}
@@ -8517,7 +8810,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public AgentFileInfo getAgentFileInfo(AgentFile file) throws IOException,
-			NXCException {
+	NXCException {
 		if (!file.isDirectory())
 			return new AgentFileInfo(file.getName(), 0, file.getSize());
 
@@ -8611,7 +8904,7 @@ public class NXCSession {
 	 */
 	public void uploadLocalFileToAgent(long nodeId, File localFile,
 			String remoteFileName, boolean overvrite, ProgressListener listener)
-			throws IOException, NXCException {
+					throws IOException, NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_FILEMGR_UPLOAD);
 		if ((remoteFileName == null) || remoteFileName.isEmpty()) {
 			remoteFileName = localFile.getName();
@@ -8699,7 +8992,7 @@ public class NXCSession {
 	public AgentFileData downloadFileFromAgent(long nodeId,
 			String remoteFileName, long maxFileSize, boolean follow,
 			ProgressListener listener, ServerJobIdUpdater updateServerJobId)
-			throws IOException, NXCException {
+					throws IOException, NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_AGENT_FILE);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) nodeId);
 		msg.setField(NXCPCodes.VID_FILE_NAME, remoteFileName);
@@ -8708,11 +9001,11 @@ public class NXCSession {
 		sendMessage(msg);
 
 		final NXCPMessage response = waitForRCC(msg.getMessageId()); // first
-																		// confirmation
-																		// -
-																		// server
-																		// job
-																		// started
+		// confirmation
+		// -
+		// server
+		// job
+		// started
 		final String id = response.getFieldAsString(NXCPCodes.VID_NAME);
 		if (updateServerJobId != null)
 			updateServerJobId.setJobIdCallback(response
@@ -8734,7 +9027,7 @@ public class NXCSession {
 
 		try {
 			waitForRCC(msg.getMessageId()); // second confirmation - file
-											// transfered from agent to console
+			// transfered from agent to console
 		} finally {
 			removeProgressListener(msg.getMessageId());
 		}
@@ -8793,7 +9086,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void deleteServerFile(String serverFileName) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_DELETE_FILE);
 		msg.setField(NXCPCodes.VID_FILE_NAME, serverFileName);
 		sendMessage(msg);
@@ -8915,7 +9208,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public boolean processConsoleCommand(String command) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_ADM_REQUEST);
 		msg.setField(NXCPCodes.VID_COMMAND, command);
 		sendMessage(msg);
@@ -8984,7 +9277,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public List<VlanInfo> getVlans(long nodeId) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_VLANS);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) nodeId);
 		sendMessage(msg);
@@ -9071,7 +9364,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void resetServerComponent(int component) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_RESET_COMPONENT);
 		msg.setFieldInt32(NXCPCodes.VID_COMPONENT_ID, component);
 		sendMessage(msg);
@@ -9117,7 +9410,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public List<Route> getRoutingTable(long nodeId) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_ROUTING_TABLE);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) nodeId);
 		sendMessage(msg);
@@ -9240,7 +9533,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public List<PackageInfo> getInstalledPackages() throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_PACKAGE_LIST);
 		sendMessage(msg);
 		waitForRCC(msg.getMessageId());
@@ -9353,7 +9646,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void sendSMS(String phoneNumber, String message) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_SEND_SMS);
 		msg.setField(NXCPCodes.VID_RCPT_ADDR, phoneNumber);
 		msg.setField(NXCPCodes.VID_MESSAGE, message);
@@ -9372,7 +9665,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void pushDciData(DciPushData[] data) throws IOException,
-			NXCException {
+	NXCException {
 		NXCPMessage msg = newMessage(NXCPCodes.CMD_PUSH_DCI_DATA);
 		msg.setFieldInt32(NXCPCodes.VID_NUM_ITEMS, data.length);
 		long varId = NXCPCodes.VID_PUSH_DCI_DATA_BASE;
@@ -9514,7 +9807,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public List<MappingTableDescriptor> listMappingTables() throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_LIST_MAPPING_TABLES);
 		sendMessage(msg);
 		final NXCPMessage response = waitForRCC(msg.getMessageId());
@@ -9541,7 +9834,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public MappingTable getMappingTable(int id) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_MAPPING_TABLE);
 		msg.setFieldInt32(NXCPCodes.VID_MAPPING_TABLE_ID, id);
 		sendMessage(msg);
@@ -9583,7 +9876,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public int updateMappingTable(MappingTable table) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_UPDATE_MAPPING_TABLE);
 		table.fillMessage(msg);
 		sendMessage(msg);
@@ -9688,7 +9981,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public DciSummaryTable getDciSummaryTable(int id) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_SUMMARY_TABLE_DETAILS);
 		msg.setFieldInt32(NXCPCodes.VID_SUMMARY_TABLE_ID, id);
 		sendMessage(msg);
@@ -9708,7 +10001,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public int modifyDciSummaryTable(DciSummaryTable table) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_MODIFY_SUMMARY_TABLE);
 		table.fillMessage(msg);
 		sendMessage(msg);
@@ -9782,7 +10075,7 @@ public class NXCSession {
 	public Table queryAdHocDciSummaryTable(long baseObjectId,
 			List<DciSummaryTableColumn> columns, AggregationFunction function,
 			Date periodStart, Date periodEnd, boolean multiInstance)
-			throws IOException, NXCException {
+					throws IOException, NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_QUERY_ADHOC_SUMMARY_TABLE);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) baseObjectId);
 		msg.setFieldInt32(NXCPCodes.VID_NUM_COLUMNS, columns.size());
@@ -9792,9 +10085,9 @@ public class NXCSession {
 		msg.setField(NXCPCodes.VID_TIME_FROM, periodStart);
 		msg.setField(NXCPCodes.VID_TIME_TO, periodEnd);
 		msg.setFieldInt32(NXCPCodes.VID_FLAGS, multiInstance ? 1 : 0); // FIXME:
-																		// define
-																		// flags
-																		// properly
+		// define
+		// flags
+		// properly
 		long id = NXCPCodes.VID_COLUMN_INFO_BASE;
 		for (DciSummaryTableColumn c : columns) {
 			c.fillMessage(msg, id);
@@ -9995,9 +10288,9 @@ public class NXCSession {
 			msg.setFieldInt32(NXCPCodes.VID_RENDER_FORMAT, job
 					.getRenderFormat().getCode());
 			msg.setField(NXCPCodes.VID_RS_REPORT_NAME, job.getComments()); // FIXME:
-																			// is
-																			// this
-																			// correct?
+			// is
+			// this
+			// correct?
 			msg.setFieldInt32(NXCPCodes.VID_NUM_ITEMS, job.getEmailRecipients()
 					.size());
 			varId = NXCPCodes.VID_ITEM_LIST;
@@ -10126,7 +10419,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public long[] getSubnetAddressMap(long subnetId) throws NXCException,
-			IOException {
+	IOException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_SUBNET_ADDRESS_MAP);
 		msg.setFieldInt32(NXCPCodes.VID_OBJECT_ID, (int) subnetId);
 		sendMessage(msg);
@@ -10145,7 +10438,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public List<ConfigListElement> getConfigList() throws NXCException,
-			IOException {
+	IOException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_AGENT_CFG_LIST);
 		sendMessage(msg);
 		NXCPMessage response = waitForRCC(msg.getMessageId());
@@ -10172,7 +10465,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public ConfigContent getConfigContent(long id) throws NXCException,
-			IOException {
+	IOException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_OPEN_AGENT_CONFIG);
 		msg.setFieldInt32(NXCPCodes.VID_CONFIG_ID, (int) id);
 		sendMessage(msg);
@@ -10193,7 +10486,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void saveAgentConfig(ConfigContent conf) throws NXCException,
-			IOException {
+	IOException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_SAVE_AGENT_CONFIG);
 		conf.fillMessage(msg);
 		sendMessage(msg);
@@ -10231,7 +10524,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void swapAgentConfigs(long id1, long id2) throws NXCException,
-			IOException {
+	IOException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_SWAP_AGENT_CONFIGS);
 		msg.setFieldInt32(NXCPCodes.VID_CONFIG_ID, (int) id1);
 		msg.setFieldInt32(NXCPCodes.VID_CONFIG_ID_2, (int) id2);
@@ -10315,7 +10608,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public List<String> listScheduleCallbacks() throws NXCException,
-			IOException {
+	IOException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_LIST_SCHEDULE_CALLBACKS);
 		sendMessage(msg);
 		NXCPMessage response = waitForRCC(msg.getMessageId());
@@ -10330,7 +10623,7 @@ public class NXCSession {
 	}
 
 	public List<ScheduledTask> listScheduleTasks() throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_LIST_SCHEDULES);
 		sendMessage(msg);
 		NXCPMessage response = waitForRCC(msg.getMessageId());
@@ -10346,7 +10639,7 @@ public class NXCSession {
 	}
 
 	public void addSchedule(ScheduledTask task) throws NXCException,
-			IOException {
+	IOException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_ADD_SCHEDULE);
 		task.fillMessage(msg);
 		sendMessage(msg);
@@ -10354,7 +10647,7 @@ public class NXCSession {
 	}
 
 	public void updateSchedule(ScheduledTask task) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_UPDATE_SCHEDULE);
 		task.fillMessage(msg);
 		sendMessage(msg);
@@ -10362,7 +10655,7 @@ public class NXCSession {
 	}
 
 	public void removeSchedule(long scheduleId) throws NXCException,
-			IOException {
+	IOException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_REMOVE_SCHEDULE);
 		msg.setFieldInt32(NXCPCodes.VID_SCHEDULED_TASK_ID, (int) scheduleId);
 		sendMessage(msg);
@@ -10563,7 +10856,7 @@ public class NXCSession {
 	 * @return List of PredictionEngine objects
 	 */
 	public List<PredictionEngine> getPredictionEngines() throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_GET_PREDICTION_ENGINES);
 		sendMessage(msg);
 		NXCPMessage response = waitForRCC(msg.getMessageId());
@@ -10670,7 +10963,7 @@ public class NXCSession {
 	 *             if NetXMS server returns an error or operation was timed out
 	 */
 	public void bindAgentTunnel(int tunnelId, long nodeId) throws IOException,
-			NXCException {
+	NXCException {
 		final NXCPMessage msg = newMessage(NXCPCodes.CMD_BIND_AGENT_TUNNEL);
 		msg.setFieldInt32(NXCPCodes.VID_TUNNEL_ID, tunnelId);
 		msg.setFieldInt32(NXCPCodes.VID_NODE_ID, (int) nodeId);

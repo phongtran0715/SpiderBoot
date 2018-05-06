@@ -1,4 +1,4 @@
-/* static_subagents.cpp  Generated at Thứ bảy, 21 Tháng tư năm 2018 10:25:41 +07 */
+/* static_subagents.cpp  Generated at Thứ tư, 02 Tháng năm năm 2018 10:14:53 +07 */
 #include <nxagentd.h>
 
 extern "C"

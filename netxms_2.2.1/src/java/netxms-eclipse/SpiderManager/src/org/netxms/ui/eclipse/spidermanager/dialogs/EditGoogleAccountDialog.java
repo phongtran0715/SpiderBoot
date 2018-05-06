@@ -32,19 +32,32 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.spider.client.GoogleAccountObject;
 
 /**
  * User database object creation dialog
  * 
  */
-public class EditGoocleAccountDialog extends Dialog {
-	private Text txtEmail;
+public class EditGoogleAccountDialog extends Dialog {
+	private Text txtUserName;
 	private Text txtClientSecret;
 	private Text txtAppName;
 	private Text txtApiKey;
+	
+	private int id;
+	String userName;
+	String api;
+	String clientSecret;
+	String appName;
+	int accountType;
+	GoogleAccountObject gObject;
 
-	public EditGoocleAccountDialog(Shell parentShell) {
+	public EditGoogleAccountDialog(Shell parentShell, Object firstElement) {
 		super(parentShell);
+		if(firstElement instanceof GoogleAccountObject)
+		{
+			gObject = (GoogleAccountObject)firstElement;
+		}
 	}
 
 	/*
@@ -76,9 +89,9 @@ public class EditGoocleAccountDialog extends Dialog {
 		label.setBounds(10, 31, 38, 17);
 		label.setText("Email");
 
-		txtEmail = new Text(grpCreateNewAccount, SWT.BORDER);
-		txtEmail.setBounds(101, 26, 320, 27);
-		txtEmail.setTextLimit(150);
+		txtUserName = new Text(grpCreateNewAccount, SWT.BORDER);
+		txtUserName.setBounds(101, 26, 320, 27);
+		txtUserName.setTextLimit(150);
 
 		Label label_1 = new Label(grpCreateNewAccount, SWT.NONE);
 		label_1.setBounds(10, 64, 86, 17);
@@ -120,6 +133,14 @@ public class EditGoocleAccountDialog extends Dialog {
 		btnBrowse.setBounds(427, 57, 71, 29);
 		btnBrowse.setText("Browse...");
 
+		//initial data
+		id = gObject.getId();
+		txtUserName.setText(gObject.getUserName());
+		txtClientSecret.setText(gObject.getClientSecret());
+		txtApiKey.setText(gObject.getApi());
+		txtAppName.setText(gObject.getAppName());
+		accountType = 0;
+		
 		return dialogArea;
 	}
 
@@ -142,7 +163,7 @@ public class EditGoocleAccountDialog extends Dialog {
 	 */
 	@Override
 	protected void okPressed() {
-		String email = txtEmail.getText();
+		String email = txtUserName.getText();
 		if(email == null || email.isEmpty())
 		{
 			MessageBox dialog =
@@ -152,6 +173,51 @@ public class EditGoocleAccountDialog extends Dialog {
 			dialog.open();
 			return;	
 		}
+		userName = txtUserName.getText().trim();
+		api = txtApiKey.getText();
+		clientSecret = txtClientSecret.getText();
+		accountType = 0;
+		appName = txtAppName.getText();
 		super.okPressed();
+	}
+
+	public Text getTxtUserName() {
+		return txtUserName;
+	}
+
+	public Text getTxtClientSecret() {
+		return txtClientSecret;
+	}
+
+	public Text getTxtAppName() {
+		return txtAppName;
+	}
+
+	public Text getTxtApiKey() {
+		return txtApiKey;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public String getApi() {
+		return api;
+	}
+
+	public String getClientSecret() {
+		return clientSecret;
+	}
+
+	public String getAppName() {
+		return appName;
+	}
+
+	public int getAccountType() {
+		return accountType;
 	}
 }

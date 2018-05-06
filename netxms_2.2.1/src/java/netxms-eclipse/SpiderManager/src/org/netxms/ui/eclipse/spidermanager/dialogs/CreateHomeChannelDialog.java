@@ -46,7 +46,16 @@ public class CreateHomeChannelDialog extends Dialog {
 	private Text txtLogo;
 	private Text txtTitleTemplate;
 	private Text txtDesTemplate;
-
+	
+	private String cId;
+	private String cName; 
+	private String gAccount;
+	private String vIntro;
+	private String vOutro;
+	private String logo;
+	private String desc;
+	private String title;
+	
 	public CreateHomeChannelDialog(Shell parentShell) {
 		super(parentShell);
 	}
@@ -226,7 +235,6 @@ public class CreateHomeChannelDialog extends Dialog {
 		});
 		btnDesc.setText("Browse...");
 		btnDesc.setBounds(427, 257, 79, 29);
-		//txtAppName.setLayoutData(gridData);
 
 		return dialogArea;
 	}
@@ -250,8 +258,15 @@ public class CreateHomeChannelDialog extends Dialog {
 	 */
 	@Override
 	protected void okPressed() {
-		String channelID = txtChannelId.getText();
-		if(channelID == null || channelID.isEmpty())
+		cId = txtChannelId.getText();
+		cName = txtChannelName.getText();
+		gAccount = txtGoogleAccount.getText();
+		vIntro = txtVideoIntro.getText();
+		vOutro = txtVideoOutro.getText();
+		logo = txtLogo.getText();
+		desc = txtDesTemplate.getText();
+		title = txtTitleTemplate.getText();
+		if(cId == null || cId.isEmpty())
 		{
 			MessageBox dialog =
 					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
@@ -269,7 +284,40 @@ public class CreateHomeChannelDialog extends Dialog {
 			dialog.setMessage("Google account must not empty!");
 			dialog.open();
 			return;
-		}	
+		}
+		
 		super.okPressed();
+	}
+
+	public String getcId() {
+		return cId;
+	}
+
+	public String getcName() {
+		return cName;
+	}
+
+	public String getgAccount() {
+		return gAccount;
+	}
+
+	public String getvIntro() {
+		return vIntro;
+	}
+
+	public String getvOutro() {
+		return vOutro;
+	}
+
+	public String getLogo() {
+		return logo;
+	}
+
+	public String getDesc() {
+		return desc;
+	}
+
+	public String getTitle() {
+		return title;
 	}
 }

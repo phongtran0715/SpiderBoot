@@ -1,5 +1,7 @@
 package org.spider.ui.eclipse.spidermanager.views;
 
+import java.io.IOException;
+
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.part.*;
@@ -11,14 +13,19 @@ import org.eclipse.jface.action.*;
 import org.eclipse.ui.*;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.SWT;
+import org.netxms.client.NXCException;
 import org.netxms.client.NXCSession;
 import org.netxms.client.SessionListener;
+import org.netxms.client.SessionNotification;
+import org.netxms.ui.eclipse.actions.RefreshAction;
 import org.netxms.ui.eclipse.jobs.ConsoleJob;
 import org.netxms.ui.eclipse.shared.ConsoleSharedData;
 import org.netxms.ui.eclipse.spidermanager.dialogs.CreateHomeChannelDialog;
 import org.netxms.ui.eclipse.spidermanager.dialogs.EditHomeChannelDialog;
 import org.netxms.ui.eclipse.widgets.SortableTableViewer;
+import org.spider.client.HomeChannelObject;
 import org.spider.ui.eclipse.spidermanager.Activator;
+import org.spider.ui.eclipse.spidermanager.helper.HomeChannelLabelProvider;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -46,9 +53,20 @@ public class HomeChannelManagerView extends ViewPart {
 	private Action actAddHomeChannel;
 	private Action actEditHomeChannel;
 	private Action actDeleteHomeChannel;
+	private RefreshAction actionRefresh;
 	private NXCSession session;
 	private SessionListener sessionListener;
-	private boolean databaseLocked = false;
+	
+
+	public static final int COLUMN_ID 				= 0;
+	public static final int COLUMN_CHANNEL_ID 		= 1;
+	public static final int COLUMN_CHANNEL_NAME 	= 2;
+	public static final int COLUMN_GOOGLE_ACCOUNT 	= 3;
+	public static final int COLUMN_VIDEO_INTRO 		= 4;
+	public static final int COLUMN_VIDEO_OUTRO 		= 5;
+	public static final int COLUMN_LOGO 			= 6;
+	public static final int COLUMN_DESCRIPTION 		= 7;
+	public static final int COLUMN_TITLE 			= 8;
 
 	/*
 	 * The content provider class is responsible for providing objects to the
@@ -89,20 +107,27 @@ public class HomeChannelManagerView extends ViewPart {
 	 */
 	public void createPartControl(Composite parent) {
 		session = ConsoleSharedData.getSession();
-		final String[] names = { "ChannelId",
+		final String[] names = { "Id", 
+				"ChannelId",
 				"ChannelName",
 				"GoogleAccount",
 				"VideoIntro",
 				"VideoOutro",
 				"Logo",
 				"DescriptionTemplate", 
-				"TitleTemplate"};
-		final int[] widths = { 120, 120, 120, 160, 160, 160, 160, 160 };
+		"TitleTemplate"};
+		final int[] widths = { 40, 120, 120, 120, 160, 160, 160, 160, 160 };
 		viewer = new SortableTableViewer(parent, names, widths, 0, SWT.UP, SortableTableViewer.DEFAULT_STYLE);
 
-		viewer.setContentProvider(new ArrayContentProvider());	
+		viewer.setContentProvider(new ArrayContentProvider());
+		viewer.setLabelProvider(new HomeChannelLabelProvider());
 		viewer.setSorter(new NameSorter());
-		viewer.setInput(session.getHomeChannel());
+		try {
+			viewer.setInput(session.getHomeChannel());
+		} catch (IOException | NXCException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		// Create the help context id for the viewer's control
 		PlatformUI
@@ -114,6 +139,62 @@ public class HomeChannelManagerView extends ViewPart {
 		hookContextMenu();
 		hookDoubleClickAction();
 		contributeToActionBars();
+		// Listener for server's notifications
+		sessionListener = new SessionListener() {
+			@Override
+			public void notificationHandler(final SessionNotification n) {
+				if (n.getCode() == SessionNotification.HOME_CHANNEL_CHANGED) {
+					viewer.getControl().getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								viewer.setInput(session.getHomeChannel());
+							} catch (IOException | NXCException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					});
+				}
+			}
+		};
+
+		// Request server to lock user database, and on success refresh view
+		new ConsoleJob("Refresh home channel list", this,
+				Activator.PLUGIN_ID, null) {
+			@Override
+			protected void runInternal(IProgressMonitor monitor)
+					throws Exception {
+				runInUIThread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							viewer.setInput(session.getHomeChannel());
+						} catch (IOException | NXCException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						session.addListener(sessionListener);
+					}
+				});
+			}
+
+			@Override
+			protected void jobFailureHandler() {
+				runInUIThread(new Runnable() {
+					@Override
+					public void run() {
+						HomeChannelManagerView.this.getViewSite().getPage()
+						.hideView(HomeChannelManagerView.this);
+					}
+				});
+			}
+
+			@Override
+			protected String getErrorMessage() {
+				return "Open home channel error!";
+			}
+		}.start();
 	}
 
 	private void hookContextMenu() {
@@ -141,12 +222,15 @@ public class HomeChannelManagerView extends ViewPart {
 		manager.add(actEditHomeChannel);
 		manager.add(new Separator());
 		manager.add(actDeleteHomeChannel);
+		manager.add(new Separator());
+		manager.add(actionRefresh);
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
 		manager.add(actAddHomeChannel);
 		manager.add(actEditHomeChannel);
 		manager.add(actDeleteHomeChannel);
+		manager.add(actionRefresh);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -155,6 +239,7 @@ public class HomeChannelManagerView extends ViewPart {
 		manager.add(actAddHomeChannel);
 		manager.add(actEditHomeChannel);
 		manager.add(actDeleteHomeChannel);
+		manager.add(actionRefresh);
 	}
 
 	private void makeActions() {
@@ -169,7 +254,7 @@ public class HomeChannelManagerView extends ViewPart {
 		actEditHomeChannel = new Action("Edit home channel", 
 				Activator.getImageDescriptor("icons/account_edit.png")) {
 			public void run() {
-				editHomeChannel();
+				modifyHomeChannel();
 			}
 		};
 		actEditHomeChannel.setToolTipText("Edit home channel");
@@ -177,10 +262,27 @@ public class HomeChannelManagerView extends ViewPart {
 		actDeleteHomeChannel = new Action("Delete home channel", 
 				Activator.getImageDescriptor("icons/account_delete.png")) {
 			public void run() {
-				deleteHomeChannel();
+				try {
+					deleteHomeChannel();
+				} catch (IOException | NXCException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		};
 		actDeleteHomeChannel.setToolTipText("Delete home channel");
+		
+		actionRefresh = new RefreshAction(this) {
+			@Override
+			public void run() {
+				try {
+					viewer.setInput(session.getHomeChannel());
+				} catch (IOException | NXCException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		};
 	}
 
 	private void hookDoubleClickAction() {
@@ -197,7 +299,7 @@ public class HomeChannelManagerView extends ViewPart {
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
-	
+
 	/**
 	 * Create new home channel
 	 */
@@ -210,8 +312,8 @@ public class HomeChannelManagerView extends ViewPart {
 				@Override
 				protected void runInternal(IProgressMonitor monitor)
 						throws Exception {
-					//TODO : implement to send information to server
-					//session.createUser(dlg.getLoginName());
+					session.createHomeCHannel(dlg.getcId(), dlg.getcName(), dlg.getgAccount(), 
+							dlg.getvIntro(),dlg.getvOutro(),dlg.getLogo(),dlg.getDesc(),dlg.getTitle());
 				}
 
 				@Override
@@ -221,11 +323,11 @@ public class HomeChannelManagerView extends ViewPart {
 			}.start();
 		}
 	}
-	
+
 	/**
 	 * Edit home channel
 	 */
-	private void editHomeChannel()
+	private void modifyHomeChannel()
 	{
 		final IStructuredSelection selection = (IStructuredSelection) viewer
 				.getSelection();
@@ -238,29 +340,37 @@ public class HomeChannelManagerView extends ViewPart {
 			dialog.open();
 			return;
 		}
-		final EditHomeChannelDialog dlg = new EditHomeChannelDialog(getViewSite().getShell());
-		if (dlg.open() == Window.OK) {
-			new ConsoleJob("Edit home channel",
-					this, Activator.PLUGIN_ID, null) {
-				@Override
-				protected void runInternal(IProgressMonitor monitor)
-						throws Exception {
-					//TODO : implement to send information to server
-					//session.createUser(dlg.getLoginName());
-				}
+		Object firstElement = selection.getFirstElement();
+		if(firstElement instanceof HomeChannelObject)
+		{
+			final EditHomeChannelDialog dlg = new EditHomeChannelDialog(getViewSite().getShell(), 
+					(HomeChannelObject)firstElement);
+			if (dlg.open() == Window.OK) {
+				new ConsoleJob("Edit home channel",
+						this, Activator.PLUGIN_ID, null) {
+					@Override
+					protected void runInternal(IProgressMonitor monitor)
+							throws Exception {
+						session.modifyHomeCHannel(dlg.getId(), dlg.getcId(), dlg.getcName(), dlg.getgAccount(), 
+								dlg.getvIntro(), dlg.getvOutro(), dlg.getLogo(), dlg.getDesc(), dlg.getTitle());
+					}
 
-				@Override
-				protected String getErrorMessage() {
-					return "Can not edit home channel";
-				}
-			}.start();
+					@Override
+					protected String getErrorMessage() {
+						return "Can not edit home channel";
+					}
+				}.start();
+			}
 		}
+
 	}
-	
+
 	/**
 	 * Delete home channel
+	 * @throws NXCException 
+	 * @throws IOException 
 	 */
-	private void deleteHomeChannel()
+	private void deleteHomeChannel() throws IOException, NXCException
 	{
 		final IStructuredSelection selection = (IStructuredSelection) viewer
 				.getSelection();
@@ -277,7 +387,13 @@ public class HomeChannelManagerView extends ViewPart {
 				new MessageBox(getViewSite().getShell(), SWT.ICON_QUESTION | SWT.OK| SWT.CANCEL);
 		dialog.setText("Confirm to delete item");
 		dialog.setMessage("Do you really want to do delete this item?");
-		if (dialog.open() == Window.OK) {
+		if (dialog.open() == SWT.OK) {
+			Object firstElement = selection.getFirstElement();
+			if(firstElement instanceof HomeChannelObject)
+			{
+				HomeChannelObject object = (HomeChannelObject)firstElement;
+				session.deleteHomeChannel(object.getId());
+			}
 		}
 	}
 }

@@ -46,6 +46,7 @@ Copyright (c) 2003-2017 Raden Solutions
    </license>
 
    <plugins>
+      <plugin id="SpiderBase"/>
       <plugin id="com.ibm.icu"/>
       <plugin id="org.apache.commons.codec"/>
       <plugin id="org.eclipse.birt.chart.device.extension"/>

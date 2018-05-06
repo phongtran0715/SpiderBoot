@@ -1,16 +1,16 @@
-package org.spider.object;
+package org.spider.client;
 
-public class MonitorChannel {
+public class MonitorChannelObject {
 	int id;
 	String channelId;
 	String channelName;
 	
-	public MonitorChannel()
+	public MonitorChannelObject()
 	{
 		
 	}
 	
-	public MonitorChannel(int id, String channelId, String channelName) {
+	public MonitorChannelObject(int id, String channelId, String channelName) {
 		super();
 		this.id = id;
 		this.channelId = channelId;

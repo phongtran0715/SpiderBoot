@@ -1,25 +1,23 @@
-package org.spider.object;
+package org.spider.client;
 
-import java.util.Date;
-
-public class MappingChannel {
+public class MappingChannelObject {
 	int id;
 	String homeId;
 	String monitorId;
 	long timeIntervalSync;
 	int statusSync;
 	int action;
-	Date lastSyncTime;
+	String lastSyncTime;
 	String downloadClusterId;
 	String renderClusterId;
 	String uploadClusterId;
 	
-	public MappingChannel() {
+	public MappingChannelObject() {
 	}
 
-	public MappingChannel(int id, String homeId, String monitorId,
+	public MappingChannelObject(int id, String homeId, String monitorId,
 			long timeIntervalSync, int statusSync, int action,
-			Date lastSyncTime, String downloadClusterId,
+			String lastSyncTime, String downloadClusterId,
 			String renderClusterId, String uploadClusterId) {
 		super();
 		this.id = id;
@@ -82,11 +80,11 @@ public class MappingChannel {
 		this.action = action;
 	}
 
-	public Date getLastSyncTime() {
+	public String getLastSyncTime() {
 		return lastSyncTime;
 	}
 
-	public void setLastSyncTime(Date lastSyncTime) {
+	public void setLastSyncTime(String lastSyncTime) {
 		this.lastSyncTime = lastSyncTime;
 	}
 

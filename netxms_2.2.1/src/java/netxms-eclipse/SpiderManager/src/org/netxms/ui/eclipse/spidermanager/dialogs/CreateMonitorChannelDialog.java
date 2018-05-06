@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Group;
+import org.spider.client.MonitorChannelObject;
 
 /**
  * User database object creation dialog
@@ -36,8 +37,12 @@ import org.eclipse.swt.widgets.Group;
 public class CreateMonitorChannelDialog extends Dialog {
 	private Text txtChannelId;
 	private Text txtChannelName;
+	
+	private String channelId;
+	private String channelName;
 
-	public CreateMonitorChannelDialog(Shell parentShell) {
+	public CreateMonitorChannelDialog(Shell parentShell) 
+	{
 		super(parentShell);
 	}
 
@@ -82,7 +87,6 @@ public class CreateMonitorChannelDialog extends Dialog {
 		txtChannelName = new Text(grpCreateNewAccount, SWT.BORDER);
 		txtChannelName.setTextLimit(150);
 		txtChannelName.setBounds(131, 59, 290, 27);
-		//txtAppName.setLayoutData(gridData);
 		
 		return dialogArea;
 	}
@@ -106,9 +110,10 @@ public class CreateMonitorChannelDialog extends Dialog {
 	 */
 	@Override
 	protected void okPressed() {
+		channelId = txtChannelId.getText();
+		channelName = txtChannelName.getText();
 		// validate data
-		String channelID = txtChannelId.getText();
-		if(channelID == null || channelID.isEmpty())
+		if(channelId == null || channelId.isEmpty())
 		{
 			MessageBox dialog =
 					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
@@ -118,5 +123,13 @@ public class CreateMonitorChannelDialog extends Dialog {
 			return;
 		}
 		super.okPressed();
+	}
+
+	public String getChannelId() {
+		return channelId;
+	}
+
+	public String getChannelName() {
+		return channelName;
 	}
 }

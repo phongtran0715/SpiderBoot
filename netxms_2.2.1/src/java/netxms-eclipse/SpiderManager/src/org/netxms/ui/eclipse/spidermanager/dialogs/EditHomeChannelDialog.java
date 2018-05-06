@@ -21,7 +21,6 @@ package org.netxms.ui.eclipse.spidermanager.dialogs;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
@@ -33,6 +32,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.spider.client.HomeChannelObject;
 
 /**
  * User database object creation dialog
@@ -47,9 +47,22 @@ public class EditHomeChannelDialog extends Dialog {
 	private Text txtLogo;
 	private Text txtTitleTemplate;
 	private Text txtDesTemplate;
+	
+	private int id;
+	private String cId;
+	private String cName; 
+	private String gAccount;
+	private String vIntro;
+	private String vOutro;
+	private String logo;
+	private String desc;
+	private String title;
+	HomeChannelObject object;
 
-	public EditHomeChannelDialog(Shell parentShell) {
+	public EditHomeChannelDialog(Shell parentShell, HomeChannelObject object) {
 		super(parentShell);
+		this.object = object;
+		id = this.object.getId();
 	}
 
 	/*
@@ -227,8 +240,15 @@ public class EditHomeChannelDialog extends Dialog {
 		});
 		btnDesc.setText("Browse...");
 		btnDesc.setBounds(427, 257, 79, 29);
-		//txtAppName.setLayoutData(gridData);
-
+		//initial data
+		txtChannelId.setText(this.object.getChannelId());
+		txtChannelName.setText(this.object.getChannelName());
+		txtDesTemplate.setText(this.object.getDescTemp());
+		txtGoogleAccount.setText(this.object.getGoogleAccount());
+		txtLogo.setText(this.object.getLogo());
+		txtTitleTemplate.setText(this.object.getTitleTemp());
+		txtVideoIntro.setText(this.object.getvIntro());
+		txtVideoOutro.setText(this.object.getvOutro());
 		return dialogArea;
 	}
 
@@ -251,8 +271,15 @@ public class EditHomeChannelDialog extends Dialog {
 	 */
 	@Override
 	protected void okPressed() {
-		String channelID = txtChannelId.getText();
-		if(channelID == null || channelID.isEmpty())
+		cId = txtChannelId.getText();
+		cName = txtChannelName.getText();
+		gAccount = txtGoogleAccount.getText();
+		vIntro = txtVideoIntro.getText();
+		vOutro = txtVideoOutro.getText();
+		logo = txtLogo.getText();
+		desc = txtDesTemplate.getText();
+		title = txtTitleTemplate.getText();
+		if(cId == null || cId.isEmpty())
 		{
 			MessageBox dialog =
 					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
@@ -261,8 +288,7 @@ public class EditHomeChannelDialog extends Dialog {
 			dialog.open();
 			return;
 		}
-		String googleAccount = txtGoogleAccount.getText();
-		if(googleAccount == null || googleAccount.isEmpty())
+		if(gAccount == null || gAccount.isEmpty())
 		{
 			MessageBox dialog =
 					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
@@ -272,5 +298,45 @@ public class EditHomeChannelDialog extends Dialog {
 			return;
 		}
 		super.okPressed();
+	}
+	
+	public int getId() {
+		return id;
+	}
+
+	public String getcId() {
+		return cId;
+	}
+
+	public String getcName() {
+		return cName;
+	}
+
+	public String getgAccount() {
+		return gAccount;
+	}
+
+	public String getvIntro() {
+		return vIntro;
+	}
+
+	public String getvOutro() {
+		return vOutro;
+	}
+
+	public String getLogo() {
+		return logo;
+	}
+
+	public String getDesc() {
+		return desc;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public HomeChannelObject getObject() {
+		return object;
 	}
 }
