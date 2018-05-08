@@ -1,0 +1,8 @@
+#ifndef __SPIDER_IDL__
+#define __SPIDER_IDL__
+
+interface Spider {
+  string echoString(in string mesg);
+};
+
+#endif  // __SPIDER_IDL__

@@ -4,12 +4,12 @@ const TCHAR *g_cppFlags = _T(" -D_THREAD_SAFE -DTRE_WCHAR=1 -D_GNU_SOURCE -O2 -W
 const TCHAR *g_cFlags = _T("-g -O2");
 const TCHAR *g_cxxFlags = _T("-g -O2 -std=c++11 -fno-rtti -fno-exceptions");
 const TCHAR *g_ldFlags = _T("  -L/usr/local/lib  ");
-const TCHAR *g_libs = _T("-lz -lresolv -ldl  -lpthread -lssl -lcrypto");
+const TCHAR *g_libs = _T("-lexpat -lz -lresolv -ldl  -lpthread -lssl -lcrypto");
 const TCHAR *g_cc = _T("gcc");
 const TCHAR *g_cxx = _T("g++");
 const TCHAR *g_ld = _T("/usr/bin/ld -m elf_x86_64");
 const TCHAR *g_perl = _T("/usr/bin/perl");
-const TCHAR *g_serverLibs = _T("");
+const TCHAR *g_serverLibs = _T(" -ltermcap");
 const TCHAR *g_tuxedoCppFlags = _T("");
 const TCHAR *g_tuxedoLdFlags = _T("");
 const TCHAR *g_tuxedoLibs = _T("");

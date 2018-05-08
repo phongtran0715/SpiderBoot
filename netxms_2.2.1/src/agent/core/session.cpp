@@ -57,16 +57,16 @@ static VolatileCounter s_activeProxySessions = 0;
  */
 LONG H_AgentProxyStats(const TCHAR *cmd, const TCHAR *arg, TCHAR *value, AbstractCommSession *session)
 {
-   switch(*arg)
+   switch (*arg)
    {
-      case 'A':
-         ret_uint(value, (UINT32)s_activeProxySessions);
-         break;
-      case 'C':
-         ret_uint64(value, s_proxyConnectionRequests);
-         break;
-      default:
-         return SYSINFO_RC_UNSUPPORTED;
+   case 'A':
+      ret_uint(value, (UINT32)s_activeProxySessions);
+      break;
+   case 'C':
+      ret_uint64(value, s_proxyConnectionRequests);
+      break;
+   default:
+      return SYSINFO_RC_UNSUPPORTED;
    }
    return SYSINFO_RC_SUCCESS;
 }
@@ -160,18 +160,18 @@ CommSession::~CommSession()
       closesocket(m_hProxySocket);
 
    void *p;
-   while((p = m_sendQueue->get()) != NULL)
+   while ((p = m_sendQueue->get()) != NULL)
       if (p != INVALID_POINTER_VALUE)
          free(p);
    delete m_sendQueue;
 
-   while((p = m_processingQueue->get()) != NULL)
+   while ((p = m_processingQueue->get()) != NULL)
       if (p != INVALID_POINTER_VALUE)
          delete (NXCPMessage *)p;
    delete m_processingQueue;
-	if ((m_pCtx != NULL) && (m_pCtx != PROXY_ENCRYPTION_CTX))
-		m_pCtx->decRefCount();
-	MutexDestroy(m_socketWriteMutex);
+   if ((m_pCtx != NULL) && (m_pCtx != PROXY_ENCRYPTION_CTX))
+      m_pCtx->decRefCount();
+   MutexDestroy(m_socketWriteMutex);
    delete m_responseQueue;
 }
 
@@ -208,7 +208,7 @@ void CommSession::run()
  */
 void CommSession::disconnect()
 {
-	debugPrintf(5, _T("CommSession::disconnect()"));
+   debugPrintf(5, _T("CommSession::disconnect()"));
    m_channel->shutdown();
    if (m_hProxySocket != -1)
       shutdown(m_hProxySocket, SHUT_RDWR);
@@ -221,7 +221,7 @@ void CommSession::disconnect()
 void CommSession::readThread()
 {
    CommChannelMessageReceiver receiver(m_channel, 4096, MAX_AGENT_MSG_SIZE);
-   while(!m_disconnected)
+   while (!m_disconnected)
    {
       if (!m_proxyConnection)
       {
@@ -329,62 +329,62 @@ void CommSession::readThread()
             debugPrintf(6, _T("Received message %s (%d)"), NXCPMessageCodeName(msg->getCode(), buffer), msg->getId());
 
             UINT32 rcc;
-            switch(msg->getCode())
+            switch (msg->getCode())
             {
-               case CMD_REQUEST_COMPLETED:
-                  m_responseQueue->put(msg);
-                  break;
-               case CMD_REQUEST_SESSION_KEY:
-                  if (m_pCtx == NULL)
-                  {
-                     NXCPMessage *pResponse;
-                     SetupEncryptionContext(msg, &m_pCtx, &pResponse, NULL, NXCP_VERSION);
-                     sendMessage(pResponse);
-                     delete pResponse;
-                     receiver.setEncryptionContext(m_pCtx);
-                  }
+            case CMD_REQUEST_COMPLETED:
+               m_responseQueue->put(msg);
+               break;
+            case CMD_REQUEST_SESSION_KEY:
+               if (m_pCtx == NULL)
+               {
+                  NXCPMessage *pResponse;
+                  SetupEncryptionContext(msg, &m_pCtx, &pResponse, NULL, NXCP_VERSION);
+                  sendMessage(pResponse);
+                  delete pResponse;
+                  receiver.setEncryptionContext(m_pCtx);
+               }
+               delete msg;
+               break;
+            case CMD_SETUP_PROXY_CONNECTION:
+               s_proxyConnectionRequests++;
+               rcc = setupProxyConnection(msg);
+               // When proxy session established incoming messages will
+               // not be processed locally. Acknowledgment message sent
+               // by setupProxyConnection() in case of success.
+               if (rcc == ERR_SUCCESS)
+               {
+                  InterlockedIncrement(&s_activeProxySessions);
+                  m_processingQueue->put(INVALID_POINTER_VALUE);
+               }
+               else
+               {
+                  NXCPMessage response;
+                  response.setCode(CMD_REQUEST_COMPLETED);
+                  response.setId(msg->getId());
+                  response.setField(VID_RCC, rcc);
+                  sendMessage(&response);
+               }
+               delete msg;
+               break;
+            case CMD_SNMP_REQUEST:
+               if (m_masterServer && (g_dwFlags & AF_ENABLE_SNMP_PROXY))
+               {
+                  incRefCount();
+                  ThreadPoolExecute(g_snmpProxyThreadPool, this, &CommSession::proxySnmpRequest, msg);
+               }
+               else
+               {
+                  NXCPMessage response;
+                  response.setCode(CMD_REQUEST_COMPLETED);
+                  response.setId(msg->getId());
+                  response.setField(VID_RCC, ERR_ACCESS_DENIED);
+                  sendMessage(&response);
                   delete msg;
-                  break;
-               case CMD_SETUP_PROXY_CONNECTION:
-                  s_proxyConnectionRequests++;
-                  rcc = setupProxyConnection(msg);
-                  // When proxy session established incoming messages will
-                  // not be processed locally. Acknowledgment message sent
-                  // by setupProxyConnection() in case of success.
-                  if (rcc == ERR_SUCCESS)
-                  {
-                     InterlockedIncrement(&s_activeProxySessions);
-                     m_processingQueue->put(INVALID_POINTER_VALUE);
-                  }
-                  else
-                  {
-                     NXCPMessage response;
-                     response.setCode(CMD_REQUEST_COMPLETED);
-                     response.setId(msg->getId());
-                     response.setField(VID_RCC, rcc);
-                     sendMessage(&response);
-                  }
-                  delete msg;
-                  break;
-               case CMD_SNMP_REQUEST:
-                  if (m_masterServer && (g_dwFlags & AF_ENABLE_SNMP_PROXY))
-                  {
-                     incRefCount();
-                     ThreadPoolExecute(g_snmpProxyThreadPool, this, &CommSession::proxySnmpRequest, msg);
-                  }
-                  else
-                  {
-                     NXCPMessage response;
-                     response.setCode(CMD_REQUEST_COMPLETED);
-                     response.setId(msg->getId());
-                     response.setField(VID_RCC, ERR_ACCESS_DENIED);
-                     sendMessage(&response);
-                     delete msg;
-                  }
-                  break;
-               default:
-                  m_processingQueue->put(msg);
-                  break;
+               }
+               break;
+            default:
+               m_processingQueue->put(msg);
+               break;
             }
          }
       }
@@ -439,8 +439,8 @@ bool CommSession::sendRawMessage(NXCP_MESSAGE *msg, NXCPEncryptionContext *ctx)
    {
       TCHAR buffer[128];
       debugPrintf(6, _T("Sending message %s (ID %d; size %d; %s)"), NXCPMessageCodeName(ntohs(msg->code), buffer),
-               ntohl(msg->id), ntohl(msg->size),
-               ntohs(msg->flags) & MF_COMPRESSED ? _T("compressed") : _T("uncompressed"));
+                  ntohl(msg->id), ntohl(msg->size),
+                  ntohs(msg->flags) & MF_COMPRESSED ? _T("compressed") : _T("uncompressed"));
       if (nxlog_get_debug_level() >= 8)
       {
          String msgDump = NXCPMessage::dump(msg, NXCP_VERSION);
@@ -468,12 +468,12 @@ bool CommSession::sendRawMessage(NXCP_MESSAGE *msg, NXCPEncryptionContext *ctx)
       }
    }
 
-	if (!success)
-	{
+   if (!success)
+   {
       TCHAR buffer[128];
-	   debugPrintf(6, _T("CommSession::SendRawMessage() for %s (size %d) failed (error %d: %s)"),
-	            NXCPMessageCodeName(ntohs(msg->code), buffer), ntohl(msg->size), WSAGetLastError(), _tcserror(WSAGetLastError()));
-	}
+      debugPrintf(6, _T("CommSession::SendRawMessage() for %s (size %d) failed (error %d: %s)"),
+                  NXCPMessageCodeName(ntohs(msg->code), buffer), ntohl(msg->size), WSAGetLastError(), _tcserror(WSAGetLastError()));
+   }
    free(msg);
    return success;
 }
@@ -502,7 +502,7 @@ bool CommSession::sendRawMessage(NXCP_MESSAGE *msg)
  */
 void CommSession::writeThread()
 {
-   while(true)
+   while (true)
    {
       NXCP_MESSAGE *msg = (NXCP_MESSAGE *)m_sendQueue->getOrBlock();
       if (msg == INVALID_POINTER_VALUE)    // Session termination indicator
@@ -520,7 +520,7 @@ void CommSession::writeThread()
 void CommSession::processingThread()
 {
    NXCPMessage response;
-   while(true)
+   while (true)
    {
       NXCPMessage *request = (NXCPMessage *)m_processingQueue->getOrBlock();
       if (request == INVALID_POINTER_VALUE)    // Session termination indicator
@@ -534,181 +534,190 @@ void CommSession::processingThread()
       // Check if authentication required
       if ((!m_authenticated) && (command != CMD_AUTHENTICATE))
       {
-			debugPrintf(6, _T("Authentication required"));
-			response.setField(VID_RCC, ERR_AUTH_REQUIRED);
+         debugPrintf(6, _T("Authentication required"));
+         response.setField(VID_RCC, ERR_AUTH_REQUIRED);
       }
       else if ((g_dwFlags & AF_REQUIRE_ENCRYPTION) && (m_pCtx == NULL))
       {
-			debugPrintf(6, _T("Encryption required"));
-			response.setField(VID_RCC, ERR_ENCRYPTION_REQUIRED);
+         debugPrintf(6, _T("Encryption required"));
+         response.setField(VID_RCC, ERR_ENCRYPTION_REQUIRED);
       }
       else
       {
-         switch(command)
+         switch (command)
          {
-            case CMD_AUTHENTICATE:
-               authenticate(request, &response);
-               break;
-            case CMD_GET_PARAMETER:
-               getParameter(request, &response);
-               break;
-            case CMD_GET_LIST:
-               getList(request, &response);
-               break;
-            case CMD_GET_TABLE:
-               getTable(request, &response);
-               break;
-            case CMD_KEEPALIVE:
-               response.setField(VID_RCC, ERR_SUCCESS);
-               break;
-            case CMD_ACTION:
-               action(request, &response);
-               break;
-            case CMD_TRANSFER_FILE:
-               recvFile(request, &response);
-               break;
-            case CMD_UPGRADE_AGENT:
-               response.setField(VID_RCC, upgrade(request));
-               break;
-            case CMD_GET_PARAMETER_LIST:
-               response.setField(VID_RCC, ERR_SUCCESS);
-               GetParameterList(&response);
-               break;
-            case CMD_GET_ENUM_LIST:
-               response.setField(VID_RCC, ERR_SUCCESS);
-               GetEnumList(&response);
-               break;
-            case CMD_GET_TABLE_LIST:
-               response.setField(VID_RCC, ERR_SUCCESS);
-               GetTableList(&response);
-               break;
-            case CMD_GET_AGENT_CONFIG:
-               getConfig(&response);
-               break;
-            case CMD_UPDATE_AGENT_CONFIG:
-               updateConfig(request, &response);
-               break;
-            case CMD_ENABLE_AGENT_TRAPS:
-               m_acceptTraps = true;
-               response.setField(VID_RCC, ERR_SUCCESS);
-               break;
-            case CMD_ENABLE_FILE_UPDATES:
-               if (m_masterServer)
-               {
-                  m_acceptFileUpdates = true;
-                  response.setField(VID_RCC, ERR_SUCCESS);
-               }
-               else
-               {
-                  response.setField(VID_RCC, ERR_ACCESS_DENIED);
-               }
-               break;
-				case CMD_DEPLOY_AGENT_POLICY:
-					if (m_masterServer)
-					{
-					   response.setField(VID_RCC, DeployPolicy(this, request));
-					}
-					else
-					{
-					   response.setField(VID_RCC, ERR_ACCESS_DENIED);
-					}
-					break;
-				case CMD_UNINSTALL_AGENT_POLICY:
-					if (m_masterServer)
-					{
-					   response.setField(VID_RCC, UninstallPolicy(this, request));
-					}
-					else
-					{
-					   response.setField(VID_RCC, ERR_ACCESS_DENIED);
-					}
-					break;
-				case CMD_GET_POLICY_INVENTORY:
-					if (m_masterServer)
-					{
-					   response.setField(VID_RCC, GetPolicyInventory(this, &response));
-					}
-					else
-					{
-					   response.setField(VID_RCC, ERR_ACCESS_DENIED);
-					}
-					break;
-            case CMD_TAKE_SCREENSHOT:
-					if (m_controlServer)
-					{
-                  TCHAR sessionName[256];
-                  request->getFieldAsString(VID_NAME, sessionName, 256);
-                  debugPrintf(6, _T("Take screenshot from session \"%s\""), sessionName);
-                  SessionAgentConnector *conn = AcquireSessionAgentConnector(sessionName);
-                  if (conn != NULL)
-                  {
-                     debugPrintf(6, _T("Session agent connector acquired"));
-                     conn->takeScreenshot(&response);
-                     conn->decRefCount();
-                  }
-                  else
-                  {
-                     response.setField(VID_RCC, ERR_NO_SESSION_AGENT);
-                  }
-					}
-					else
-					{
-					   response.setField(VID_RCC, ERR_ACCESS_DENIED);
-					}
-					break;
-            case CMD_HOST_BY_IP:
+         case CMD_AUTHENTICATE:
+            authenticate(request, &response);
+            break;
+         case CMD_GET_PARAMETER:
+            getParameter(request, &response);
+            break;
+         case CMD_GET_LIST:
+            getList(request, &response);
+            break;
+         case CMD_GET_TABLE:
+            getTable(request, &response);
+            break;
+         case CMD_KEEPALIVE:
+            response.setField(VID_RCC, ERR_SUCCESS);
+            break;
+         case CMD_ACTION:
+            action(request, &response);
+            break;
+         case CMD_TRANSFER_FILE:
+            recvFile(request, &response);
+            break;
+         case CMD_UPGRADE_AGENT:
+            response.setField(VID_RCC, upgrade(request));
+            break;
+         case CMD_GET_PARAMETER_LIST:
+            response.setField(VID_RCC, ERR_SUCCESS);
+            GetParameterList(&response);
+            break;
+         case CMD_GET_ENUM_LIST:
+            response.setField(VID_RCC, ERR_SUCCESS);
+            GetEnumList(&response);
+            break;
+         case CMD_GET_TABLE_LIST:
+            response.setField(VID_RCC, ERR_SUCCESS);
+            GetTableList(&response);
+            break;
+         case CMD_GET_AGENT_CONFIG:
+            getConfig(&response);
+            break;
+         case CMD_UPDATE_AGENT_CONFIG:
+            updateConfig(request, &response);
+            break;
+         case CMD_ENABLE_AGENT_TRAPS:
+            m_acceptTraps = true;
+            response.setField(VID_RCC, ERR_SUCCESS);
+            break;
+         case CMD_ENABLE_FILE_UPDATES:
+            if (m_masterServer)
             {
-               InetAddress addr = request->getFieldAsInetAddress(VID_IP_ADDRESS);
-               TCHAR dnsName[MAX_DNS_NAME];
-               response.setField(VID_NAME, addr.getHostByAddr(dnsName, MAX_DNS_NAME));
+               m_acceptFileUpdates = true;
                response.setField(VID_RCC, ERR_SUCCESS);
-               break;
             }
-            case CMD_SET_SERVER_CAPABILITIES:
-               // Servers before 2.0 use VID_ENABLED
-               m_ipv6Aware = request->isFieldExist(VID_IPV6_SUPPORT) ? request->getFieldAsBoolean(VID_IPV6_SUPPORT) : request->getFieldAsBoolean(VID_ENABLED);
-               m_bulkReconciliationSupported = request->getFieldAsBoolean(VID_BULK_RECONCILIATION);
-               m_allowCompression = request->getFieldAsBoolean(VID_ENABLE_COMPRESSION);
-               response.setField(VID_RCC, ERR_SUCCESS);
-               debugPrintf(1, _T("Server capabilities: IPv6: %s; bulk reconciliation: %s; compression: %s"),
-                           m_ipv6Aware ? _T("yes") : _T("no"),
-                           m_bulkReconciliationSupported ? _T("yes") : _T("no"),
-                           m_allowCompression ? _T("yes") : _T("no"));
-               break;
-            case CMD_SET_SERVER_ID:
-               m_serverId = request->getFieldAsUInt64(VID_SERVER_ID);
-               debugPrintf(1, _T("Server ID set to ") UINT64X_FMT(_T("016")), m_serverId);
-               response.setField(VID_RCC, ERR_SUCCESS);
-               break;
-            case CMD_DATA_COLLECTION_CONFIG:
-               if (m_serverId != 0)
+            else
+            {
+               response.setField(VID_RCC, ERR_ACCESS_DENIED);
+            }
+            break;
+         case CMD_DEPLOY_AGENT_POLICY:
+            if (m_masterServer)
+            {
+               response.setField(VID_RCC, DeployPolicy(this, request));
+            }
+            else
+            {
+               response.setField(VID_RCC, ERR_ACCESS_DENIED);
+            }
+            break;
+         case CMD_UNINSTALL_AGENT_POLICY:
+            if (m_masterServer)
+            {
+               response.setField(VID_RCC, UninstallPolicy(this, request));
+            }
+            else
+            {
+               response.setField(VID_RCC, ERR_ACCESS_DENIED);
+            }
+            break;
+         case CMD_GET_POLICY_INVENTORY:
+            if (m_masterServer)
+            {
+               response.setField(VID_RCC, GetPolicyInventory(this, &response));
+            }
+            else
+            {
+               response.setField(VID_RCC, ERR_ACCESS_DENIED);
+            }
+            break;
+         case CMD_TAKE_SCREENSHOT:
+            if (m_controlServer)
+            {
+               TCHAR sessionName[256];
+               request->getFieldAsString(VID_NAME, sessionName, 256);
+               debugPrintf(6, _T("Take screenshot from session \"%s\""), sessionName);
+               SessionAgentConnector *conn = AcquireSessionAgentConnector(sessionName);
+               if (conn != NULL)
                {
-                  ConfigureDataCollection(m_serverId, request);
-                  m_acceptData = true;
-                  response.setField(VID_RCC, ERR_SUCCESS);
+                  debugPrintf(6, _T("Session agent connector acquired"));
+                  conn->takeScreenshot(&response);
+                  conn->decRefCount();
                }
                else
                {
-                  debugPrintf(1, _T("Data collection configuration command received but server ID is not set"));
-                  response.setField(VID_RCC, ERR_SERVER_ID_UNSET);
+                  response.setField(VID_RCC, ERR_NO_SESSION_AGENT);
                }
-               break;
-            case CMD_CLEAN_AGENT_DCI_CONF:
-               if (m_masterServer)
-               {
-                  ClearDataCollectionConfiguration();
-                  response.setField(VID_RCC, ERR_SUCCESS);
-               }
-               else
-               {
-                  response.setField(VID_RCC, ERR_ACCESS_DENIED);
-               }
-               break;
-            default:
-               // Attempt to process unknown command by subagents
-               if (!ProcessCmdBySubAgent(command, request, &response, this))
-                  response.setField(VID_RCC, ERR_UNKNOWN_COMMAND);
-               break;
+            }
+            else
+            {
+               response.setField(VID_RCC, ERR_ACCESS_DENIED);
+            }
+            break;
+         case CMD_HOST_BY_IP:
+         {
+            InetAddress addr = request->getFieldAsInetAddress(VID_IP_ADDRESS);
+            TCHAR dnsName[MAX_DNS_NAME];
+            response.setField(VID_NAME, addr.getHostByAddr(dnsName, MAX_DNS_NAME));
+            response.setField(VID_RCC, ERR_SUCCESS);
+            break;
+         }
+         case CMD_SET_SERVER_CAPABILITIES:
+            // Servers before 2.0 use VID_ENABLED
+            m_ipv6Aware = request->isFieldExist(VID_IPV6_SUPPORT) ? request->getFieldAsBoolean(VID_IPV6_SUPPORT) : request->getFieldAsBoolean(VID_ENABLED);
+            m_bulkReconciliationSupported = request->getFieldAsBoolean(VID_BULK_RECONCILIATION);
+            m_allowCompression = request->getFieldAsBoolean(VID_ENABLE_COMPRESSION);
+            response.setField(VID_RCC, ERR_SUCCESS);
+            debugPrintf(1, _T("Server capabilities: IPv6: %s; bulk reconciliation: %s; compression: %s"),
+                        m_ipv6Aware ? _T("yes") : _T("no"),
+                        m_bulkReconciliationSupported ? _T("yes") : _T("no"),
+                        m_allowCompression ? _T("yes") : _T("no"));
+            break;
+         case CMD_SET_SERVER_ID:
+            m_serverId = request->getFieldAsUInt64(VID_SERVER_ID);
+            debugPrintf(1, _T("Server ID set to ") UINT64X_FMT(_T("016")), m_serverId);
+            response.setField(VID_RCC, ERR_SUCCESS);
+            break;
+         case CMD_DATA_COLLECTION_CONFIG:
+            if (m_serverId != 0)
+            {
+               ConfigureDataCollection(m_serverId, request);
+               m_acceptData = true;
+               response.setField(VID_RCC, ERR_SUCCESS);
+            }
+            else
+            {
+               debugPrintf(1, _T("Data collection configuration command received but server ID is not set"));
+               response.setField(VID_RCC, ERR_SERVER_ID_UNSET);
+            }
+            break;
+         case CMD_CLEAN_AGENT_DCI_CONF:
+            if (m_masterServer)
+            {
+               ClearDataCollectionConfiguration();
+               response.setField(VID_RCC, ERR_SUCCESS);
+            }
+            else
+            {
+               response.setField(VID_RCC, ERR_ACCESS_DENIED);
+            }
+            break;
+         case CMD_CREATE_MAPPING_CHANNEL:
+            createMappingChannel(request, &response);
+            break;
+         case CMD_MOD_MAPPING_CHANNEL:
+            modifyMappingChannel(request, &response);
+            break;
+         case CMD_DEL_MAPPING_CHANNEL:
+            deleteMappingChannel(request, &response);
+            break;
+         default:
+            // Attempt to process unknown command by subagents
+            if (!ProcessCmdBySubAgent(command, request, &response, this))
+               response.setField(VID_RCC, ERR_UNKNOWN_COMMAND);
+            break;
          }
       }
       delete request;
@@ -736,70 +745,70 @@ void CommSession::authenticate(NXCPMessage *pRequest, NXCPMessage *pMsg)
       WORD wAuthMethod;
 
       wAuthMethod = pRequest->getFieldAsUInt16(VID_AUTH_METHOD);
-      switch(wAuthMethod)
+      switch (wAuthMethod)
       {
-         case AUTH_PLAINTEXT:
-            pRequest->getFieldAsString(VID_SHARED_SECRET, szSecret, MAX_SECRET_LENGTH);
-            if (!_tcscmp(szSecret, g_szSharedSecret))
-            {
-               m_authenticated = true;
-               pMsg->setField(VID_RCC, ERR_SUCCESS);
-            }
-            else
-            {
-               nxlog_write(MSG_AUTH_FAILED, EVENTLOG_WARNING_TYPE, "Is", &m_serverAddr, _T("PLAIN"));
-               pMsg->setField(VID_RCC, ERR_AUTH_FAILED);
-            }
-            break;
-         case AUTH_MD5_HASH:
-            pRequest->getFieldAsBinary(VID_SHARED_SECRET, (BYTE *)szSecret, MD5_DIGEST_SIZE);
+      case AUTH_PLAINTEXT:
+         pRequest->getFieldAsString(VID_SHARED_SECRET, szSecret, MAX_SECRET_LENGTH);
+         if (!_tcscmp(szSecret, g_szSharedSecret))
+         {
+            m_authenticated = true;
+            pMsg->setField(VID_RCC, ERR_SUCCESS);
+         }
+         else
+         {
+            nxlog_write(MSG_AUTH_FAILED, EVENTLOG_WARNING_TYPE, "Is", &m_serverAddr, _T("PLAIN"));
+            pMsg->setField(VID_RCC, ERR_AUTH_FAILED);
+         }
+         break;
+      case AUTH_MD5_HASH:
+         pRequest->getFieldAsBinary(VID_SHARED_SECRET, (BYTE *)szSecret, MD5_DIGEST_SIZE);
 #ifdef UNICODE
-				{
-					char sharedSecret[256];
-					WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK | WC_DEFAULTCHAR, g_szSharedSecret, -1, sharedSecret, 256, NULL, NULL);
-					sharedSecret[255] = 0;
-					CalculateMD5Hash((BYTE *)sharedSecret, strlen(sharedSecret), hash);
-				}
+         {
+            char sharedSecret[256];
+            WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK | WC_DEFAULTCHAR, g_szSharedSecret, -1, sharedSecret, 256, NULL, NULL);
+            sharedSecret[255] = 0;
+            CalculateMD5Hash((BYTE *)sharedSecret, strlen(sharedSecret), hash);
+         }
 #else
-            CalculateMD5Hash((BYTE *)g_szSharedSecret, strlen(g_szSharedSecret), hash);
+         CalculateMD5Hash((BYTE *)g_szSharedSecret, strlen(g_szSharedSecret), hash);
 #endif
-            if (!memcmp(szSecret, hash, MD5_DIGEST_SIZE))
-            {
-               m_authenticated = true;
-               pMsg->setField(VID_RCC, ERR_SUCCESS);
-            }
-            else
-            {
-               nxlog_write(MSG_AUTH_FAILED, EVENTLOG_WARNING_TYPE, "Is", &m_serverAddr, _T("MD5"));
-               pMsg->setField(VID_RCC, ERR_AUTH_FAILED);
-            }
-            break;
-         case AUTH_SHA1_HASH:
-            pRequest->getFieldAsBinary(VID_SHARED_SECRET, (BYTE *)szSecret, SHA1_DIGEST_SIZE);
+         if (!memcmp(szSecret, hash, MD5_DIGEST_SIZE))
+         {
+            m_authenticated = true;
+            pMsg->setField(VID_RCC, ERR_SUCCESS);
+         }
+         else
+         {
+            nxlog_write(MSG_AUTH_FAILED, EVENTLOG_WARNING_TYPE, "Is", &m_serverAddr, _T("MD5"));
+            pMsg->setField(VID_RCC, ERR_AUTH_FAILED);
+         }
+         break;
+      case AUTH_SHA1_HASH:
+         pRequest->getFieldAsBinary(VID_SHARED_SECRET, (BYTE *)szSecret, SHA1_DIGEST_SIZE);
 #ifdef UNICODE
-				{
-					char sharedSecret[256];
-					WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK | WC_DEFAULTCHAR, g_szSharedSecret, -1, sharedSecret, 256, NULL, NULL);
-					sharedSecret[255] = 0;
-					CalculateSHA1Hash((BYTE *)sharedSecret, strlen(sharedSecret), hash);
-				}
+         {
+            char sharedSecret[256];
+            WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK | WC_DEFAULTCHAR, g_szSharedSecret, -1, sharedSecret, 256, NULL, NULL);
+            sharedSecret[255] = 0;
+            CalculateSHA1Hash((BYTE *)sharedSecret, strlen(sharedSecret), hash);
+         }
 #else
-            CalculateSHA1Hash((BYTE *)g_szSharedSecret, strlen(g_szSharedSecret), hash);
+         CalculateSHA1Hash((BYTE *)g_szSharedSecret, strlen(g_szSharedSecret), hash);
 #endif
-            if (!memcmp(szSecret, hash, SHA1_DIGEST_SIZE))
-            {
-               m_authenticated = true;
-               pMsg->setField(VID_RCC, ERR_SUCCESS);
-            }
-            else
-            {
-               nxlog_write(MSG_AUTH_FAILED, EVENTLOG_WARNING_TYPE, "Is", &m_serverAddr, _T("SHA1"));
-               pMsg->setField(VID_RCC, ERR_AUTH_FAILED);
-            }
-            break;
-         default:
-            pMsg->setField(VID_RCC, ERR_NOT_IMPLEMENTED);
-            break;
+         if (!memcmp(szSecret, hash, SHA1_DIGEST_SIZE))
+         {
+            m_authenticated = true;
+            pMsg->setField(VID_RCC, ERR_SUCCESS);
+         }
+         else
+         {
+            nxlog_write(MSG_AUTH_FAILED, EVENTLOG_WARNING_TYPE, "Is", &m_serverAddr, _T("SHA1"));
+            pMsg->setField(VID_RCC, ERR_AUTH_FAILED);
+         }
+         break;
+      default:
+         pMsg->setField(VID_RCC, ERR_NOT_IMPLEMENTED);
+         break;
       }
    }
 }
@@ -850,7 +859,7 @@ void CommSession::getTable(NXCPMessage *pRequest, NXCPMessage *pMsg)
    pMsg->setField(VID_RCC, dwErrorCode);
    if (dwErrorCode == ERR_SUCCESS)
    {
-		value.fillMessage(*pMsg, 0, -1);	// no row limit
+      value.fillMessage(*pMsg, 0, -1); // no row limit
    }
 }
 
@@ -867,8 +876,8 @@ void CommSession::action(NXCPMessage *pRequest, NXCPMessage *pMsg)
 
       int numArgs = pRequest->getFieldAsInt32(VID_NUM_ARGS);
       StringList *args = new StringList;
-      for(int i = 0; i < numArgs; i++)
-			args->addPreallocated(pRequest->getFieldAsString(VID_ACTION_ARG_BASE + i));
+      for (int i = 0; i < numArgs; i++)
+         args->addPreallocated(pRequest->getFieldAsString(VID_ACTION_ARG_BASE + i));
 
       // Execute action
       if (pRequest->getFieldAsBoolean(VID_RECEIVE_OUTPUT))
@@ -894,22 +903,22 @@ void CommSession::action(NXCPMessage *pRequest, NXCPMessage *pMsg)
  */
 void CommSession::recvFile(NXCPMessage *pRequest, NXCPMessage *pMsg)
 {
-	TCHAR szFileName[MAX_PATH], szFullPath[MAX_PATH];
+   TCHAR szFileName[MAX_PATH], szFullPath[MAX_PATH];
 
-	if (m_masterServer)
-	{
-		szFileName[0] = 0;
-		pRequest->getFieldAsString(VID_FILE_NAME, szFileName, MAX_PATH);
-		debugPrintf(5, _T("CommSession::recvFile(): Preparing for receiving file \"%s\""), szFileName);
+   if (m_masterServer)
+   {
+      szFileName[0] = 0;
+      pRequest->getFieldAsString(VID_FILE_NAME, szFileName, MAX_PATH);
+      debugPrintf(5, _T("CommSession::recvFile(): Preparing for receiving file \"%s\""), szFileName);
       BuildFullPath(szFileName, szFullPath);
 
-		// Check if for some reason we have already opened file
+      // Check if for some reason we have already opened file
       pMsg->setField(VID_RCC, openFile(szFullPath, pRequest->getId(), pRequest->getFieldAsTime(VID_MODIFICATION_TIME)));
-	}
-	else
-	{
-		pMsg->setField(VID_RCC, ERR_ACCESS_DENIED);
-	}
+   }
+   else
+   {
+      pMsg->setField(VID_RCC, ERR_ACCESS_DENIED);
+   }
 }
 
 /**
@@ -938,7 +947,7 @@ UINT32 CommSession::openFile(TCHAR *szFullPath, UINT32 requestId, time_t fileMod
  */
 static void SendFileProgressCallback(INT64 bytesTransferred, void *cbArg)
 {
-	((CommSession *)cbArg)->updateTimeStamp();
+   ((CommSession *)cbArg)->updateTimeStamp();
 }
 
 /**
@@ -948,8 +957,8 @@ bool CommSession::sendFile(UINT32 requestId, const TCHAR *file, long offset, boo
 {
    if (m_disconnected)
       return false;
-	return SendFileOverNXCP(m_channel, requestId, file, m_pCtx, offset,
-	         SendFileProgressCallback, this, m_socketWriteMutex, allowCompression ? NXCP_STREAM_COMPRESSION_DEFLATE : NXCP_STREAM_COMPRESSION_NONE, cancelationFlag);
+   return SendFileOverNXCP(m_channel, requestId, file, m_pCtx, offset,
+                           SendFileProgressCallback, this, m_socketWriteMutex, allowCompression ? NXCP_STREAM_COMPRESSION_DEFLATE : NXCP_STREAM_COMPRESSION_NONE, cancelationFlag);
 }
 
 /**
@@ -967,7 +976,7 @@ UINT32 CommSession::upgrade(NXCPMessage *request)
 
       //Create line in registry file with upgrade file name to delete it after system start
       DB_HANDLE hdb = GetLocalDatabaseHandle();
-      if(hdb != NULL)
+      if (hdb != NULL)
       {
          TCHAR upgradeFileInsert[256];
          _sntprintf(upgradeFileInsert, 256, _T("INSERT INTO registry (attribute,value) VALUES ('upgrade.file',%s)"), (const TCHAR *)DBPrepareString(hdb, szPkgName));
@@ -990,7 +999,7 @@ void CommSession::getConfig(NXCPMessage *pMsg)
    if (m_masterServer)
    {
       pMsg->setField(VID_RCC,
-         pMsg->setFieldFromFile(VID_CONFIG_FILE, g_szConfigFile) ? ERR_SUCCESS : ERR_IO_FAILURE);
+                     pMsg->setFieldFromFile(VID_CONFIG_FILE, g_szConfigFile) ? ERR_SUCCESS : ERR_IO_FAILURE);
    }
    else
    {
@@ -1015,12 +1024,12 @@ void CommSession::updateConfig(NXCPMessage *pRequest, NXCPMessage *pMsg)
          {
             if (size > 0)
             {
-               for(UINT32 i = 0; i < size - 1; i++)
+               for (UINT32 i = 0; i < size - 1; i++)
                   if (pConfig[i] == 0x0D)
                   {
                      size--;
                      memmove(&pConfig[i], &pConfig[i + 1], size - i);
-							i--;
+                     i--;
                   }
             }
             if (_write(hFile, pConfig, static_cast<unsigned int>(size)) == size)
@@ -1031,7 +1040,7 @@ void CommSession::updateConfig(NXCPMessage *pRequest, NXCPMessage *pMsg)
          }
          else
          {
-				debugPrintf(2, _T("CommSession::updateConfig(): Error opening file \"%s\" for writing (%s)"),
+            debugPrintf(2, _T("CommSession::updateConfig(): Error opening file \"%s\" for writing (%s)"),
                         g_szConfigFile, _tcserror(errno));
             pMsg->setField(VID_RCC, ERR_FILE_OPEN_ERROR);
          }
@@ -1046,6 +1055,64 @@ void CommSession::updateConfig(NXCPMessage *pRequest, NXCPMessage *pMsg)
    {
       pMsg->setField(VID_RCC, ERR_ACCESS_DENIED);
    }
+}
+
+/*
+* Create new maping channel
+* Forward information to download application
+*/
+void CommSession::createMappingChannel(NXCPMessage *pRequest, NXCPMessage *pMsg)
+{
+   debugPrintf(2, _T("CommSession::createMappingChannel recieve message %d"), pRequest->getId());
+   // Prepare and execute INSERT or UPDATE query
+   INT32 id = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_RECORD_ID);
+   TCHAR* cHomeId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_HOME_ID);
+   TCHAR* cMonitorId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_MONITOR_ID);
+   INT32 timeSync = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_TIME_SYNC);
+   INT32 statusSync = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_STATUS_SYNC);
+   INT32 action = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_ACTION);
+   TCHAR* lastSyncTime = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_LAST_SYNC_TIME);
+   TCHAR* downloadId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID);
+   TCHAR* renderId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID);
+   TCHAR* uploadId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID);
+
+   corbaSpiderClient = new CorbaSpiderClient();
+   CORBA::String_var dest = corbaSpiderClient->mSpiderRef->echoString("phongtran0715 hello");
+   debugPrintf(2, _T("Download respond = %s"), (char*)dest);
+
+   pMsg->setField(VID_RCC, ERR_SUCCESS);
+}
+
+/*
+* Modify new maping channel
+* Forward information to download application
+*/
+void CommSession::modifyMappingChannel(NXCPMessage *pRequest, NXCPMessage *pMsg)
+{
+   debugPrintf(2, _T("CommSession::createMappingChannel recieve message %d"), pRequest->getId());
+   // Prepare and execute INSERT or UPDATE query
+   INT32 id = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_RECORD_ID);
+   TCHAR* cHomeId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_HOME_ID);
+   TCHAR* cMonitorId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_MONITOR_ID);
+   INT32 timeSync = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_TIME_SYNC);
+   INT32 statusSync = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_STATUS_SYNC);
+   INT32 action = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_ACTION);
+   TCHAR* lastSyncTime = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_LAST_SYNC_TIME);
+   TCHAR* downloadId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID);
+   TCHAR* renderId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID);
+   TCHAR* uploadId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID);
+   pMsg->setField(VID_RCC, ERR_SUCCESS);
+}
+
+/*
+* Delete new maping channel
+* Forward information to download application
+*/
+void CommSession::deleteMappingChannel(NXCPMessage *pRequest, NXCPMessage *pMsg)
+{
+   debugPrintf(2, _T("CommSession::createMappingChannel recieve message %d"), pRequest->getId());
+   INT32 id = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_RECORD_ID);
+   pMsg->setField(VID_RCC, ERR_SUCCESS);
 }
 
 /**
@@ -1080,7 +1147,7 @@ UINT32 CommSession::setupProxyConnection(NXCPMessage *pRequest)
             m_sendQueue->put(INVALID_POINTER_VALUE);
 
             // Wait while all queued messages will be sent
-            while(m_sendQueue->size() > 0)
+            while (m_sendQueue->size() > 0)
                ThreadSleepMs(100);
 
             // Finish proxy connection setup
@@ -1099,8 +1166,8 @@ UINT32 CommSession::setupProxyConnection(NXCPMessage *pRequest)
             msg.setField(VID_RCC, RCC_SUCCESS);
             pRawMsg = msg.serialize();
             sendRawMessage(pRawMsg, pSavedCtx);
-				if (pSavedCtx != NULL)
-					pSavedCtx->decRefCount();
+            if (pSavedCtx != NULL)
+               pSavedCtx->decRefCount();
 
             debugPrintf(5, _T("Established proxy connection to %s:%d"), IpToStr(dwAddr, szBuffer), wPort);
          }
@@ -1127,7 +1194,7 @@ UINT32 CommSession::setupProxyConnection(NXCPMessage *pRequest)
 void CommSession::proxyReadThread()
 {
    SocketPoller sp;
-   while(true)
+   while (true)
    {
       sp.reset();
       sp.add(m_hProxySocket);
