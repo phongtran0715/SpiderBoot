@@ -368,7 +368,6 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -406,7 +405,9 @@ serverinclude_HEADERS = \
 	nxmodule.h \
 	nxsrvapi.h \
 	pdsdrv.h \
-	zeromq.h
+	zeromq.h \
+	nms_corba.h \
+	echo.hh
 
 all: all-am
 

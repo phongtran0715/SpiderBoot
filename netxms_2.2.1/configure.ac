@@ -1243,9 +1243,9 @@ if test "x$ac_compiler_gnu" = "xyes" ; then
 			AC_MSG_RESULT(no)
 		])
 
-	AC_MSG_CHECKING(whether C++ compiler accepts -fno-exceptions)
+	AC_MSG_CHECKING(whether C++ compiler accepts -fexceptions)
 	OLD_CXXFLAGS="$CXXFLAGS"
-	CXXFLAGS="$CXXFLAGS -fno-exceptions"
+	CXXFLAGS="$CXXFLAGS -fexceptions"
 	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[ ]], [[ ]])],
 		[ AC_MSG_RESULT(yes) ], 
 		[ 
@@ -3420,6 +3420,12 @@ if test $? = 0; then
 fi
 
 #--------------------------------------------------------------------
+# Check CORBA
+#--------------------------------------------------------------------
+AC_CHECK_LIB([omnithread], [main], [], [AC_MSG_ERROR([cannot find omnithread library])])
+AC_CHECK_LIB([omniORB4], [main], [], [AC_MSG_ERROR([cannot find omniORB4 library])])
+
+#--------------------------------------------------------------------
 # Other settings
 #--------------------------------------------------------------------
 
@@ -3782,6 +3788,7 @@ AC_CONFIG_FILES([
 	src/server/hdlink/redmine/Makefile
 	src/server/include/Makefile
 	src/server/libnxsrv/Makefile
+	src/server/libcorba/Makefile
 	src/server/netxmsd/Makefile
 	src/server/pdsdrv/Makefile
 	src/server/pdsdrv/rrdtool/Makefile

@@ -379,7 +379,6 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -388,7 +387,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = @SERVER_INCLUDE@ libnxsrv core netxmsd tools drivers hdlink pdsdrv
+SUBDIRS = @SERVER_INCLUDE@ libnxsrv core netxmsd tools drivers hdlink pdsdrv libcorba
 EXTRA_DIST = Makefile.w32
 all: all-recursive
 

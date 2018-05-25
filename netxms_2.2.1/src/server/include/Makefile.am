@@ -37,4 +37,6 @@ serverinclude_HEADERS = \
 	nxmodule.h \
 	nxsrvapi.h \
 	pdsdrv.h \
-	zeromq.h
+	zeromq.h \
+	nms_corba.h \
+	echo.hh

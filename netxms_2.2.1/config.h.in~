@@ -432,6 +432,12 @@
 /* Define to 1 if you have the `nsl' library (-lnsl). */
 #undef HAVE_LIBNSL
 
+/* Define to 1 if you have the `omniORB4' library (-lomniORB4). */
+#undef HAVE_LIBOMNIORB4
+
+/* Define to 1 if you have the `omnithread' library (-lomnithread). */
+#undef HAVE_LIBOMNITHREAD
+
 /* Define to 1 if you have the `resolv' library (-lresolv). */
 #undef HAVE_LIBRESOLV
 

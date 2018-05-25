@@ -107,8 +107,9 @@ PROGRAMS = $(bin_PROGRAMS)
 am_netxmsd_OBJECTS = netxmsd-netxmsd.$(OBJEXT)
 netxmsd_OBJECTS = $(am_netxmsd_OBJECTS)
 netxmsd_DEPENDENCIES = ../core/libnxcore.la ../libnxsrv/libnxsrv.la \
-	../../snmp/libnxsnmp/libnxsnmp.la ../../libnxsl/libnxsl.la \
-	../../libnxlp/libnxlp.la ../../db/libnxdb/libnxdb.la \
+	../libcorba/libcorba.la ../../snmp/libnxsnmp/libnxsnmp.la \
+	../../libnxsl/libnxsl.la ../../libnxlp/libnxlp.la \
+	../../db/libnxdb/libnxdb.la \
 	../../agent/libnxagent/libnxagent.la \
 	../../libnetxms/libnetxms.la
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -364,7 +365,6 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -378,6 +378,7 @@ netxmsd_CPPFLAGS = -I@top_srcdir@/include -I@top_srcdir@/src/server/include
 netxmsd_LDADD = \
 	../core/libnxcore.la \
 	../libnxsrv/libnxsrv.la \
+	../libcorba/libcorba.la \
 	../../snmp/libnxsnmp/libnxsnmp.la \
 	../../libnxsl/libnxsl.la \
 	../../libnxlp/libnxlp.la \

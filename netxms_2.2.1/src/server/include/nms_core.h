@@ -78,6 +78,7 @@
 #include <nddrv.h>
 #include <npe.h>
 #include <nxcore_smclp.h>
+#include <nms_corba.h>
 
 /**
  * Console context

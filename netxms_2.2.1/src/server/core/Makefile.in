@@ -141,9 +141,9 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(radiusdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 libnxcore_la_DEPENDENCIES = ../libnxsrv/libnxsrv.la \
-	../../snmp/libnxsnmp/libnxsnmp.la ../../libnxlp/libnxlp.la \
-	../../db/libnxdb/libnxdb.la ../../libnxsl/libnxsl.la \
-	../../agent/libnxagent/libnxagent.la \
+	../libcorba/libcorba.la ../../snmp/libnxsnmp/libnxsnmp.la \
+	../../libnxlp/libnxlp.la ../../db/libnxdb/libnxdb.la \
+	../../libnxsl/libnxsl.la ../../agent/libnxagent/libnxagent.la \
 	../../libnetxms/libnetxms.la $(am__append_1) $(am__append_2) \
 	$(am__append_3) $(am__append_4) $(am__DEPENDENCIES_1)
 am_libnxcore_la_OBJECTS = libnxcore_la-accesspoint.lo \
@@ -472,7 +472,6 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -521,13 +520,12 @@ libnxcore_la_CPPFLAGS = -I@top_srcdir@/include -I@top_srcdir@/src/server/include
 libnxcore_la_CXXFLAGS = -I@top_srcdir@/@CUSTOM_INCLUDE@ \
 	$(am__append_6)
 libnxcore_la_LDFLAGS = -version-info $(NETXMS_LIBRARY_VERSION) @MQTT_LDFLAGS@ @ZEROMQ_LDFLAGS@
-libnxcore_la_LIBADD = ../libnxsrv/libnxsrv.la \
+libnxcore_la_LIBADD = ../libnxsrv/libnxsrv.la ../libcorba/libcorba.la \
 	../../snmp/libnxsnmp/libnxsnmp.la ../../libnxlp/libnxlp.la \
 	../../db/libnxdb/libnxdb.la ../../libnxsl/libnxsl.la \
 	../../agent/libnxagent/libnxagent.la \
-	../../libnetxms/libnetxms.la @SERVER_LIBS@ $(am__append_1) \
-	$(am__append_2) $(am__append_3) $(am__append_4) \
-	$(am__append_5)
+	../../libnetxms/libnetxms.la $(am__append_1) $(am__append_2) \
+	$(am__append_3) $(am__append_4) $(am__append_5)
 EXTRA_DIST = \
 	nxcore.vcxproj nxcore.vcxproj.filters \
 	nxcore.h radius.h \
@@ -1997,6 +1995,7 @@ uninstall-am: uninstall-libLTLIBRARIES uninstall-radiusDATA
 
 .PRECIOUS: Makefile
 
+	@SERVER_LIBS@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

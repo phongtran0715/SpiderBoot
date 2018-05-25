@@ -4,6 +4,7 @@ netxmsd_CPPFLAGS=-I@top_srcdir@/include -I@top_srcdir@/src/server/include
 netxmsd_LDADD = \
 	../core/libnxcore.la \
 	../libnxsrv/libnxsrv.la \
+	../libcorba/libcorba.la \
 	../../snmp/libnxsnmp/libnxsnmp.la \
 	../../libnxsl/libnxsl.la \
 	../../libnxlp/libnxlp.la \

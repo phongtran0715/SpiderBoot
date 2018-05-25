@@ -21,6 +21,7 @@
 **/
 
 #include "nxcore.h"
+#include <nms_corba.h>
 #include <netxmsdb.h>
 #include <netxms_mt.h>
 #include <hdlink.h>
@@ -120,6 +121,7 @@ THREAD_RESULT THREAD_CALL JobManagerThread(void *);
 THREAD_RESULT THREAD_CALL UptimeCalculator(void *);
 THREAD_RESULT THREAD_CALL ReportingServerConnector(void *);
 THREAD_RESULT THREAD_CALL TunnelListenerThread(void *arg);
+//THREAD_RESULT THREAD_CALL CorbaServerThread(void *);
 
 /**
  * Global variables
@@ -179,6 +181,21 @@ static StringSet s_components;
 #ifndef _WIN32
 static pthread_t m_signalHandlerThread;
 #endif
+
+/*
+THREAD_RESULT THREAD_CALL CorbaServerThread(void *arg)
+{
+   CorbaServer* corbaServer = new CorbaServer();
+   bool result = corbaServer->initCorbaServer();
+   if(result)
+   {
+      printf ("Init corba server successful!\n");
+   }else{
+      printf ("Init corba server false!\n");
+   }
+   return THREAD_OK;
+}
+*/
 
 /**
  * Register component
@@ -1042,6 +1059,9 @@ retry_db_lock:
 #endif
 
    ExecuteStartupScripts();
+
+   //start corba server thread
+   //ThreadCreate(CorbaServerThread, 0, NULL);
 
 	g_flags |= AF_SERVER_INITIALIZED;
 	nxlog_debug(1, _T("Server initialization completed"));

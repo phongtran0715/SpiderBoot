@@ -704,15 +704,6 @@ void CommSession::processingThread()
                response.setField(VID_RCC, ERR_ACCESS_DENIED);
             }
             break;
-         case CMD_CREATE_MAPPING_CHANNEL:
-            createMappingChannel(request, &response);
-            break;
-         case CMD_MOD_MAPPING_CHANNEL:
-            modifyMappingChannel(request, &response);
-            break;
-         case CMD_DEL_MAPPING_CHANNEL:
-            deleteMappingChannel(request, &response);
-            break;
          default:
             // Attempt to process unknown command by subagents
             if (!ProcessCmdBySubAgent(command, request, &response, this))
@@ -1055,64 +1046,6 @@ void CommSession::updateConfig(NXCPMessage *pRequest, NXCPMessage *pMsg)
    {
       pMsg->setField(VID_RCC, ERR_ACCESS_DENIED);
    }
-}
-
-/*
-* Create new maping channel
-* Forward information to download application
-*/
-void CommSession::createMappingChannel(NXCPMessage *pRequest, NXCPMessage *pMsg)
-{
-   debugPrintf(2, _T("CommSession::createMappingChannel recieve message %d"), pRequest->getId());
-   // Prepare and execute INSERT or UPDATE query
-   INT32 id = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_RECORD_ID);
-   TCHAR* cHomeId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_HOME_ID);
-   TCHAR* cMonitorId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_MONITOR_ID);
-   INT32 timeSync = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_TIME_SYNC);
-   INT32 statusSync = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_STATUS_SYNC);
-   INT32 action = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_ACTION);
-   TCHAR* lastSyncTime = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_LAST_SYNC_TIME);
-   TCHAR* downloadId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID);
-   TCHAR* renderId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID);
-   TCHAR* uploadId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID);
-
-   corbaSpiderClient = new CorbaSpiderClient();
-   CORBA::String_var dest = corbaSpiderClient->mSpiderRef->echoString("phongtran0715 hello");
-   debugPrintf(2, _T("Download respond = %s"), (char*)dest);
-
-   pMsg->setField(VID_RCC, ERR_SUCCESS);
-}
-
-/*
-* Modify new maping channel
-* Forward information to download application
-*/
-void CommSession::modifyMappingChannel(NXCPMessage *pRequest, NXCPMessage *pMsg)
-{
-   debugPrintf(2, _T("CommSession::createMappingChannel recieve message %d"), pRequest->getId());
-   // Prepare and execute INSERT or UPDATE query
-   INT32 id = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_RECORD_ID);
-   TCHAR* cHomeId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_HOME_ID);
-   TCHAR* cMonitorId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_MONITOR_ID);
-   INT32 timeSync = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_TIME_SYNC);
-   INT32 statusSync = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_STATUS_SYNC);
-   INT32 action = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_ACTION);
-   TCHAR* lastSyncTime = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_LAST_SYNC_TIME);
-   TCHAR* downloadId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID);
-   TCHAR* renderId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID);
-   TCHAR* uploadId = pRequest->getFieldAsString(VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID);
-   pMsg->setField(VID_RCC, ERR_SUCCESS);
-}
-
-/*
-* Delete new maping channel
-* Forward information to download application
-*/
-void CommSession::deleteMappingChannel(NXCPMessage *pRequest, NXCPMessage *pMsg)
-{
-   debugPrintf(2, _T("CommSession::createMappingChannel recieve message %d"), pRequest->getId());
-   INT32 id = pRequest->getFieldAsInt32(VID_MAPPING_CHANNEL_RECORD_ID);
-   pMsg->setField(VID_RCC, ERR_SUCCESS);
 }
 
 /**
