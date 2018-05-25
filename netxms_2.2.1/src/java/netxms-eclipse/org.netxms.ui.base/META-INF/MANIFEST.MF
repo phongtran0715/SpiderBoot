@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Base
+Bundle-SymbolicName: org.netxms.ui.base
+Bundle-Version: 2.2.1
+Export-Package: com.jcraft.jzlib,
+ org.netxms.base,
+ org.netxms.base.annotations,
+ org.netxms.certificate.loader,
+ org.netxms.certificate.loader.exception,
+ org.netxms.certificate.manager,
+ org.netxms.certificate.manager.exception,
+ org.netxms.certificate.request,
+ org.netxms.certificate.subject

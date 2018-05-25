@@ -32,11 +32,6 @@ public class Config {
     private static Logger logger = Logger.getLogger(Config.class);
     static Utility util = new Utility();
 
-    public static String dbServer;
-    public static String dbName;
-    public static String dbUserName;
-    public static String dbPassword;
-
     public static String youtubeKey="AIzaSyDGGgByVC_2oIOaqznVM03GSpIfb5Ghyuc";
     public static String videoFolder;
     public static String videoFormat;
@@ -45,13 +40,9 @@ public class Config {
     public static Integer noVideoReturn;
 
     public static boolean loadConfig() {
-    	//Get file from resources folder
     	ClassLoader classLoader = Config.class.getClassLoader();
-    	//TODO: load config file from resource
-    	//File fileConfig = new File(classLoader.getResource("app.properties").getFile());
     	File fileConfig = new File("/etc/app.properties");
     	
-        //File fileConfig = new File(Constant.FILE_CONFIG);
         Properties prop;
         FileInputStream fileReader = null;
         String strTemp;
@@ -121,39 +112,6 @@ public class Config {
                 clientSecret = "../etc/client_secrets.json";
             }
             logger.info(Constant.CLIENT_SCERET + "|" + clientSecret);
-
-            strTemp = prop.getProperty(Constant.DBSERVER, "").trim();
-            dbServer = strTemp;
-            if (strTemp.isEmpty()) {
-                logger.error(Constant.DBSERVER + " is empty.");
-                return false;
-            } else {
-                logger.info(Constant.DBSERVER + "|" + dbServer);
-            }
-
-            strTemp = prop.getProperty(Constant.DBNAME, "").trim();
-            dbName = strTemp;
-            if (strTemp.isEmpty()) {
-                logger.error(Constant.DBNAME + " is empty.");
-                return false;
-            } else {
-                logger.info(Constant.DBNAME + "|" + dbName);
-            }
-
-            strTemp = prop.getProperty(Constant.USERNAME, "").trim();
-            dbUserName = strTemp;
-            if (strTemp.isEmpty()) {
-                logger.error(Constant.USERNAME + " is empty");
-                return false;
-            } else {
-                logger.info(Constant.USERNAME + "|" + dbUserName);
-            }
-
-            strTemp = prop.getProperty(Constant.PASSWD, "").trim();
-            dbPassword = strTemp;
-            if (strTemp.isEmpty()) {
-                logger.warn(Constant.PASSWD + " is empty");
-            }
 
         } catch (Exception e) {
             logger.error("Exception load file config ", e);

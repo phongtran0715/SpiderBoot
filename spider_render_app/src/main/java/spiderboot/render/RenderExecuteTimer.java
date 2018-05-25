@@ -14,7 +14,6 @@ import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import spiderboot.configuration.Config;
-import spiderboot.database.MySqlAccess;
 import spiderboot.util.Utility;
 
 public class RenderExecuteTimer extends TimerTask{
@@ -60,7 +59,7 @@ public class RenderExecuteTimer extends TimerTask{
 					+ "FROM video_container WHERE ProcessStatus = '0';";
 			System.out.println(query);
 			try {
-				stmt = MySqlAccess.getInstance().connect.createStatement();
+				//stmt = MySqlAccess.getInstance().connect.createStatement();
 				if(stmt != null) {
 					System.out.println("Create stm successful");
 				}
@@ -117,8 +116,8 @@ public class RenderExecuteTimer extends TimerTask{
 				+ "WHERE ChannelId = '" + cHomeId + "'";
 		System.out.println(query);
 		try {
-			stmt = MySqlAccess.getInstance().connect.createStatement();
-			ResultSet rs = stmt.executeQuery(query);
+			//stmt = MySqlAccess.getInstance().connect.createStatement();
+//			ResultSet rs = stmt.executeQuery(query);
 			while (rs.next()) {
 				result = rs.getString(1);
 			}
@@ -199,7 +198,7 @@ public class RenderExecuteTimer extends TimerTask{
 		PreparedStatement preparedStm = null;
 		String query = "UPDATE video_container SET ProcessStatus = ? WHERE Id = ? ";
 		try {
-			preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
+//			preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
 			// execute insert SQL statement
 			preparedStm.setInt(1, processStatus);
 			preparedStm.setInt(2, id);

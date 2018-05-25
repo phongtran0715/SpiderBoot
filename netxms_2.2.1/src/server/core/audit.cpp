@@ -217,7 +217,7 @@ void NXCORE_EXPORTABLE WriteAuditLogWithValues2(const TCHAR *subsys, bool isSucc
 	msg.setField(VID_SUCCESS_AUDIT, (WORD)isSuccess);
 	msg.setField(VID_USER_ID, userId);
 	msg.setField(VID_WORKSTATION, workstation);
-   msg.setField(VID_SESSION_ID, sessionId);
+  msg.setField(VID_SESSION_ID, sessionId);
 	msg.setField(VID_OBJECT_ID, objectId);
 	msg.setField(VID_MESSAGE, (const TCHAR *)text);
 	EnumerateClientSessions(SendNewRecord, &msg);

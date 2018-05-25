@@ -1,15 +1,15 @@
 package com.itc.edu.ulvideo.main;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-import spiderboot.timer.TimerWrapper;
 
-public class UploadTimerManager extends TimerWrapper {
+public class UploadTimerManager {
 
 	private static UploadTimerManager instance = null;
+	public static HashMap<String, Timer> timerMap = new HashMap<String, Timer>();
 
 	public UploadTimerManager() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public static UploadTimerManager getInstance() {

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.itc.edu</groupId>
+	<groupId>com.spider</groupId>
 	<artifactId>DlVideo</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
@@ -156,7 +157,7 @@
 					<daemons>
 						<daemon>
 							<id>dlvideo</id>
-							<mainClass>com.itc.edu.dlvideo.main.Main</mainClass>
+							<mainClass>com.spider.main.Main</mainClass>
 							<commandLineArguments>
 								<commandLineArguments>start</commandLineArguments>
 							</commandLineArguments>
@@ -251,10 +252,19 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.itc.edu.dlvideo.main.MainDownload</mainClass>
+							<addClasspath>true</addClasspath>
+							<mainClass>com.spider.main.MainDownload</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
