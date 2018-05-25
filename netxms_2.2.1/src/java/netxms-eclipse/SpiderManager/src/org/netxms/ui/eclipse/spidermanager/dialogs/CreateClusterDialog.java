@@ -21,7 +21,6 @@ package org.netxms.ui.eclipse.spidermanager.dialogs;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -29,24 +28,24 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Group;
-import org.spider.client.MonitorChannelObject;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.netxms.client.NXCSession;
+import org.netxms.ui.eclipse.shared.ConsoleSharedData;
 
 /**
  * User database object creation dialog
  * 
  */
-public class CreateMonitorChannelDialog extends Dialog {
-	private Text txtChannelId;
-	private Text txtChannelName;
-	
-	private String channelId;
-	private String channelName;
+public class CreateClusterDialog extends Dialog {
+	private String clusterId;
+	private String clusterName;
+	private String ipAddress;
+	private int port;
+	private Text txtClusterId;
+	private Text txtClusterName;
+	private Text txtIpAddress;
+	private Text txtPort;
 
-	public CreateMonitorChannelDialog(Shell parentShell) 
-	{
+	public CreateClusterDialog(Shell parentShell) {
 		super(parentShell);
 	}
 
@@ -60,48 +59,57 @@ public class CreateMonitorChannelDialog extends Dialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
-				
+
 		GridData gridData;
 		dialogArea.setLayout(null);
 		gridData = new GridData(GridData.VERTICAL_ALIGN_END);
 		gridData.horizontalAlignment = GridData.FILL;
-	    gridData.horizontalSpan = 4;
+		gridData.horizontalSpan = 4;
 		gridData = new GridData(GridData.VERTICAL_ALIGN_END);
 		gridData.horizontalAlignment = GridData.FILL;
-	    gridData.horizontalSpan = 2;
-		
+		gridData.horizontalSpan = 2;
+
 		Group grpCreateNewAccount = new Group(dialogArea, SWT.NONE);
-		grpCreateNewAccount.setText("Create new Monitor channel");
-		grpCreateNewAccount.setBounds(5, 10, 518, 97);
-		
+		grpCreateNewAccount.setText("Create cluster");
+		grpCreateNewAccount.setBounds(5, 10, 427, 210);
+
 		Label lblChannelId = new Label(grpCreateNewAccount, SWT.NONE);
 		lblChannelId.setAlignment(SWT.RIGHT);
-		lblChannelId.setText("Channel ID");
+		lblChannelId.setText("Cluters ID");
 		lblChannelId.setBounds(10, 31, 109, 17);
-		
-		txtChannelId = new Text(grpCreateNewAccount, SWT.BORDER);
-		txtChannelId.setTextLimit(150);
-		txtChannelId.setBounds(131, 26, 290, 27);
-		
+
 		Label lblChannelName = new Label(grpCreateNewAccount, SWT.NONE);
 		lblChannelName.setAlignment(SWT.RIGHT);
-		lblChannelName.setText("Channel name");
-		lblChannelName.setBounds(10, 64, 109, 17);
+		lblChannelName.setText("Cluster Name");
+		lblChannelName.setBounds(10, 76, 109, 17);
+
+		Label lblGoogleAccount = new Label(grpCreateNewAccount, SWT.NONE);
+		lblGoogleAccount.setAlignment(SWT.RIGHT);
+		lblGoogleAccount.setText("IP Address");
+		lblGoogleAccount.setBounds(10, 119, 109, 17);
 		
-		txtChannelName = new Text(grpCreateNewAccount, SWT.BORDER);
-		txtChannelName.setTextLimit(150);
-		txtChannelName.setBounds(131, 59, 290, 27);
+		txtClusterId = new Text(grpCreateNewAccount, SWT.BORDER);
+		txtClusterId.setTextLimit(150);
+		txtClusterId.setBounds(131, 21, 290, 27);
 		
-		Button button = new Button(grpCreateNewAccount, SWT.NONE);
-		button.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Program.launch("https://www.youtube.com/channel/" + txtChannelId.getText());
-			}
-		});
-		button.setText("View");
-		button.setBounds(427, 26, 79, 29);
+		txtClusterName = new Text(grpCreateNewAccount, SWT.BORDER);
+		txtClusterName.setTextLimit(150);
+		txtClusterName.setBounds(131, 66, 290, 27);
 		
+		txtIpAddress = new Text(grpCreateNewAccount, SWT.BORDER);
+		txtIpAddress.setTextLimit(150);
+		txtIpAddress.setBounds(131, 109, 290, 27);
+		
+		txtPort = new Text(grpCreateNewAccount, SWT.BORDER);
+		txtPort.setTextLimit(150);
+		txtPort.setBounds(131, 154, 290, 27);
+		
+		Label lblPort = new Label(grpCreateNewAccount, SWT.NONE);
+		lblPort.setText("Port");
+		lblPort.setAlignment(SWT.RIGHT);
+		lblPort.setBounds(10, 164, 109, 17);
+
+		initialData();
 		return dialogArea;
 	}
 
@@ -115,7 +123,7 @@ public class CreateMonitorChannelDialog extends Dialog {
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText("Create new monitor channel");
+		newShell.setText("Create cluster");
 	}
 	/*
 	 * (non-Javadoc)
@@ -124,26 +132,49 @@ public class CreateMonitorChannelDialog extends Dialog {
 	 */
 	@Override
 	protected void okPressed() {
-		channelId = txtChannelId.getText();
-		channelName = txtChannelName.getText();
-		// validate data
-		if(channelId == null || channelId.isEmpty())
+		clusterId = txtClusterId.getText();
+		clusterName = txtClusterName.getText();
+		if(clusterId == null || clusterId.isEmpty())
 		{
 			MessageBox dialog =
 					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
 			dialog.setText("Error");
-			dialog.setMessage("Channel ID must not empty!");
+			dialog.setMessage("Cluster ID must not empty!");
 			dialog.open();
 			return;
 		}
+		
+		ipAddress = txtIpAddress.getText();
+		if(ipAddress == null || ipAddress.isEmpty())
+		{
+			MessageBox dialog =
+					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
+			dialog.setText("Error");
+			dialog.setMessage("IP Address must not empty!");
+			dialog.open();
+			return;
+		}
+		
 		super.okPressed();
 	}
 
-	public String getChannelId() {
-		return channelId;
+	private void initialData()
+	{
 	}
 
-	public String getChannelName() {
-		return channelName;
+	public String getClusterId() {
+		return clusterId;
+	}
+
+	public String getClusterName() {
+		return clusterName;
+	}
+
+	public String getIpAddress() {
+		return ipAddress;
+	}
+
+	public int getPort() {
+		return port;
 	}
 }

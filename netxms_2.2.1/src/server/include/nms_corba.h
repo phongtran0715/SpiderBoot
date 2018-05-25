@@ -1,29 +1,77 @@
 #ifndef _nms_corba_h_
 #define _nms_corba_h_
 
-#ifndef __CORBA_H_EXTERNAL_GUARD__
-#include <omniORB4/CORBA.h>
+#include "SpiderAgentAPI.hh"
+
+#ifdef _WIN32
+#ifdef LIBCORBA_EXPORTS
+#define LIBCORBA_EXPORTABLE __declspec(dllexport)
+#else
+#define LIBCORBA_EXPORTABLE __declspec(dllimport)
+#endif
+#else    /* _WIN32 */
+#define LIBCORBA_EXPORTABLE
 #endif
 
-#include <echo.hh>
-
-class CorbaServer
+class LIBCORBA_EXPORTABLE SpiderDownloadClient
 {
+private:
+   CORBA::Object_ptr getObjectReference(CORBA::ORB_ptr orb);
 public:
-	CorbaServer();
-	~CorbaServer();
-	CORBA::Boolean bindObjectToName(CORBA::ORB_ptr orb, CORBA::Object_ptr objref);
-	bool initCorbaServer();
+   SpiderDownloadApp::SpiderFootSide_var mDownloadRef;
+   CORBA::ORB_var mOrb;
+   bool initSuccess;
+   SpiderDownloadClient();
+   ~SpiderDownloadClient();
 };
 
-class CorbaClient
+class LIBCORBA_EXPORTABLE SpiderRenderClient
 {
+private:
+   CORBA::Object_ptr getObjectReference(CORBA::ORB_ptr orb);
 public:
-	CorbaClient();
-	~CorbaClient();
-	CORBA::Object_ptr getObjectReference(CORBA::ORB_ptr orb);
-	void hello(Echo_ptr e);
-	bool initCorbaClient ();
+   SpiderRenderApp::SpiderFootSide_var mRenderRef;
+   CORBA::ORB_var mOrb;
+   bool initSuccess;
+   SpiderRenderClient();
+   ~SpiderRenderClient();
 };
 
-#endif   /* _nms_corba_h_ */
+class LIBCORBA_EXPORTABLE SpiderUploadClient
+{
+private:
+   CORBA::Object_ptr getObjectReference(CORBA::ORB_ptr orb);
+public:
+   SpiderUploadApp::SpiderFootSide_var mUploadRef;
+   CORBA::ORB_var mOrb;
+   bool initSuccess;
+   SpiderUploadClient();
+   ~SpiderUploadClient();
+};
+
+class AgentCorbaServer
+{
+private:
+   CORBA::Boolean bindObjectToName(CORBA::ORB_ptr, CORBA::Object_ptr);
+public:
+   void initCorba();
+   bool initSuccess;
+   AgentCorbaServer();
+   ~AgentCorbaServer();
+};
+
+
+class AgentSide_i : public POA_SpiderAgentApp::AgentSide
+{
+public:
+   void onDownloadStartup();
+   void onRenderStartup();
+   void onUploadStartup();
+   ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId);
+   void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong lastSyncTime);
+   void updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::VideoInfo& vInfo);
+   void updateRenderedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const char* videoLocation);
+   void updateUploadedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const char* videoLocation);
+};
+
+#endif /* _nms_corba_h_ */

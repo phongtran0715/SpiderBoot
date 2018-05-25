@@ -18,11 +18,13 @@
  */
 package org.netxms.ui.eclipse.spidermanager.dialogs;
 
+import java.io.Console;
 import java.io.IOException;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -41,6 +43,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.widgets.Link;
 
 /**
  * User database object creation dialog
@@ -51,8 +54,8 @@ public class CreateMappingChannelDialog extends Dialog {
 	private Combo cbHome;
 	private Combo cbMonitor;
 	private Combo cbStatus;
-	Label lbHome;
-	Label lbMonitor;
+	Link linkHomeChanel;
+	Link linkMonitorChanel;
 	Object [] cHomeObject;
 	Object [] cMoniorObject;
 	private NXCSession session;
@@ -116,22 +119,12 @@ public class CreateMappingChannelDialog extends Dialog {
 		lblVideoIntro.setText("Sync Status");
 		lblVideoIntro.setBounds(10, 200, 109, 17);
 
-		lbHome = new Label(grpCreateNewAccount, SWT.NONE);
-		lbHome.setAlignment(SWT.CENTER);
-		lbHome.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
-		lbHome.setBounds(131, 54, 290, 17);
-
-		lbMonitor = new Label(grpCreateNewAccount, SWT.NONE);
-		lbMonitor.setAlignment(SWT.CENTER);
-		lbMonitor.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
-		lbMonitor.setBounds(131, 113, 290, 17);
-
 		cbHome = new Combo(grpCreateNewAccount, SWT.NONE);
 		cbHome.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String cName = getHomeChannelName(cbHome.getText());
-				lbHome.setText(cName);
+				linkHomeChanel.setText("Go to <a href=\"https://www.youtube.com/channel\">" + cName + "</a> channel." );
 			}
 		});
 		cbHome.setItems(new String[] {});
@@ -147,11 +140,37 @@ public class CreateMappingChannelDialog extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String cName = getMonitorChannelName(cbMonitor.getText());
-				lbMonitor.setText(cName);
+				linkMonitorChanel.setText("Go to <a href=\"https://www.youtube.com/channel\">" + cName + "</a> channel." );
 			}
 		});
 		cbMonitor.setItems(new String[] {});
 		cbMonitor.setBounds(132, 78, 289, 29);
+		
+		linkHomeChanel = new Link(grpCreateNewAccount, SWT.NONE);
+		linkHomeChanel.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(cbHome.getText().isEmpty() == false)
+				{
+					Program.launch("https://www.youtube.com/channel/" + cbHome.getText());	
+				}
+			}
+		});
+		linkHomeChanel.setBounds(131, 54, 290, 17);
+		linkHomeChanel.setText("<a></a>");
+		
+		linkMonitorChanel = new Link(grpCreateNewAccount, 0);
+		linkMonitorChanel.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(cbMonitor.getText().isEmpty() == false)
+				{
+					Program.launch("https://www.youtube.com/channel/" + cbMonitor.getText());	
+				}
+			}
+		});
+		linkMonitorChanel.setText("<a></a>");
+		linkMonitorChanel.setBounds(131, 113, 290, 17);
 
 		initialData();
 		return dialogArea;

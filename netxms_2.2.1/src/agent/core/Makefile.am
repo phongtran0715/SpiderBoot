@@ -1,4 +1,5 @@
 AM_CPPFLAGS=-I@top_srcdir@/include
+AM_CXXFLAGS=
 bin_PROGRAMS = nxagentd
 nxagentd_SOURCES = messages.c actions.cpp appagent.cpp comm.cpp config.cpp \
                    ctrl.cpp datacoll.cpp dcsnmp.cpp dbupgrade.cpp epp.cpp \
@@ -6,11 +7,11 @@ nxagentd_SOURCES = messages.c actions.cpp appagent.cpp comm.cpp config.cpp \
                    nxagentd.cpp policy.cpp push.cpp register.cpp sa.cpp \
                    session.cpp snmpproxy.cpp snmptrapproxy.cpp \
                    static_subagents.cpp subagent.cpp sysinfo.cpp syslog.cpp \
-		   tools.cpp trap.cpp tunnel.cpp upgrade.cpp watchdog.cpp
+		               tools.cpp trap.cpp tunnel.cpp upgrade.cpp watchdog.cpp
 if USE_INTERNAL_EXPAT
 nxagentd_LDADD = ../../appagent/libappagent.la ../libnxagent/libnxagent.la @top_srcdir@/src/db/libnxdb/libnxdb.la @top_srcdir@/src/libnetxms/libnetxms.la @top_srcdir@/src/snmp/libnxsnmp/libnxsnmp.la @top_srcdir@/src/libexpat/libexpat/libnxexpat.la @SUBAGENT_LIBS@
 else
-nxagentd_LDADD = ../../appagent/libappagent.la ../libnxagent/libnxagent.la @top_srcdir@/src/db/libnxdb/libnxdb.la @top_srcdir@/src/libnetxms/libnetxms.la @top_srcdir@/src/snmp/libnxsnmp/libnxsnmp.la @SUBAGENT_LIBS@ 
+nxagentd_LDADD = ../../appagent/libappagent.la ../libnxagent/libnxagent.la @top_srcdir@/src/db/libnxdb/libnxdb.la @top_srcdir@/src/libnetxms/libnetxms.la @top_srcdir@/src/snmp/libnxsnmp/libnxsnmp.la @SUBAGENT_LIBS@
 endif
 if STATIC_BUILD
 if ALL_STATIC

@@ -24,6 +24,7 @@
 #include <netxms_mt.h>
 #include <nxtools.h>
 #include <nxstat.h>
+#include <nms_corba.h>
 
 #ifdef _WIN32
 #include <psapi.h>
@@ -1369,6 +1370,90 @@ void ClientSession::processingThread()
          zmqListSubscriptions(pMsg, zmq::DATA);
          break;
 #endif
+      case CMD_GET_GOOGLE_ACCOUNT:
+         getGoogleAccount(pMsg);
+         break;
+      case CMD_GET_HOME_CHANNEL:
+         getHomeChannels(pMsg);
+         break;
+      case CMD_GET_MONITOR_CHANNEL:
+         getMonitorChannels(pMsg);
+         break;
+      case CMD_GET_MAPPING_CHANNEL:
+         getMappingChannels(pMsg);
+         break;
+      case CMD_CREATE_GOOGLE_ACCOUNT:
+         createGoogleAccount(pMsg);
+         break;
+      case CMD_CREATE_HOME_CHANNEL:
+         createHomeChannel(pMsg);
+         break;
+      case CMD_CREATE_MONITOR_CHANNEL:
+         createMonitorChannel(pMsg);
+         break;
+      case CMD_CREATE_MAPPING_CHANNEL:
+         createMappingChannel(pMsg);
+         break;
+      case CMD_MOD_GOOGLE_ACCOUNT:
+         modifyGoogleAccount(pMsg);
+         break;
+      case CMD_MOD_HOME_CHANNEL:
+         modifyHomeChannel(pMsg);
+         break;
+      case CMD_MOD_MONITOR_CHANNEL:
+         modifyMonitorChannel(pMsg);
+         break;
+      case CMD_MOD_MAPPING_CHANNEL:
+         modifyMappingChannel(pMsg);
+         break;
+      case CMD_DEL_GOOGLE_ACCOUNT:
+         deleteGoogleAccount(pMsg);
+         break;
+      case CMD_DEL_HOME_CHANNEL:
+         deleteHomeChannel(pMsg);
+         break;
+      case CMD_DEL_MONITOR_CHANNEL:
+         deleteMonitorAccount(pMsg);
+         break;
+      case CMD_DEL_MAPPING_CHANNEL:
+         deleteMappingChannel(pMsg);
+         break;
+      case CMD_GET_DOWNLOAD_CLUSTER:
+         getDownloadCluster(pMsg);
+         break;
+      case CMD_GET_RENDER_CLUSTER:
+         getRenderCluster(pMsg);
+         break;
+      case CMD_GET_UPLOAD_CLUSTER:
+         getUploadCluster(pMsg);
+         break;
+      case CMD_MOD_DOWNLOAD_CLUSTER:
+         modifyDownloadCluster(pMsg);
+         break;
+      case CMD_MOD_RENDER_CLUSTER:
+         modifyRenderCluster(pMsg);
+         break;
+      case CMD_MOD_UPLOAD_CLUSTER:
+         modifyUploadCluster(pMsg);
+         break;
+      case CMD_DEL_DOWNLOAD_CLUSTER:
+         deleteDownloadCluster(pMsg);
+         break;
+      case CMD_DEL_RENDER_CLUSTER:
+         deleteRenderCluster(pMsg);
+         break;
+      case CMD_DEL_UPLOAD_CLUSTER:
+         deleteUploadCluster(pMsg);
+         break;
+      case CMD_CREATE_DOWNLOAD_CLUSTER:
+         createDownloadCluster(pMsg);
+         break;
+      case CMD_CREATE_RENDER_CLUSTER:
+         createRenderCluster(pMsg);
+         break;
+      case CMD_CREATE_UPLOAD_CLUSTER:
+         createUploadCluster(pMsg);
+         break;
       default:
          if ((m_wCurrentCmd >> 8) == 0x11)
          {
@@ -14027,3 +14112,844 @@ void ClientSession::zmqListSubscriptions(NXCPMessage *request, zmq::Subscription
 }
 
 #endif
+
+void ClientSession::getGoogleAccount(NXCPMessage *request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_RESULT hResult;
+   UINT32 i, dwId, dwNumRecords;
+
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT * FROM google_account"));
+   if (hStmt != NULL)
+   {
+      hResult = DBSelectPrepared(hStmt);
+      if (hResult != NULL)
+      {
+         dwNumRecords = DBGetNumRows(hResult);
+         msg.setField(VID_NUM_VARIABLES, dwNumRecords);
+         msg.setField(VID_RCC, RCC_SUCCESS);
+         for (i = 0, dwId = VID_VARLIST_BASE; i < dwNumRecords; i++, dwId += 10)
+         {
+            msg.setField(dwId, DBGetFieldInt64(hResult, i, 0));
+            msg.setField(dwId + 1, DBGetField(hResult, i, 1, NULL, 0));
+            msg.setField(dwId + 2, DBGetField(hResult, i, 2, NULL, 0));
+            msg.setField(dwId + 3, DBGetField(hResult, i, 3, NULL, 0));
+            msg.setField(dwId + 4, DBGetFieldInt64(hResult, i, 4));
+            msg.setField(dwId + 5, DBGetField(hResult, i, 5, NULL, 0));
+         }
+         DBFreeResult(hResult);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+void ClientSession::getHomeChannels(NXCPMessage *request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_RESULT hResult;
+   UINT32 i, dwId, dwNumRecords;
+
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT * FROM home_channel_list"));
+   if (hStmt != NULL)
+   {
+      hResult = DBSelectPrepared(hStmt);
+      if (hResult != NULL)
+      {
+         dwNumRecords = DBGetNumRows(hResult);
+         msg.setField(VID_NUM_VARIABLES, dwNumRecords);
+         msg.setField(VID_RCC, RCC_SUCCESS);
+         for (i = 0, dwId = VID_VARLIST_BASE; i < dwNumRecords; i++, dwId += 10)
+         {
+            msg.setField(dwId, DBGetFieldInt64(hResult, i, 0));            //id
+            msg.setField(dwId + 1, DBGetField(hResult, i, 1, NULL, 0));    //Channel ID
+            msg.setField(dwId + 2, DBGetField(hResult, i, 2, NULL, 0));    //ChannelName
+            msg.setField(dwId + 3, DBGetField(hResult, i, 3, NULL, 0));    //GoogleAccount
+            msg.setField(dwId + 4, DBGetField(hResult, i, 4, NULL, 0));    //VideoIntro
+            msg.setField(dwId + 5, DBGetField(hResult, i, 5, NULL, 0));    //VideoOutro
+            msg.setField(dwId + 6, DBGetField(hResult, i, 6, NULL, 0));    //Logo
+            msg.setField(dwId + 7, DBGetField(hResult, i, 7, NULL, 0));    //DescriptionTemplate
+            msg.setField(dwId + 8, DBGetField(hResult, i, 8, NULL, 0));    //TitleTemplate
+         }
+         DBFreeResult(hResult);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+void ClientSession::getMonitorChannels(NXCPMessage *request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_RESULT hResult;
+   UINT32 i, dwId, dwNumRecords;
+
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT * FROM monitor_channel_list"));
+   if (hStmt != NULL)
+   {
+      hResult = DBSelectPrepared(hStmt);
+      if (hResult != NULL)
+      {
+         dwNumRecords = DBGetNumRows(hResult);
+         msg.setField(VID_NUM_VARIABLES, dwNumRecords);
+         msg.setField(VID_RCC, RCC_SUCCESS);
+         for (i = 0, dwId = VID_VARLIST_BASE; i < dwNumRecords; i++, dwId += 10)
+         {
+            msg.setField(dwId, DBGetFieldInt64(hResult, i, 0));            //id
+            msg.setField(dwId + 1, DBGetField(hResult, i, 1, NULL, 0));    //Channel ID
+            msg.setField(dwId + 2, DBGetField(hResult, i, 2, NULL, 0));    //ChannelName
+         }
+         DBFreeResult(hResult);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+void ClientSession::getMappingChannels(NXCPMessage *request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_RESULT hResult;
+   UINT32 i, dwId, dwNumRecords;
+
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT * FROM channel_mapping"));
+   if (hStmt != NULL)
+   {
+      hResult = DBSelectPrepared(hStmt);
+      if (hResult != NULL)
+      {
+         dwNumRecords = DBGetNumRows(hResult);
+         msg.setField(VID_NUM_VARIABLES, dwNumRecords);
+         msg.setField(VID_RCC, RCC_SUCCESS);
+         for (i = 0, dwId = VID_VARLIST_BASE; i < dwNumRecords; i++, dwId += 10)
+         {
+            msg.setField(dwId, DBGetFieldInt64(hResult, i, 0));            //id
+            msg.setField(dwId + 1, DBGetField(hResult, i, 1, NULL, 0));    //Home Channel ID
+            msg.setField(dwId + 2, DBGetField(hResult, i, 2, NULL, 0));    //HomeChannel Name
+            msg.setField(dwId + 3, DBGetField(hResult, i, 3, NULL, 0));    //Monitor Channe ID
+            msg.setField(dwId + 4, DBGetField(hResult, i, 4, NULL, 0));    //Monitor Channe Name
+            msg.setField(dwId + 5, DBGetFieldInt64(hResult, i, 5));        //Time Interval Sync
+            msg.setField(dwId + 6, DBGetFieldInt64(hResult, i, 6));        //Status Sync
+            long lastSyncTime = DBGetFieldInt64(hResult, i, 7);
+            char buff[20];
+            time_t temp = lastSyncTime;
+            struct tm ts = *localtime(&temp);
+            strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S ", &ts);
+            msg.setField(dwId + 7, buff);                                   //Last sync time
+            msg.setField(dwId + 8, DBGetField(hResult, i, 8, NULL, 0));    //Download cluster ID
+            msg.setField(dwId + 9, DBGetField(hResult, i, 9, NULL, 0));    //Render Cluster ID
+            msg.setField(dwId + 10, DBGetField(hResult, i, 10, NULL, 0));  //Upload cluster ID
+         }
+         DBFreeResult(hResult);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+void ClientSession::createGoogleAccount(NXCPMessage *request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   if (hdb != NULL)
+   {
+      // Prepare and execute INSERT or UPDATE query
+      TCHAR* userName = request->getFieldAsString(VID_GOOGLE_USER_NAME);
+      TCHAR* api = request->getFieldAsString(VID_GOOGLE_API);
+      TCHAR* clientSecret = request->getFieldAsString(VID_GOOGLE_CLIENT_SECRET);
+      UINT32 accountType = request->getFieldAsUInt32(VID_GOOGLE_ACCOUNT_TYPE);
+      TCHAR* appName = request->getFieldAsString(VID_GOOGLE_APP_NAME);
+
+      hStmt = DBPrepare(hdb, _T("INSERT INTO google_account (UserName,Api,ClientSecret,AccountType,AppName) VALUES (?,?,?,?,?)"));
+      DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)userName, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)api, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)clientSecret, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 4, DB_SQLTYPE_INTEGER, (INT32)accountType);
+      DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)appName, DB_BIND_TRANSIENT);
+      bool success = DBExecute(hStmt);
+      if (success == true)
+      {
+         msg.setField(VID_RCC, RCC_SUCCESS);
+      }
+      else {
+         msg.setField(VID_RCC, RCC_DB_FAILURE);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+void ClientSession::createHomeChannel(NXCPMessage *request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   if (hdb != NULL)
+   {
+      // Prepare and execute INSERT or UPDATE query
+      TCHAR* cId = request->getFieldAsString(VID_HOME_CHANNEL_ID);
+      TCHAR* cName = request->getFieldAsString(VID_HOME_CHANNEL_NAME);
+      TCHAR* googleAcc = request->getFieldAsString(VID_HOME_CHANNEL_GACCOUNT);
+      TCHAR* vIntro = request->getFieldAsString(VID_HOME_CHANNEL_VINTRO);
+      TCHAR* vOutro = request->getFieldAsString(VID_HOME_CHANNEL_VOUTRO);
+      TCHAR* logo = request->getFieldAsString(VID_HOME_CHANNEL_LOGO);
+      TCHAR* desc = request->getFieldAsString(VID_HOME_CHANNEL_DESC);
+      TCHAR* title = request->getFieldAsString(VID_HOME_CHANNEL_TITLE);
+
+      hStmt = DBPrepare(hdb, _T("INSERT INTO home_channel_list (ChannelId, ChannelName, GoogleAccount, " )
+                        _T("VideoIntro, VideoOutro, Logo, DescriptionTemplate, TitleTemplate) VALUES (?,?,?,?,?,?,?,?)"));
+      DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)cId, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)cName, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)googleAcc, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)vIntro, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)vOutro, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)logo, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)desc, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 8, DB_SQLTYPE_VARCHAR, (const TCHAR *)title, DB_BIND_TRANSIENT);
+      bool success = DBExecute(hStmt);
+      if (success == true)
+      {
+         msg.setField(VID_RCC, RCC_SUCCESS);
+      }
+      else {
+         msg.setField(VID_RCC, RCC_DB_FAILURE);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+void ClientSession::createMonitorChannel(NXCPMessage *request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   if (hdb != NULL)
+   {
+      // Prepare and execute INSERT or UPDATE query
+      TCHAR* cId = request->getFieldAsString(VID_MONITOR_CHANNEL_ID);
+      TCHAR* cName = request->getFieldAsString(VID_MONITOR_CHANNEL_NAME);
+
+      hStmt = DBPrepare(hdb, _T("INSERT INTO monitor_channel_list (ChannelId, ChannelName) VALUES (?,?)"));
+      DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)cId, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)cName, DB_BIND_TRANSIENT);
+      bool success = DBExecute(hStmt);
+      if (success == true)
+      {
+         msg.setField(VID_RCC, RCC_SUCCESS);
+      }
+      else {
+         msg.setField(VID_RCC, RCC_DB_FAILURE);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+void ClientSession::createMappingChannel(NXCPMessage *request)
+{
+   debugPrintf(1, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   if (hdb != NULL)
+   {
+      // Prepare and execute INSERT or UPDATE query
+      TCHAR* cHomeId = request->getFieldAsString(VID_MAPPING_CHANNEL_HOME_ID);
+      TCHAR* cMonitorId = request->getFieldAsString(VID_MAPPING_CHANNEL_MONITOR_ID);
+      INT32 timeSync = request->getFieldAsInt32(VID_MAPPING_CHANNEL_TIME_SYNC);
+      INT32 statusSync = request->getFieldAsInt32(VID_MAPPING_CHANNEL_STATUS_SYNC);
+      INT32 lastSyncTime = request->getFieldAsInt32(VID_MAPPING_CHANNEL_LAST_SYNC_TIME);
+      TCHAR* downloadId = request->getFieldAsString(VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID);
+      TCHAR* renderId = request->getFieldAsString(VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID);
+      TCHAR* uploadId = request->getFieldAsString(VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID);
+
+      //TODO: check mapping channel is existed or not
+      bool isExisted = checkMappingIsExisted(cHomeId, cMonitorId);
+      if (isExisted == false)
+      {
+         hStmt = DBPrepare(hdb, _T("INSERT INTO channel_mapping (HomeChannelId, MonitorChannelId, TimeIntervalSync, ")
+                           _T(" StatusSync, LastSyncTime, DownloadClusterId, ProcessClusterId, UploadClusterId) VALUES (?,?,?,?,?,?,?,?)"));
+         DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)cHomeId, DB_BIND_TRANSIENT);
+         DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)cMonitorId, DB_BIND_TRANSIENT);
+         DBBind(hStmt, 3, DB_SQLTYPE_INTEGER, (INT32)timeSync);
+         DBBind(hStmt, 4, DB_SQLTYPE_INTEGER, (INT32)statusSync);
+         DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (INT32)lastSyncTime);
+         DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)downloadId, DB_BIND_TRANSIENT);
+         DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)renderId, DB_BIND_TRANSIENT);
+         DBBind(hStmt, 8, DB_SQLTYPE_VARCHAR, (const TCHAR *)uploadId, DB_BIND_TRANSIENT);
+         bool success = DBExecute(hStmt);
+         if (success == true)
+         {
+            msg.setField(VID_RCC, RCC_SUCCESS);
+
+            if (statusSync == 1) //enable timer
+            {
+               //notify to download app
+               SpiderDownloadClient* downloadClient = new SpiderDownloadClient();
+               if (downloadClient->initSuccess)
+               {
+                  debugPrintf(6, _T("ClientSession::[%s] Init corba for download client successful!"), __FUNCTION__);
+                  try {
+                     INT32 timerId = getMaxId(_T("channel_mapping"));
+                     downloadClient->mDownloadRef->createMappingChannel(timerId, (const char*)cHomeId, (const char*)cMonitorId, timeSync);
+                  }
+                  catch (CORBA::TRANSIENT&) {
+                     debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
+                  }
+                  catch (CORBA::SystemException& ex) {
+                     debugPrintf(1, _T("Caught a CORBA:: %s"), ex._name());
+                  }
+                  catch (CORBA::Exception& ex) {
+                     debugPrintf(1, _T("Caught a CORBA:: %s"), ex._name());
+                  }
+               } else {
+                  debugPrintf(1, _T("ClientSession::[%s] Init corba for download client FALSE"), __FUNCTION__);
+               }
+            }
+         }
+         else
+         {
+            msg.setField(VID_RCC, RCC_DB_FAILURE);
+         }
+
+      } else {
+         msg.setField(VID_RCC, RCC_DUPLICATE_ID);
+      }
+   }
+   else
+   {
+      msg.setField(VID_RCC, RCC_DB_FAILURE);
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+void ClientSession::modifyGoogleAccount(NXCPMessage * request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   if (hdb != NULL)
+   {
+      // Prepare and execute INSERT or UPDATE query
+      INT32 id = request->getFieldAsInt32(VID_GOOGLE_RECORD_ID);
+      TCHAR* userName = request->getFieldAsString(VID_GOOGLE_USER_NAME);
+      TCHAR* api = request->getFieldAsString(VID_GOOGLE_API);
+      TCHAR* clientSecret = request->getFieldAsString(VID_GOOGLE_CLIENT_SECRET);
+      UINT32 accountType = request->getFieldAsUInt32(VID_GOOGLE_ACCOUNT_TYPE);
+      TCHAR* appName = request->getFieldAsString(VID_GOOGLE_APP_NAME);
+
+      hStmt = DBPrepare(hdb, _T("UPDATE google_account SET UserName = ?, Api = ?, ClientSecret = ?, ")
+                        _T(" AccountType = ?, AppName = ? WHERE Id = ?"));
+      DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)userName, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)api, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)clientSecret, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 4, DB_SQLTYPE_INTEGER, (INT32)accountType);
+      DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)appName, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 6, DB_SQLTYPE_INTEGER, (INT32)id);
+      bool success = DBExecute(hStmt);
+      if (success == true)
+      {
+         msg.setField(VID_RCC, RCC_SUCCESS);
+      }
+      else
+      {
+         msg.setField(VID_RCC, RCC_DB_FAILURE);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+void ClientSession::modifyHomeChannel(NXCPMessage * request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   if (hdb != NULL)
+   {
+      // Prepare and execute INSERT or UPDATE query
+      INT32 id = request->getFieldAsInt32(VID_HOME_CHANNEL_RECORD_ID);
+      TCHAR* cId = request->getFieldAsString(VID_HOME_CHANNEL_ID);
+      TCHAR* cName = request->getFieldAsString(VID_HOME_CHANNEL_NAME);
+      TCHAR* googleAcc = request->getFieldAsString(VID_HOME_CHANNEL_GACCOUNT);
+      TCHAR* vIntro = request->getFieldAsString(VID_HOME_CHANNEL_VINTRO);
+      TCHAR* vOutro = request->getFieldAsString(VID_HOME_CHANNEL_VOUTRO);
+      TCHAR* logo = request->getFieldAsString(VID_HOME_CHANNEL_LOGO);
+      TCHAR* desc = request->getFieldAsString(VID_HOME_CHANNEL_DESC);
+      TCHAR* title = request->getFieldAsString(VID_HOME_CHANNEL_TITLE);
+
+      hStmt = DBPrepare(hdb, _T("UPDATE home_channel_list SET ChannelId = ?, ChannelName = ?, GoogleAccount= ?, " )
+                        _T("VideoIntro = ?, VideoOutro = ?, Logo = ?, DescriptionTemplate = ?, TitleTemplate = ? WHERE Id = ?"));
+      DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)cId, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)cName, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)googleAcc, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)vIntro, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)vOutro, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)logo, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)desc, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 8, DB_SQLTYPE_VARCHAR, (const TCHAR *)title, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 9, DB_SQLTYPE_INTEGER, (INT32)id);
+      bool success = DBExecute(hStmt);
+      if (success == true)
+      {
+         msg.setField(VID_RCC, RCC_SUCCESS);
+      }
+      else {
+         msg.setField(VID_RCC, RCC_DB_FAILURE);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+void ClientSession::modifyMonitorChannel(NXCPMessage * request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   if (hdb != NULL)
+   {
+      // Prepare and execute INSERT or UPDATE query
+      INT32 id = request->getFieldAsInt32(VID_MONITOR_CHANNEL_RECORD_ID);
+      TCHAR* cId = request->getFieldAsString(VID_MONITOR_CHANNEL_ID);
+      TCHAR* cName = request->getFieldAsString(VID_MONITOR_CHANNEL_NAME);
+
+      hStmt = DBPrepare(hdb, _T("UPDATE monitor_channel_list SET ChannelId = ?, ChannelName = ? WHERE Id = ?"));
+      DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)cId, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)cName, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 3, DB_SQLTYPE_INTEGER, (INT32)id);
+      bool success = DBExecute(hStmt);
+      if (success == true)
+      {
+         msg.setField(VID_RCC, RCC_SUCCESS);
+      }
+      else {
+         msg.setField(VID_RCC, RCC_DB_FAILURE);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+void ClientSession::modifyMappingChannel(NXCPMessage * request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   if (hdb != NULL)
+   {
+      // Prepare and execute INSERT or UPDATE query
+      INT32 id = request->getFieldAsInt32(VID_MAPPING_CHANNEL_RECORD_ID);
+      TCHAR* cHomeId = request->getFieldAsString(VID_MAPPING_CHANNEL_HOME_ID);
+      TCHAR* cMonitorId = request->getFieldAsString(VID_MAPPING_CHANNEL_MONITOR_ID);
+      INT32 timeSync = request->getFieldAsInt32(VID_MAPPING_CHANNEL_TIME_SYNC);
+      INT32 statusSync = request->getFieldAsInt32(VID_MAPPING_CHANNEL_STATUS_SYNC);
+      TCHAR* downloadId = request->getFieldAsString(VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID);
+      TCHAR* renderId = request->getFieldAsString(VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID);
+      TCHAR* uploadId = request->getFieldAsString(VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID);
+
+      hStmt = DBPrepare(hdb, _T("UPDATE channel_mapping SET HomeChannelId = ?, MonitorChannelId = ?, TimeIntervalSync = ?, ")
+                        _T(" StatusSync = ?, DownloadClusterId = ?, ProcessClusterId = ?, UploadClusterId = ? WHERE Id = ?"));
+      DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)cHomeId, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)cMonitorId, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 3, DB_SQLTYPE_INTEGER, (INT32)timeSync);
+      DBBind(hStmt, 4, DB_SQLTYPE_INTEGER, (INT32)statusSync);
+      DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)downloadId, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)renderId, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)uploadId, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 8, DB_SQLTYPE_INTEGER, (INT32)id);
+
+      debugPrintf(6, _T("ClientSession::[%s] id = %d"), __FUNCTION__, id);
+      debugPrintf(6, _T("ClientSession::[%s] cHomeId = %s"), __FUNCTION__, cHomeId);
+
+      bool success = DBExecute(hStmt);
+      if (success == true)
+      {
+         msg.setField(VID_RCC, RCC_SUCCESS);
+         //notify information to download app
+         SpiderDownloadClient* downloadClient = new SpiderDownloadClient();
+         if (downloadClient->initSuccess)
+         {
+            debugPrintf(6, _T("ClientSession::[%s] Init corba for download client successful!"), __FUNCTION__);
+            try {
+               downloadClient->mDownloadRef->modifyMappingChannel(id, (const char*)cHomeId, (const char*)cMonitorId, timeSync, statusSync);
+            }
+            catch (CORBA::TRANSIENT&) {
+               debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
+            }
+            catch (CORBA::SystemException& ex) {
+               debugPrintf(1, _T("Caught a CORBA:: %s"), ex._name());
+            }
+            catch (CORBA::Exception& ex) {
+               debugPrintf(1, _T("Caught a CORBA:: %s"), ex._name());
+            }
+         } else {
+            debugPrintf(1, _T("ClientSession::[%s] Init corba for download client FALSE"), __FUNCTION__);
+         }
+      }
+      else
+      {
+         msg.setField(VID_RCC, RCC_DB_FAILURE);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+void ClientSession::deleteGoogleAccount(NXCPMessage * request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   if (hdb != NULL)
+   {
+      INT32 id = request->getFieldAsInt32(VID_GOOGLE_RECORD_ID);
+      debugPrintf(6, _T("ClientSession::[%s] id = %d"), __FUNCTION__, id);
+      hStmt = DBPrepare(hdb, _T("DELETE FROM google_account WHERE Id = ?"));
+      DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)id);
+      bool success = DBExecute(hStmt);
+      if (success == true)
+      {
+         msg.setField(VID_RCC, RCC_SUCCESS);
+         debugPrintf(6, _T("ClientSession::[%s] delete success"), __FUNCTION__);
+      }
+      else {
+         msg.setField(VID_RCC, RCC_DB_FAILURE);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+void ClientSession::deleteHomeChannel(NXCPMessage * request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   if (hdb != NULL)
+   {
+      INT32 id = request->getFieldAsInt32(VID_HOME_CHANNEL_RECORD_ID);
+      debugPrintf(6, _T("ClientSession::[%s] id = %d"), __FUNCTION__, id);
+      hStmt = DBPrepare(hdb, _T("DELETE FROM home_channel_list WHERE Id = ?"));
+      DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)id);
+      bool success = DBExecute(hStmt);
+      if (success == true)
+      {
+         msg.setField(VID_RCC, RCC_SUCCESS);
+         debugPrintf(6, _T("ClientSession::[%s] delete success"), __FUNCTION__);
+      }
+      else {
+         msg.setField(VID_RCC, RCC_DB_FAILURE);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+void ClientSession::deleteMonitorAccount(NXCPMessage * request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   if (hdb != NULL)
+   {
+      INT32 id = request->getFieldAsInt32(VID_MONITOR_CHANNEL_RECORD_ID);
+      debugPrintf(6, _T("ClientSession::[%s] id = %d"), __FUNCTION__, id);
+      hStmt = DBPrepare(hdb, _T("DELETE FROM monitor_channel_list WHERE Id = ?"));
+      DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)id);
+      bool success = DBExecute(hStmt);
+      if (success == true)
+      {
+         msg.setField(VID_RCC, RCC_SUCCESS);
+         debugPrintf(6, _T("ClientSession::[%s] delete success"), __FUNCTION__);
+      }
+      else {
+         msg.setField(VID_RCC, RCC_DB_FAILURE);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+void ClientSession::deleteMappingChannel(NXCPMessage * request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+   // Prepare response message
+   msg.setCode(CMD_REQUEST_COMPLETED);
+   msg.setId(request->getId());
+
+   if (hdb != NULL)
+   {
+      INT32 id = request->getFieldAsInt32(VID_MAPPING_CHANNEL_RECORD_ID);
+      debugPrintf(6, _T("ClientSession::[%s] id = %d"), __FUNCTION__, id);
+      hStmt = DBPrepare(hdb, _T("DELETE FROM channel_mapping WHERE Id = ?"));
+      DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)id);
+      bool success = DBExecute(hStmt);
+      if (success == true)
+      {
+         msg.setField(VID_RCC, RCC_SUCCESS);
+         //notify information to download app
+         SpiderDownloadClient* downloadClient = new SpiderDownloadClient();
+         if (downloadClient->initSuccess)
+         {
+            debugPrintf(6, _T("ClientSession::[%s] Init corba for download client successful!"), __FUNCTION__);
+            try {
+               downloadClient->mDownloadRef->deleteMappingChannel(id);
+            }
+            catch (CORBA::TRANSIENT&) {
+               debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
+            }
+            catch (CORBA::SystemException& ex) {
+               debugPrintf(1, _T("Caught a CORBA:: %s"), ex._name());
+            }
+            catch (CORBA::Exception& ex) {
+               debugPrintf(1, _T("Caught a CORBA:: %s"), ex._name());
+            }
+         } else {
+            debugPrintf(1, _T("ClientSession::[%s] Init corba for download client FALSE"), __FUNCTION__);
+         }
+      }
+      else
+      {
+         msg.setField(VID_RCC, RCC_DB_FAILURE);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   sendMessage(&msg);
+}
+
+INT32 ClientSession::getLastestInsertId(TCHAR * tbName)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   INT32 result = -1;
+   DB_RESULT hResult;
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT MAX(Id) FROM channel_mapping"));
+   if (hStmt != NULL)
+   {
+      //DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)tbName, DB_BIND_TRANSIENT);
+      hResult = DBSelectPrepared(hStmt);
+      if (hResult != NULL)
+      {
+         result = DBGetFieldInt64(hResult, 0, 0);
+         DBFreeResult(hResult);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   return result;
+}
+
+AgentConnection * ClientSession::getAgentConnectionByObjectName(TCHAR * objectName)
+{
+   AgentConnection *agentConn = NULL;
+   // Resolve hostname
+   InetAddress addr = InetAddress::resolveHostName(objectName);
+   debugPrintf(2, _T("ClientSession::[%s] address v4 = %d"), __FUNCTION__, addr.getAddressV4());
+   if (addr.isValid())
+   {
+      Node *node = FindNodeByIP(0, addr.getAddressV4()); /* TODO: add possibility to specify action target by object id */
+      if (node != NULL)
+      {
+         agentConn = node->createAgentConnection();
+      }
+      else
+      {
+         // Target node is not in our database, try default communication settings
+         agentConn = new AgentConnection(addr, AGENT_LISTEN_PORT, AUTH_NONE, _T(""));
+         agentConn->setCommandTimeout(g_agentCommandTimeout);
+         if (!agentConn->connect(g_pServerKey))
+         {
+            debugPrintf(2, _T("ClientSession:: Can not create connection to agent ..."));
+            agentConn->decRefCount();
+         }
+      }
+   }
+   return agentConn;
+}
+
+bool ClientSession::checkMappingIsExisted(TCHAR* cHomeId, TCHAR* cMonitorId)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __func__);
+   bool isExisted = false;
+   DB_RESULT hResult;
+   UINT32 dwNumRecords;
+
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT COUNT(*) FROM channel_mapping WHERE HomeChannelId = ? AND MonitorChannelId = ?"));
+   DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)cHomeId, DB_BIND_TRANSIENT);
+   DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)cMonitorId, DB_BIND_TRANSIENT);
+   if (hStmt != NULL)
+   {
+      hResult = DBSelectPrepared(hStmt);
+      if (hResult != NULL)
+      {
+         int numRecord = DBGetFieldInt64(hResult, 0, 0);
+         if (numRecord > 0)
+         {
+            isExisted = true;
+         }
+         DBFreeResult(hResult);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   return isExisted;
+}
+
+void ClientSession::getDownloadCluster(NXCPMessage *request)
+{
+
+}
+
+void ClientSession::getRenderCluster(NXCPMessage *request)
+{
+
+}
+
+void ClientSession::getUploadCluster(NXCPMessage *request)
+{
+
+}
+
+void ClientSession::createDownloadCluster(NXCPMessage *request)
+{
+
+}
+
+void ClientSession::createRenderCluster(NXCPMessage *request)
+{
+
+}
+
+void ClientSession::createUploadCluster(NXCPMessage *request)
+{
+
+}
+void ClientSession::modifyDownloadCluster(NXCPMessage *request)
+{
+
+}
+void ClientSession::modifyRenderCluster(NXCPMessage *request)
+{
+
+}
+void ClientSession::modifyUploadCluster(NXCPMessage *request)
+{
+
+}
+void ClientSession::deleteDownloadCluster(NXCPMessage *request)
+{
+
+}
+void ClientSession::deleteRenderCluster(NXCPMessage *request)
+{
+
+}
+void ClientSession::deleteUploadCluster(NXCPMessage *request)
+{
+
+}
+
+INT32 ClientSession::getMaxId(TCHAR * tbName)
+{
+   INT32 result = -1;
+   DB_RESULT hResult;
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT MAX(Id) FROM channel_mapping"));
+   if (hStmt != NULL)
+   {
+      hResult = DBSelectPrepared(hStmt);
+      if (hResult != NULL)
+      {
+         result = DBGetFieldInt64(hResult, 0, 0);
+         DBFreeResult(hResult);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+   return result;
+}
+
+

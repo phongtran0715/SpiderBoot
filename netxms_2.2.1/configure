@@ -839,6 +839,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -988,6 +989,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1240,6 +1242,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1377,7 +1388,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1530,6 +1541,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -27441,9 +27453,51 @@ fi
 	LIBS="$OLD_LIBS"
 fi
 
+
 #--------------------------------------------------------------------
-# Check CORBA
+# CORBA
 #--------------------------------------------------------------------
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lomniORB4" >&5
+$as_echo_n "checking for main in -lomniORB4... " >&6; }
+if ${ac_cv_lib_omniORB4_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lomniORB4  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_omniORB4_main=yes
+else
+  ac_cv_lib_omniORB4_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_omniORB4_main" >&5
+$as_echo "$ac_cv_lib_omniORB4_main" >&6; }
+if test "x$ac_cv_lib_omniORB4_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBOMNIORB4 1
+_ACEOF
+
+  LIBS="-lomniORB4 $LIBS"
+
+else
+  as_fn_error $? "cannot find omniORB library" "$LINENO" 5
+fi
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lomnithread" >&5
 $as_echo_n "checking for main in -lomnithread... " >&6; }
 if ${ac_cv_lib_omnithread_main+:} false; then :
@@ -27485,47 +27539,8 @@ else
   as_fn_error $? "cannot find omnithread library" "$LINENO" 5
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lomniORB4" >&5
-$as_echo_n "checking for main in -lomniORB4... " >&6; }
-if ${ac_cv_lib_omniORB4_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lomniORB4  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_omniORB4_main=yes
-else
-  ac_cv_lib_omniORB4_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_omniORB4_main" >&5
-$as_echo "$ac_cv_lib_omniORB4_main" >&6; }
-if test "x$ac_cv_lib_omniORB4_main" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBOMNIORB4 1
-_ACEOF
-
-  LIBS="-lomniORB4 $LIBS"
-
-else
-  as_fn_error $? "cannot find omniORB4 library" "$LINENO" 5
-fi
-
+#AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4 header files])])
+#AC_CHECK_PROG([IDL], [omniidl], [omniidl], [AC_MSG_ERROR([cannot find omniidl prgram])])
 
 #--------------------------------------------------------------------
 # Other settings
@@ -27826,7 +27841,7 @@ NETXMS_LIBRARY_VERSION=2:0:0
 # Generate output files
 #--------------------------------------------------------------------
 
-ac_config_files="$ac_config_files Makefile contrib/Makefile contrib/backgrounds/Makefile contrib/integration/Makefile contrib/integration/HP_EVA/Makefile contrib/integration/HP_P2000/Makefile contrib/mibs/Makefile contrib/music/Makefile contrib/startup/Makefile contrib/startup/systemd/Makefile contrib/startup/debian/Makefile contrib/startup/gentoo/Makefile contrib/startup/hp-ux/Makefile contrib/startup/redhat/Makefile contrib/startup/suse/Makefile contrib/startup/ubuntu/Makefile contrib/startup/solaris/Makefile contrib/templates/Makefile doc/Makefile doc/internal/Makefile doc/manuals/Makefile doc/misc/Makefile images/Makefile include/Makefile include/msvc/Makefile m4/Makefile src/Makefile src/agent/Makefile src/agent/core/Makefile src/agent/install/Makefile src/agent/libnxagent/Makefile src/agent/libnxappc/Makefile src/agent/libnxsd/Makefile src/agent/libnxtux/Makefile src/agent/subagents/Makefile src/agent/subagents/aix/Makefile src/agent/subagents/bind9/Makefile src/agent/subagents/darwin/Makefile src/agent/subagents/db2/Makefile src/agent/subagents/dbquery/Makefile src/agent/subagents/devemu/Makefile src/agent/subagents/ds18x20/Makefile src/agent/subagents/ecs/Makefile src/agent/subagents/filemgr/Makefile src/agent/subagents/freebsd/Makefile src/agent/subagents/gps/Makefile src/agent/subagents/hpux/Makefile src/agent/subagents/informix/Makefile src/agent/subagents/ipso/Makefile src/agent/subagents/java/Makefile src/agent/subagents/java/java/Makefile src/agent/subagents/jmx/Makefile src/agent/subagents/linux/Makefile src/agent/subagents/lmsensors/Makefile src/agent/subagents/logwatch/Makefile src/agent/subagents/minix/Makefile src/agent/subagents/mqtt/Makefile src/agent/subagents/mysql/Makefile src/agent/subagents/netbsd/Makefile src/agent/subagents/netsvc/Makefile src/agent/subagents/odbcquery/Makefile src/agent/subagents/openbsd/Makefile src/agent/subagents/oracle/Makefile src/agent/subagents/ping/Makefile src/agent/subagents/portCheck/Makefile src/agent/subagents/rpi/Makefile src/agent/subagents/sms/Makefile src/agent/subagents/ssh/Makefile src/agent/subagents/sunos/Makefile src/agent/subagents/tuxedo/Makefile src/agent/subagents/mongodb/Makefile src/agent/subagents/ubntlw/Makefile src/agent/subagents/ups/Makefile src/agent/subagents/vmgr/Makefile src/agent/subagents/winnt/Makefile src/agent/subagents/winperf/Makefile src/agent/subagents/wmi/Makefile src/agent/subagents/xen/Makefile src/agent/tools/Makefile src/agent/tools/nxappget/Makefile src/agent/tools/nxapush/Makefile src/appagent/Makefile src/client/Makefile src/client/install/Makefile src/client/java/Makefile src/client/java/netxms-client/Makefile src/client/libnxclient/Makefile src/client/nxalarm/Makefile src/client/nxevent/Makefile src/client/nxpush/Makefile src/client/nxshell/Makefile src/client/nxshell/java/Makefile src/client/nxsms/Makefile src/db/Makefile src/db/dbdrv/Makefile src/db/dbdrv/db2/Makefile src/db/dbdrv/informix/Makefile src/db/dbdrv/odbc/Makefile src/db/dbdrv/mariadb/Makefile src/db/dbdrv/mssql/Makefile src/db/dbdrv/mysql/Makefile src/db/dbdrv/oracle/Makefile src/db/dbdrv/pgsql/Makefile src/db/dbdrv/sqlite/Makefile src/db/libnxdb/Makefile src/install/Makefile src/install/windows/Makefile src/jansson/Makefile src/libexpat/Makefile src/libexpat/libexpat/Makefile src/libnetxms/Makefile src/libnxcc/Makefile src/libnxjava/Makefile src/libnxjava/java/Makefile src/libnxjava/java/base/Makefile src/libnxjava/java/base/lib/Makefile src/libnxjava/java/base/netxms-base/Makefile src/libnxjava/java/bridge/Makefile src/libnxlp/Makefile src/libnxmb/Makefile src/libnxsl/Makefile src/libstrophe/Makefile src/libtre/Makefile src/libtre/win32/Makefile src/nxcproxy/Makefile src/nxlptest/Makefile src/nxscript/Makefile src/server/Makefile src/server/core/Makefile src/server/drivers/Makefile src/server/drivers/airespace/Makefile src/server/drivers/at/Makefile src/server/drivers/baystack/Makefile src/server/drivers/cat2900xl/Makefile src/server/drivers/catalyst/Makefile src/server/drivers/cisco-esw/Makefile src/server/drivers/cisco-sb/Makefile src/server/drivers/dell-pwc/Makefile src/server/drivers/dlink/Makefile src/server/drivers/ers8000/Makefile src/server/drivers/extreme/Makefile src/server/drivers/h3c/Makefile src/server/drivers/hpsw/Makefile src/server/drivers/ignitenet/Makefile src/server/drivers/juniper/Makefile src/server/drivers/lib/Makefile src/server/drivers/lib/avaya-ers/Makefile src/server/drivers/lib/cisco/Makefile src/server/drivers/mikrotik/Makefile src/server/drivers/netonix/Makefile src/server/drivers/netscreen/Makefile src/server/drivers/ntws/Makefile src/server/drivers/ping3/Makefile src/server/drivers/procurve/Makefile src/server/drivers/qtech-olt/Makefile src/server/drivers/symbol-ws/Makefile src/server/drivers/tb/Makefile src/server/drivers/ubnt/Makefile src/server/hdlink/Makefile src/server/hdlink/jira/Makefile src/server/hdlink/redmine/Makefile src/server/include/Makefile src/server/libnxsrv/Makefile src/server/libcorba/Makefile src/server/netxmsd/Makefile src/server/pdsdrv/Makefile src/server/pdsdrv/rrdtool/Makefile src/server/tools/Makefile src/server/tools/nxaction/Makefile src/server/tools/nxadm/Makefile src/server/tools/nxap/Makefile src/server/tools/nxconfig/Makefile src/server/tools/nxconfig/res/Makefile src/server/tools/nxdbmgr/Makefile src/server/tools/nxget/Makefile src/server/tools/nxminfo/Makefile src/server/tools/nxupload/Makefile src/smsdrv/Makefile src/smsdrv/anysms/Makefile src/smsdrv/dbemu/Makefile src/smsdrv/dummy/Makefile src/smsdrv/generic/Makefile src/smsdrv/kannel/Makefile src/smsdrv/mymobile/Makefile src/smsdrv/nexmo/Makefile src/smsdrv/nxagent/Makefile src/smsdrv/portech/Makefile src/smsdrv/slack/Makefile src/smsdrv/smseagle/Makefile src/smsdrv/text2reach/Makefile src/smsdrv/websms/Makefile src/snmp/Makefile src/snmp/libnxsnmp/Makefile src/snmp/nxmibc/Makefile src/snmp/nxsnmpget/Makefile src/snmp/nxsnmpset/Makefile src/snmp/nxsnmpwalk/Makefile src/sqlite/Makefile src/tools/Makefile src/tools/nxdevcfg/Makefile src/tools/nxencpasswd/Makefile src/tools/nxgenguid/Makefile src/zlib/Makefile sql/Makefile tests/Makefile tests/include/Makefile tests/test-libnetxms/Makefile tests/test-libnxcc/Makefile tests/test-libnxdb/Makefile tests/test-libnxsnmp/Makefile tools/Makefile"
+ac_config_files="$ac_config_files Makefile contrib/Makefile contrib/backgrounds/Makefile contrib/integration/Makefile contrib/integration/HP_EVA/Makefile contrib/integration/HP_P2000/Makefile contrib/mibs/Makefile contrib/music/Makefile contrib/startup/Makefile contrib/startup/systemd/Makefile contrib/startup/debian/Makefile contrib/startup/gentoo/Makefile contrib/startup/hp-ux/Makefile contrib/startup/redhat/Makefile contrib/startup/suse/Makefile contrib/startup/ubuntu/Makefile contrib/startup/solaris/Makefile contrib/templates/Makefile doc/Makefile doc/internal/Makefile doc/manuals/Makefile doc/misc/Makefile images/Makefile include/Makefile include/msvc/Makefile m4/Makefile src/Makefile src/agent/Makefile src/agent/core/Makefile src/agent/install/Makefile src/agent/libnxagent/Makefile src/agent/libnxappc/Makefile src/agent/libnxsd/Makefile src/agent/libnxtux/Makefile src/agent/subagents/Makefile src/agent/subagents/aix/Makefile src/agent/subagents/bind9/Makefile src/agent/subagents/darwin/Makefile src/agent/subagents/db2/Makefile src/agent/subagents/dbquery/Makefile src/agent/subagents/devemu/Makefile src/agent/subagents/ds18x20/Makefile src/agent/subagents/ecs/Makefile src/agent/subagents/filemgr/Makefile src/agent/subagents/freebsd/Makefile src/agent/subagents/gps/Makefile src/agent/subagents/hpux/Makefile src/agent/subagents/informix/Makefile src/agent/subagents/ipso/Makefile src/agent/subagents/java/Makefile src/agent/subagents/java/java/Makefile src/agent/subagents/jmx/Makefile src/agent/subagents/linux/Makefile src/agent/subagents/lmsensors/Makefile src/agent/subagents/logwatch/Makefile src/agent/subagents/minix/Makefile src/agent/subagents/mqtt/Makefile src/agent/subagents/mysql/Makefile src/agent/subagents/netbsd/Makefile src/agent/subagents/netsvc/Makefile src/agent/subagents/odbcquery/Makefile src/agent/subagents/openbsd/Makefile src/agent/subagents/oracle/Makefile src/agent/subagents/ping/Makefile src/agent/subagents/portCheck/Makefile src/agent/subagents/rpi/Makefile src/agent/subagents/sms/Makefile src/agent/subagents/ssh/Makefile src/agent/subagents/sunos/Makefile src/agent/subagents/tuxedo/Makefile src/agent/subagents/mongodb/Makefile src/agent/subagents/ubntlw/Makefile src/agent/subagents/ups/Makefile src/agent/subagents/vmgr/Makefile src/agent/subagents/winnt/Makefile src/agent/subagents/winperf/Makefile src/agent/subagents/wmi/Makefile src/agent/subagents/xen/Makefile src/agent/tools/Makefile src/agent/tools/nxappget/Makefile src/agent/tools/nxapush/Makefile src/appagent/Makefile src/client/Makefile src/client/install/Makefile src/client/java/Makefile src/client/java/netxms-client/Makefile src/client/libnxclient/Makefile src/client/nxalarm/Makefile src/client/nxevent/Makefile src/client/nxpush/Makefile src/client/nxshell/Makefile src/client/nxshell/java/Makefile src/client/nxsms/Makefile src/db/Makefile src/db/dbdrv/Makefile src/db/dbdrv/db2/Makefile src/db/dbdrv/informix/Makefile src/db/dbdrv/odbc/Makefile src/db/dbdrv/mariadb/Makefile src/db/dbdrv/mssql/Makefile src/db/dbdrv/mysql/Makefile src/db/dbdrv/oracle/Makefile src/db/dbdrv/pgsql/Makefile src/db/dbdrv/sqlite/Makefile src/db/libnxdb/Makefile src/install/Makefile src/install/windows/Makefile src/jansson/Makefile src/libexpat/Makefile src/libexpat/libexpat/Makefile src/libnetxms/Makefile src/libnxcc/Makefile src/libnxjava/Makefile src/libnxjava/java/Makefile src/libnxjava/java/base/Makefile src/libnxjava/java/base/lib/Makefile src/libnxjava/java/base/netxms-base/Makefile src/libnxjava/java/bridge/Makefile src/libnxlp/Makefile src/libnxmb/Makefile src/libnxsl/Makefile src/libstrophe/Makefile src/libtre/Makefile src/libtre/win32/Makefile src/nxcproxy/Makefile src/nxlptest/Makefile src/nxscript/Makefile src/server/Makefile src/server/core/Makefile src/server/drivers/Makefile src/server/drivers/airespace/Makefile src/server/drivers/at/Makefile src/server/drivers/baystack/Makefile src/server/drivers/cat2900xl/Makefile src/server/drivers/catalyst/Makefile src/server/drivers/cisco-esw/Makefile src/server/drivers/cisco-sb/Makefile src/server/drivers/dell-pwc/Makefile src/server/drivers/dlink/Makefile src/server/drivers/ers8000/Makefile src/server/drivers/extreme/Makefile src/server/drivers/h3c/Makefile src/server/drivers/hpsw/Makefile src/server/drivers/ignitenet/Makefile src/server/drivers/juniper/Makefile src/server/drivers/lib/Makefile src/server/drivers/lib/avaya-ers/Makefile src/server/drivers/lib/cisco/Makefile src/server/drivers/mikrotik/Makefile src/server/drivers/netonix/Makefile src/server/drivers/netscreen/Makefile src/server/drivers/ntws/Makefile src/server/drivers/ping3/Makefile src/server/drivers/procurve/Makefile src/server/drivers/qtech-olt/Makefile src/server/drivers/symbol-ws/Makefile src/server/drivers/tb/Makefile src/server/drivers/ubnt/Makefile src/server/hdlink/Makefile src/server/hdlink/jira/Makefile src/server/hdlink/redmine/Makefile src/server/include/Makefile src/server/libnxsrv/Makefile src/server/netxmsd/Makefile src/server/pdsdrv/Makefile src/server/pdsdrv/rrdtool/Makefile src/server/tools/Makefile src/server/tools/nxaction/Makefile src/server/tools/nxadm/Makefile src/server/tools/nxap/Makefile src/server/tools/nxconfig/Makefile src/server/tools/nxconfig/res/Makefile src/server/tools/nxdbmgr/Makefile src/server/tools/nxget/Makefile src/server/tools/nxminfo/Makefile src/server/tools/nxupload/Makefile src/smsdrv/Makefile src/smsdrv/anysms/Makefile src/smsdrv/dbemu/Makefile src/smsdrv/dummy/Makefile src/smsdrv/generic/Makefile src/smsdrv/kannel/Makefile src/smsdrv/mymobile/Makefile src/smsdrv/nexmo/Makefile src/smsdrv/nxagent/Makefile src/smsdrv/portech/Makefile src/smsdrv/slack/Makefile src/smsdrv/smseagle/Makefile src/smsdrv/text2reach/Makefile src/smsdrv/websms/Makefile src/snmp/Makefile src/snmp/libnxsnmp/Makefile src/snmp/nxmibc/Makefile src/snmp/nxsnmpget/Makefile src/snmp/nxsnmpset/Makefile src/snmp/nxsnmpwalk/Makefile src/sqlite/Makefile src/tools/Makefile src/tools/nxdevcfg/Makefile src/tools/nxencpasswd/Makefile src/tools/nxgenguid/Makefile src/zlib/Makefile sql/Makefile tests/Makefile tests/include/Makefile tests/test-libnetxms/Makefile tests/test-libnxcc/Makefile tests/test-libnxdb/Makefile tests/test-libnxsnmp/Makefile tools/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -29162,7 +29177,6 @@ do
     "src/server/hdlink/redmine/Makefile") CONFIG_FILES="$CONFIG_FILES src/server/hdlink/redmine/Makefile" ;;
     "src/server/include/Makefile") CONFIG_FILES="$CONFIG_FILES src/server/include/Makefile" ;;
     "src/server/libnxsrv/Makefile") CONFIG_FILES="$CONFIG_FILES src/server/libnxsrv/Makefile" ;;
-    "src/server/libcorba/Makefile") CONFIG_FILES="$CONFIG_FILES src/server/libcorba/Makefile" ;;
     "src/server/netxmsd/Makefile") CONFIG_FILES="$CONFIG_FILES src/server/netxmsd/Makefile" ;;
     "src/server/pdsdrv/Makefile") CONFIG_FILES="$CONFIG_FILES src/server/pdsdrv/Makefile" ;;
     "src/server/pdsdrv/rrdtool/Makefile") CONFIG_FILES="$CONFIG_FILES src/server/pdsdrv/rrdtool/Makefile" ;;

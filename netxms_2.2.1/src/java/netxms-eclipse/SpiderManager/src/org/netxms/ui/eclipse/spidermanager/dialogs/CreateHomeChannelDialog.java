@@ -21,6 +21,7 @@ package org.netxms.ui.eclipse.spidermanager.dialogs;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
@@ -235,6 +236,16 @@ public class CreateHomeChannelDialog extends Dialog {
 		});
 		btnDesc.setText("Browse...");
 		btnDesc.setBounds(427, 257, 79, 29);
+		
+		Button btnView = new Button(grpCreateNewAccount, SWT.NONE);
+		btnView.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Program.launch("https://www.youtube.com/channel/" + txtChannelId.getText());	
+			}
+		});
+		btnView.setText("View");
+		btnView.setBounds(427, 26, 79, 29);
 
 		return dialogArea;
 	}

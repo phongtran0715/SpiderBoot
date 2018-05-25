@@ -39,4 +39,4 @@ serverinclude_HEADERS = \
 	pdsdrv.h \
 	zeromq.h \
 	nms_corba.h \
-	echo.hh
+	SpiderAgentAPI.hh

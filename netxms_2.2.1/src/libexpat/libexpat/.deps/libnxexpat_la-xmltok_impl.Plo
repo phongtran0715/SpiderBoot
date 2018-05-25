@@ -1,3 +1,0 @@
-libnxexpat_la-xmltok_impl.lo: xmltok_impl.c /usr/include/stdc-predef.h
-
-/usr/include/stdc-predef.h:

@@ -217,6 +217,13 @@ enum CertificateType
    CERT_TYPE_SERVER = 3
 };
 
+enum VideoStatus
+{
+   VIDEO_DOWNLOADED  = 1,
+   VIDEO_RENDERED    = 2,
+   VIDEO_UPLOADED    = 3
+};
+
 /**
  * Audit subsystems
  */
@@ -749,6 +756,38 @@ private:
    void alarmUpdateWorker(Alarm *alarm);
    void sendActionDBUpdateMessage(NXCP_MESSAGE *msg);
    void sendObjectUpdate(NetObj *object);
+   void getGoogleAccount(NXCPMessage *request);
+   void getHomeChannels(NXCPMessage *request);
+   void getMonitorChannels(NXCPMessage *request);
+   void getMappingChannels(NXCPMessage *request);
+   void createGoogleAccount(NXCPMessage *request);
+   void createHomeChannel(NXCPMessage *request);
+   void createMonitorChannel(NXCPMessage *request);
+   void createMappingChannel(NXCPMessage *request);
+   void modifyGoogleAccount(NXCPMessage *request);
+   void modifyHomeChannel(NXCPMessage *request);
+   void modifyMonitorChannel(NXCPMessage *request);
+   void modifyMappingChannel(NXCPMessage *request);
+   void deleteGoogleAccount(NXCPMessage *request);
+   void deleteHomeChannel(NXCPMessage *request);
+   void deleteMonitorAccount(NXCPMessage *request);
+   void deleteMappingChannel(NXCPMessage *request);
+   void getDownloadCluster(NXCPMessage *request);
+   void getRenderCluster(NXCPMessage *request);
+   void getUploadCluster(NXCPMessage *request);
+   void createDownloadCluster(NXCPMessage *request);
+   void createRenderCluster(NXCPMessage *request);
+   void createUploadCluster(NXCPMessage *request);
+   void modifyDownloadCluster(NXCPMessage *request);
+   void modifyRenderCluster(NXCPMessage *request);
+   void modifyUploadCluster(NXCPMessage *request);
+   void deleteDownloadCluster(NXCPMessage *request);
+   void deleteRenderCluster(NXCPMessage *request);
+   void deleteUploadCluster(NXCPMessage *request);
+   INT32 getLastestInsertId(TCHAR* tbName);
+   AgentConnection* getAgentConnectionByObjectName(TCHAR* objectName);
+   bool checkMappingIsExisted(TCHAR* cHomeId, TCHAR* cMonitorId);
+   INT32 getMaxId(TCHAR * tbName);
 
 public:
    ClientSession(SOCKET hSocket, const InetAddress& addr);

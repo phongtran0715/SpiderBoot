@@ -3,10 +3,11 @@ package org.spider.client;
 public class MappingChannelObject {
 	int id;
 	String homeId;
+	String homeName;
 	String monitorId;
+	String monitorName;
 	long timeIntervalSync;
 	int statusSync;
-	int action;
 	String lastSyncTime;
 	String downloadClusterId;
 	String renderClusterId;
@@ -15,17 +16,19 @@ public class MappingChannelObject {
 	public MappingChannelObject() {
 	}
 
-	public MappingChannelObject(int id, String homeId, String monitorId,
-			long timeIntervalSync, int statusSync, int action,
+	public MappingChannelObject(int id, String homeId, 
+			String homeName, String monitorId, String monitorName,
+			long timeIntervalSync, int statusSync,
 			String lastSyncTime, String downloadClusterId,
 			String renderClusterId, String uploadClusterId) {
 		super();
 		this.id = id;
 		this.homeId = homeId;
+		this.homeName = homeName;
 		this.monitorId = monitorId;
+		this.monitorName = monitorName;
 		this.timeIntervalSync = timeIntervalSync;
 		this.statusSync = statusSync;
-		this.action = action;
 		this.lastSyncTime = lastSyncTime;
 		this.downloadClusterId = downloadClusterId;
 		this.renderClusterId = renderClusterId;
@@ -38,6 +41,21 @@ public class MappingChannelObject {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+	public String getHomeName() {
+		return homeName;
+	}
+
+	public void setHomeName(String homeName) {
+		this.homeName = homeName;
+	}
+
+	public String getMonitorName() {
+		return monitorName;
+	}
+
+	public void setMonitorName(String monitorName) {
+		this.monitorName = monitorName;
 	}
 
 	public String getHomeId() {
@@ -70,14 +88,6 @@ public class MappingChannelObject {
 
 	public void setStatusSync(int statusSync) {
 		this.statusSync = statusSync;
-	}
-
-	public int getAction() {
-		return action;
-	}
-
-	public void setAction(int action) {
-		this.action = action;
 	}
 
 	public String getLastSyncTime() {

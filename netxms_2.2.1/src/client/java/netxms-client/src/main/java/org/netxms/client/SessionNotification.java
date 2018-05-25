@@ -23,20 +23,23 @@ package org.netxms.client;
  */
 public class SessionNotification {
 	// Common notification codes
-	public static final int CONNECTION_BROKEN = 1;
-	public static final int NEW_EVENTLOG_RECORD = 2;
-	public static final int USER_DB_CHANGED = 3;
-	public static final int OBJECT_CHANGED = 4;
-	public static final int DEPLOYMENT_STATUS = 6;
-	public static final int NEW_SYSLOG_RECORD = 7;
-	public static final int NEW_SNMP_TRAP = 8;
-	public static final int JOB_CHANGE = 10;
-	public static final int IMAGE_LIBRARY_CHANGED = 11;
-	public static final int GOOGLE_ACCOUNT_CHANGED = 12;
-	public static final int HOME_CHANNEL_CHANGED = 13;
-	public static final int MONITOR_CHANNEL_CHANGED = 14;
-	public static final int MAPPING_CHANNEL_CHANGED = 15;
-	public static final int OBJECT_DELETED = 99;
+	public static final int CONNECTION_BROKEN 			= 1;
+	public static final int NEW_EVENTLOG_RECORD 		= 2;
+	public static final int USER_DB_CHANGED 			= 3;
+	public static final int OBJECT_CHANGED 				= 4;
+	public static final int DEPLOYMENT_STATUS 			= 6;
+	public static final int NEW_SYSLOG_RECORD 			= 7;
+	public static final int NEW_SNMP_TRAP 				= 8;
+	public static final int JOB_CHANGE 					= 10;
+	public static final int IMAGE_LIBRARY_CHANGED 		= 11;
+	public static final int GOOGLE_ACCOUNT_CHANGED 		= 12;
+	public static final int HOME_CHANNEL_CHANGED 		= 13;
+	public static final int MONITOR_CHANNEL_CHANGED 	= 14;
+	public static final int MAPPING_CHANNEL_CHANGED 	= 15;
+	public static final int DOWNLOAD_CLUSTER_CHANGED 	= 16;
+	public static final int RENDER_CLUSTER_CHANGED 		= 17;
+	public static final int UPLOAD_CLUSTER_CHANGED 		= 18;
+	public static final int OBJECT_DELETED 				= 99;
 
 	// public static final int SITUATION_BASE = 100;
 	// public static final int SITUATION_CREATED = 101;

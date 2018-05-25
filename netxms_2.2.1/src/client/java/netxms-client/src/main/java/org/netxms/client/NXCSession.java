@@ -186,6 +186,7 @@ import org.netxms.client.users.User;
 import org.netxms.client.users.UserGroup;
 import org.netxms.client.zeromq.ZmqSubscription;
 import org.netxms.client.zeromq.ZmqSubscriptionType;
+import org.spider.client.ClusterObject;
 import org.spider.client.GoogleAccountObject;
 import org.spider.client.HomeChannelObject;
 import org.spider.client.MappingChannelObject;
@@ -3845,20 +3846,58 @@ public class NXCSession {
 		{
 			int  id = msg.getFieldAsInt32(baseIndex);
 			String  cHomeId = msg.getFieldAsString(baseIndex + 1);
-			String  cMonitorId = msg.getFieldAsString(baseIndex + 2);
-			long  timeSync = msg.getFieldAsInt64(baseIndex + 3);
-			int  statusSync = msg.getFieldAsInt32(baseIndex + 4);
-			int  action = msg.getFieldAsInt32(baseIndex + 5);
-			String  lastSyncTime = msg.getFieldAsString(baseIndex + 6);
-			String  downloadCusterID = msg.getFieldAsString(baseIndex + 7);
-			String  renderClusterId = msg.getFieldAsString(baseIndex + 8);
-			String  uploadClusterId = msg.getFieldAsString(baseIndex + 9);
+			String cHomeName = msg.getFieldAsString(baseIndex + 2);
+			String  cMonitorId = msg.getFieldAsString(baseIndex + 3);
+			String cMonitorName = msg.getFieldAsString(baseIndex + 4);
+			long  timeSync = msg.getFieldAsInt64(baseIndex + 5);
+			int  statusSync = msg.getFieldAsInt32(baseIndex + 6);
+			String  lastSyncTime = msg.getFieldAsString(baseIndex + 7);
+			String  downloadCusterID = msg.getFieldAsString(baseIndex + 8);
+			String  renderClusterId = msg.getFieldAsString(baseIndex + 9);
+			String  uploadClusterId = msg.getFieldAsString(baseIndex + 10);
 
-			mappingChannleList.put(id , new MappingChannelObject(id, cHomeId, cMonitorId, timeSync, statusSync, 
-					action, lastSyncTime, downloadCusterID, renderClusterId, uploadClusterId));
+			mappingChannleList.put(id , new MappingChannelObject(id, cHomeId, cHomeName, cMonitorId, cMonitorName,  
+					timeSync, statusSync, lastSyncTime, downloadCusterID, renderClusterId, uploadClusterId));
 
 		}
 		return mappingChannleList.values().toArray();
+	}
+
+	/**
+	 * Get download cluster info
+	 * @throws NXCException 
+	 * @throws IOException 
+	 */
+	public Object [] getCluster(String clusterType) throws IOException, NXCException
+	{
+		NXCPMessage msg;
+		if(clusterType.equals("CLUSTER_DOWNLOAD"))
+		{
+			msg = newMessage(SpiderCodes.CMD_GET_DOWNLOAD_CLUSTER);	
+		}else if(clusterType.equals("CLUSTER_RENDER"))
+		{
+			msg = newMessage(SpiderCodes.CMD_GET_RENDER_CLUSTER);
+		} else if(clusterType.equals("CLUSTER_UPLOAD"))
+		{
+			msg = newMessage(SpiderCodes.CMD_GET_UPLOAD_CLUSTER);
+		}else{
+			return null;
+		}
+		final long rqId = msg.getMessageId();
+		sendMessage(msg);
+		final Map<Integer, ClusterObject> clusterObjectList = new HashMap<Integer, ClusterObject>();
+		msg = waitForRCC(rqId);
+		int count = msg.getFieldAsInt32(NXCPCodes.VID_NUM_VARIABLES);
+		long baseIndex = NXCPCodes.VID_VARLIST_BASE;
+		for (int i = 0; i < count; i++, baseIndex += 10) 
+		{
+			String clusterId = msg.getFieldAsString(baseIndex);
+			String clusterName = msg.getFieldAsString(baseIndex + 1);
+			String ipAddress = msg.getFieldAsString(baseIndex + 2);
+			int port = msg.getFieldAsInt32(baseIndex + 3);
+			clusterObjectList.put(i , new ClusterObject(clusterId, clusterName, ipAddress, port));
+		}
+		return clusterObjectList.values().toArray();
 	}
 
 	public void createGoogleAccount(String userName, String api, 
@@ -3942,12 +3981,50 @@ public class NXCSession {
 		sendMessage(msg);
 		msg = waitForRCC(msg.getMessageId());
 		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
-		// Send notification if changed object was found in local database
-		// copy
-		// or added to it and notification code was known
 		if (code == 0) //RCC_SUCCESS
 			sendNotification(new SessionNotification(
 					SessionNotification.HOME_CHANNEL_CHANGED, code));
+			}
+
+	public void modifyCluster(String clusterId, String clusterName, String ipAddress, int port, String clusterType) 
+			throws IOException, NXCException
+			{
+		NXCPMessage msg;
+		if(clusterType.equals("CLUSTER_DOWNLOAD"))
+		{
+			msg = newMessage(SpiderCodes.CMD_MOD_DOWNLOAD_CLUSTER);	
+		}else if(clusterType.equals("CLUSTER_RENDER"))
+		{
+			msg = newMessage(SpiderCodes.CMD_MOD_RENDER_CLUSTER);
+		} else if(clusterType.equals("CLUSTER_UPLOAD"))
+		{
+			msg = newMessage(SpiderCodes.CMD_MOD_UPLOAD_CLUSTER);
+		}else{
+			return;
+		}
+		msg.setField(SpiderCodes.VID_CLUSTER_ID, clusterId);
+		msg.setField(SpiderCodes.VID_CLUSTER_NAME, clusterName);
+		msg.setField(SpiderCodes.VID_CLUSTER_IP_ADDRESS, ipAddress);
+		msg.setFieldInt32(SpiderCodes.VID_CLUSTER_PORT, port);
+		sendMessage(msg);
+		msg = waitForRCC(msg.getMessageId());
+		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+		if (code == 0) //RCC_SUCCESS
+		{
+			if(clusterType.equals("CLUSTER_DOWNLOAD"))
+			{
+				sendNotification(new SessionNotification(SessionNotification.DOWNLOAD_CLUSTER_CHANGED, code));	
+			}else if(clusterType.equals("CLUSTER_RENDER"))
+			{
+				sendNotification(new SessionNotification(SessionNotification.RENDER_CLUSTER_CHANGED, code));
+			} else if(clusterType.equals("CLUSTER_UPLOAD"))
+			{
+				sendNotification(new SessionNotification(SessionNotification.UPLOAD_CLUSTER_CHANGED, code));
+			}else{
+				return;
+			}
+		}
+
 			}
 
 	public void createMonitorChannel(String cId, String cName) throws IOException, NXCException
@@ -3958,9 +4035,6 @@ public class NXCSession {
 		sendMessage(msg);
 		msg = waitForRCC(msg.getMessageId());
 		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
-		// Send notification if changed object was found in local database
-		// copy
-		// or added to it and notification code was known
 		if (code == 0) //RCC_SUCCESS
 			sendNotification(new SessionNotification(
 					SessionNotification.MONITOR_CHANNEL_CHANGED, code));
@@ -3975,41 +4049,84 @@ public class NXCSession {
 		sendMessage(msg);
 		msg = waitForRCC(msg.getMessageId());
 		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
-		// Send notification if changed object was found in local database
-		// copy
-		// or added to it and notification code was known
 		if (code == 0) //RCC_SUCCESS
 			sendNotification(new SessionNotification(
 					SessionNotification.MONITOR_CHANNEL_CHANGED, code));
 	}
 
 
-	public void createMappingChannel(String cHomeId, String cMonitorId, int timeSync, int statusSync, 
-			String lastSyncTime, String downloadCluster, String renderCluster, String uploadCluster) 
+	public int createMappingChannel(String cHomeId, String cMonitorId, int timeSync, int statusSync, 
+			int lastSyncTime, String downloadCluster, String renderCluster, String uploadCluster) 
 					throws IOException, NXCException
 					{
+		int errorCode = 0;
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_CREATE_MAPPING_CHANNEL);
 		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_HOME_ID, cHomeId);
 		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_MONITOR_ID, cMonitorId);
 		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_TIME_SYNC, timeSync);
 		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_STATUS_SYNC, statusSync);
-		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_LAST_SYNC_TIME, lastSyncTime);
+		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_LAST_SYNC_TIME, lastSyncTime);
 		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID, downloadCluster);
 		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID, renderCluster);
 		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID, uploadCluster);
 		sendMessage(msg);
 		msg = waitForRCC(msg.getMessageId());
-		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+		errorCode = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
 		// Send notification if changed object was found in local database
 		// copy
 		// or added to it and notification code was known
-		if (code == 0) //RCC_SUCCESS
+		if (errorCode == 0) //RCC_SUCCESS
 			sendNotification(new SessionNotification(
-					SessionNotification.MAPPING_CHANNEL_CHANGED, code));
+					SessionNotification.MAPPING_CHANNEL_CHANGED, errorCode));
+		return errorCode;
 					}
 
+	public int createCluster(String clusterId, String clusterName, String ipAddress, 
+			int port, String clusterType)  throws IOException, NXCException
+			{
+		int code = 0;
+		NXCPMessage msg;
+		if(clusterType.equals("CLUSTER_DOWNLOAD"))
+		{
+			msg = newMessage(SpiderCodes.CMD_CREATE_DOWNLOAD_CLUSTER);	
+		}else if(clusterType.equals("CLUSTER_RENDER"))
+		{
+			msg = newMessage(SpiderCodes.CMD_CREATE_RENDER_CLUSTER);
+		} else if(clusterType.equals("CLUSTER_UPLOAD"))
+		{
+			msg = newMessage(SpiderCodes.CMD_CREATE_UPLOAD_CLUSTER);
+		}else{
+			return 1;
+		}
+
+		msg.setField(SpiderCodes.VID_CLUSTER_ID, clusterId);
+		msg.setField(SpiderCodes.VID_CLUSTER_NAME, clusterName);
+		msg.setField(SpiderCodes.VID_CLUSTER_IP_ADDRESS, ipAddress);
+		msg.setFieldInt32(SpiderCodes.VID_CLUSTER_PORT, port);
+
+		sendMessage(msg);
+		msg = waitForRCC(msg.getMessageId());
+		code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+
+		if (code == 0) //RCC_SUCCESS
+		{
+			if(clusterType.equals("CLUSTER_DOWNLOAD"))
+			{
+				sendNotification(new SessionNotification(SessionNotification.DOWNLOAD_CLUSTER_CHANGED, code));	
+			}else if(clusterType.equals("CLUSTER_RENDER"))
+			{
+				sendNotification(new SessionNotification(SessionNotification.RENDER_CLUSTER_CHANGED, code));
+			} else if(clusterType.equals("CLUSTER_UPLOAD"))
+			{
+				sendNotification(new SessionNotification(SessionNotification.UPLOAD_CLUSTER_CHANGED, code));
+			}else{
+			}
+		}
+		return code;
+			}
+
 	public void modifyMappingChannel(int id, String cHomeId, String cMonitorId, int timeSync, int statusSync, 
-			int action, String lastSyncTime, String downloadCluster, String renderCluster, String uploadCluster) 
+			String downloadCluster, String renderCluster, String uploadCluster) 
 					throws IOException, NXCException
 					{
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_MOD_MAPPING_CHANNEL);
@@ -4018,8 +4135,6 @@ public class NXCSession {
 		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_MONITOR_ID, cMonitorId);
 		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_TIME_SYNC, timeSync);
 		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_STATUS_SYNC, statusSync);
-		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_ACTION, action);
-		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_LAST_SYNC_TIME, lastSyncTime);
 		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID, downloadCluster);
 		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID, renderCluster);
 		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID, uploadCluster);
@@ -4062,6 +4177,42 @@ public class NXCSession {
 		if (code == 0) //RCC_SUCCESS
 			sendNotification(new SessionNotification(
 					SessionNotification.HOME_CHANNEL_CHANGED, code));
+	}
+
+	public void deleteCluster(String clusterId, String clusterType) throws IOException, NXCException
+	{
+		NXCPMessage msg;
+		if(clusterType.equals("CLUSTER_DOWNLOAD"))
+		{
+			msg = newMessage(SpiderCodes.CMD_DEL_DOWNLOAD_CLUSTER);	
+		}else if(clusterType.equals("CLUSTER_RENDER"))
+		{
+			msg = newMessage(SpiderCodes.CMD_DEL_RENDER_CLUSTER);
+		} else if(clusterType.equals("CLUSTER_UPLOAD"))
+		{
+			msg = newMessage(SpiderCodes.CMD_DEL_UPLOAD_CLUSTER);
+		}else{
+			return;
+		}
+		msg.setField(SpiderCodes.VID_CLUSTER_ID, clusterId);
+		sendMessage(msg);
+		msg = waitForRCC(msg.getMessageId());
+		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
+		if (code == 0) //RCC_SUCCESS
+		{
+			if(clusterType.equals("CLUSTER_DOWNLOAD"))
+			{
+				sendNotification(new SessionNotification(SessionNotification.DOWNLOAD_CLUSTER_CHANGED, code));	
+			}else if(clusterType.equals("CLUSTER_RENDER"))
+			{
+				sendNotification(new SessionNotification(SessionNotification.RENDER_CLUSTER_CHANGED, code));
+			} else if(clusterType.equals("CLUSTER_UPLOAD"))
+			{
+				sendNotification(new SessionNotification(SessionNotification.UPLOAD_CLUSTER_CHANGED, code));
+			}else{
+				return;
+			}
+		}
 	}
 
 	public void deleteMonitorChannel(int id) throws IOException, NXCException

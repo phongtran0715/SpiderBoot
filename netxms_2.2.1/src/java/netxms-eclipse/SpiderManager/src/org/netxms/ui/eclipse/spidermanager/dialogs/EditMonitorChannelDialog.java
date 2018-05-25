@@ -21,6 +21,7 @@ package org.netxms.ui.eclipse.spidermanager.dialogs;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -29,6 +30,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Group;
 import org.spider.client.MonitorChannelObject;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 /**
  * User database object creation dialog
@@ -72,7 +76,7 @@ public class EditMonitorChannelDialog extends Dialog {
 		
 		Group grpCreateNewAccount = new Group(dialogArea, SWT.NONE);
 		grpCreateNewAccount.setText("Edit monitor channel");
-		grpCreateNewAccount.setBounds(5, 10, 436, 97);
+		grpCreateNewAccount.setBounds(5, 10, 519, 97);
 		
 		Label lblChannelId = new Label(grpCreateNewAccount, SWT.NONE);
 		lblChannelId.setAlignment(SWT.RIGHT);
@@ -95,6 +99,16 @@ public class EditMonitorChannelDialog extends Dialog {
 		//initial data
 		txtChannelId.setText(object.getChannelId());
 		txtChannelName.setText(object.getChannelName());
+		
+		Button btnView = new Button(grpCreateNewAccount, SWT.NONE);
+		btnView.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Program.launch("https://www.youtube.com/channel/" + txtChannelId.getText());
+			}
+		});
+		btnView.setText("View");
+		btnView.setBounds(427, 26, 79, 29);
 		
 		return dialogArea;
 	}

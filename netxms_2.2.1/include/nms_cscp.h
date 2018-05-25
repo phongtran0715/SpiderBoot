@@ -31,7 +31,7 @@
 #define SERVER_LISTEN_PORT_FOR_CLIENTS 4701
 #define SERVER_LISTEN_PORT_FOR_MOBILES 4747
 #define MAX_DCI_STRING_VALUE           256
-#define CLIENT_CHALLENGE_SIZE				256
+#define CLIENT_CHALLENGE_SIZE          256
 #define NXCP_HEADER_SIZE               16
 #define NXCP_ENCRYPTION_HEADER_SIZE    16
 #define NXCP_EH_UNENCRYPTED_BYTES      8
@@ -407,8 +407,8 @@ typedef struct
 #define CMD_SUBMAP_DATA                   0x00A8
 #define CMD_UPLOAD_SUBMAP_BK_IMAGE        0x00A9
 #define CMD_GET_SUBMAP_BK_IMAGE           0x00AA
-#define CMD_GET_MODULE_LIST			      0x00AB
-#define CMD_UPDATE_MODULE_INFO		      0x00AC
+#define CMD_GET_MODULE_LIST               0x00AB
+#define CMD_UPDATE_MODULE_INFO            0x00AC
 #define CMD_COPY_USER_VARIABLE            0x00AD
 #define CMD_RESOLVE_DCI_NAMES             0x00AE
 #define CMD_GET_MY_CONFIG                 0x00AF
@@ -430,18 +430,18 @@ typedef struct
 #define CMD_GET_DCI_EVENTS_LIST           0x00BF
 #define CMD_EXPORT_CONFIGURATION          0x00C0
 #define CMD_IMPORT_CONFIGURATION          0x00C1
-#define CMD_GET_TRAP_CFG_RO			      0x00C2
-#define CMD_SNMP_REQUEST				      0x00C3
-#define CMD_GET_DCI_INFO				      0x00C4
-#define CMD_GET_GRAPH_LIST				      0x00C5
-#define CMD_SAVE_GRAPH		   		      0x00C6
-#define CMD_DELETE_GRAPH				      0x00C7
+#define CMD_GET_TRAP_CFG_RO               0x00C2
+#define CMD_SNMP_REQUEST                  0x00C3
+#define CMD_GET_DCI_INFO                  0x00C4
+#define CMD_GET_GRAPH_LIST                0x00C5
+#define CMD_SAVE_GRAPH                    0x00C6
+#define CMD_DELETE_GRAPH                  0x00C7
 #define CMD_GET_PERFTAB_DCI_LIST          0x00C8
-#define CMD_ADD_CA_CERTIFICATE		      0x00C9
-#define CMD_DELETE_CERTIFICATE		      0x00CA
-#define CMD_GET_CERT_LIST				      0x00CB
-#define CMD_UPDATE_CERT_COMMENTS		      0x00CC
-#define CMD_QUERY_L2_TOPOLOGY			      0x00CD
+#define CMD_ADD_CA_CERTIFICATE            0x00C9
+#define CMD_DELETE_CERTIFICATE            0x00CA
+#define CMD_GET_CERT_LIST                 0x00CB
+#define CMD_UPDATE_CERT_COMMENTS          0x00CC
+#define CMD_QUERY_L2_TOPOLOGY             0x00CD
 #define CMD_AUDIT_RECORD                  0x00CE
 #define CMD_GET_AUDIT_LOG                 0x00CF
 #define CMD_SEND_SMS                      0x00D0
@@ -604,6 +604,37 @@ typedef struct
 #define CMD_RS_DELETE_SCHEDULE         0x1107
 #define CMD_RS_NOTIFY                  0x1108
 #define CMD_RS_ADD_REPORT_NOTIFY       0x1109
+
+#define CMD_SPIDER_START               0x2000
+#define CMD_GET_GOOGLE_ACCOUNT         0x2001
+#define CMD_GET_HOME_CHANNEL           0x2002
+#define CMD_GET_MONITOR_CHANNEL        0x2003
+#define CMD_GET_MAPPING_CHANNEL        0x2004
+#define CMD_CREATE_GOOGLE_ACCOUNT      0x2005
+#define CMD_CREATE_HOME_CHANNEL        0x2006
+#define CMD_CREATE_MONITOR_CHANNEL     0x2007
+#define CMD_CREATE_MAPPING_CHANNEL     0x2008
+#define CMD_MOD_GOOGLE_ACCOUNT         0x2009
+#define CMD_MOD_HOME_CHANNEL           0x200A
+#define CMD_MOD_MONITOR_CHANNEL        0x200B
+#define CMD_MOD_MAPPING_CHANNEL        0x200C
+#define CMD_DEL_GOOGLE_ACCOUNT         0x200D
+#define CMD_DEL_HOME_CHANNEL           0x200E
+#define CMD_DEL_MONITOR_CHANNEL        0x200F
+#define CMD_DEL_MAPPING_CHANNEL        0x2010
+#define CMD_GET_DOWNLOAD_CLUSTER       0x2011
+#define CMD_GET_RENDER_CLUSTER         0x2012
+#define CMD_GET_UPLOAD_CLUSTER         0x2013
+#define CMD_MOD_DOWNLOAD_CLUSTER       0x2014
+#define CMD_MOD_RENDER_CLUSTER         0x2015
+#define CMD_MOD_UPLOAD_CLUSTER         0x2016
+#define CMD_DEL_DOWNLOAD_CLUSTER       0x2017
+#define CMD_DEL_RENDER_CLUSTER         0x2018
+#define CMD_DEL_UPLOAD_CLUSTER         0x2019
+#define CMD_CREATE_DOWNLOAD_CLUSTER    0x2020
+#define CMD_CREATE_RENDER_CLUSTER      0x2021
+#define CMD_CREATE_UPLOAD_CLUSTER      0x2022
+#define CMD_SPIDER_END                 0x2FFF
 
 /**
  * Variable identifiers
@@ -868,27 +899,27 @@ typedef struct
 #define VID_NXMP_CONTENT            ((UINT32)258)
 #define VID_ERROR_TEXT              ((UINT32)259)
 #define VID_COMPONENT               ((UINT32)260)
-#define VID_CONSOLE_UPGRADE_URL		((UINT32)261)
-#define VID_CLUSTER_TYPE				((UINT32)262)
-#define VID_NUM_SYNC_SUBNETS			((UINT32)263)
-#define VID_SYNC_SUBNETS				((UINT32)264)
-#define VID_NUM_RESOURCES				((UINT32)265)
-#define VID_RESOURCE_ID					((UINT32)266)
-#define VID_SNMP_PROXY					((UINT32)267)
-#define VID_PORT							((UINT32)268)
-#define VID_PDU							((UINT32)269)
-#define VID_PDU_SIZE						((UINT32)270)
-#define VID_IS_SYSTEM					((UINT32)271)
-#define VID_GRAPH_CONFIG				((UINT32)272)
-#define VID_NUM_GRAPHS					((UINT32)273)
-#define VID_GRAPH_ID						((UINT32)274)
-#define VID_AUTH_TYPE					((UINT32)275)
-#define VID_CERTIFICATE					((UINT32)276)
-#define VID_SIGNATURE					((UINT32)277)
-#define VID_CHALLENGE					((UINT32)278)
-#define VID_CERT_MAPPING_METHOD		((UINT32)279)
+#define VID_CONSOLE_UPGRADE_URL     ((UINT32)261)
+#define VID_CLUSTER_TYPE            ((UINT32)262)
+#define VID_NUM_SYNC_SUBNETS        ((UINT32)263)
+#define VID_SYNC_SUBNETS            ((UINT32)264)
+#define VID_NUM_RESOURCES           ((UINT32)265)
+#define VID_RESOURCE_ID             ((UINT32)266)
+#define VID_SNMP_PROXY              ((UINT32)267)
+#define VID_PORT                    ((UINT32)268)
+#define VID_PDU                     ((UINT32)269)
+#define VID_PDU_SIZE                ((UINT32)270)
+#define VID_IS_SYSTEM               ((UINT32)271)
+#define VID_GRAPH_CONFIG            ((UINT32)272)
+#define VID_NUM_GRAPHS              ((UINT32)273)
+#define VID_GRAPH_ID                ((UINT32)274)
+#define VID_AUTH_TYPE               ((UINT32)275)
+#define VID_CERTIFICATE             ((UINT32)276)
+#define VID_SIGNATURE               ((UINT32)277)
+#define VID_CHALLENGE               ((UINT32)278)
+#define VID_CERT_MAPPING_METHOD     ((UINT32)279)
 #define VID_CERT_MAPPING_DATA       ((UINT32)280)
-#define VID_CERTIFICATE_ID				((UINT32)281)
+#define VID_CERTIFICATE_ID          ((UINT32)281)
 #define VID_NUM_CERTIFICATES        ((UINT32)282)
 #define VID_ALARM_TIMEOUT_EVENT     ((UINT32)283)
 #define VID_NUM_GROUPS              ((UINT32)284)
@@ -1220,6 +1251,65 @@ typedef struct
 #define VID_INSTANCE_RETENTION      ((UINT32)610)
 #define VID_RACK_ORIENTATION        ((UINT32)611)
 
+#define VID_SPIDER_START            ((UINT32)1000)
+//google account variable
+#define VID_GOOGLE_START            ((UINT32)1001)
+#define VID_GOOGLE_RECORD_ID        ((UINT32)1002)
+#define VID_GOOGLE_USER_NAME        ((UINT32)1003)
+#define VID_GOOGLE_API              ((UINT32)1004)
+#define VID_GOOGLE_CLIENT_SECRET    ((UINT32)1005)
+#define VID_GOOGLE_ACCOUNT_TYPE     ((UINT32)1006)
+#define VID_GOOGLE_APP_NAME         ((UINT32)1007)
+#define VID_GOOGLE_END              ((UINT32)1015)
+//end google account
+
+//home channel variable
+#define VID_HOME_CHANNEL_START       ((UINT32)1016)
+#define VID_HOME_CHANNEL_ID          ((UINT32)1017)
+#define VID_HOME_CHANNEL_NAME        ((UINT32)1018)
+#define VID_HOME_CHANNEL_GACCOUNT    ((UINT32)1019)
+#define VID_HOME_CHANNEL_VINTRO      ((UINT32)1020)
+#define VID_HOME_CHANNEL_VOUTRO      ((UINT32)1021)
+#define VID_HOME_CHANNEL_LOGO        ((UINT32)1022)
+#define VID_HOME_CHANNEL_DESC        ((UINT32)1023)
+#define VID_HOME_CHANNEL_TITLE       ((UINT32)1024)
+#define VID_HOME_CHANNEL_RECORD_ID   ((UINT32)1025)
+#define VID_HOME_CHANNEL_END         ((UINT32)1030)
+//end home channel variable
+
+//monitor channel variable
+#define VID_MONITOR_CHANNEL_START                  ((UINT32)1031)
+#define VID_MONITOR_CHANNEL_ID                     ((UINT32)1032)
+#define VID_MONITOR_CHANNEL_NAME                   ((UINT32)1033)
+#define VID_MONITOR_CHANNEL_RECORD_ID              ((UINT32)1034)
+#define VID_MONITOR_CHANNEL_END                    ((UINT32)1045)
+//end monitor variable
+
+//mapping channel variable
+#define VID_MAPPING_CHANNEL_START                  ((UINT32)1046)
+#define VID_MAPPING_CHANNEL_RECORD_ID              ((UINT32)1047)
+#define VID_MAPPING_CHANNEL_HOME_ID                ((UINT32)1048)
+#define VID_MAPPING_CHANNEL_MONITOR_ID             ((UINT32)1049)
+#define VID_MAPPING_CHANNEL_TIME_SYNC              ((UINT32)1050)
+#define VID_MAPPING_CHANNEL_STATUS_SYNC            ((UINT32)1051)
+#define VID_MAPPING_CHANNEL_ACTION                 ((UINT32)1052)
+#define VID_MAPPING_CHANNEL_LAST_SYNC_TIME         ((UINT32)1053)
+#define VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID    ((UINT32)1054)
+#define VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID      ((UINT32)1055)
+#define VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID      ((UINT32)1056)
+#define VID_MAPPING_CHANNEL_END                    ((UINT32)1060)
+
+//cluster variable
+#define VID_CLUSTER_START                          ((UINT32)1061)
+#define VID_CLUSTER_ID                             ((UINT32)1062)
+#define VID_CLUSTER_NAME                           ((UINT32)1063)
+#define VID_CLUSTER_IP_ADDRESS                     ((UINT32)1064)
+#define VID_CLUSTER_PORT                           ((UINT32)1065)
+#define VID_CLUSTER_END                            ((UINT32)1075)
+//end cluster variable
+
+#define VID_SPIDER_END              ((UINT32)2000)
+
 // Base variabe for single threshold in message
 #define VID_THRESHOLD_BASE          ((UINT32)0x00800000)
 
@@ -1358,16 +1448,16 @@ typedef struct
 
 // Base value for graph list
 #define VID_GRAPH_LIST_BASE         ((UINT32)0x10000000)
-#define VID_GRAPH_ACL_BASE				((UINT32)0x20000000)
+#define VID_GRAPH_ACL_BASE          ((UINT32)0x20000000)
 
 // Base value for system DCI list
-#define VID_SYSDCI_LIST_BASE			((UINT32)0x10000000)
+#define VID_SYSDCI_LIST_BASE        ((UINT32)0x10000000)
 
 // Base value for certificate list
-#define VID_CERT_LIST_BASE 			((UINT32)0x10000000)
+#define VID_CERT_LIST_BASE          ((UINT32)0x10000000)
 
 // Base value for various string lists
-#define VID_STRING_LIST_BASE 			((UINT32)0x10000000)
+#define VID_STRING_LIST_BASE        ((UINT32)0x10000000)
 
 // Base values for persistent storage actions in epp
 #define VID_PSTORAGE_SET_LIST_BASE     ((UINT32)0x10000000)
@@ -1380,7 +1470,7 @@ typedef struct
 #define VID_INSTANCE_LIST_BASE      ((UINT32)0x20000000)
 
 // Base value for object links list
-#define VID_OBJECT_LINKS_BASE			((UINT32)0x10000000)
+#define VID_OBJECT_LINKS_BASE       ((UINT32)0x10000000)
 #define VID_SUBMAP_LINK_NAMES_BASE  ((UINT32)0x20000000)
 
 #define VID_TABLE_COLUMN_INFO_BASE  ((UINT32)0x10000000)

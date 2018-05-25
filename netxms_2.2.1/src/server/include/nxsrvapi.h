@@ -580,6 +580,11 @@ public:
    UINT32 getSupportedParameters(ObjectArray<AgentParameterDefinition> **paramList, ObjectArray<AgentTableDefinition> **tableList);
    UINT32 getConfigFile(TCHAR **ppszConfig, UINT32 *pdwSize);
    UINT32 updateConfigFile(const TCHAR *pszConfig);
+   UINT32 createMappingChannel(INT32 id, TCHAR *cHomeId, TCHAR *cMonitorId, INT32 timeSync, INT32 statusSync, 
+               TCHAR* lastSyncTime, TCHAR* downloadId, TCHAR* renderId, TCHAR* uploadId);
+   UINT32 modifyMappingChannel(INT32 id, TCHAR *cHomeId, TCHAR *cMonitorId, INT32 timeSync, INT32 statusSync, 
+               TCHAR* lastSyncTime, TCHAR* downloadId, TCHAR* renderId, TCHAR* uploadId);
+   UINT32 deleteMappingChannel(INT32 id);
    UINT32 enableTraps();
    UINT32 enableFileUpdates();
 	UINT32 getPolicyInventory(AgentPolicyInfo **info);

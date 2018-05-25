@@ -28,10 +28,12 @@ Export-Package: org.netxms.client,
  org.netxms.client.snmp,
  org.netxms.client.topology,
  org.netxms.client.users,
- org.netxms.client.xml
+ org.netxms.client.xml,
+ org.spider.client
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.8.0",
  org.netxms.ui.base;bundle-version="2.2.0",
- org.simpleframework.xml;bundle-version="2.7.1"
+ org.simpleframework.xml;bundle-version="2.7.1",
+ SpiderBase;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.netxms.client.plugin.Activator
 Import-Package: org.netxms.client.events

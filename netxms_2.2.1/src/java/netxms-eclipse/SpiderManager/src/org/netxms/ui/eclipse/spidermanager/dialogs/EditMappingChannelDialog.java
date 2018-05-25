@@ -23,6 +23,7 @@ import java.io.IOException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -40,6 +41,7 @@ import org.spider.client.MonitorChannelObject;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.swt.widgets.Link;
 
 /**
  * User database object creation dialog
@@ -50,10 +52,10 @@ public class EditMappingChannelDialog extends Dialog {
 	private Combo cbHome;
 	private Combo cbMonitor;
 	private Combo cbStatus;
-	private Label lbHome;
-	private Label lbMonitor;
 	MappingChannelObject object;
 	private NXCSession session;
+	Link linkHomeChanel;
+	Link linkMonitorChanel;
 
 	private int id;
 	private String homeChannelId;
@@ -118,22 +120,12 @@ public class EditMappingChannelDialog extends Dialog {
 		lblVideoIntro.setText("Sync Status");
 		lblVideoIntro.setBounds(10, 199, 109, 17);
 		
-		lbHome = new Label(grpCreateNewAccount, SWT.NONE);
-		lbHome.setAlignment(SWT.CENTER);
-		lbHome.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
-		lbHome.setBounds(131, 54, 290, 17);
-		
-		lbMonitor = new Label(grpCreateNewAccount, SWT.NONE);
-		lbMonitor.setAlignment(SWT.CENTER);
-		lbMonitor.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
-		lbMonitor.setBounds(131, 112, 290, 17);
-		
 		cbHome = new Combo(grpCreateNewAccount, SWT.NONE);
 		cbHome.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String cName = getHomeChannelName(cbHome.getText());
-				lbHome.setText(cName);
+				linkHomeChanel.setText("Go to <a href=\"https://www.youtube.com/channel\">" + cName + "</a> channel." );
 			}
 		});
 		cbHome.setItems(new String[] {});
@@ -148,11 +140,37 @@ public class EditMappingChannelDialog extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String cName = getMonitorChannelName(cbMonitor.getText());
-				lbMonitor.setText(cName);
+				linkMonitorChanel.setText("Go to <a href=\"https://www.youtube.com/channel\">" + cName + "</a> channel." );
 			}
 		});
 		cbMonitor.setItems(new String[] {});
 		cbMonitor.setBounds(132, 77, 289, 29);
+		
+		linkHomeChanel = new Link(grpCreateNewAccount, 0);
+		linkHomeChanel.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(cbHome.getText().isEmpty() == false)
+				{
+					Program.launch("https://www.youtube.com/channel/" + cbHome.getText());	
+				}
+			}
+		});
+		linkHomeChanel.setText("<a></a>");
+		linkHomeChanel.setBounds(131, 54, 290, 17);
+		
+		linkMonitorChanel = new Link(grpCreateNewAccount, 0);
+		linkMonitorChanel.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(cbMonitor.getText().isEmpty() == false)
+				{
+					Program.launch("https://www.youtube.com/channel/" + cbMonitor.getText());	
+				}
+			}
+		});
+		linkMonitorChanel.setText("<a></a>");
+		linkMonitorChanel.setBounds(131, 113, 290, 17);
 
 		initialData();
 		return dialogArea;
@@ -247,6 +265,7 @@ public class EditMappingChannelDialog extends Dialog {
 		//Initial data
 		cbHome.setText(this.object.getHomeId());
 		cbMonitor.setText(this.object.getMonitorId());
+		
 		if(this.object.getStatusSync() == 0)
 		{
 			cbStatus.setText("disable");
@@ -275,8 +294,12 @@ public class EditMappingChannelDialog extends Dialog {
 				e1.printStackTrace();
 			}
 		}
-		lbHome.setText(getHomeChannelName(cbHome.getText()));
-		lbMonitor.setText(getMonitorChannelName(cbMonitor.getText()));
+		
+		String cHomeName = getHomeChannelName(this.object.getHomeId());
+		linkHomeChanel.setText("Go to <a href=\"https://www.youtube.com/channel\">" + cHomeName + "</a> channel." );
+		
+		String cMonitorName = getMonitorChannelName(this.object.getMonitorId());
+		linkMonitorChanel.setText("Go to <a href=\"https://www.youtube.com/channel\">" + cMonitorName + "</a> channel." );
 	}
 
 	private void setHomeChannelData()
@@ -312,14 +335,17 @@ public class EditMappingChannelDialog extends Dialog {
 	private String getHomeChannelName(String cHomeID)
 	{
 		String result = "";
-		for (Object it : cHomeObject) {
-			if(it instanceof HomeChannelObject)
-			{
-				if(((HomeChannelObject) it).getChannelId().equals(cHomeID))
+		if(cHomeID != null)
+		{
+			for (Object it : cHomeObject) {
+				if(it instanceof HomeChannelObject)
 				{
-					result = ((HomeChannelObject) it).getChannelName();
+					if(((HomeChannelObject) it).getChannelId().equals(cHomeID))
+					{
+						result = ((HomeChannelObject) it).getChannelName();
+					}
 				}
-			}
+			}	
 		}
 		return result;
 	}
@@ -327,14 +353,17 @@ public class EditMappingChannelDialog extends Dialog {
 	private String getMonitorChannelName(String cMonitorID)
 	{
 		String result = "";
-		for (Object it : cMoniorObject) {
-			if(it instanceof MonitorChannelObject)
-			{
-				if(((MonitorChannelObject) it).getChannelId().equals(cMonitorID))
+		if(cMonitorID != null)
+		{
+			for (Object it : cMoniorObject) {
+				if(it instanceof MonitorChannelObject)
 				{
-					result = ((MonitorChannelObject) it).getChannelName();
+					if(((MonitorChannelObject) it).getChannelId().equals(cMonitorID))
+					{
+						result = ((MonitorChannelObject) it).getChannelName();
+					}
 				}
-			}
+			}	
 		}
 		return result;
 	}

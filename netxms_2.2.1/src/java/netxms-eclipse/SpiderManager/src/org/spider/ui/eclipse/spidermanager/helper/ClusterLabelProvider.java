@@ -23,30 +23,24 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.spider.ui.eclipse.spidermanager.views.MappingChannelManagerView;
+import org.spider.ui.eclipse.spidermanager.views.ClusterManagerView;
 import org.spider.client.*;
 /**
  * Label provider for user manager
  */
-public class MappingChannelLabelProvider extends DecoratingLabelProvider implements
+public class ClusterLabelProvider extends DecoratingLabelProvider implements
 		ITableLabelProvider {
-	private static final String[] CHANNEL_MAPPING_METHOD = {
-			"Id",
-			"HomeChannelId",
-			"HomeChannelName",
-			"MonitorChannelId",
-			"MonitorChannelName",
-			"TimeInterval",
-			"StatusSync",
-			"LastSyncTime",
-			"DownloadClusterId",
-			"ProcessClusterId",
-			"UploadClusterId"};
+	private static final String[] CLUSTER_METHOD = {
+			"Cluster ID",
+			"Cluster Name",
+			"IP Address",
+			"Port"
+			};
 
 	/**
 	 * Constructor
 	 */
-	public MappingChannelLabelProvider() {
+	public ClusterLabelProvider() {
 		super(new WorkbenchLabelProvider(), PlatformUI.getWorkbench()
 				.getDecoratorManager().getLabelDecorator());
 	}
@@ -73,32 +67,14 @@ public class MappingChannelLabelProvider extends DecoratingLabelProvider impleme
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		switch (columnIndex) {
-		case MappingChannelManagerView.COLUMN_ID:
-			return Integer.toString(((MappingChannelObject) element).getId());
-		case MappingChannelManagerView.COLUMN_HOME_CHANNEL_ID:
-			return ((MappingChannelObject) element).getHomeId();
-		case MappingChannelManagerView.COLUMN_MONITOR_CHANNEL_ID:
-			return ((MappingChannelObject) element).getMonitorId();
-		case MappingChannelManagerView.COLUMN_TIME_SYNC:
-			return Long.toString(((MappingChannelObject) element).getTimeIntervalSync());
-		case MappingChannelManagerView.COLUMN_STATUS_SYNC:
-		{
-			if(((MappingChannelObject) element).getStatusSync() == 0)
-			{
-				return "disable";
-			}
-			else{
-				return "enable";
-			}
-		}
-		case MappingChannelManagerView.COLUMN_LAST_SYNC_TIME:
-			return ((MappingChannelObject) element).getLastSyncTime();
-		case MappingChannelManagerView.COLUMN_DOWNLOAD_ID:
-			return ((MappingChannelObject) element).getDownloadClusterId();
-		case MappingChannelManagerView.COLUMN_RENDER_ID:
-			return ((MappingChannelObject) element).getRenderClusterId();
-		case MappingChannelManagerView.COLUMN_UPLOAD_ID:
-			return ((MappingChannelObject) element).getUploadClusterId();
+		case ClusterManagerView.COLUMN_CLUSTER_ID:
+			return ((ClusterObject) element).getClusterId();
+		case ClusterManagerView.COLUMN_CLUSTER_NAME:
+			return ((ClusterObject) element).getClusterName();
+		case ClusterManagerView.COLUMN_IP_ADDRESS:
+			return ((ClusterObject) element).getIpAddress();
+		case ClusterManagerView.COLUMN_PORT:
+			return Integer.toString(((ClusterObject) element).getPort());
 		default:
 			break;
 		}

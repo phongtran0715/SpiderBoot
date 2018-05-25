@@ -35,19 +35,19 @@ libnxcore_la_SOURCES =  accesspoint.cpp acl.cpp actions.cpp addrlist.cpp \
 			template.cpp tools.cpp tracert.cpp tunnel.cpp \
 			uniroot.cpp upload_job.cpp uptimecalc.cpp userdb.cpp \
 			userdb_objects.cpp vpnconn.cpp vrrp.cpp watchdog.cpp \
-			winperf.cpp xmpp.cpp zeromq.cpp zone.cpp
+			winperf.cpp xmpp.cpp zeromq.cpp zone.cpp SpiderAgentAPISK.cc corbaserver.cpp \
+			agentCorbaServer.cpp clientDownload.cpp clientRender.cpp clientUpload.cpp
 libnxcore_la_CPPFLAGS = -I@top_srcdir@/include -I@top_srcdir@/src/server/include @MQTT_CPPFLAGS@ @ZEROMQ_CPPFLAGS@
 libnxcore_la_CXXFLAGS = -I@top_srcdir@/@CUSTOM_INCLUDE@
 libnxcore_la_LDFLAGS = -version-info $(NETXMS_LIBRARY_VERSION) @MQTT_LDFLAGS@ @ZEROMQ_LDFLAGS@
 libnxcore_la_LIBADD = \
 	../libnxsrv/libnxsrv.la \
-	../libcorba/libcorba.la \
 	../../snmp/libnxsnmp/libnxsnmp.la \
 	../../libnxlp/libnxlp.la \
 	../../db/libnxdb/libnxdb.la \
 	../../libnxsl/libnxsl.la \
 	../../agent/libnxagent/libnxagent.la \
-	../../libnetxms/libnetxms.la 
+	../../libnetxms/libnetxms.la \
 	@SERVER_LIBS@
 if XMPP_SUPPORT
 libnxcore_la_LIBADD += @top_srcdir@/src/libstrophe/libstrophe.la

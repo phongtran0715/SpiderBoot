@@ -183,7 +183,7 @@ enum ThreadPoolStat
  */
 #define AGENT_ACTION_EXEC        1
 #define AGENT_ACTION_SUBAGENT    2
-#define AGENT_ACTION_SHELLEXEC	3
+#define AGENT_ACTION_SHELLEXEC   3
 
 /**
  * Action definition structure
@@ -224,41 +224,41 @@ struct SUBAGENT
 class ExternalSubagent
 {
 private:
-	TCHAR m_name[MAX_SUBAGENT_NAME];
-	TCHAR m_user[MAX_ESA_USER_NAME];
-	NamedPipeListener *m_listener;
-	NamedPipe *m_pipe;
-	bool m_connected;
-	MsgWaitQueue *m_msgQueue;
-	UINT32 m_requestId;
+   TCHAR m_name[MAX_SUBAGENT_NAME];
+   TCHAR m_user[MAX_ESA_USER_NAME];
+   NamedPipeListener *m_listener;
+   NamedPipe *m_pipe;
+   bool m_connected;
+   MsgWaitQueue *m_msgQueue;
+   UINT32 m_requestId;
 
-	bool sendMessage(NXCPMessage *msg);
-	NXCPMessage *waitForMessage(WORD code, UINT32 id);
-	UINT32 waitForRCC(UINT32 id);
-	NETXMS_SUBAGENT_PARAM *getSupportedParameters(UINT32 *count);
-	NETXMS_SUBAGENT_LIST *getSupportedLists(UINT32 *count);
-	NETXMS_SUBAGENT_TABLE *getSupportedTables(UINT32 *count);
+   bool sendMessage(NXCPMessage *msg);
+   NXCPMessage *waitForMessage(WORD code, UINT32 id);
+   UINT32 waitForRCC(UINT32 id);
+   NETXMS_SUBAGENT_PARAM *getSupportedParameters(UINT32 *count);
+   NETXMS_SUBAGENT_LIST *getSupportedLists(UINT32 *count);
+   NETXMS_SUBAGENT_TABLE *getSupportedTables(UINT32 *count);
 
 public:
-	ExternalSubagent(const TCHAR *name, const TCHAR *user);
-	~ExternalSubagent();
+   ExternalSubagent(const TCHAR *name, const TCHAR *user);
+   ~ExternalSubagent();
 
-	void startListener();
-	void connect(NamedPipe *pipe);
+   void startListener();
+   void connect(NamedPipe *pipe);
 
-	bool isConnected() { return m_connected; }
-	const TCHAR *getName() { return m_name; }
-	const TCHAR *getUserName() { return m_user; }
+   bool isConnected() { return m_connected; }
+   const TCHAR *getName() { return m_name; }
+   const TCHAR *getUserName() { return m_user; }
 
-	UINT32 getParameter(const TCHAR *name, TCHAR *buffer);
-	UINT32 getTable(const TCHAR *name, Table *value);
-	UINT32 getList(const TCHAR *name, StringList *value);
-	void listParameters(NXCPMessage *msg, UINT32 *baseId, UINT32 *count);
-	void listParameters(StringList *list);
-	void listLists(NXCPMessage *msg, UINT32 *baseId, UINT32 *count);
-	void listLists(StringList *list);
-	void listTables(NXCPMessage *msg, UINT32 *baseId, UINT32 *count);
-	void listTables(StringList *list);
+   UINT32 getParameter(const TCHAR *name, TCHAR *buffer);
+   UINT32 getTable(const TCHAR *name, Table *value);
+   UINT32 getList(const TCHAR *name, StringList *value);
+   void listParameters(NXCPMessage *msg, UINT32 *baseId, UINT32 *count);
+   void listParameters(StringList *list);
+   void listLists(NXCPMessage *msg, UINT32 *baseId, UINT32 *count);
+   void listLists(StringList *list);
+   void listTables(NXCPMessage *msg, UINT32 *baseId, UINT32 *count);
+   void listTables(StringList *list);
    void shutdown();
    void restart();
 };
@@ -334,14 +334,14 @@ private:
    bool m_bulkReconciliationSupported;
    HashMap<UINT32, DownloadFileInfo> m_downloadFileMap;
    bool m_allowCompression;   // allow compression for structured messages
-	NXCPEncryptionContext *m_pCtx;
+   NXCPEncryptionContext *m_pCtx;
    time_t m_ts;               // Last activity timestamp
    SOCKET m_hProxySocket;     // Socket for proxy connection
-	MUTEX m_socketWriteMutex;
+   MUTEX m_socketWriteMutex;
    VolatileCounter m_requestId;
    MsgWaitQueue *m_responseQueue;
 
-	bool sendRawMessage(NXCP_MESSAGE *msg, NXCPEncryptionContext *ctx);
+   bool sendRawMessage(NXCP_MESSAGE *msg, NXCPEncryptionContext *ctx);
    void authenticate(NXCPMessage *pRequest, NXCPMessage *pMsg);
    void getConfig(NXCPMessage *pMsg);
    void updateConfig(NXCPMessage *pRequest, NXCPMessage *pMsg);
@@ -377,7 +377,7 @@ public:
    virtual void postMessage(NXCPMessage *msg) { if (!m_disconnected) m_sendQueue->put(msg->serialize(m_allowCompression)); }
    virtual bool sendRawMessage(NXCP_MESSAGE *msg);
    virtual void postRawMessage(NXCP_MESSAGE *msg) { if (!m_disconnected) m_sendQueue->put(nx_memdup(msg, ntohl(msg->size))); }
-	virtual bool sendFile(UINT32 requestId, const TCHAR *file, long offset, bool allowCompression, VolatileCounter *cancelationFlag);
+   virtual bool sendFile(UINT32 requestId, const TCHAR *file, long offset, bool allowCompression, VolatileCounter *cancelationFlag);
    virtual UINT32 doRequest(NXCPMessage *msg, UINT32 timeout);
    virtual NXCPMessage *doRequestEx(NXCPMessage *msg, UINT32 timeout);
    virtual UINT32 generateRequestId();
@@ -385,7 +385,7 @@ public:
    virtual UINT32 getId() { return m_id; };
 
    virtual UINT64 getServerId() { return m_serverId; }
-	virtual const InetAddress& getServerAddress() { return m_serverAddr; }
+   virtual const InetAddress& getServerAddress() { return m_serverAddr; }
 
    virtual bool isMasterServer() { return m_masterServer; }
    virtual bool isControlServer() { return m_controlServer; }
@@ -403,7 +403,7 @@ public:
    void setIndex(UINT32 index) { if (m_index == INVALID_INDEX) m_index = index; }
 
    time_t getTimeStamp() { return m_ts; }
-	void updateTimeStamp() { m_ts = time(NULL); }
+   void updateTimeStamp() { m_ts = time(NULL); }
 };
 
 /**
@@ -532,13 +532,13 @@ void Main();
 
 void ConsolePrintf(const TCHAR *format, ...)
 #if !defined(UNICODE) && (defined(__GNUC__) || defined(__clang__))
-   __attribute__ ((format(printf, 1, 2)))
+__attribute__ ((format(printf, 1, 2)))
 #endif
 ;
 
 void DebugPrintf(int level, const TCHAR *format, ...)
 #if !defined(UNICODE) && (defined(__GNUC__) || defined(__clang__))
-   __attribute__ ((format(printf, 2, 3)))
+__attribute__ ((format(printf, 2, 3)))
 #endif
 ;
 

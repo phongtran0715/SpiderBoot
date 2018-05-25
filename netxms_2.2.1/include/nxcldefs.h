@@ -550,6 +550,7 @@ enum SessionState
 #define RCC_INVALID_TUNNEL_ID         ((UINT32)125)
 #define RCC_FILE_ALREADY_EXISTS       ((UINT32)126)
 #define RCC_FOLDER_ALREADY_EXISTS     ((UINT32)127)
+#define RCC_DUPLICATE_ID              ((UINT32)128)
 
 /**
  * Mask bits for NXCModifyEventTemplate()

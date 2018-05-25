@@ -3419,11 +3419,14 @@ if test $? = 0; then
 	LIBS="$OLD_LIBS"
 fi
 
+
 #--------------------------------------------------------------------
-# Check CORBA
+# CORBA
 #--------------------------------------------------------------------
+AC_CHECK_LIB([omniORB4], [main], [], [AC_MSG_ERROR([cannot find omniORB library])])
 AC_CHECK_LIB([omnithread], [main], [], [AC_MSG_ERROR([cannot find omnithread library])])
-AC_CHECK_LIB([omniORB4], [main], [], [AC_MSG_ERROR([cannot find omniORB4 library])])
+#AC_CHECK_HEADERS([omniORB4/CORBA.h], [], [AC_MSG_ERROR([cannot find omniORB4 header files])])
+#AC_CHECK_PROG([IDL], [omniidl], [omniidl], [AC_MSG_ERROR([cannot find omniidl prgram])])
 
 #--------------------------------------------------------------------
 # Other settings
@@ -3788,7 +3791,6 @@ AC_CONFIG_FILES([
 	src/server/hdlink/redmine/Makefile
 	src/server/include/Makefile
 	src/server/libnxsrv/Makefile
-	src/server/libcorba/Makefile
 	src/server/netxmsd/Makefile
 	src/server/pdsdrv/Makefile
 	src/server/pdsdrv/rrdtool/Makefile

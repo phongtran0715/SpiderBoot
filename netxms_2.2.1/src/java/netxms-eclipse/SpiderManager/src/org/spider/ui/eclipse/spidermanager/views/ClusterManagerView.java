@@ -20,13 +20,13 @@ import org.netxms.client.SessionNotification;
 import org.netxms.ui.eclipse.actions.RefreshAction;
 import org.netxms.ui.eclipse.jobs.ConsoleJob;
 import org.netxms.ui.eclipse.shared.ConsoleSharedData;
-import org.netxms.ui.eclipse.spidermanager.dialogs.CreateMappingChannelDialog;
-import org.netxms.ui.eclipse.spidermanager.dialogs.EditMappingChannelDialog;
+import org.netxms.ui.eclipse.spidermanager.dialogs.CreateClusterDialog;
+import org.netxms.ui.eclipse.spidermanager.dialogs.EditClusterDialog;
 import org.netxms.ui.eclipse.widgets.SortableTableViewer;
-import org.spider.client.MappingChannelObject;
-import org.spider.client.MonitorChannelObject;
+import org.spider.client.ClusterObject;
+import org.spider.client.HomeChannelObject;
 import org.spider.ui.eclipse.spidermanager.Activator;
-import org.spider.ui.eclipse.spidermanager.helper.MappingChannelLabelProvider;
+import org.spider.ui.eclipse.spidermanager.helper.ClusterLabelProvider;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -43,32 +43,27 @@ import org.spider.ui.eclipse.spidermanager.helper.MappingChannelLabelProvider;
  * <p>
  */
 
-public class MappingChannelManagerView extends ViewPart {
+public abstract class ClusterManagerView extends ViewPart {
 
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
-	public static final String ID = "org.spider.ui.eclipse.spidermanager.views.MappingChannelManager";
-
+	//public static final String ID = "org.spider.ui.eclipse.spidermanager.views.DownloadClusterManager";
+	private String CLUSTER_TYPE	;
+	
 	private TableViewer viewer;
-	private Action actAddMapping;
-	private Action actEditMapping;
-	private Action actDeleteMapping;
+	private Action actAddCluster;
+	private Action actEditCluster;
+	private Action actDeleteCluster;
 	private RefreshAction actionRefresh;
 	private NXCSession session;
 	private SessionListener sessionListener;
-
-	public static final int COLUMN_ID 					= 0;
-	public static final int COLUMN_HOME_CHANNEL_ID 		= 1;
-	public static final int COLUMN_HOME_CHANNEL_NAME 	= 2;
-	public static final int COLUMN_MONITOR_CHANNEL_ID 	= 3;
-	public static final int COLUMN_MONITOR_CHANNEL_NAME = 4;
-	public static final int COLUMN_TIME_SYNC 			= 5;
-	public static final int COLUMN_STATUS_SYNC 			= 6;
-	public static final int COLUMN_LAST_SYNC_TIME 		= 7;
-	public static final int COLUMN_DOWNLOAD_ID		 	= 8;
-	public static final int COLUMN_RENDER_ID		 	= 9;
-	public static final int COLUMN_UPLOAD_ID		 	= 10;
+	
+	public static final int COLUMN_CLUSTER_ID 		= 0;
+	public static final int COLUMN_CLUSTER_NAME 	= 1;
+	public static final int COLUMN_IP_ADDRESS 		= 2;
+	public static final int COLUMN_PORT 			= 3;
+	
 
 	/*
 	 * The content provider class is responsible for providing objects to the
@@ -100,7 +95,7 @@ public class MappingChannelManagerView extends ViewPart {
 	/**
 	 * The constructor.
 	 */
-	public MappingChannelManagerView() {
+	public ClusterManagerView() {
 	}
 
 	/**
@@ -109,24 +104,20 @@ public class MappingChannelManagerView extends ViewPart {
 	 */
 	public void createPartControl(Composite parent) {
 		session = ConsoleSharedData.getSession();
-		final String[] names = { "Id",
-				"HomeChannelId",
-				"HomeChannelName",
-				"MonitorChannelId",
-				"MonitorChannelName",
-				"TimeInterval",
-				"StatusSync",
-				"LastSyncTime",
-				"DownloadClusterId", 
-				"ProcessClusterId",
-		"UploadClusterId"};
-		final int[] widths = { 40, 240, 240, 240, 240, 120, 120, 160, 160, 160, 160 };
+		final String[] names = { 
+				"Cluster Id", 
+				"Cluster Name",
+				"IP Address",
+				"Port"
+				};
+		final int[] widths = { 120, 120, 120, 120};
 		viewer = new SortableTableViewer(parent, names, widths, 0, SWT.UP, SortableTableViewer.DEFAULT_STYLE);
+
 		viewer.setContentProvider(new ArrayContentProvider());
-		viewer.setLabelProvider(new MappingChannelLabelProvider());
+		viewer.setLabelProvider(new ClusterLabelProvider());
 		viewer.setSorter(new NameSorter());
 		try {
-			viewer.setInput(session.getMappingChannelList());
+			viewer.setInput(session.getCluster(CLUSTER_TYPE));
 		} catch (IOException | NXCException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -146,12 +137,12 @@ public class MappingChannelManagerView extends ViewPart {
 		sessionListener = new SessionListener() {
 			@Override
 			public void notificationHandler(final SessionNotification n) {
-				if (n.getCode() == SessionNotification.MAPPING_CHANNEL_CHANGED) {
+				if (n.getCode() == SessionNotification.DOWNLOAD_CLUSTER_CHANGED) {
 					viewer.getControl().getDisplay().asyncExec(new Runnable() {
 						@Override
 						public void run() {
 							try {
-								viewer.setInput(session.getMappingChannelList());
+								viewer.setInput(session.getCluster(CLUSTER_TYPE));
 							} catch (IOException | NXCException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -163,7 +154,7 @@ public class MappingChannelManagerView extends ViewPart {
 		};
 
 		// Request server to lock user database, and on success refresh view
-		new ConsoleJob("Refresh mapping channel list", this,
+		new ConsoleJob("Refresh cluster list", this,
 				Activator.PLUGIN_ID, null) {
 			@Override
 			protected void runInternal(IProgressMonitor monitor)
@@ -172,7 +163,7 @@ public class MappingChannelManagerView extends ViewPart {
 					@Override
 					public void run() {
 						try {
-							viewer.setInput(session.getMappingChannelList());
+							viewer.setInput(session.getCluster(CLUSTER_TYPE));
 						} catch (IOException | NXCException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -187,25 +178,30 @@ public class MappingChannelManagerView extends ViewPart {
 				runInUIThread(new Runnable() {
 					@Override
 					public void run() {
-						MappingChannelManagerView.this.getViewSite().getPage()
-						.hideView(MappingChannelManagerView.this);
+						ClusterManagerView.this.getViewSite().getPage()
+						.hideView(ClusterManagerView.this);
 					}
 				});
 			}
 
 			@Override
 			protected String getErrorMessage() {
-				return "Open mapping channel error!";
+				return "Open home channel error!";
 			}
 		}.start();
 	}
 
+	public void setClusterType(String clusterType)
+	{
+		this.CLUSTER_TYPE = clusterType;
+	}
+	
 	private void hookContextMenu() {
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
-				MappingChannelManagerView.this.fillContextMenu(manager);
+				ClusterManagerView.this.fillContextMenu(manager);
 			}
 		});
 		Menu menu = menuMgr.createContextMenu(viewer.getControl());
@@ -220,61 +216,65 @@ public class MappingChannelManagerView extends ViewPart {
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
-		manager.add(actAddMapping);
+		manager.add(actAddCluster);
 		manager.add(new Separator());
-		manager.add(actEditMapping);
+		manager.add(actEditCluster);
 		manager.add(new Separator());
-		manager.add(actDeleteMapping);
+		manager.add(actDeleteCluster);
 		manager.add(new Separator());
 		manager.add(actionRefresh);
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
-		manager.add(actAddMapping);
-		manager.add(actEditMapping);
-		manager.add(actDeleteMapping);
+		manager.add(actAddCluster);
+		manager.add(actEditCluster);
+		manager.add(actDeleteCluster);
 		manager.add(actionRefresh);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
-		manager.add(actAddMapping);
-		manager.add(actEditMapping);
-		manager.add(actDeleteMapping);
+		manager.add(actAddCluster);
+		manager.add(actEditCluster);
+		manager.add(actDeleteCluster);
 		manager.add(actionRefresh);
 	}
 
 	private void makeActions() {
-		actAddMapping = new Action("Add new mapping channel", 
+		actAddCluster = new Action("Add new cluster", 
 				Activator.getImageDescriptor("icons/account_add.png")) {
 			public void run() {
-				addMappingChannel();
+				addCluster();
 			}
 		};
-		actAddMapping.setToolTipText("Add new mapping channel");
+		actAddCluster.setToolTipText("Add new cluster");
 
-		actEditMapping = new Action("Edit mapping channel", 
+		actEditCluster = new Action("Edit home channel", 
 				Activator.getImageDescriptor("icons/account_edit.png")) {
 			public void run() {
-				editMappingChannel();
+				modifyCluster();
 			}
 		};
-		actEditMapping.setToolTipText("Edit mapping channel");
+		actEditCluster.setToolTipText("Edit cluster");
 
-		actDeleteMapping = new Action("Delete mapping channel", 
+		actDeleteCluster = new Action("Delete cluster", 
 				Activator.getImageDescriptor("icons/account_delete.png")) {
 			public void run() {
-				deleteMappingChannel();
+				try {
+					deleteCluster();
+				} catch (IOException | NXCException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		};
-		actDeleteMapping.setToolTipText("Delete mapping channel");
-
+		actDeleteCluster.setToolTipText("Delete cluster");
+		
 		actionRefresh = new RefreshAction(this) {
-			@Override
 			public void run() {
 				try {
-					viewer.setInput(session.getMappingChannelList());
+					viewer.setInput(session.getCluster(CLUSTER_TYPE));
 				} catch (IOException | NXCException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -286,38 +286,46 @@ public class MappingChannelManagerView extends ViewPart {
 	private void hookDoubleClickAction() {
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
+
 			}
 		});
 	}
 
 	/**
-	 * Create new mapping channel
+	 * Passing the focus request to the viewer's control.
 	 */
-	private void addMappingChannel()
+	public void setFocus() {
+		viewer.getControl().setFocus();
+	}
+
+	/**
+	 * Create new cluster
+	 */
+	private void addCluster()
 	{
-		final CreateMappingChannelDialog dlg = new CreateMappingChannelDialog(getViewSite().getShell());
+		final CreateClusterDialog dlg = new CreateClusterDialog(getViewSite().getShell());
 		if (dlg.open() == Window.OK) {
-			new ConsoleJob("Create mapping channel",
+			new ConsoleJob("Create cluster",
 					this, Activator.PLUGIN_ID, null) {
 				@Override
 				protected void runInternal(IProgressMonitor monitor)
 						throws Exception {
-					session.createMappingChannel(dlg.getHomeChannelId(), dlg.getMonitorChannelId(), (int)dlg.getTimeSync(), 
-							dlg.getStatus(), 0, "", "", "");
+					session.createCluster(dlg.getClusterId(), dlg.getClusterName(), 
+							dlg.getIpAddress(), dlg.getPort(), CLUSTER_TYPE);
 				}
 
 				@Override
 				protected String getErrorMessage() {
-					return "Can not create mapping channel";
+					return "Can not cluster";
 				}
 			}.start();
 		}
 	}
 
 	/**
-	 * Edit mapping channel
+	 * Edit cluster
 	 */
-	private void editMappingChannel()
+	private void modifyCluster()
 	{
 		final IStructuredSelection selection = (IStructuredSelection) viewer
 				.getSelection();
@@ -331,23 +339,23 @@ public class MappingChannelManagerView extends ViewPart {
 			return;
 		}
 		Object firstElement = selection.getFirstElement();
-		if(firstElement instanceof MappingChannelObject)
+		if(firstElement instanceof HomeChannelObject)
 		{
-			final EditMappingChannelDialog dlg = new EditMappingChannelDialog(getViewSite().getShell(), 
-					(MappingChannelObject)firstElement);
+			final EditClusterDialog dlg = new EditClusterDialog(getViewSite().getShell(), 
+					(ClusterObject)firstElement);
 			if (dlg.open() == Window.OK) {
-				new ConsoleJob("Edit mapping channel",
+				new ConsoleJob("Edit cluster",
 						this, Activator.PLUGIN_ID, null) {
 					@Override
 					protected void runInternal(IProgressMonitor monitor)
 							throws Exception {
-						session.modifyMappingChannel(dlg.getId(), dlg.getHomeChannelId(), dlg.getMonitorChannelId(), 
-								(int)dlg.getTimeSync(),dlg.getStatus(), "", "", "");
+						session.modifyCluster(dlg.getClusterId(), dlg.getClusterName(), 
+								dlg.getIpAddress(), dlg.getPort(), CLUSTER_TYPE);
 					}
 
 					@Override
 					protected String getErrorMessage() {
-						return "Can not edit mapping channel";
+						return "Can not edit cluster";
 					}
 				}.start();
 			}
@@ -355,9 +363,11 @@ public class MappingChannelManagerView extends ViewPart {
 	}
 
 	/**
-	 * Delete home channel
+	 * Delete cluster
+	 * @throws NXCException 
+	 * @throws IOException 
 	 */
-	private void deleteMappingChannel()
+	private void deleteCluster() throws IOException, NXCException
 	{
 		final IStructuredSelection selection = (IStructuredSelection) viewer
 				.getSelection();
@@ -376,23 +386,11 @@ public class MappingChannelManagerView extends ViewPart {
 		dialog.setMessage("Do you really want to do delete this item?");
 		if (dialog.open() == SWT.OK) {
 			Object firstElement = selection.getFirstElement();
-			if(firstElement instanceof MappingChannelObject)
+			if(firstElement instanceof ClusterObject)
 			{
-				MappingChannelObject object = (MappingChannelObject)firstElement;
-				try {
-					session.deleteMappingChannel(object.getId());
-				} catch (IOException | NXCException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				ClusterObject object = (ClusterObject)firstElement;
+				session.deleteCluster(object.getClusterId(), CLUSTER_TYPE);
 			}
 		}
-	}
-
-	/**
-	 * Passing the focus request to the viewer's control.
-	 */
-	public void setFocus() {
-		viewer.getControl().setFocus();
 	}
 }
