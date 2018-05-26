@@ -44,9 +44,11 @@ public class CreateClusterDialog extends Dialog {
 	private Text txtClusterName;
 	private Text txtIpAddress;
 	private Text txtPort;
+	private String title;
 
-	public CreateClusterDialog(Shell parentShell) {
+	public CreateClusterDialog(Shell parentShell, String title) {
 		super(parentShell);
+		this.title = title;
 	}
 
 	/*
@@ -123,7 +125,7 @@ public class CreateClusterDialog extends Dialog {
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText("Create cluster");
+		newShell.setText(this.title);
 	}
 	/*
 	 * (non-Javadoc)

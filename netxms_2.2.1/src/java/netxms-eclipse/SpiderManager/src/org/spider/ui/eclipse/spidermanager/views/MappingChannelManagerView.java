@@ -23,6 +23,7 @@ import org.netxms.ui.eclipse.shared.ConsoleSharedData;
 import org.netxms.ui.eclipse.spidermanager.dialogs.CreateMappingChannelDialog;
 import org.netxms.ui.eclipse.spidermanager.dialogs.EditMappingChannelDialog;
 import org.netxms.ui.eclipse.widgets.SortableTableViewer;
+import org.spider.client.HomeChannelObject;
 import org.spider.client.MappingChannelObject;
 import org.spider.client.MonitorChannelObject;
 import org.spider.ui.eclipse.spidermanager.Activator;
@@ -303,7 +304,7 @@ public class MappingChannelManagerView extends ViewPart {
 				protected void runInternal(IProgressMonitor monitor)
 						throws Exception {
 					session.createMappingChannel(dlg.getHomeChannelId(), dlg.getMonitorChannelId(), (int)dlg.getTimeSync(), 
-							dlg.getStatus(), 0, "", "", "");
+							dlg.getStatus(), 0, dlg.getDownloadClusterId(), dlg.getRenderClusterId(), dlg.getUploadClusterId());
 				}
 
 				@Override
@@ -341,8 +342,9 @@ public class MappingChannelManagerView extends ViewPart {
 					@Override
 					protected void runInternal(IProgressMonitor monitor)
 							throws Exception {
-						session.modifyMappingChannel(dlg.getId(), dlg.getHomeChannelId(), dlg.getMonitorChannelId(), 
-								(int)dlg.getTimeSync(),dlg.getStatus(), "", "", "");
+						session.modifyMappingChannel(dlg.getRecordId(), dlg.getHomeChannelId(), 
+								dlg.getMonitorChannelId(), (int)dlg.getTimeSync(),dlg.getStatus(), 
+								dlg.getDownloadClusterId(), dlg.getRenderClusterId(), dlg.getUploadClusterId());
 					}
 
 					@Override
@@ -379,12 +381,32 @@ public class MappingChannelManagerView extends ViewPart {
 			if(firstElement instanceof MappingChannelObject)
 			{
 				MappingChannelObject object = (MappingChannelObject)firstElement;
-				try {
-					session.deleteMappingChannel(object.getId());
-				} catch (IOException | NXCException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if(object.getStatusSync() == 1)
+				{
+					dialog =
+							new MessageBox(getViewSite().getShell(), SWT.ICON_WARNING | SWT.OK);
+					dialog.setText("Error");
+					dialog.setMessage("Can not delete mapping channel with sync status is enable. " +
+							"Please set sync status to disable and try again!");
+					dialog.open();
+					return;	
 				}
+				
+				new ConsoleJob("Delete channel mapping", this,
+						Activator.PLUGIN_ID, null) {
+					@Override
+					protected void runInternal(IProgressMonitor monitor)
+							throws Exception {
+						for (Object object : selection.toList()) {					
+							session.deleteMappingChannel(((MappingChannelObject)object).getId());
+						}
+					}
+
+					@Override
+					protected String getErrorMessage() {
+						return "Can not delete channel mapping";
+					}
+				}.start();
 			}
 		}
 	}

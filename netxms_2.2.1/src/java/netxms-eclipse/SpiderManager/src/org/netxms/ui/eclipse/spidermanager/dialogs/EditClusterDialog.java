@@ -36,6 +36,7 @@ import org.spider.client.ClusterObject;
  */
 public class EditClusterDialog extends Dialog {
 	private ClusterObject object;
+	private int recordId;
 	private String clusterId;
 	private String clusterName;
 	private String ipAddress;
@@ -44,11 +45,13 @@ public class EditClusterDialog extends Dialog {
 	private Text txtClusterName;
 	private Text txtIpAddress;
 	private Text txtPort;
+	private String title;
 
-	public EditClusterDialog(Shell parentShell, ClusterObject object) {
+	public EditClusterDialog(Shell parentShell, ClusterObject object, String title) {
 		super(parentShell);
 		this.object = object;
-		clusterId = object.getClusterId();
+		recordId = object.getRecordID();
+		this.title = title;
 	}
 
 	/*
@@ -73,7 +76,7 @@ public class EditClusterDialog extends Dialog {
 
 		Group grpCreateNewAccount = new Group(dialogArea, SWT.NONE);
 		grpCreateNewAccount.setText("Create cluster");
-		grpCreateNewAccount.setBounds(5, 10, 437, 250);
+		grpCreateNewAccount.setBounds(5, 10, 437, 208);
 
 		Label lblChannelId = new Label(grpCreateNewAccount, SWT.NONE);
 		lblChannelId.setAlignment(SWT.RIGHT);
@@ -89,11 +92,6 @@ public class EditClusterDialog extends Dialog {
 		lblGoogleAccount.setAlignment(SWT.RIGHT);
 		lblGoogleAccount.setText("IP Address");
 		lblGoogleAccount.setBounds(10, 119, 109, 17);
-
-		Label lblVideoIntro = new Label(grpCreateNewAccount, SWT.NONE);
-		lblVideoIntro.setAlignment(SWT.RIGHT);
-		lblVideoIntro.setText("Sync Status");
-		lblVideoIntro.setBounds(10, 199, 109, 17);
 		
 		txtClusterId = new Text(grpCreateNewAccount, SWT.BORDER);
 		txtClusterId.setTextLimit(150);
@@ -130,7 +128,7 @@ public class EditClusterDialog extends Dialog {
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText("Edit download cluster");
+		newShell.setText(this.title);
 	}
 	/*
 	 * (non-Javadoc)
@@ -161,13 +159,14 @@ public class EditClusterDialog extends Dialog {
 			dialog.open();
 			return;
 		}
+		port = Integer.parseInt(txtPort.getText());
 		
 		super.okPressed();
 	}
 
 	private void initialData()
 	{
-		txtClusterId.setText(clusterId);
+		txtClusterId.setText(object.getClusterId());
 		txtClusterName.setText(object.getClusterName());
 		txtIpAddress.setText(object.getIpAddress());
 		txtPort.setText(Integer.toString(object.getPort()));
@@ -188,4 +187,9 @@ public class EditClusterDialog extends Dialog {
 	public int getPort() {
 		return port;
 	}
+
+	public int getRecordId() {
+		return recordId;
+	}
+	
 }

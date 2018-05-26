@@ -1,6 +1,13 @@
 package org.spider.base;
 
 public class SpiderCodes {
+	public static final int CLUSTER_DOWNLOAD = 1;
+	public static final int CLUSTER_RENDER	 = 2;
+	public static final int CLUSTER_UPLOAD	 = 3;
+	
+	public static final int ACCOUNT_HELPER	 = 1;
+	public static final int ACCOUNT_SEO		 = 2;
+	public static final int ACCOUNT_ADSEND	 = 3;
 	//Spider command codes
 	public static final int CMD_SPIDER_START 			   = 0x2000;
 	public static final int CMD_GET_GOOGLE_ACCOUNT 		   = 0x2001;
@@ -19,18 +26,10 @@ public class SpiderCodes {
 	public static final int CMD_DEL_HOME_CHANNEL           = 0x200E;
 	public static final int CMD_DEL_MONITOR_CHANNEL        = 0x200F;
 	public static final int CMD_DEL_MAPPING_CHANNEL        = 0x2010;
-	public static final int CMD_GET_DOWNLOAD_CLUSTER       = 0x2011;
-	public static final int CMD_GET_RENDER_CLUSTER         = 0x2012;
-	public static final int CMD_GET_UPLOAD_CLUSTER         = 0x2013;
-	public static final int CMD_MOD_DOWNLOAD_CLUSTER       = 0x2014;
-	public static final int CMD_MOD_RENDER_CLUSTER         = 0x2015;
-	public static final int CMD_MOD_UPLOAD_CLUSTER         = 0x2016;
-	public static final int CMD_DEL_DOWNLOAD_CLUSTER       = 0x2017;
-	public static final int CMD_DEL_RENDER_CLUSTER         = 0x2018;
-	public static final int CMD_DEL_UPLOAD_CLUSTER         = 0x2019;
-	public static final int CMD_CREATE_DOWNLOAD_CLUSTER    = 0x2020;
-	public static final int CMD_CREATE_RENDER_CLUSTER      = 0x2021;
-	public static final int CMD_CREATE_UPLOAD_CLUSTER      = 0x2022;
+	public static final int CMD_GET_CLUSTER       		   = 0x2011;
+	public static final int CMD_MOD_CLUSTER       		   = 0x2012;
+	public static final int CMD_DEL_CLUSTER       		   = 0x2013;
+	public static final int CMD_CREATE_CLUSTER    		   = 0x2014;
 	public static final int CMD_SPIDER_END		           = 0x2FFF;
 	
 	public static final long VID_SPIDER_START				= 1000;
@@ -56,6 +55,7 @@ public class SpiderCodes {
 	public static final long VID_HOME_CHANNEL_DESC			= 1023;
 	public static final long VID_HOME_CHANNEL_TITLE			= 1024;
 	public static final long VID_HOME_CHANNEL_RECORD_ID		= 1025;
+	public static final long VID_HOME_CHANNEL_TAGS			= 1026;
 	public static final long VID_HOME_CHANNEL_END			= 1030;
 	//end home channel variable
 	
@@ -83,12 +83,14 @@ public class SpiderCodes {
 	//end mapping channel variable
 	
 	//cluster variable
-	public static final long VID_CLUSTER_START							= 1061;
-	public static final long VID_CLUSTER_ID								= 1062;
-	public static final long VID_CLUSTER_NAME							= 1063;
-	public static final long VID_CLUSTER_IP_ADDRESS						= 1064;
-	public static final long VID_CLUSTER_PORT							= 1065;
-	public static final long VID_CLUSTER_END							= 1075;
+	public static final long VID_SPIDER_CLUSTER_START					= 1061;
+	public static final long VID_SPIDER_CLUSTER_RECORD_ID				= 1062;
+	public static final long VID_SPIDER_CLUSTER_ID						= 1063;
+	public static final long VID_SPIDER_CLUSTER_NAME					= 1064;
+	public static final long VID_SPIDER_CLUSTER_IP_ADDRESS				= 1065;
+	public static final long VID_SPIDER_CLUSTER_PORT					= 1066;
+	public static final long VID_SPIDER_CLUSTER_TYPE					= 1067;
+	public static final long VID_SPIDER_CLUSTER_END						= 1075;
 	//end cluster variable
 	
 	public static final long VID_SPIDER_END					= 2000;

@@ -18,6 +18,8 @@
  */
 package org.netxms.ui.eclipse.spidermanager.dialogs;
 
+import java.io.IOException;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -33,6 +35,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Combo;
+import org.netxms.client.NXCException;
+import org.netxms.client.NXCSession;
+import org.netxms.ui.eclipse.shared.ConsoleSharedData;
+import org.spider.client.GoogleAccountObject;
+import org.spider.client.HomeChannelObject;
 
 /**
  * User database object creation dialog
@@ -41,12 +49,12 @@ import org.eclipse.swt.events.SelectionEvent;
 public class CreateHomeChannelDialog extends Dialog {
 	private Text txtChannelId;
 	private Text txtChannelName;
-	private Text txtGoogleAccount;
 	private Text txtVideoIntro;
 	private Text txtVideoOutro;
 	private Text txtLogo;
 	private Text txtTitleTemplate;
 	private Text txtDesTemplate;
+	private Combo cbGoogleAccount;
 	
 	private String cId;
 	private String cName; 
@@ -56,18 +64,16 @@ public class CreateHomeChannelDialog extends Dialog {
 	private String logo;
 	private String desc;
 	private String title;
+	private String tags;
+	private Text txtTagsTemp;
+	private NXCSession session;
+	Object[] objGoogleAccount;
 	
 	public CreateHomeChannelDialog(Shell parentShell) {
 		super(parentShell);
+		session = ConsoleSharedData.getSession();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets
-	 * .Composite)
-	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
@@ -83,7 +89,7 @@ public class CreateHomeChannelDialog extends Dialog {
 
 		Group grpCreateNewAccount = new Group(dialogArea, SWT.NONE);
 		grpCreateNewAccount.setText("Create new home channel");
-		grpCreateNewAccount.setBounds(5, 10, 516, 304);
+		grpCreateNewAccount.setBounds(5, 10, 516, 336);
 
 		Label lblChannelId = new Label(grpCreateNewAccount, SWT.NONE);
 		lblChannelId.setAlignment(SWT.RIGHT);
@@ -107,10 +113,6 @@ public class CreateHomeChannelDialog extends Dialog {
 		lblGoogleAccount.setAlignment(SWT.RIGHT);
 		lblGoogleAccount.setText("Google Account");
 		lblGoogleAccount.setBounds(10, 97, 109, 17);
-
-		txtGoogleAccount = new Text(grpCreateNewAccount, SWT.BORDER);
-		txtGoogleAccount.setTextLimit(150);
-		txtGoogleAccount.setBounds(131, 92, 290, 27);
 
 		Label lblVideoIntro = new Label(grpCreateNewAccount, SWT.NONE);
 		lblVideoIntro.setAlignment(SWT.RIGHT);
@@ -246,17 +248,68 @@ public class CreateHomeChannelDialog extends Dialog {
 		});
 		btnView.setText("View");
 		btnView.setBounds(427, 26, 79, 29);
-
+		
+		Label lblTagsTemplate = new Label(grpCreateNewAccount, SWT.NONE);
+		lblTagsTemplate.setText("Tags Template");
+		lblTagsTemplate.setAlignment(SWT.RIGHT);
+		lblTagsTemplate.setBounds(10, 295, 109, 17);
+		
+		txtTagsTemp = new Text(grpCreateNewAccount, SWT.BORDER);
+		txtTagsTemp.setTextLimit(150);
+		txtTagsTemp.setBounds(131, 290, 290, 27);
+		
+		Button btnTagsTemp = new Button(grpCreateNewAccount, SWT.NONE);
+		btnTagsTemp.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
+				fd.setText("Select tag template file");
+				fd.setFilterExtensions(new String[] {"*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
+				fd.setFilterNames(new String[] {
+				"All file" });
+				String fileName = fd.open();
+				txtTagsTemp.setText(fileName);
+			}
+		});
+		btnTagsTemp.setText("Browse...");
+		btnTagsTemp.setBounds(427, 290, 79, 29);
+		
+		cbGoogleAccount = new Combo(grpCreateNewAccount, SWT.NONE);
+		cbGoogleAccount.setBounds(131, 92, 290, 29);
+		
+		initData();
 		return dialogArea;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets
-	 * .Shell)
-	 */
+	
+	private void initData()
+	{
+		try {
+			if(objGoogleAccount == null)
+			{
+				objGoogleAccount = session.getGoogleAccount();
+				setGoogleAccount();
+			}
+		} catch (IOException | NXCException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+	
+	private void setGoogleAccount()
+	{
+		if(objGoogleAccount != null)
+		{
+			for(int i = 0; i < objGoogleAccount.length; i++)
+			{
+				Object homeObj = objGoogleAccount[i];
+				if(homeObj instanceof GoogleAccountObject)
+				{
+					cbGoogleAccount.add(((GoogleAccountObject) homeObj).getUserName());
+				}
+			}
+		}
+	}
+	
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
@@ -271,12 +324,13 @@ public class CreateHomeChannelDialog extends Dialog {
 	protected void okPressed() {
 		cId = txtChannelId.getText();
 		cName = txtChannelName.getText();
-		gAccount = txtGoogleAccount.getText();
+		gAccount = cbGoogleAccount.getText();
 		vIntro = txtVideoIntro.getText();
 		vOutro = txtVideoOutro.getText();
 		logo = txtLogo.getText();
 		desc = txtDesTemplate.getText();
 		title = txtTitleTemplate.getText();
+		tags = txtTagsTemp.getText();
 		if(cId == null || cId.isEmpty())
 		{
 			MessageBox dialog =
@@ -286,7 +340,7 @@ public class CreateHomeChannelDialog extends Dialog {
 			dialog.open();
 			return;
 		}
-		String googleAccount = txtGoogleAccount.getText();
+		String googleAccount = cbGoogleAccount.getText();
 		if(googleAccount == null || googleAccount.isEmpty())
 		{
 			MessageBox dialog =
@@ -331,4 +385,9 @@ public class CreateHomeChannelDialog extends Dialog {
 	public String getTitle() {
 		return title;
 	}
+
+	public String getTags() {
+		return tags;
+	}
+	
 }

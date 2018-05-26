@@ -46,7 +46,7 @@
          <action
                class="org.spider.ui.eclipse.spidermanager.actions.OpenGoogleAccountManager"
                icon="icons/gmail_16x16.png"
-               id="SpiderManager.action1"
+               id="SpiderManager.googleAccount"
                label="&amp;Google Account"
                menubarPath="spiderMenu/googleAccountGroup"
                tooltip="Google Account Manager">
@@ -54,7 +54,7 @@
          <action
                class="org.spider.ui.eclipse.spidermanager.actions.OpenHomeChannelManager"
                icon="icons/playlist_16x16.png"
-               id="SpiderManager.action2"
+               id="SpiderManager.homeChannel"
                label="&amp;Home Channel"
                menubarPath="spiderMenu/channelGroup"
                style="push">
@@ -62,7 +62,7 @@
          <action
                class="org.spider.ui.eclipse.spidermanager.actions.OpenMonitorChannelManager"
                icon="icons/eye_16x16.png"
-               id="SpiderManager.action3"
+               id="SpiderManager.monitorChanel"
                label="&amp;Monitor Channel"
                menubarPath="spiderMenu/channelGroup"
                style="push">
@@ -70,7 +70,7 @@
          <action
                class="org.spider.ui.eclipse.spidermanager.actions.OpenMappingChannelManager"
                icon="icons/settings_16x16.png"
-               id="SpiderManager.action5"
+               id="SpiderManager.mappingChannel"
                label="&amp;Mapping Channel"
                menubarPath="spiderMenu/channelGroup"
                style="push">
@@ -78,7 +78,7 @@
          <action
                class="org.spider.ui.eclipse.spidermanager.actions.OpenDownloadClusterManager"
                icon="icons/sample.gif"
-               id="SpiderManager.action1"
+               id="SpiderManager.downloadCluster"
                label="&amp;Download Cluster"
                menubarPath="spiderMenu/clusterGroup"
                style="push">
@@ -86,7 +86,7 @@
          <action
                class="org.spider.ui.eclipse.spidermanager.actions.OpenRenderClusterManager"
                icon="icons/sample.gif"
-               id="SpiderManager.action2"
+               id="SpiderManager.renderCluster"
                label="&amp;Render Cluster"
                menubarPath="spiderMenu/clusterGroup"
                style="push">
@@ -94,7 +94,7 @@
          <action
                class="org.spider.ui.eclipse.spidermanager.actions.OpenUploadClusterManager"
                icon="icons/sample.gif"
-               id="SpiderManager.action3"
+               id="SpiderManager.uploadCluster"
                label="&amp;Upload Cluster"
                menubarPath="spiderMenu/clusterGroup"
                style="push">
@@ -143,7 +143,6 @@
             restorable="true">
       </view>
       <view
-            category="org.spider.ui.eclipse.channel_manager"
             class="org.spider.ui.eclipse.spidermanager.views.DownloadClusterManagerView"
             icon="icons/sample.gif"
             id="org.spider.ui.eclipse.spidermanager.views.DownloadClusterManager"
@@ -158,7 +157,7 @@
             restorable="true">
       </view>
       <view
-            class="org.spider.ui.eclipse.spidermanager.views.RenderClusterManagerView"
+            class="org.spider.ui.eclipse.spidermanager.views.UploadClusterManagerView"
             icon="icons/sample.gif"
             id="org.spider.ui.eclipse.spidermanager.views.UploadClusterManager"
             name="Upload Cluster"

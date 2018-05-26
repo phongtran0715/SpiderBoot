@@ -21,7 +21,7 @@ import org.netxms.ui.eclipse.actions.RefreshAction;
 import org.netxms.ui.eclipse.jobs.ConsoleJob;
 import org.netxms.ui.eclipse.shared.ConsoleSharedData;
 import org.netxms.ui.eclipse.spidermanager.dialogs.CreateGoogleAccoutDialog;
-import org.netxms.ui.eclipse.spidermanager.dialogs.EditGoogleAccountDialog;
+import org.netxms.ui.eclipse.spidermanager.dialogs.EditGoogleAccoutDialog;
 import org.netxms.ui.eclipse.widgets.SortableTableViewer;
 import org.spider.client.GoogleAccountObject;
 import org.spider.ui.eclipse.spidermanager.Activator;
@@ -290,7 +290,7 @@ public class GoogleAccountManagerView extends ViewPart {
 				protected void runInternal(IProgressMonitor monitor)
 						throws Exception {
 					session.createGoogleAccount(dlg.getUserName(), dlg.getApiKey(), 
-							dlg.getClientSecret(), 0, dlg.getAppName());
+							dlg.getClientSecret(), dlg.getAccountType(), dlg.getAppName());
 				}
 
 				@Override
@@ -318,14 +318,14 @@ public class GoogleAccountManagerView extends ViewPart {
 			return;
 		}
 		final Object firstElement = selection.getFirstElement();
-		final EditGoogleAccountDialog dlg = new EditGoogleAccountDialog(getViewSite().getShell(), firstElement);	
+		final EditGoogleAccoutDialog dlg = new EditGoogleAccoutDialog(getViewSite().getShell(), (GoogleAccountObject)firstElement);	
 		if (dlg.open() == Window.OK) {
 			new ConsoleJob("Modify google account",
 					this, Activator.PLUGIN_ID, null) {
 				@Override
 				protected void runInternal(IProgressMonitor monitor)
 						throws Exception {
-					session.modifyGoogleAccount(dlg.getId(), dlg.getUserName(), dlg.getApi(), 
+					session.modifyGoogleAccount(dlg.getId(), dlg.getUserName(), dlg.getApiKey(), 
 							dlg.getClientSecret(), dlg.getAccountType(),dlg.getAppName());
 				}
 

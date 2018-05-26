@@ -622,18 +622,10 @@ typedef struct
 #define CMD_DEL_HOME_CHANNEL           0x200E
 #define CMD_DEL_MONITOR_CHANNEL        0x200F
 #define CMD_DEL_MAPPING_CHANNEL        0x2010
-#define CMD_GET_DOWNLOAD_CLUSTER       0x2011
-#define CMD_GET_RENDER_CLUSTER         0x2012
-#define CMD_GET_UPLOAD_CLUSTER         0x2013
-#define CMD_MOD_DOWNLOAD_CLUSTER       0x2014
-#define CMD_MOD_RENDER_CLUSTER         0x2015
-#define CMD_MOD_UPLOAD_CLUSTER         0x2016
-#define CMD_DEL_DOWNLOAD_CLUSTER       0x2017
-#define CMD_DEL_RENDER_CLUSTER         0x2018
-#define CMD_DEL_UPLOAD_CLUSTER         0x2019
-#define CMD_CREATE_DOWNLOAD_CLUSTER    0x2020
-#define CMD_CREATE_RENDER_CLUSTER      0x2021
-#define CMD_CREATE_UPLOAD_CLUSTER      0x2022
+#define CMD_GET_CLUSTER                0x2011
+#define CMD_MOD_CLUSTER                0x2012
+#define CMD_DEL_CLUSTER                0x2013
+#define CMD_CREATE_CLUSTER             0x2014
 #define CMD_SPIDER_END                 0x2FFF
 
 /**
@@ -1274,6 +1266,7 @@ typedef struct
 #define VID_HOME_CHANNEL_DESC        ((UINT32)1023)
 #define VID_HOME_CHANNEL_TITLE       ((UINT32)1024)
 #define VID_HOME_CHANNEL_RECORD_ID   ((UINT32)1025)
+#define VID_HOME_CHANNEL_TAGS        ((UINT32)1026)
 #define VID_HOME_CHANNEL_END         ((UINT32)1030)
 //end home channel variable
 
@@ -1300,12 +1293,14 @@ typedef struct
 #define VID_MAPPING_CHANNEL_END                    ((UINT32)1060)
 
 //cluster variable
-#define VID_CLUSTER_START                          ((UINT32)1061)
-#define VID_CLUSTER_ID                             ((UINT32)1062)
-#define VID_CLUSTER_NAME                           ((UINT32)1063)
-#define VID_CLUSTER_IP_ADDRESS                     ((UINT32)1064)
-#define VID_CLUSTER_PORT                           ((UINT32)1065)
-#define VID_CLUSTER_END                            ((UINT32)1075)
+#define VID_SPIDER_CLUSTER_START                   ((UINT32)1061)
+#define VID_SPIDER_CLUSTER_RECORD_ID               ((UINT32)1062)
+#define VID_SPIDER_CLUSTER_ID                      ((UINT32)1063)
+#define VID_SPIDER_CLUSTER_NAME                    ((UINT32)1064)
+#define VID_SPIDER_CLUSTER_IP_ADDRESS              ((UINT32)1065)
+#define VID_SPIDER_CLUSTER_PORT                    ((UINT32)1066)
+#define VID_SPIDER_CLUSTER_TYPE                    ((UINT32)1067)
+#define VID_SPIDER_CLUSTER_END                     ((UINT32)1075)
 //end cluster variable
 
 #define VID_SPIDER_END              ((UINT32)2000)

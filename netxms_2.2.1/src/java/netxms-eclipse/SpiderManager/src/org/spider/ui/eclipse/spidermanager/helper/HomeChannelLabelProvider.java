@@ -39,7 +39,8 @@ public class HomeChannelLabelProvider extends DecoratingLabelProvider implements
 			"VideoOutro",
 			"Logo",
 			"DescriptionTemplate",
-			"TitleTemplate"};
+			"TitleTemplate", 
+			"TagsTemplate"};
 
 	/**
 	 * Constructor
@@ -89,6 +90,8 @@ public class HomeChannelLabelProvider extends DecoratingLabelProvider implements
 			return ((HomeChannelObject) element).getDescTemp();
 		case HomeChannelManagerView.COLUMN_TITLE:
 			return ((HomeChannelObject) element).getTitleTemp();
+		case HomeChannelManagerView.COLUMN_TAGS:
+			return ((HomeChannelObject) element).getTagsTemp();
 		default:
 			break;
 		}

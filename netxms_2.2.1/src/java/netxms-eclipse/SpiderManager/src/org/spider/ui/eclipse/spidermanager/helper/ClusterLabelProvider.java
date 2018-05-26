@@ -23,7 +23,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.spider.ui.eclipse.spidermanager.views.ClusterManagerView;
+import org.spider.ui.eclipse.spidermanager.views.DownloadClusterManagerView;
 import org.spider.client.*;
 /**
  * Label provider for user manager
@@ -31,6 +31,7 @@ import org.spider.client.*;
 public class ClusterLabelProvider extends DecoratingLabelProvider implements
 		ITableLabelProvider {
 	private static final String[] CLUSTER_METHOD = {
+			"ID",
 			"Cluster ID",
 			"Cluster Name",
 			"IP Address",
@@ -67,13 +68,15 @@ public class ClusterLabelProvider extends DecoratingLabelProvider implements
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		switch (columnIndex) {
-		case ClusterManagerView.COLUMN_CLUSTER_ID:
+		case DownloadClusterManagerView.COLUMN_RECORD_ID:
+			return Integer.toString(((ClusterObject) element).getRecordID());
+		case DownloadClusterManagerView.COLUMN_CLUSTER_ID:
 			return ((ClusterObject) element).getClusterId();
-		case ClusterManagerView.COLUMN_CLUSTER_NAME:
+		case DownloadClusterManagerView.COLUMN_CLUSTER_NAME:
 			return ((ClusterObject) element).getClusterName();
-		case ClusterManagerView.COLUMN_IP_ADDRESS:
+		case DownloadClusterManagerView.COLUMN_IP_ADDRESS:
 			return ((ClusterObject) element).getIpAddress();
-		case ClusterManagerView.COLUMN_PORT:
+		case DownloadClusterManagerView.COLUMN_PORT:
 			return Integer.toString(((ClusterObject) element).getPort());
 		default:
 			break;

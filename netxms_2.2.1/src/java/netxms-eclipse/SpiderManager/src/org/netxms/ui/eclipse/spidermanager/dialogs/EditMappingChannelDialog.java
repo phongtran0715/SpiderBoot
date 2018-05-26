@@ -35,12 +35,13 @@ import org.eclipse.swt.widgets.Combo;
 import org.netxms.client.NXCException;
 import org.netxms.client.NXCSession;
 import org.netxms.ui.eclipse.shared.ConsoleSharedData;
+import org.spider.base.SpiderCodes;
+import org.spider.client.ClusterObject;
 import org.spider.client.HomeChannelObject;
 import org.spider.client.MappingChannelObject;
 import org.spider.client.MonitorChannelObject;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.widgets.Link;
 
 /**
@@ -48,37 +49,44 @@ import org.eclipse.swt.widgets.Link;
  * 
  */
 public class EditMappingChannelDialog extends Dialog {
+	MappingChannelObject object;
 	private Text txtTimeSync;
 	private Combo cbHome;
 	private Combo cbMonitor;
 	private Combo cbStatus;
-	MappingChannelObject object;
-	private NXCSession session;
+	private Combo cbDownload;
+	private Label lblDownloadCluster;
+	private Label lblRenderCid;
+	private Combo cbRender;
+	private Label lblUploadCid;
+	private Combo cbUpload;
 	Link linkHomeChanel;
 	Link linkMonitorChanel;
-
-	private int id;
+	Object [] cHomeObject;
+	Object [] cMoniorObject;
+	Object [] downloadClusters;
+	Object [] renderClusters;
+	Object [] uploadClusters;
+	private NXCSession session;
+	
+	private int recordId;
 	private String homeChannelId;
 	private String monitorChannelId;
 	private int status;
 	private long timeSync;
-	Object [] cHomeObject;
-	Object [] cMoniorObject;
+	private String downloadClusterId;
+	private String renderClusterId;
+	private String uploadClusterId;
+
+
 
 	public EditMappingChannelDialog(Shell parentShell, MappingChannelObject object) {
 		super(parentShell);
-		this.object = object;
-		id = object.getId();
 		session = ConsoleSharedData.getSession();
+		this.object = object;
+		this.recordId = object.getId();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets
-	 * .Composite)
-	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
@@ -93,8 +101,8 @@ public class EditMappingChannelDialog extends Dialog {
 		gridData.horizontalSpan = 2;
 
 		Group grpCreateNewAccount = new Group(dialogArea, SWT.NONE);
-		grpCreateNewAccount.setText("Edit mapping channel");
-		grpCreateNewAccount.setBounds(5, 10, 437, 250);
+		grpCreateNewAccount.setText("Create new mapping channel");
+		grpCreateNewAccount.setBounds(5, 10, 432, 372);
 
 		Label lblChannelId = new Label(grpCreateNewAccount, SWT.NONE);
 		lblChannelId.setAlignment(SWT.RIGHT);
@@ -104,7 +112,7 @@ public class EditMappingChannelDialog extends Dialog {
 		Label lblChannelName = new Label(grpCreateNewAccount, SWT.NONE);
 		lblChannelName.setAlignment(SWT.RIGHT);
 		lblChannelName.setText("C Monitor ID");
-		lblChannelName.setBounds(10, 87, 109, 17);
+		lblChannelName.setBounds(10, 88, 109, 17);
 
 		Label lblGoogleAccount = new Label(grpCreateNewAccount, SWT.NONE);
 		lblGoogleAccount.setAlignment(SWT.RIGHT);
@@ -112,14 +120,15 @@ public class EditMappingChannelDialog extends Dialog {
 		lblGoogleAccount.setBounds(10, 141, 109, 17);
 
 		txtTimeSync = new Text(grpCreateNewAccount, SWT.BORDER);
+		txtTimeSync.setText("600");
 		txtTimeSync.setTextLimit(150);
 		txtTimeSync.setBounds(131, 136, 290, 27);
 
 		Label lblVideoIntro = new Label(grpCreateNewAccount, SWT.NONE);
 		lblVideoIntro.setAlignment(SWT.RIGHT);
 		lblVideoIntro.setText("Sync Status");
-		lblVideoIntro.setBounds(10, 199, 109, 17);
-		
+		lblVideoIntro.setBounds(10, 187, 109, 17);
+
 		cbHome = new Combo(grpCreateNewAccount, SWT.NONE);
 		cbHome.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -133,7 +142,8 @@ public class EditMappingChannelDialog extends Dialog {
 
 		cbStatus = new Combo(grpCreateNewAccount, SWT.NONE);
 		cbStatus.setItems(new String[] {"disable", "enable"});
-		cbStatus.setBounds(132, 194, 289, 29);
+		cbStatus.setBounds(132, 182, 289, 29);
+		cbStatus.select(0);
 
 		cbMonitor = new Combo(grpCreateNewAccount, SWT.NONE);
 		cbMonitor.addSelectionListener(new SelectionAdapter() {
@@ -146,7 +156,7 @@ public class EditMappingChannelDialog extends Dialog {
 		cbMonitor.setItems(new String[] {});
 		cbMonitor.setBounds(132, 77, 289, 29);
 		
-		linkHomeChanel = new Link(grpCreateNewAccount, 0);
+		linkHomeChanel = new Link(grpCreateNewAccount, SWT.NONE);
 		linkHomeChanel.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -156,8 +166,8 @@ public class EditMappingChannelDialog extends Dialog {
 				}
 			}
 		});
-		linkHomeChanel.setText("<a></a>");
 		linkHomeChanel.setBounds(131, 54, 290, 17);
+		linkHomeChanel.setText("<a></a>");
 		
 		linkMonitorChanel = new Link(grpCreateNewAccount, 0);
 		linkMonitorChanel.addSelectionListener(new SelectionAdapter() {
@@ -171,52 +181,53 @@ public class EditMappingChannelDialog extends Dialog {
 		});
 		linkMonitorChanel.setText("<a></a>");
 		linkMonitorChanel.setBounds(131, 113, 290, 17);
+		
+		cbDownload = new Combo(grpCreateNewAccount, SWT.NONE);
+		cbDownload.setItems(new String[] {});
+		cbDownload.setBounds(132, 228, 289, 29);
+		
+		lblDownloadCluster = new Label(grpCreateNewAccount, SWT.NONE);
+		lblDownloadCluster.setText("Download CID");
+		lblDownloadCluster.setAlignment(SWT.RIGHT);
+		lblDownloadCluster.setBounds(10, 240, 109, 17);
+		
+		lblRenderCid = new Label(grpCreateNewAccount, SWT.NONE);
+		lblRenderCid.setText("Render CID");
+		lblRenderCid.setAlignment(SWT.RIGHT);
+		lblRenderCid.setBounds(10, 286, 109, 17);
+		
+		cbRender = new Combo(grpCreateNewAccount, SWT.NONE);
+		cbRender.setItems(new String[] {});
+		cbRender.setBounds(132, 274, 289, 29);
+		
+		lblUploadCid = new Label(grpCreateNewAccount, SWT.NONE);
+		lblUploadCid.setText("Upload CID");
+		lblUploadCid.setAlignment(SWT.RIGHT);
+		lblUploadCid.setBounds(10, 329, 109, 17);
+		
+		cbUpload = new Combo(grpCreateNewAccount, SWT.NONE);
+		cbUpload.setItems(new String[] {});
+		cbUpload.setBounds(132, 317, 289, 29);
 
 		initialData();
 		return dialogArea;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets
-	 * .Shell)
-	 */
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText("Edit mapping channel");
+		newShell.setText("Create new mapping channel");
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
-	 */
+
 	@Override
 	protected void okPressed() {
 		homeChannelId = cbHome.getText();
 		monitorChannelId = cbMonitor.getText();
-		if(cbStatus.getText().equals("disable"))
-		{
-			status = 0;
-		}
-		else{
-			status = 1;
-		}
-		
+		downloadClusterId = cbDownload.getText();
+		renderClusterId = cbRender.getText();
+		uploadClusterId = cbUpload.getText();
 		String strTime = txtTimeSync.getText();
-		if(strTime == null || strTime.isEmpty())
-		{
-			MessageBox dialog =
-					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
-			dialog.setText("Error");
-			dialog.setMessage("Time sync interval must not empty!");
-			dialog.open();
-			return;
-		}
-		timeSync = Integer.parseInt(txtTimeSync.getText());
-		
+		timeSync = Integer.parseInt(strTime);
 		if(homeChannelId == null || homeChannelId.isEmpty())
 		{
 			MessageBox dialog =
@@ -225,7 +236,7 @@ public class EditMappingChannelDialog extends Dialog {
 			dialog.setMessage("Home channel ID must not empty!");
 			dialog.open();
 			return;
-		}
+		}		
 		
 		if(monitorChannelId == null || monitorChannelId.isEmpty())
 		{
@@ -236,43 +247,43 @@ public class EditMappingChannelDialog extends Dialog {
 			dialog.open();
 			return;
 		}
+
+		if(strTime == null || strTime.isEmpty())
+		{
+			MessageBox dialog =
+					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
+			dialog.setText("Error");
+			dialog.setMessage("Time sync interval must not empty!");
+			dialog.open();
+			return;
+		}
 		
+		if(cbStatus.getText().equals("disable"))
+		{
+			status = 0;
+		}
+		else{
+			status = 1;
+		}
 		super.okPressed();
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public String getHomeChannelId() {
-		return homeChannelId;
-	}
-
-	public String getMonitorChannelId() {
-		return monitorChannelId;
-	}
-
-	public int getStatus() {
-		return status;
-	}
-
-	public long getTimeSync() {
-		return timeSync;
 	}
 
 	private void initialData()
 	{
 		//Initial data
-		cbHome.setText(this.object.getHomeId());
-		cbMonitor.setText(this.object.getMonitorId());
-		
-		if(this.object.getStatusSync() == 0)
+		cbHome.setText(object.getHomeId());
+		cbMonitor.setText(object.getMonitorId());
+		txtTimeSync.setText(Long.toString(object.getTimeIntervalSync()));
+		if(object.getStatusSync() == 0)
 		{
 			cbStatus.setText("disable");
 		}else{
 			cbStatus.setText("enable");
 		}
-		txtTimeSync.setText(Long.toString(this.object.getTimeIntervalSync()));
+		cbDownload.setText(object.getDownloadClusterId());
+		cbRender.setText(object.getRenderClusterId());
+		cbUpload.setText(object.getUploadClusterId());
+		
 		try {
 			if(cHomeObject == null)
 			{
@@ -295,11 +306,36 @@ public class EditMappingChannelDialog extends Dialog {
 			}
 		}
 		
-		String cHomeName = getHomeChannelName(this.object.getHomeId());
-		linkHomeChanel.setText("Go to <a href=\"https://www.youtube.com/channel\">" + cHomeName + "</a> channel." );
-		
-		String cMonitorName = getMonitorChannelName(this.object.getMonitorId());
-		linkMonitorChanel.setText("Go to <a href=\"https://www.youtube.com/channel\">" + cMonitorName + "</a> channel." );
+		if(downloadClusters == null)
+		{
+			try {
+				downloadClusters = session.getCluster(SpiderCodes.CLUSTER_DOWNLOAD);
+				setDownloadCluster();
+			} catch (IOException | NXCException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if(renderClusters == null)
+		{
+			try {
+				renderClusters = session.getCluster(SpiderCodes.CLUSTER_RENDER);
+				setRenderCluster();
+			} catch (IOException | NXCException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if(uploadClusters == null)
+		{
+			try {
+				uploadClusters = session.getCluster(SpiderCodes.CLUSTER_UPLOAD);
+				setUploadCluster();
+			} catch (IOException | NXCException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private void setHomeChannelData()
@@ -332,39 +368,110 @@ public class EditMappingChannelDialog extends Dialog {
 		}
 	}
 	
+	private void setDownloadCluster()
+	{
+		if(downloadClusters != null)
+		{
+			for(int i = 0; i < downloadClusters.length; i++)
+			{
+				Object object = downloadClusters[i];
+				if(object instanceof ClusterObject)
+				{
+					cbDownload.add(((ClusterObject) object).getClusterId());
+				}
+			}
+		}
+	}
+	
+	private void setRenderCluster()
+	{
+		if(renderClusters != null)
+		{
+			for(int i = 0; i < renderClusters.length; i++)
+			{
+				Object object = renderClusters[i];
+				if(object instanceof ClusterObject)
+				{
+					cbRender.add(((ClusterObject) object).getClusterId());
+				}
+			}
+		}
+	}
+	
+	private void setUploadCluster()
+	{
+		if(uploadClusters != null)
+		{
+			for(int i = 0; i < uploadClusters.length; i++)
+			{
+				Object object = uploadClusters[i];
+				if(object instanceof ClusterObject)
+				{
+					cbUpload.add(((ClusterObject) object).getClusterId());
+				}
+			}
+		}
+	}
+
 	private String getHomeChannelName(String cHomeID)
 	{
 		String result = "";
-		if(cHomeID != null)
-		{
-			for (Object it : cHomeObject) {
-				if(it instanceof HomeChannelObject)
+		for (Object it : cHomeObject) {
+			if(it instanceof HomeChannelObject)
+			{
+				if(((HomeChannelObject) it).getChannelId().equals(cHomeID))
 				{
-					if(((HomeChannelObject) it).getChannelId().equals(cHomeID))
-					{
-						result = ((HomeChannelObject) it).getChannelName();
-					}
+					result = ((HomeChannelObject) it).getChannelName();
 				}
-			}	
+			}
+		}
+		return result;
+	}
+
+	private String getMonitorChannelName(String cMonitorID)
+	{
+		String result = "";
+		for (Object it : cMoniorObject) {
+			if(it instanceof MonitorChannelObject)
+			{
+				if(((MonitorChannelObject) it).getChannelId().equals(cMonitorID))
+				{
+					result = ((MonitorChannelObject) it).getChannelName();
+				}
+			}
 		}
 		return result;
 	}
 	
-	private String getMonitorChannelName(String cMonitorID)
-	{
-		String result = "";
-		if(cMonitorID != null)
-		{
-			for (Object it : cMoniorObject) {
-				if(it instanceof MonitorChannelObject)
-				{
-					if(((MonitorChannelObject) it).getChannelId().equals(cMonitorID))
-					{
-						result = ((MonitorChannelObject) it).getChannelName();
-					}
-				}
-			}	
-		}
-		return result;
+	public String getHomeChannelId() {
+		return homeChannelId;
 	}
+
+	public String getMonitorChannelId() {
+		return monitorChannelId;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public long getTimeSync() {
+		return timeSync;
+	}
+
+	public String getDownloadClusterId() {
+		return downloadClusterId;
+	}
+
+	public String getRenderClusterId() {
+		return renderClusterId;
+	}
+
+	public String getUploadClusterId() {
+		return uploadClusterId;
+	}
+
+	public int getRecordId() {
+		return recordId;
+	}	
 }

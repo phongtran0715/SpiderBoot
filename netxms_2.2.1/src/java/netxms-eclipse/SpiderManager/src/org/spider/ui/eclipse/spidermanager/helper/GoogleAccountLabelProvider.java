@@ -24,6 +24,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.spider.ui.eclipse.spidermanager.views.GoogleAccountManagerView;
+import org.spider.base.SpiderCodes;
 import org.spider.client.*;
 /**
  * Label provider for user manager
@@ -76,7 +77,23 @@ public class GoogleAccountLabelProvider extends DecoratingLabelProvider implemen
 		case GoogleAccountManagerView.COLUMN_CLIENT_SECRET:
 			return ((GoogleAccountObject) element).getClientSecret();
 		case GoogleAccountManagerView.COLUMN_ACCOUNT_TYPE:
-			return ((GoogleAccountObject) element).getAccountType();
+		{
+			String result = "";
+			switch (((GoogleAccountObject) element).getAccountType()) {
+			case SpiderCodes.ACCOUNT_HELPER:
+				result = "Helper";
+				break;
+			case SpiderCodes.ACCOUNT_SEO:
+				result = "SEO";
+				break;
+			case SpiderCodes.ACCOUNT_ADSEND:
+				result = "Adsend";
+				break;
+			default:
+				break;
+			}
+			return result;
+		}
 		case GoogleAccountManagerView.COLUMN_APPNAME:
 			return ((GoogleAccountObject) element).getAppName();
 		default:

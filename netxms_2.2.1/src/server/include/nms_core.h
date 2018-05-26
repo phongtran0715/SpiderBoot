@@ -217,11 +217,11 @@ enum CertificateType
    CERT_TYPE_SERVER = 3
 };
 
-enum VideoStatus
+enum ClusterType
 {
-   VIDEO_DOWNLOADED  = 1,
-   VIDEO_RENDERED    = 2,
-   VIDEO_UPLOADED    = 3
+   TYPE_DOWNLOADED  = 1,
+   TYPE_RENDERED    = 2,
+   TYPE_UPLOADED    = 3
 };
 
 /**
@@ -772,18 +772,12 @@ private:
    void deleteHomeChannel(NXCPMessage *request);
    void deleteMonitorAccount(NXCPMessage *request);
    void deleteMappingChannel(NXCPMessage *request);
-   void getDownloadCluster(NXCPMessage *request);
-   void getRenderCluster(NXCPMessage *request);
-   void getUploadCluster(NXCPMessage *request);
-   void createDownloadCluster(NXCPMessage *request);
-   void createRenderCluster(NXCPMessage *request);
-   void createUploadCluster(NXCPMessage *request);
-   void modifyDownloadCluster(NXCPMessage *request);
-   void modifyRenderCluster(NXCPMessage *request);
-   void modifyUploadCluster(NXCPMessage *request);
-   void deleteDownloadCluster(NXCPMessage *request);
-   void deleteRenderCluster(NXCPMessage *request);
-   void deleteUploadCluster(NXCPMessage *request);
+   void getCluster(NXCPMessage *request);
+   void createCluster(NXCPMessage *request);
+   void modifyCluster(NXCPMessage *request);
+   void deleteCluster(NXCPMessage *request);
+   TCHAR* getChannelNameById(TCHAR* channelId, TCHAR* tbName);
+   bool checkDeleteCondition(TCHAR* checkId, TCHAR* tbCheck, TCHAR* fieldCheck);
    INT32 getLastestInsertId(TCHAR* tbName);
    AgentConnection* getAgentConnectionByObjectName(TCHAR* objectName);
    bool checkMappingIsExisted(TCHAR* cHomeId, TCHAR* cMonitorId);

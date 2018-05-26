@@ -103,7 +103,7 @@ public class MonitorChannelManagerView extends ViewPart {
 		final String[] names = { "Id",
 				"ChannelID",
 		"Channel Name"};
-		final int[] widths = { 60, 120, 120};
+		final int[] widths = { 60, 240, 240};
 		viewer = new SortableTableViewer(parent, names, widths, 0, SWT.UP, SortableTableViewer.DEFAULT_STYLE);
 		viewer.setContentProvider(new ArrayContentProvider());
 		viewer.setLabelProvider(new MonitorChannelLabelProvider());
@@ -359,12 +359,21 @@ public class MonitorChannelManagerView extends ViewPart {
 		dialog.setText("Confirm to delete item");
 		dialog.setMessage("Do you really want to do delete this item?");
 		if (dialog.open() == SWT.OK) {
-			Object firstElement = selection.getFirstElement();
-			if(firstElement instanceof MonitorChannelObject)
-			{
-				MonitorChannelObject object = (MonitorChannelObject)firstElement;
-				session.deleteMonitorChannel(object.getId());
-			}
+			new ConsoleJob("Delete channel mapping", this,
+					Activator.PLUGIN_ID, null) {
+				@Override
+				protected void runInternal(IProgressMonitor monitor)
+						throws Exception {
+					for (Object object : selection.toList()) {					
+						session.deleteMonitorChannel(((MonitorChannelObject)object).getId(), ((MonitorChannelObject)object).getChannelId());
+					}
+				}
+
+				@Override
+				protected String getErrorMessage() {
+					return "Can not delete mapping channel";
+				}
+			}.start();
 		}
 	}
 }

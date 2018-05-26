@@ -10,6 +10,7 @@ public class HomeChannelObject {
 	String logo;
 	String descTemp;
 	String titleTemp;
+	String tagsTemp;
 	
 	public HomeChannelObject()
 	{
@@ -17,7 +18,7 @@ public class HomeChannelObject {
 	}
 	
 	public HomeChannelObject(int id, String channelId, String channelName, String googleAccount, 
-			String vIntro, String vOutro, String logo, String desctemp, String titletemp)
+			String vIntro, String vOutro, String logo, String desctemp, String titletemp, String tagstemp)
 	{
 		this.id = id;
 		this.channelId = channelId;
@@ -28,6 +29,7 @@ public class HomeChannelObject {
 		this.logo = logo;
 		this.descTemp = desctemp;
 		this.titleTemp = titletemp;
+		this.tagsTemp = tagstemp;
 	}
 
 	public int getId() {
@@ -100,6 +102,14 @@ public class HomeChannelObject {
 
 	public void setTitleTemp(String titleTemp) {
 		this.titleTemp = titleTemp;
+	}
+
+	public String getTagsTemp() {
+		return tagsTemp;
+	}
+
+	public void setTagsTemp(String tagsTemp) {
+		this.tagsTemp = tagsTemp;
 	}
 	
 }

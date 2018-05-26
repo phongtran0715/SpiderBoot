@@ -18,6 +18,8 @@
  */
 package org.netxms.ui.eclipse.spidermanager.dialogs;
 
+import java.io.IOException;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -32,6 +34,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Combo;
+import org.netxms.client.NXCException;
+import org.netxms.client.NXCSession;
+import org.netxms.ui.eclipse.shared.ConsoleSharedData;
+import org.spider.base.SpiderCodes;
+import org.spider.client.HomeChannelObject;
 
 /**
  * User database object creation dialog
@@ -42,23 +50,20 @@ public class CreateGoogleAccoutDialog extends Dialog {
 	private Text txtClientSecret;
 	private Text txtAppName;
 	private Text txtApiKey;
-	
+	Combo cbAccountType;
+
 	private String userName;
 	private String clientSecret;
 	private String appName;
 	private String apiKey;
+	private int accountType;
+	private NXCSession session;
 
 	public CreateGoogleAccoutDialog(Shell parentShell) {
 		super(parentShell);
+		session = ConsoleSharedData.getSession();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets
-	 * .Composite)
-	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
@@ -74,39 +79,43 @@ public class CreateGoogleAccoutDialog extends Dialog {
 
 		Group grpCreateNewAccount = new Group(dialogArea, SWT.NONE);
 		grpCreateNewAccount.setText("Create new account");
-		grpCreateNewAccount.setBounds(5, 10, 516, 171);
+		grpCreateNewAccount.setBounds(5, 10, 516, 217);
 
 		Label label = new Label(grpCreateNewAccount, SWT.NONE);
+		label.setAlignment(SWT.RIGHT);
 		label.setText("Email");
-		label.setBounds(10, 31, 38, 17);
+		label.setBounds(10, 31, 95, 17);
 
 		txtUserName = new Text(grpCreateNewAccount, SWT.BORDER);
 		txtUserName.setTextLimit(150);
-		txtUserName.setBounds(101, 26, 320, 27);
+		txtUserName.setBounds(111, 26, 310, 27);
 
 		Label label_1 = new Label(grpCreateNewAccount, SWT.NONE);
+		label_1.setAlignment(SWT.RIGHT);
 		label_1.setText("Client Secret");
-		label_1.setBounds(10, 65, 86, 17);
+		label_1.setBounds(10, 65, 95, 17);
 
 		txtClientSecret = new Text(grpCreateNewAccount, SWT.BORDER);
 		txtClientSecret.setTextLimit(150);
-		txtClientSecret.setBounds(101, 60, 320, 27);
+		txtClientSecret.setBounds(111, 60, 310, 27);
 
 		Label label_2 = new Label(grpCreateNewAccount, SWT.NONE);
+		label_2.setAlignment(SWT.RIGHT);
 		label_2.setText("App Name");
-		label_2.setBounds(10, 101, 71, 17);
+		label_2.setBounds(10, 101, 95, 17);
 
 		txtAppName = new Text(grpCreateNewAccount, SWT.BORDER);
 		txtAppName.setTextLimit(150);
-		txtAppName.setBounds(101, 96, 320, 27);
+		txtAppName.setBounds(111, 96, 310, 27);
 
 		Label label_3 = new Label(grpCreateNewAccount, SWT.NONE);
+		label_3.setAlignment(SWT.RIGHT);
 		label_3.setText("API Key");
-		label_3.setBounds(10, 134, 50, 17);
+		label_3.setBounds(10, 134, 95, 17);
 
 		txtApiKey = new Text(grpCreateNewAccount, SWT.BORDER);
 		txtApiKey.setTextLimit(150);
-		txtApiKey.setBounds(101, 129, 320, 27);
+		txtApiKey.setBounds(111, 129, 310, 27);
 
 		Button btnClientSecret = new Button(grpCreateNewAccount, SWT.NONE);
 		btnClientSecret.addSelectionListener(new SelectionAdapter() {
@@ -114,7 +123,7 @@ public class CreateGoogleAccoutDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
 				fd.setText("Select client secret file");
-				fd.setFilterExtensions(new String[] {"*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
+				fd.setFilterExtensions(new String[] {"*.*" });
 				fd.setFilterNames(new String[] {
 				"All file" });
 				String fileName = fd.open();
@@ -123,35 +132,32 @@ public class CreateGoogleAccoutDialog extends Dialog {
 		});
 		btnClientSecret.setText("Browse...");
 		btnClientSecret.setBounds(427, 60, 71, 29);
-		//txtAppName.setLayoutData(gridData);
 
+		Label lblAccountType = new Label(grpCreateNewAccount, SWT.NONE);
+		lblAccountType.setAlignment(SWT.RIGHT);
+		lblAccountType.setText("Account Type");
+		lblAccountType.setBounds(10, 167, 95, 17);
+
+		cbAccountType = new Combo(grpCreateNewAccount, SWT.NONE);
+		cbAccountType.setItems(new String[] {"Helper", "SEO", "Adsend"});
+		cbAccountType.setBounds(111, 162, 310, 29);
+		cbAccountType.select(0);
 		return dialogArea;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets
-	 * .Shell)
-	 */
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText("Create new google account");
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
-	 */
+
 	@Override
 	protected void okPressed() {
 		userName = txtUserName.getText();
 		clientSecret = txtClientSecret.getText();
 		appName = txtAppName.getText();
 		apiKey = txtApiKey.getText();
-		
+
 		if(userName == null || userName.isEmpty())
 		{
 			MessageBox dialog =
@@ -160,6 +166,14 @@ public class CreateGoogleAccoutDialog extends Dialog {
 			dialog.setMessage("User name must not empty!");
 			dialog.open();
 			return;	
+		}
+		if(cbAccountType.getText().equals("Helper"))
+		{
+			accountType = SpiderCodes.ACCOUNT_HELPER;
+		}else if(cbAccountType.getText().equals("SEO")){
+			accountType = SpiderCodes.ACCOUNT_SEO;
+		}else{
+			accountType = SpiderCodes.ACCOUNT_ADSEND;
 		}
 		super.okPressed();
 	}
@@ -179,4 +193,8 @@ public class CreateGoogleAccoutDialog extends Dialog {
 	public String getApiKey() {
 		return apiKey;
 	}
+
+	public int getAccountType() {
+		return accountType;
+	}	
 }

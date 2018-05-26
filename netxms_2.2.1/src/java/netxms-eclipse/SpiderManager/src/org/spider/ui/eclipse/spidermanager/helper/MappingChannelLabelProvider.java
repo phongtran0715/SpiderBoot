@@ -77,8 +77,12 @@ public class MappingChannelLabelProvider extends DecoratingLabelProvider impleme
 			return Integer.toString(((MappingChannelObject) element).getId());
 		case MappingChannelManagerView.COLUMN_HOME_CHANNEL_ID:
 			return ((MappingChannelObject) element).getHomeId();
+		case MappingChannelManagerView.COLUMN_HOME_CHANNEL_NAME:
+			return ((MappingChannelObject) element).getHomeName();
 		case MappingChannelManagerView.COLUMN_MONITOR_CHANNEL_ID:
 			return ((MappingChannelObject) element).getMonitorId();
+		case MappingChannelManagerView.COLUMN_MONITOR_CHANNEL_NAME:
+			return ((MappingChannelObject) element).getMonitorName();
 		case MappingChannelManagerView.COLUMN_TIME_SYNC:
 			return Long.toString(((MappingChannelObject) element).getTimeIntervalSync());
 		case MappingChannelManagerView.COLUMN_STATUS_SYNC:

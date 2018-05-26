@@ -5,7 +5,7 @@ public class GoogleAccountObject {
 	private String userName;
 	private String api;
 	private String clientSecret;
-	private String accountType;
+	private int accountType;
 	private String appName;
 	
 	public GoogleAccountObject()
@@ -14,7 +14,7 @@ public class GoogleAccountObject {
 	}
 	
 	public GoogleAccountObject(int id, String userName, String api, 
-			String clientSecret, String accountType, String appName)
+			String clientSecret, int accountType, String appName)
 	{
 		this.id = id;
 		this.userName = userName;
@@ -56,11 +56,11 @@ public class GoogleAccountObject {
 		this.clientSecret = clientSecret;
 	}
 
-	public String getAccountType() {
+	public int getAccountType() {
 		return accountType;
 	}
 
-	public void setAccountType(String accountType) {
+	public void setAccountType(int accountType) {
 		this.accountType = accountType;
 	}
 

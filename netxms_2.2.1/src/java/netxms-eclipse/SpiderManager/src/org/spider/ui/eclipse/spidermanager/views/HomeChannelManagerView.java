@@ -24,6 +24,7 @@ import org.netxms.ui.eclipse.spidermanager.dialogs.CreateHomeChannelDialog;
 import org.netxms.ui.eclipse.spidermanager.dialogs.EditHomeChannelDialog;
 import org.netxms.ui.eclipse.widgets.SortableTableViewer;
 import org.spider.client.HomeChannelObject;
+import org.spider.client.MonitorChannelObject;
 import org.spider.ui.eclipse.spidermanager.Activator;
 import org.spider.ui.eclipse.spidermanager.helper.HomeChannelLabelProvider;
 
@@ -67,6 +68,7 @@ public class HomeChannelManagerView extends ViewPart {
 	public static final int COLUMN_LOGO 			= 6;
 	public static final int COLUMN_DESCRIPTION 		= 7;
 	public static final int COLUMN_TITLE 			= 8;
+	public static final int COLUMN_TAGS 			= 9;
 
 	/*
 	 * The content provider class is responsible for providing objects to the
@@ -115,8 +117,10 @@ public class HomeChannelManagerView extends ViewPart {
 				"VideoOutro",
 				"Logo",
 				"DescriptionTemplate", 
-		"TitleTemplate"};
-		final int[] widths = { 40, 120, 120, 120, 160, 160, 160, 160, 160 };
+				"TitleTemplate",
+				"TagsTemplate"
+				};
+		final int[] widths = { 40, 160, 160, 160, 200, 200, 200, 200, 200, 200 };
 		viewer = new SortableTableViewer(parent, names, widths, 0, SWT.UP, SortableTableViewer.DEFAULT_STYLE);
 
 		viewer.setContentProvider(new ArrayContentProvider());
@@ -313,7 +317,7 @@ public class HomeChannelManagerView extends ViewPart {
 				protected void runInternal(IProgressMonitor monitor)
 						throws Exception {
 					session.createHomeCHannel(dlg.getcId(), dlg.getcName(), dlg.getgAccount(), 
-							dlg.getvIntro(),dlg.getvOutro(),dlg.getLogo(),dlg.getDesc(),dlg.getTitle());
+							dlg.getvIntro(),dlg.getvOutro(),dlg.getLogo(),dlg.getDesc(),dlg.getTitle(), dlg.getTags());
 				}
 
 				@Override
@@ -352,7 +356,7 @@ public class HomeChannelManagerView extends ViewPart {
 					protected void runInternal(IProgressMonitor monitor)
 							throws Exception {
 						session.modifyHomeCHannel(dlg.getId(), dlg.getcId(), dlg.getcName(), dlg.getgAccount(), 
-								dlg.getvIntro(), dlg.getvOutro(), dlg.getLogo(), dlg.getDesc(), dlg.getTitle());
+								dlg.getvIntro(), dlg.getvOutro(), dlg.getLogo(), dlg.getDesc(), dlg.getTitle(),  "");
 					}
 
 					@Override
@@ -388,12 +392,22 @@ public class HomeChannelManagerView extends ViewPart {
 		dialog.setText("Confirm to delete item");
 		dialog.setMessage("Do you really want to do delete this item?");
 		if (dialog.open() == SWT.OK) {
-			Object firstElement = selection.getFirstElement();
-			if(firstElement instanceof HomeChannelObject)
-			{
-				HomeChannelObject object = (HomeChannelObject)firstElement;
-				session.deleteHomeChannel(object.getId());
-			}
+			new ConsoleJob("Delete home mapping", this,
+					Activator.PLUGIN_ID, null) {
+				@Override
+				protected void runInternal(IProgressMonitor monitor)
+						throws Exception {
+					for (Object object : selection.toList()) {					
+						session.deleteHomeChannel(((HomeChannelObject)object).getId(), 
+								((HomeChannelObject)object).getChannelId());
+					}
+				}
+
+				@Override
+				protected String getErrorMessage() {
+					return "Can not delete home channel";
+				}
+			}.start();
 		}
 	}
 }
