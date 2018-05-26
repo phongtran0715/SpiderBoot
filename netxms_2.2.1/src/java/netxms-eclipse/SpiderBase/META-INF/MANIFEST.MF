@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SpiderBase
+Bundle-SymbolicName: SpiderBase
+Bundle-Version: 1.0.0.qualifier
+Export-Package: org.spider.base
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
