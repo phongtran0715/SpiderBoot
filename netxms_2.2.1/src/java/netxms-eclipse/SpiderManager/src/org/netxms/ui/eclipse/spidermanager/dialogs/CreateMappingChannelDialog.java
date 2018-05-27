@@ -18,7 +18,6 @@
  */
 package org.netxms.ui.eclipse.spidermanager.dialogs;
 
-import java.io.Console;
 import java.io.IOException;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -35,23 +34,15 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Combo;
 import org.netxms.client.NXCException;
 import org.netxms.client.NXCSession;
-import org.netxms.client.objects.Cluster;
 import org.netxms.ui.eclipse.shared.ConsoleSharedData;
 import org.spider.base.SpiderCodes;
 import org.spider.client.ClusterObject;
 import org.spider.client.HomeChannelObject;
 import org.spider.client.MonitorChannelObject;
-import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.MouseTrackAdapter;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Link;
 
-/**
- * User database object creation dialog
- * 
- */
 public class CreateMappingChannelDialog extends Dialog {
 	private Text txtTimeSync;
 	private Combo cbHome;
@@ -87,13 +78,6 @@ public class CreateMappingChannelDialog extends Dialog {
 		session = ConsoleSharedData.getSession();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets
-	 * .Composite)
-	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite dialogArea = (Composite) super.createDialogArea(parent);

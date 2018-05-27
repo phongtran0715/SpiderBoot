@@ -31,8 +31,8 @@
             id="org.spider.ui.eclipse.spidermanager.actionSet">
          <menu
                icon="icons/settings_16x16.png"
-               id="spiderMenu"
-               label="Spider &amp;Menu">
+               id="spiderManager"
+               label="Spider &amp;Manager">
             <separator
                   name="googleAccountGroup">
             </separator>
@@ -48,7 +48,8 @@
                icon="icons/gmail_16x16.png"
                id="SpiderManager.googleAccount"
                label="&amp;Google Account"
-               menubarPath="spiderMenu/googleAccountGroup"
+               menubarPath="spiderManager/googleAccountGroup"
+               toolbarPath="spiderManager/googleAccountGroup"
                tooltip="Google Account Manager">
          </action>
          <action
@@ -56,48 +57,54 @@
                icon="icons/playlist_16x16.png"
                id="SpiderManager.homeChannel"
                label="&amp;Home Channel"
-               menubarPath="spiderMenu/channelGroup"
-               style="push">
+               menubarPath="spiderManager/channelGroup"
+               style="push"
+               toolbarPath="spiderManager/channelGroup">
          </action>
          <action
                class="org.spider.ui.eclipse.spidermanager.actions.OpenMonitorChannelManager"
                icon="icons/eye_16x16.png"
                id="SpiderManager.monitorChanel"
                label="&amp;Monitor Channel"
-               menubarPath="spiderMenu/channelGroup"
-               style="push">
+               menubarPath="spiderManager/channelGroup"
+               style="push"
+               toolbarPath="spiderManager/channelGroup">
          </action>
          <action
                class="org.spider.ui.eclipse.spidermanager.actions.OpenMappingChannelManager"
                icon="icons/settings_16x16.png"
                id="SpiderManager.mappingChannel"
                label="&amp;Mapping Channel"
-               menubarPath="spiderMenu/channelGroup"
-               style="push">
+               menubarPath="spiderManager/channelGroup"
+               style="push"
+               toolbarPath="spiderManager/channelGroup">
          </action>
          <action
                class="org.spider.ui.eclipse.spidermanager.actions.OpenDownloadClusterManager"
                icon="icons/sample.gif"
                id="SpiderManager.downloadCluster"
                label="&amp;Download Cluster"
-               menubarPath="spiderMenu/clusterGroup"
-               style="push">
+               menubarPath="spiderManager/clusterGroup"
+               style="push"
+               toolbarPath="spiderManager/clusterGroup">
          </action>
          <action
                class="org.spider.ui.eclipse.spidermanager.actions.OpenRenderClusterManager"
                icon="icons/sample.gif"
                id="SpiderManager.renderCluster"
                label="&amp;Render Cluster"
-               menubarPath="spiderMenu/clusterGroup"
-               style="push">
+               menubarPath="spiderManager/clusterGroup"
+               style="push"
+               toolbarPath="spiderManager/clusterGroup">
          </action>
          <action
                class="org.spider.ui.eclipse.spidermanager.actions.OpenUploadClusterManager"
                icon="icons/sample.gif"
                id="SpiderManager.uploadCluster"
                label="&amp;Upload Cluster"
-               menubarPath="spiderMenu/clusterGroup"
-               style="push">
+               menubarPath="spiderManager/clusterGroup"
+               style="push"
+               toolbarPath="spiderManager/clusterGroup">
          </action>
       </actionSet>
    </extension>

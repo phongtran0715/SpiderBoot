@@ -44,10 +44,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Link;
 
-/**
- * User database object creation dialog
- * 
- */
 public class EditMappingChannelDialog extends Dialog {
 	MappingChannelObject object;
 	private Text txtTimeSync;
@@ -270,20 +266,7 @@ public class EditMappingChannelDialog extends Dialog {
 
 	private void initialData()
 	{
-		//Initial data
-		cbHome.setText(object.getHomeId());
-		cbMonitor.setText(object.getMonitorId());
-		txtTimeSync.setText(Long.toString(object.getTimeIntervalSync()));
-		if(object.getStatusSync() == 0)
-		{
-			cbStatus.setText("disable");
-		}else{
-			cbStatus.setText("enable");
-		}
-		cbDownload.setText(object.getDownloadClusterId());
-		cbRender.setText(object.getRenderClusterId());
-		cbUpload.setText(object.getUploadClusterId());
-		
+		//Initial data for combo box
 		try {
 			if(cHomeObject == null)
 			{
@@ -336,6 +319,26 @@ public class EditMappingChannelDialog extends Dialog {
 				e.printStackTrace();
 			}
 		}
+		
+		//Set data for field
+		cbHome.setText(object.getHomeId());
+		String cHomeName = getHomeChannelName(object.getHomeId());
+		linkHomeChanel.setText("Go to <a href=\"https://www.youtube.com/channel\">" + cHomeName + "</a> channel." );
+		
+		cbMonitor.setText(object.getMonitorId());
+		String cMonitorName = getMonitorChannelName(object.getMonitorId());
+		linkMonitorChanel.setText("Go to <a href=\"https://www.youtube.com/channel\">" + cMonitorName + "</a> channel." );
+		
+		txtTimeSync.setText(Long.toString(object.getTimeIntervalSync()));
+		if(object.getStatusSync() == 0)
+		{
+			cbStatus.setText("disable");
+		}else{
+			cbStatus.setText("enable");
+		}
+		cbDownload.setText(object.getDownloadClusterId());
+		cbRender.setText(object.getRenderClusterId());
+		cbUpload.setText(object.getUploadClusterId());
 	}
 
 	private void setHomeChannelData()

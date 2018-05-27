@@ -133,8 +133,8 @@ public class EditHomeChannelDialog extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
-				fd.setText("Select client secret file");
-				fd.setFilterExtensions(new String[] {"*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
+				fd.setText("Select video intro");
+				fd.setFilterExtensions(new String[] {"*.*" });
 				fd.setFilterNames(new String[] {
 				"All file" });
 				String fileName = fd.open();
@@ -185,7 +185,7 @@ public class EditHomeChannelDialog extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
-				fd.setText("Select client secret file");
+				fd.setText("Select video outro");
 				fd.setFilterExtensions(new String[] {"*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
 				fd.setFilterNames(new String[] {
 				"All file" });
@@ -201,7 +201,7 @@ public class EditHomeChannelDialog extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
-				fd.setText("Select client secret file");
+				fd.setText("Select logo image");
 				fd.setFilterExtensions(new String[] {"*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
 				fd.setFilterNames(new String[] {
 				"All file" });
@@ -217,7 +217,7 @@ public class EditHomeChannelDialog extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
-				fd.setText("Select client secret file");
+				fd.setText("Select title template file");
 				fd.setFilterExtensions(new String[] {"*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
 				fd.setFilterNames(new String[] {
 				"All file" });
@@ -233,7 +233,7 @@ public class EditHomeChannelDialog extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
-				fd.setText("Select client secret file");
+				fd.setText("Select description template file");
 				fd.setFilterExtensions(new String[] {"*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
 				fd.setFilterNames(new String[] {
 				"All file" });
@@ -267,7 +267,7 @@ public class EditHomeChannelDialog extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
-				fd.setText("Select client secret file");
+				fd.setText("Select tag template file");
 				fd.setFilterExtensions(new String[] {"*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
 				fd.setFilterNames(new String[] {
 				"All file" });

@@ -18,7 +18,6 @@
  */
 package org.netxms.ui.eclipse.spidermanager.dialogs;
 
-import java.io.IOException;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
@@ -35,9 +34,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Combo;
-import org.netxms.client.NXCException;
-import org.netxms.client.NXCSession;
-import org.netxms.ui.eclipse.shared.ConsoleSharedData;
 import org.spider.base.SpiderCodes;
 import org.spider.client.GoogleAccountObject;
 
