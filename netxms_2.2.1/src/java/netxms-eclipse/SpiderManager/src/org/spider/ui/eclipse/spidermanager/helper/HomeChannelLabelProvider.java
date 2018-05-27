@@ -30,17 +30,6 @@ import org.spider.client.*;
  */
 public class HomeChannelLabelProvider extends DecoratingLabelProvider implements
 		ITableLabelProvider {
-	private static final String[] HOME_CHANNEL_METHOD = {
-			"Id",
-			"ChannelId",
-			"ChannelName",
-			"GoogleAccount",
-			"VideoIntro",
-			"VideoOutro",
-			"Logo",
-			"DescriptionTemplate",
-			"TitleTemplate", 
-			"TagsTemplate"};
 
 	/**
 	 * Constructor
@@ -50,28 +39,16 @@ public class HomeChannelLabelProvider extends DecoratingLabelProvider implements
 				.getDecoratorManager().getLabelDecorator());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang
-	 * .Object, int)
-	 */
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
 		return (columnIndex == 0) ? getImage(element) : null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang
-	 * .Object, int)
-	 */
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		switch (columnIndex) {
+		case HomeChannelManagerView.COLUMN_STT:
+			return Integer.toString(((HomeChannelObject)element).getStt());
 		case HomeChannelManagerView.COLUMN_ID:
 			return Integer.toString(((HomeChannelObject) element).getId());
 		case HomeChannelManagerView.COLUMN_CHANNEL_ID:

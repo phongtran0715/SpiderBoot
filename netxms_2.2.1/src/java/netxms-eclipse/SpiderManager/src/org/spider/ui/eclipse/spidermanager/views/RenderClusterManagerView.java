@@ -58,12 +58,6 @@ public class RenderClusterManagerView extends ViewPart {
 	private NXCSession session;
 	private SessionListener sessionListener;
 
-	public static final int COLUMN_RECORD_ID 			= 0;
-	public static final int COLUMN_CLUSTER_ID 			= 1;
-	public static final int COLUMN_CLUSTER_NAME 		= 2;
-	public static final int COLUMN_IP_ADDRESS 			= 3;
-	public static final int COLUMN_PORT 				= 4;
-
 
 	/*
 	 * The content provider class is responsible for providing objects to the
@@ -104,14 +98,15 @@ public class RenderClusterManagerView extends ViewPart {
 	 */
 	public void createPartControl(Composite parent) {
 		session = ConsoleSharedData.getSession();
-		final String[] names = { 
+		final String[] names = {
+				"STT",
 				"Id",
 				"Cluster Id", 
 				"Cluster Name",
 				"IP Address",
 				"Port"
 		};
-		final int[] widths = { 40, 200, 200, 200, 120};
+		final int[] widths = {60, 0, 200, 200, 200, 120};
 		viewer = new SortableTableViewer(parent, names, widths, 0, SWT.UP, SortableTableViewer.DEFAULT_STYLE);
 
 		viewer.setContentProvider(new ArrayContentProvider());

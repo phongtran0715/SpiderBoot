@@ -23,6 +23,8 @@ import org.netxms.ui.eclipse.shared.ConsoleSharedData;
 import org.netxms.ui.eclipse.spidermanager.dialogs.CreateGoogleAccoutDialog;
 import org.netxms.ui.eclipse.spidermanager.dialogs.EditGoogleAccoutDialog;
 import org.netxms.ui.eclipse.widgets.SortableTableViewer;
+import org.spider.base.SpiderCodes;
+import org.spider.client.ClusterObject;
 import org.spider.client.GoogleAccountObject;
 import org.spider.ui.eclipse.spidermanager.Activator;
 import org.spider.ui.eclipse.spidermanager.helper.GoogleAccountLabelProvider;
@@ -58,12 +60,13 @@ public class GoogleAccountManagerView extends ViewPart {
 	private SessionListener sessionListener;
 
 	// Columns
-	public static final int COLUMN_ID = 0;
-	public static final int COLUMN_USER_NAME = 1;
-	public static final int COLUMN_API = 2;
-	public static final int COLUMN_CLIENT_SECRET = 3;
-	public static final int COLUMN_ACCOUNT_TYPE = 4;
-	public static final int COLUMN_APPNAME = 5;
+	public static final int COLUMN_STT 				= 0;
+	public static final int COLUMN_ID 				= 1;
+	public static final int COLUMN_USER_NAME 		= 2;
+	public static final int COLUMN_API 				= 3;
+	public static final int COLUMN_CLIENT_SECRET 	= 4;
+	public static final int COLUMN_ACCOUNT_TYPE 	= 5;
+	public static final int COLUMN_APPNAME 			= 6;
 
 	class ViewLabelProvider extends LabelProvider implements
 	ITableLabelProvider {
@@ -96,13 +99,15 @@ public class GoogleAccountManagerView extends ViewPart {
 	 */
 	public void createPartControl(Composite parent) {
 		session = ConsoleSharedData.getSession();
-		final String[] names = { "Id",
+		final String[] names = { 
+				"STT",
+				"Id",
 				"UserName",
 				"Api",
 				"ClientSecrect",
 				"AccountType",
 		"AppName"};
-		final int[] widths = { 80, 160, 160, 160, 160, 160 };
+		final int[] widths = { 60, 0, 160, 160, 160, 160, 160 };
 		viewer = new SortableTableViewer(parent, names, widths, 0, SWT.UP, SortableTableViewer.DEFAULT_STYLE);
 
 		viewer.setContentProvider(new ArrayContentProvider());
@@ -144,7 +149,7 @@ public class GoogleAccountManagerView extends ViewPart {
 				}
 			}
 		};
-		
+
 		// Request server to lock user database, and on success refresh view
 		new ConsoleJob("", this,
 				Activator.PLUGIN_ID, null) {
@@ -171,7 +176,7 @@ public class GoogleAccountManagerView extends ViewPart {
 					@Override
 					public void run() {
 						GoogleAccountManagerView.this.getViewSite().getPage()
-								.hideView(GoogleAccountManagerView.this);
+						.hideView(GoogleAccountManagerView.this);
 					}
 				});
 			}
@@ -257,7 +262,7 @@ public class GoogleAccountManagerView extends ViewPart {
 			}
 		};
 		deleteAccount.setToolTipText("Delete account");
-		
+
 		actionRefresh = new RefreshAction(this) {
 			@Override
 			public void run() {
@@ -356,13 +361,23 @@ public class GoogleAccountManagerView extends ViewPart {
 		dialog.setText("Confirm to delete item");
 		dialog.setMessage("Do you really want to do delete this item?");
 		if (dialog.open() == SWT.OK) {
-			final Object firstElement = selection.getFirstElement();
-			if(firstElement instanceof GoogleAccountObject)
-			{
-				GoogleAccountObject gObject = (GoogleAccountObject)firstElement;
-				int id = gObject.getId();
-				session.deleteGoogleAccount(gObject.getId());
-			}
+			new ConsoleJob("Delete google account", this,
+					Activator.PLUGIN_ID, null) {
+				@Override
+				protected void runInternal(IProgressMonitor monitor)
+						throws Exception {
+					for (Object object : selection.toList()) {					
+						session.deleteCluster(((ClusterObject)object).getRecordID(), 
+								SpiderCodes.CLUSTER_DOWNLOAD);
+						session.deleteGoogleAccount(((GoogleAccountObject)object).getId());
+					}
+				}
+
+				@Override
+				protected String getErrorMessage() {
+					return "Can not delete google account";
+				}
+			}.start();
 		}
 	}
 }

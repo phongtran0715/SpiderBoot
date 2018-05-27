@@ -1,6 +1,7 @@
 package org.spider.client;
 
 public class ClusterObject {
+	int stt;
 	int recordID;
 	String clusterId;
 	String clusterName;
@@ -10,10 +11,11 @@ public class ClusterObject {
 	public ClusterObject() {
 	}
 
-	public ClusterObject(int recordId, String clusterId, 
+	public ClusterObject(int stt, int recordId, String clusterId, 
 			String clusterName, String ipAddress, int port) 
 	{
 		super();
+		this.stt = stt;
 		this.recordID = recordId;
 		this.clusterId = clusterId;
 		this.clusterName = clusterName;
@@ -59,6 +61,14 @@ public class ClusterObject {
 
 	public void setRecordID(int recordID) {
 		this.recordID = recordID;
+	}
+
+	public int getStt() {
+		return stt;
+	}
+
+	public void setStt(int stt) {
+		this.stt = stt;
 	}
 	
 }

@@ -3762,6 +3762,7 @@ public class NXCSession {
 		msg = waitForRCC(rqId);
 		int count = msg.getFieldAsInt32(NXCPCodes.VID_NUM_VARIABLES);
 		long baseIndex = NXCPCodes.VID_VARLIST_BASE;
+		int stt = 0;
 		for (int i = 0; i < count; i++, baseIndex += 10) 
 		{
 			int id = msg.getFieldAsInt32(baseIndex);
@@ -3770,7 +3771,7 @@ public class NXCSession {
 			String clientSecret = msg.getFieldAsString(baseIndex + 3);
 			int accountType = msg.getFieldAsInt32(baseIndex + 4);
 			String appname = msg.getFieldAsString(baseIndex + 5);
-			googleAccountList.put(id, new GoogleAccountObject(id, userName, 
+			googleAccountList.put(id, new GoogleAccountObject(++stt, id, userName, 
 					api, clientSecret, accountType, appname));
 		}
 		return googleAccountList.values().toArray();
@@ -3790,6 +3791,7 @@ public class NXCSession {
 		msg = waitForRCC(rqId);
 		int count = msg.getFieldAsInt32(NXCPCodes.VID_NUM_VARIABLES);
 		long baseIndex = NXCPCodes.VID_VARLIST_BASE;
+		int stt = 0;
 		for (int i = 0; i < count; i++, baseIndex += 10) 
 		{
 			int id = msg.getFieldAsInt32(baseIndex);
@@ -3802,7 +3804,7 @@ public class NXCSession {
 			String  desc = msg.getFieldAsString(baseIndex + 7);
 			String  title = msg.getFieldAsString(baseIndex + 8);
 			String  tags = msg.getFieldAsString(baseIndex + 9);
-			homeChannelList.put(id , new HomeChannelObject(id, cId, cName, gAccount,
+			homeChannelList.put(id , new HomeChannelObject(++stt, id, cId, cName, gAccount,
 					vIntro, vOutro, logo, desc, title, tags));
 		}
 		return homeChannelList.values().toArray();
@@ -3824,12 +3826,13 @@ public class NXCSession {
 		msg = waitForRCC(rqId);
 		int count = msg.getFieldAsInt32(NXCPCodes.VID_NUM_VARIABLES);
 		long baseIndex = NXCPCodes.VID_VARLIST_BASE;
+		int stt = 0;
 		for (int i = 0; i < count; i++, baseIndex += 10) 
 		{
 			int id = msg.getFieldAsInt32(baseIndex);
 			String  cId = msg.getFieldAsString(baseIndex + 1);
 			String  cName = msg.getFieldAsString(baseIndex + 2);
-			monitorChannleList.put(id , new MonitorChannelObject(id, cId, cName));
+			monitorChannleList.put(id , new MonitorChannelObject(++stt, id, cId, cName));
 		}
 
 		return monitorChannleList.values().toArray();
@@ -3845,6 +3848,7 @@ public class NXCSession {
 		msg = waitForRCC(rqId);
 		int count = msg.getFieldAsInt32(NXCPCodes.VID_NUM_VARIABLES);
 		long baseIndex = NXCPCodes.VID_VARLIST_BASE;
+		int stt = 0;
 		for (int i = 0; i < count; i++, baseIndex += 10) 
 		{
 			int  id = msg.getFieldAsInt32(baseIndex);
@@ -3858,7 +3862,7 @@ public class NXCSession {
 			String  downloadCusterID = msg.getFieldAsString(baseIndex + 8);
 			String  renderClusterId = msg.getFieldAsString(baseIndex + 9);
 			String  uploadClusterId = msg.getFieldAsString(baseIndex + 10);
-			mappingChannleList.put(id , new MappingChannelObject(id, cHomeId, cHomeName, cMonitorId, cMonitorName,  
+			mappingChannleList.put(id , new MappingChannelObject(++ stt, id, cHomeId, cHomeName, cMonitorId, cMonitorName,  
 					timeSync, statusSync, lastSyncTime, downloadCusterID, renderClusterId, uploadClusterId));
 
 		}
@@ -3894,6 +3898,7 @@ public class NXCSession {
 		msg = waitForRCC(rqId);
 		int count = msg.getFieldAsInt32(NXCPCodes.VID_NUM_VARIABLES);
 		long baseIndex = NXCPCodes.VID_VARLIST_BASE;
+		int stt =0;
 		for (int i = 0; i < count; i++, baseIndex += 10) 
 		{
 			int recordId = msg.getFieldAsInt32(baseIndex);
@@ -3902,7 +3907,7 @@ public class NXCSession {
 			String clusterName = msg.getFieldAsString(baseIndex + 2);
 			String ipAddress = msg.getFieldAsString(baseIndex + 3);
 			int port = msg.getFieldAsInt32(baseIndex + 4);
-			clusterObjectList.put(i , new ClusterObject(recordId, clusterId, clusterName, ipAddress, port));
+			clusterObjectList.put(i , new ClusterObject(++stt, recordId, clusterId, clusterName, ipAddress, port));
 		}
 		return clusterObjectList.values().toArray();
 	}
@@ -3946,7 +3951,7 @@ public class NXCSession {
 	public void createHomeCHannel(String cId, String cName, String gAccount, 
 			String vIntro, String vOutro, String logo, String desc, String title, String tags) 
 					throws IOException, NXCException
-			{
+					{
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_CREATE_HOME_CHANNEL);
 		msg.setField(SpiderCodes.VID_HOME_CHANNEL_ID, cId);
 		msg.setField(SpiderCodes.VID_HOME_CHANNEL_NAME, cName);
@@ -3964,12 +3969,12 @@ public class NXCSession {
 		if (code == 0) //RCC_SUCCESS
 			sendNotification(new SessionNotification(
 					SessionNotification.HOME_CHANNEL_CHANGED, code));
-			}
+					}
 
 	public void modifyHomeCHannel(int id, String cId, String cName, String gAccount, 
 			String vIntro, String vOutro, String logo, String desc, String title, String tags) 
 					throws IOException, NXCException
-			{
+					{
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_MOD_HOME_CHANNEL);
 		msg.setFieldInt32(SpiderCodes.VID_HOME_CHANNEL_RECORD_ID, id);
 		msg.setField(SpiderCodes.VID_HOME_CHANNEL_ID, cId);
@@ -3987,7 +3992,7 @@ public class NXCSession {
 		if (code == 0) //RCC_SUCCESS
 			sendNotification(new SessionNotification(
 					SessionNotification.HOME_CHANNEL_CHANGED, code));
-			}
+					}
 
 	public void modifyCluster(int recordId, String clusterId, String clusterName, String ipAddress, int port, int clusterType) 
 			throws IOException, NXCException

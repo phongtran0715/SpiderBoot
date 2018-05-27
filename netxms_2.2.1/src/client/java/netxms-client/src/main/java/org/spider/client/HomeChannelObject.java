@@ -1,6 +1,7 @@
 package org.spider.client;
 
 public class HomeChannelObject {
+	int stt;
 	int id;
 	String channelId;
 	String channelName;
@@ -17,9 +18,10 @@ public class HomeChannelObject {
 		
 	}
 	
-	public HomeChannelObject(int id, String channelId, String channelName, String googleAccount, 
+	public HomeChannelObject(int stt, int id, String channelId, String channelName, String googleAccount, 
 			String vIntro, String vOutro, String logo, String desctemp, String titletemp, String tagstemp)
 	{
+		this.stt = stt;
 		this.id = id;
 		this.channelId = channelId;
 		this.channelName = channelName;
@@ -110,6 +112,14 @@ public class HomeChannelObject {
 
 	public void setTagsTemp(String tagsTemp) {
 		this.tagsTemp = tagsTemp;
+	}
+
+	public int getStt() {
+		return stt;
+	}
+
+	public void setStt(int stt) {
+		this.stt = stt;
 	}
 	
 }

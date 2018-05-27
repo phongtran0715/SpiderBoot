@@ -57,9 +57,10 @@ public class MonitorChannelManagerView extends ViewPart {
 	private NXCSession session;
 	private SessionListener sessionListener;
 
-	public static final int COLUMN_ID 				= 0;
-	public static final int COLUMN_CHANNEL_ID 		= 1;
-	public static final int COLUMN_CHANNEL_NAME 	= 2;
+	public static final int COLUMN_STT 				= 0;
+	public static final int COLUMN_ID 				= 1;
+	public static final int COLUMN_CHANNEL_ID 		= 2;
+	public static final int COLUMN_CHANNEL_NAME 	= 3;
 
 	/*
 	 * The content provider class is responsible for providing objects to the
@@ -100,10 +101,13 @@ public class MonitorChannelManagerView extends ViewPart {
 	 */
 	public void createPartControl(Composite parent) {
 		session = ConsoleSharedData.getSession();
-		final String[] names = { "Id",
+		final String[] names = { 
+				"STT",
+				"Id",
 				"ChannelID",
-		"Channel Name"};
-		final int[] widths = { 60, 240, 240};
+				"Channel Name"
+				};
+		final int[] widths = {60, 0, 240, 240};
 		viewer = new SortableTableViewer(parent, names, widths, 0, SWT.UP, SortableTableViewer.DEFAULT_STYLE);
 		viewer.setContentProvider(new ArrayContentProvider());
 		viewer.setLabelProvider(new MonitorChannelLabelProvider());

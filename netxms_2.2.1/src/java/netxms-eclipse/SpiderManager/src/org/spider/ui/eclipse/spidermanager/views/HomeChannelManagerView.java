@@ -58,17 +58,17 @@ public class HomeChannelManagerView extends ViewPart {
 	private NXCSession session;
 	private SessionListener sessionListener;
 	
-
-	public static final int COLUMN_ID 				= 0;
-	public static final int COLUMN_CHANNEL_ID 		= 1;
-	public static final int COLUMN_CHANNEL_NAME 	= 2;
-	public static final int COLUMN_GOOGLE_ACCOUNT 	= 3;
-	public static final int COLUMN_VIDEO_INTRO 		= 4;
-	public static final int COLUMN_VIDEO_OUTRO 		= 5;
-	public static final int COLUMN_LOGO 			= 6;
-	public static final int COLUMN_DESCRIPTION 		= 7;
-	public static final int COLUMN_TITLE 			= 8;
-	public static final int COLUMN_TAGS 			= 9;
+	public static final int COLUMN_STT 				= 0;
+	public static final int COLUMN_ID 				= 1;
+	public static final int COLUMN_CHANNEL_ID 		= 2;
+	public static final int COLUMN_CHANNEL_NAME 	= 3;
+	public static final int COLUMN_GOOGLE_ACCOUNT 	= 4;
+	public static final int COLUMN_VIDEO_INTRO 		= 5;
+	public static final int COLUMN_VIDEO_OUTRO 		= 6;
+	public static final int COLUMN_LOGO 			= 7;
+	public static final int COLUMN_DESCRIPTION 		= 8;
+	public static final int COLUMN_TITLE 			= 9;
+	public static final int COLUMN_TAGS 			= 10;
 
 	/*
 	 * The content provider class is responsible for providing objects to the
@@ -109,7 +109,9 @@ public class HomeChannelManagerView extends ViewPart {
 	 */
 	public void createPartControl(Composite parent) {
 		session = ConsoleSharedData.getSession();
-		final String[] names = { "Id", 
+		final String[] names = { 
+				"STT",
+				"Id", 
 				"ChannelId",
 				"ChannelName",
 				"GoogleAccount",
@@ -120,7 +122,7 @@ public class HomeChannelManagerView extends ViewPart {
 				"TitleTemplate",
 				"TagsTemplate"
 				};
-		final int[] widths = { 40, 160, 160, 160, 200, 200, 200, 200, 200, 200 };
+		final int[] widths = { 60, 0, 160, 160, 160, 200, 200, 200, 200, 200, 200 };
 		viewer = new SortableTableViewer(parent, names, widths, 0, SWT.UP, SortableTableViewer.DEFAULT_STYLE);
 
 		viewer.setContentProvider(new ArrayContentProvider());

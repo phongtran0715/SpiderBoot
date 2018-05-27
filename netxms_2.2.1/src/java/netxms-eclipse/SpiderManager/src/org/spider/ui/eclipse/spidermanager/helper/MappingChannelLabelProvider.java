@@ -30,18 +30,6 @@ import org.spider.client.*;
  */
 public class MappingChannelLabelProvider extends DecoratingLabelProvider implements
 		ITableLabelProvider {
-	private static final String[] CHANNEL_MAPPING_METHOD = {
-			"Id",
-			"HomeChannelId",
-			"HomeChannelName",
-			"MonitorChannelId",
-			"MonitorChannelName",
-			"TimeInterval",
-			"StatusSync",
-			"LastSyncTime",
-			"DownloadClusterId",
-			"ProcessClusterId",
-			"UploadClusterId"};
 
 	/**
 	 * Constructor
@@ -51,28 +39,16 @@ public class MappingChannelLabelProvider extends DecoratingLabelProvider impleme
 				.getDecoratorManager().getLabelDecorator());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang
-	 * .Object, int)
-	 */
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
 		return (columnIndex == 0) ? getImage(element) : null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang
-	 * .Object, int)
-	 */
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		switch (columnIndex) {
+		case MappingChannelManagerView.COLUMN_STT:
+		return Integer.toString(((MappingChannelObject)element).getStt());
 		case MappingChannelManagerView.COLUMN_ID:
 			return Integer.toString(((MappingChannelObject) element).getId());
 		case MappingChannelManagerView.COLUMN_HOME_CHANNEL_ID:

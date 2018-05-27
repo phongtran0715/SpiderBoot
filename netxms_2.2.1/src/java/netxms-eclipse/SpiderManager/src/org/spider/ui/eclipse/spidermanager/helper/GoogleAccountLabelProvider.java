@@ -32,6 +32,7 @@ import org.spider.client.*;
 public class GoogleAccountLabelProvider extends DecoratingLabelProvider implements
 		ITableLabelProvider {
 	private static final String[] GOOGLE_METHOD = {
+			"STT",
 			"Id",
 			"Username",
 			"ClientSecret",
@@ -68,6 +69,8 @@ public class GoogleAccountLabelProvider extends DecoratingLabelProvider implemen
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		switch (columnIndex) {
+		case GoogleAccountManagerView.COLUMN_STT:
+			return Integer.toString(((GoogleAccountObject)element).getStt());
 		case GoogleAccountManagerView.COLUMN_ID:
 			return Integer.toString(((GoogleAccountObject) element).getId());
 		case GoogleAccountManagerView.COLUMN_USER_NAME:

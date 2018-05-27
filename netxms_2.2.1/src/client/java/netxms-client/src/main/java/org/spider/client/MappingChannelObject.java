@@ -1,6 +1,7 @@
 package org.spider.client;
 
 public class MappingChannelObject {
+	int stt;
 	int id;
 	String homeId;
 	String homeName;
@@ -16,12 +17,13 @@ public class MappingChannelObject {
 	public MappingChannelObject() {
 	}
 
-	public MappingChannelObject(int id, String homeId, 
+	public MappingChannelObject(int stt, int id, String homeId, 
 			String homeName, String monitorId, String monitorName,
 			long timeIntervalSync, int statusSync,
 			String lastSyncTime, String downloadClusterId,
 			String renderClusterId, String uploadClusterId) {
 		super();
+		this.stt = stt;
 		this.id = id;
 		this.homeId = homeId;
 		this.homeName = homeName;
@@ -121,4 +123,13 @@ public class MappingChannelObject {
 	public void setUploadClusterId(String uploadClusterId) {
 		this.uploadClusterId = uploadClusterId;
 	}
+
+	public int getStt() {
+		return stt;
+	}
+
+	public void setStt(int stt) {
+		this.stt = stt;
+	}
+	
 }

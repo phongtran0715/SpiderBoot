@@ -31,11 +31,6 @@ import org.spider.client.*;
  */
 public class MonitorChannelLabelProvider extends DecoratingLabelProvider implements
 		ITableLabelProvider {
-	private static final String[] MONITOR_CHANNEL_METHOD = {
-			"Id",
-			"ChannelId",
-			"ChannelName"
-			};
 
 	/**
 	 * Constructor
@@ -45,28 +40,16 @@ public class MonitorChannelLabelProvider extends DecoratingLabelProvider impleme
 				.getDecoratorManager().getLabelDecorator());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang
-	 * .Object, int)
-	 */
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
 		return (columnIndex == 0) ? getImage(element) : null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang
-	 * .Object, int)
-	 */
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		switch (columnIndex) {
+		case MonitorChannelManagerView.COLUMN_STT:
+			return Integer.toString(((MonitorChannelObject)element).getStt());
 		case MonitorChannelManagerView.COLUMN_ID:
 			return Integer.toString(((MonitorChannelObject) element).getId());
 		case MonitorChannelManagerView.COLUMN_CHANNEL_ID:

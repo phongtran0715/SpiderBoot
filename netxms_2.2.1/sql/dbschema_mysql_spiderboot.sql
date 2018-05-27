@@ -1,4 +1,6 @@
+USE netxms_db;
 -- google_account
+DROP TABLE IF EXISTS `google_account`;
 CREATE TABLE `google_account` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `UserName` varchar(250) NOT NULL,
@@ -10,6 +12,7 @@ CREATE TABLE `google_account` (
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 -- home_channel_list
+DROP TABLE IF EXISTS `home_channel_list`;
 CREATE TABLE `home_channel_list` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `ChannelId` varchar(30) NOT NULL,
@@ -25,6 +28,7 @@ CREATE TABLE `home_channel_list` (
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
 -- monitor_channel_list
+DROP TABLE IF EXISTS `monitor_channel_list`;
 CREATE TABLE `monitor_channel_list` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `ChannelId` varchar(30) NOT NULL,
@@ -33,6 +37,7 @@ CREATE TABLE `monitor_channel_list` (
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
 
 -- channel_mapping
+DROP TABLE IF EXISTS `channel_mapping`;
 CREATE TABLE `channel_mapping` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `HomeChannelId` varchar(30) DEFAULT NULL,
@@ -47,6 +52,7 @@ CREATE TABLE `channel_mapping` (
 ) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=utf8;
 
 -- video_container
+DROP TABLE IF EXISTS `video_container`;
 CREATE TABLE `video_container` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `VideoId` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
@@ -66,6 +72,7 @@ CREATE TABLE `video_container` (
 
 
 -- download_cluster
+DROP TABLE IF EXISTS `download_cluster`;
 CREATE TABLE `download_cluster` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `ClusterId` varchar(45) NOT NULL,
@@ -76,6 +83,7 @@ CREATE TABLE `download_cluster` (
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=latin1;
 
 -- render_cluster
+DROP TABLE IF EXISTS `render_cluster`;
 CREATE TABLE `render_cluster` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `ClusterId` varchar(45) NOT NULL,
@@ -86,6 +94,7 @@ CREATE TABLE `render_cluster` (
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
 
 -- upload_cluster
+DROP TABLE IF EXISTS `upload_cluster`;
 CREATE TABLE `upload_cluster` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `ClusterId` varchar(45) NOT NULL,

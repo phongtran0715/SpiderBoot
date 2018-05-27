@@ -446,7 +446,7 @@
 /* #undef HAVE_LIBSOCKET */
 
 /* Define to 1 if you have the `sqlite3' library (-lsqlite3). */
-#define HAVE_LIBSQLITE3 1
+/* #undef HAVE_LIBSQLITE3 */
 
 /* Define to 1 if libssh is available */
 #define HAVE_LIBSSH 1
@@ -1033,7 +1033,7 @@
 #define PACKAGE_NAME "NetXMS"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "NetXMS 5559b0f"
+#define PACKAGE_STRING "NetXMS 272e2f8"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "netxms"
@@ -1042,7 +1042,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "5559b0f"
+#define PACKAGE_VERSION "272e2f8"
 
 /* Required cast for rl_insert */
 /* #undef RL_INSERT_CAST */
@@ -1125,7 +1125,7 @@
 /* #undef USE_RADCLI */
 
 /* Version number of package */
-#define VERSION "5559b0f"
+#define VERSION "272e2f8"
 
 /* Define to 1 if you have CommonCrypto library and headers */
 /* #undef WITH_COMMONCRYPTO */
@@ -1171,7 +1171,7 @@
 
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */
-#define YYTEXT_POINTER 1
+/* #undef YYTEXT_POINTER */
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

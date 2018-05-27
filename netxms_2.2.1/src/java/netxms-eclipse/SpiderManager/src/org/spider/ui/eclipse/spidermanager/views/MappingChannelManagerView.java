@@ -59,17 +59,18 @@ public class MappingChannelManagerView extends ViewPart {
 	private NXCSession session;
 	private SessionListener sessionListener;
 
-	public static final int COLUMN_ID 					= 0;
-	public static final int COLUMN_HOME_CHANNEL_ID 		= 1;
-	public static final int COLUMN_HOME_CHANNEL_NAME 	= 2;
-	public static final int COLUMN_MONITOR_CHANNEL_ID 	= 3;
-	public static final int COLUMN_MONITOR_CHANNEL_NAME = 4;
-	public static final int COLUMN_TIME_SYNC 			= 5;
-	public static final int COLUMN_STATUS_SYNC 			= 6;
-	public static final int COLUMN_LAST_SYNC_TIME 		= 7;
-	public static final int COLUMN_DOWNLOAD_ID		 	= 8;
-	public static final int COLUMN_RENDER_ID		 	= 9;
-	public static final int COLUMN_UPLOAD_ID		 	= 10;
+	public static final int COLUMN_STT 					= 0;
+	public static final int COLUMN_ID 					= 1;
+	public static final int COLUMN_HOME_CHANNEL_ID 		= 2;
+	public static final int COLUMN_HOME_CHANNEL_NAME 	= 3;
+	public static final int COLUMN_MONITOR_CHANNEL_ID 	= 4;
+	public static final int COLUMN_MONITOR_CHANNEL_NAME = 5;
+	public static final int COLUMN_TIME_SYNC 			= 6;
+	public static final int COLUMN_STATUS_SYNC 			= 7;
+	public static final int COLUMN_LAST_SYNC_TIME 		= 8;
+	public static final int COLUMN_DOWNLOAD_ID		 	= 9;
+	public static final int COLUMN_RENDER_ID		 	= 10;
+	public static final int COLUMN_UPLOAD_ID		 	= 11;
 
 	/*
 	 * The content provider class is responsible for providing objects to the
@@ -110,7 +111,9 @@ public class MappingChannelManagerView extends ViewPart {
 	 */
 	public void createPartControl(Composite parent) {
 		session = ConsoleSharedData.getSession();
-		final String[] names = { "Id",
+		final String[] names = { 
+				"STT",
+				"Id",
 				"HomeChannelId",
 				"HomeChannelName",
 				"MonitorChannelId",
@@ -121,7 +124,7 @@ public class MappingChannelManagerView extends ViewPart {
 				"DownloadClusterId", 
 				"ProcessClusterId",
 		"UploadClusterId"};
-		final int[] widths = { 40, 240, 240, 240, 240, 120, 120, 160, 160, 160, 160 };
+		final int[] widths = {60, 0, 240, 240, 240, 240, 120, 120, 160, 160, 160, 160 };
 		viewer = new SortableTableViewer(parent, names, widths, 0, SWT.UP, SortableTableViewer.DEFAULT_STYLE);
 		viewer.setContentProvider(new ArrayContentProvider());
 		viewer.setLabelProvider(new MappingChannelLabelProvider());

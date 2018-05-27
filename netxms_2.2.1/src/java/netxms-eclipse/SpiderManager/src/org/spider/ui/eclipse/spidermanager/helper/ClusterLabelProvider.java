@@ -31,6 +31,7 @@ import org.spider.client.*;
 public class ClusterLabelProvider extends DecoratingLabelProvider implements
 		ITableLabelProvider {
 	private static final String[] CLUSTER_METHOD = {
+			"STT",
 			"ID",
 			"Cluster ID",
 			"Cluster Name",
@@ -68,6 +69,8 @@ public class ClusterLabelProvider extends DecoratingLabelProvider implements
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		switch (columnIndex) {
+		case DownloadClusterManagerView.COLUMN_STT:
+			return Integer.toString(((ClusterObject)element).getStt());
 		case DownloadClusterManagerView.COLUMN_RECORD_ID:
 			return Integer.toString(((ClusterObject) element).getRecordID());
 		case DownloadClusterManagerView.COLUMN_CLUSTER_ID:
