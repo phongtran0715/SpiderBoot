@@ -13,7 +13,7 @@ import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
-import spiderboot.configuration.Config;
+import spiderboot.configuration.DownloadConfig;
 import spiderboot.util.Utility;
 
 public class RenderExecuteTimer extends TimerTask{
@@ -34,7 +34,7 @@ public class RenderExecuteTimer extends TimerTask{
 	public RenderExecuteTimer(String timerId) {
 		// TODO Auto-generated constructor stub
 		this.timerId = timerId;
-		videoFolderBase = Config.videoFolder;
+		videoFolderBase = DownloadConfig.clientSecrect;
 		try {
 			ffmpeg = new FFmpeg();
 			ffprobe = new FFprobe();

@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import com.google.api.services.samples.youtube.cmdline.data.UploadVideo;
-import spiderboot.configuration.Config;
+import spiderboot.configuration.DownloadConfig;
 import spiderboot.util.Utility;
 
 public class UploadExecuteTimer extends TimerTask{
@@ -25,7 +25,7 @@ public class UploadExecuteTimer extends TimerTask{
 
 	public UploadExecuteTimer(String timerId) {
 		this.timerId = timerId;
-		videoFolderBase = Config.videoFolder;
+		videoFolderBase = DownloadConfig.clientSecrect;
 	}
 
 	@Override

@@ -20,13 +20,13 @@ public class DirectDownload {
 //		//download("JyhTTkypni0","C:\\Users\\phong.tran\\Downloads\\Video\\spider_video\\");
 //		//download("J2-qgXKoeKw","/home/phongtran0715/Downloads", "phongtestvideo");
 //	}
-    public static String download(String vId, String storeLocation, String outputName) {
+    public String download(String vId, String storeLocation) {
         String ext = null;
         try {
             System.out.println("Begining download video id : " + vId);
             String[] vUlrs = {"https://www.youtube.com/watch?v=" + vId};
             for (String vUrl : vUlrs) {
-                VGet v = new VGet(new URL(vUrl), new File(storeLocation), outputName);
+                VGet v = new VGet(new URL(vUrl), new File(storeLocation), vId);
                 VideoInfoUser user = new VideoInfoUser();
                 user.setUserQuality(VideoQuality.pMaxQuality);
                 user.setUserType(VideoType.MP4);

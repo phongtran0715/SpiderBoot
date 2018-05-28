@@ -401,7 +401,7 @@ public class MappingChannelManagerView extends ViewPart {
 					protected void runInternal(IProgressMonitor monitor)
 							throws Exception {
 						for (Object object : selection.toList()) {					
-							session.deleteMappingChannel(((MappingChannelObject)object).getId());
+							session.deleteMappingChannel(((MappingChannelObject)object).getId(), ((MappingChannelObject)object).getDownloadClusterId());
 						}
 					}
 

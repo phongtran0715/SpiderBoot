@@ -3,6 +3,8 @@ package com.spider.corba;
 // SpiderDownloadServer.java
 // Copyright and License 
 import SpiderDownloadApp.*;
+import spiderboot.data.DataController;
+
 import org.omg.CosNaming.*;
 import org.omg.CORBA.*;
 import org.omg.PortableServer.*;
@@ -16,31 +18,35 @@ class DownloadImpl extends SpiderFootSidePOA {
 	public void setORB(ORB orb_val) {
 		orb = orb_val; 
 	}
-	
+
 	@Override
-	public boolean createMappingChannel(int timerId, String cHomeId, String cMonitorId, int timerInterval) 
+	public boolean createMappingChannel(int timerId, String cHomeId, String cMonitorId, String downloadClusterId, int timerInterval) 
 	{
 		System.out.println("DownloadImpl::createMappingChannel ");
 		System.out.println("timer id = " + timerId);
 		System.out.println("home channel id = " + cHomeId);
 		System.out.println("monitor id = " + cMonitorId);
 		System.out.println("time interval id = " + timerInterval);
-		DownloadTimerManager.getInstance().createDownloadTimer(timerId, cHomeId, cMonitorId, timerInterval);
+		if(downloadClusterId.equals(DataController.getInstance().downloadConfig.appId))
+		{
+			DownloadTimerManager.getInstance().createDownloadTimer(timerId, cHomeId, cMonitorId, timerInterval);	
+		}
 		return false;
 	}
 
 	@Override
-	public boolean modifyMappingChannel(int timerId, String cHomeId, String cMonitorId, int timerInterval, int synStatus) 
+	public boolean modifyMappingChannel(int timerId, String cHomeId, String cMonitorId, String downloadClusterId, int timerInterval, int synStatus) 
 	{
 		System.out.println("DownloadImpl::modifyMappingChannel ");
-		DownloadTimerManager.getInstance().modifyMappingChannel(timerId, cHomeId, cMonitorId, timerInterval, synStatus);
+		//check timer id
+		DownloadTimerManager.getInstance().modifyMappingChannel(timerId, cHomeId, cMonitorId, downloadClusterId, timerInterval, synStatus);	
 		return false;
 	}
 
 	@Override
-	public boolean deleteMappingChannel(int timerId) {
+	public boolean deleteMappingChannel(int timerId, String downloadClusterId) {
 		System.out.println("DownloadImpl::deleteMappingChannel ");
-		DownloadTimerManager.getInstance().deleteDownloadTimer(timerId);
+		DownloadTimerManager.getInstance().deleteDownloadTimer(timerId, downloadClusterId);	
 		return false;
 	}
 }
@@ -56,12 +62,11 @@ public class DownloadCorbaServer {
 		//default constructor
 	}
 
-	public boolean initCorba() {
+	public boolean initCorba(String refStr) {
 		boolean isSuccess = false;
 		try 
 		{
-			//String param = " -ORBInitRef NameService=corbaloc::localhost:2809/NameService";
-			String [] agrs = new String[] { "-ORBInitRef", "NameService=corbaloc::localhost:2809/NameService" };
+			String [] agrs = new String[] { "-ORBInitRef", refStr };
 			// create and initialize the ORB
 			ORB orb = ORB.init(agrs, null);
 

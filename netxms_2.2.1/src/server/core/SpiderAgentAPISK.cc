@@ -122,7 +122,7 @@ SpiderDownloadApp::_objref_SpiderFootSide::_ptrToObjRef(const char* id)
 // Code for SpiderDownloadApp::SpiderFootSide::createMappingChannel
 
 // Proxy call descriptor class. Mangled signature:
-//  _cboolean_i_clong_i_cstring_i_cstring_i_clong
+//  _cboolean_i_clong_i_cstring_i_cstring_i_cstring_i_clong
 class _0RL_cd_61f5032497954561_00000000
   : public omniCallDescriptor
 {
@@ -147,7 +147,9 @@ public:
   const char* arg_1;
   ::CORBA::String_var arg_2_;
   const char* arg_2;
-  ::CORBA::Long arg_3;
+  ::CORBA::String_var arg_3_;
+  const char* arg_3;
+  ::CORBA::Long arg_4;
   ::CORBA::Boolean result;
 };
 
@@ -156,7 +158,8 @@ void _0RL_cd_61f5032497954561_00000000::marshalArguments(cdrStream& _n)
   arg_0 >>= _n;
   _n.marshalString(arg_1,0);
   _n.marshalString(arg_2,0);
-  arg_3 >>= _n;
+  _n.marshalString(arg_3,0);
+  arg_4 >>= _n;
 
 }
 
@@ -167,7 +170,9 @@ void _0RL_cd_61f5032497954561_00000000::unmarshalArguments(cdrStream& _n)
   arg_1 = arg_1_.in();
   arg_2_ = _n.unmarshalString(0);
   arg_2 = arg_2_.in();
-  (::CORBA::Long&)arg_3 <<= _n;
+  arg_3_ = _n.unmarshalString(0);
+  arg_3 = arg_3_.in();
+  (::CORBA::Long&)arg_4 <<= _n;
 
 }
 
@@ -193,18 +198,19 @@ _0RL_lcfn_61f5032497954561_10000000(omniCallDescriptor* cd, omniServant* svnt)
 {
   _0RL_cd_61f5032497954561_00000000* tcd = (_0RL_cd_61f5032497954561_00000000*)cd;
   SpiderDownloadApp::_impl_SpiderFootSide* impl = (SpiderDownloadApp::_impl_SpiderFootSide*) svnt->_ptrToInterface(SpiderDownloadApp::SpiderFootSide::_PD_repoId);
-  tcd->result = impl->createMappingChannel(tcd->arg_0, tcd->arg_1, tcd->arg_2, tcd->arg_3);
+  tcd->result = impl->createMappingChannel(tcd->arg_0, tcd->arg_1, tcd->arg_2, tcd->arg_3, tcd->arg_4);
 
 
 }
 
-::CORBA::Boolean SpiderDownloadApp::_objref_SpiderFootSide::createMappingChannel(::CORBA::Long timerId, const char* cHomeId, const char* cMonitorId, ::CORBA::Long timerInterval)
+::CORBA::Boolean SpiderDownloadApp::_objref_SpiderFootSide::createMappingChannel(::CORBA::Long timerId, const char* cHomeId, const char* cMonitorId, const char* downloadClusterId, ::CORBA::Long timerInterval)
 {
   _0RL_cd_61f5032497954561_00000000 _call_desc(_0RL_lcfn_61f5032497954561_10000000, "createMappingChannel", 21);
   _call_desc.arg_0 = timerId;
   _call_desc.arg_1 = cHomeId;
   _call_desc.arg_2 = cMonitorId;
-  _call_desc.arg_3 = timerInterval;
+  _call_desc.arg_3 = downloadClusterId;
+  _call_desc.arg_4 = timerInterval;
 
   _invoke(_call_desc);
   return _call_desc.result;
@@ -217,7 +223,7 @@ _0RL_lcfn_61f5032497954561_10000000(omniCallDescriptor* cd, omniServant* svnt)
 // Code for SpiderDownloadApp::SpiderFootSide::modifyMappingChannel
 
 // Proxy call descriptor class. Mangled signature:
-//  _cboolean_i_clong_i_cstring_i_cstring_i_clong_i_clong
+//  _cboolean_i_clong_i_cstring_i_cstring_i_cstring_i_clong_i_clong
 class _0RL_cd_61f5032497954561_20000000
   : public omniCallDescriptor
 {
@@ -242,8 +248,10 @@ public:
   const char* arg_1;
   ::CORBA::String_var arg_2_;
   const char* arg_2;
-  ::CORBA::Long arg_3;
+  ::CORBA::String_var arg_3_;
+  const char* arg_3;
   ::CORBA::Long arg_4;
+  ::CORBA::Long arg_5;
   ::CORBA::Boolean result;
 };
 
@@ -252,8 +260,9 @@ void _0RL_cd_61f5032497954561_20000000::marshalArguments(cdrStream& _n)
   arg_0 >>= _n;
   _n.marshalString(arg_1,0);
   _n.marshalString(arg_2,0);
-  arg_3 >>= _n;
+  _n.marshalString(arg_3,0);
   arg_4 >>= _n;
+  arg_5 >>= _n;
 
 }
 
@@ -264,8 +273,10 @@ void _0RL_cd_61f5032497954561_20000000::unmarshalArguments(cdrStream& _n)
   arg_1 = arg_1_.in();
   arg_2_ = _n.unmarshalString(0);
   arg_2 = arg_2_.in();
-  (::CORBA::Long&)arg_3 <<= _n;
+  arg_3_ = _n.unmarshalString(0);
+  arg_3 = arg_3_.in();
   (::CORBA::Long&)arg_4 <<= _n;
+  (::CORBA::Long&)arg_5 <<= _n;
 
 }
 
@@ -291,19 +302,20 @@ _0RL_lcfn_61f5032497954561_30000000(omniCallDescriptor* cd, omniServant* svnt)
 {
   _0RL_cd_61f5032497954561_20000000* tcd = (_0RL_cd_61f5032497954561_20000000*)cd;
   SpiderDownloadApp::_impl_SpiderFootSide* impl = (SpiderDownloadApp::_impl_SpiderFootSide*) svnt->_ptrToInterface(SpiderDownloadApp::SpiderFootSide::_PD_repoId);
-  tcd->result = impl->modifyMappingChannel(tcd->arg_0, tcd->arg_1, tcd->arg_2, tcd->arg_3, tcd->arg_4);
+  tcd->result = impl->modifyMappingChannel(tcd->arg_0, tcd->arg_1, tcd->arg_2, tcd->arg_3, tcd->arg_4, tcd->arg_5);
 
 
 }
 
-::CORBA::Boolean SpiderDownloadApp::_objref_SpiderFootSide::modifyMappingChannel(::CORBA::Long timerId, const char* cHomeId, const char* cMonitorId, ::CORBA::Long timerInterval, ::CORBA::Long synStatus)
+::CORBA::Boolean SpiderDownloadApp::_objref_SpiderFootSide::modifyMappingChannel(::CORBA::Long timerId, const char* cHomeId, const char* cMonitorId, const char* downloadClusterId, ::CORBA::Long timerInterval, ::CORBA::Long synStatus)
 {
   _0RL_cd_61f5032497954561_20000000 _call_desc(_0RL_lcfn_61f5032497954561_30000000, "modifyMappingChannel", 21);
   _call_desc.arg_0 = timerId;
   _call_desc.arg_1 = cHomeId;
   _call_desc.arg_2 = cMonitorId;
-  _call_desc.arg_3 = timerInterval;
-  _call_desc.arg_4 = synStatus;
+  _call_desc.arg_3 = downloadClusterId;
+  _call_desc.arg_4 = timerInterval;
+  _call_desc.arg_5 = synStatus;
 
   _invoke(_call_desc);
   return _call_desc.result;
@@ -316,7 +328,7 @@ _0RL_lcfn_61f5032497954561_30000000(omniCallDescriptor* cd, omniServant* svnt)
 // Code for SpiderDownloadApp::SpiderFootSide::deleteMappingChannel
 
 // Proxy call descriptor class. Mangled signature:
-//  _cboolean_i_clong
+//  _cboolean_i_clong_i_cstring
 class _0RL_cd_61f5032497954561_40000000
   : public omniCallDescriptor
 {
@@ -337,18 +349,23 @@ public:
   static const char* const _user_exns[];
 
   ::CORBA::Long arg_0;
+  ::CORBA::String_var arg_1_;
+  const char* arg_1;
   ::CORBA::Boolean result;
 };
 
 void _0RL_cd_61f5032497954561_40000000::marshalArguments(cdrStream& _n)
 {
   arg_0 >>= _n;
+  _n.marshalString(arg_1,0);
 
 }
 
 void _0RL_cd_61f5032497954561_40000000::unmarshalArguments(cdrStream& _n)
 {
   (::CORBA::Long&)arg_0 <<= _n;
+  arg_1_ = _n.unmarshalString(0);
+  arg_1 = arg_1_.in();
 
 }
 
@@ -374,15 +391,16 @@ _0RL_lcfn_61f5032497954561_50000000(omniCallDescriptor* cd, omniServant* svnt)
 {
   _0RL_cd_61f5032497954561_40000000* tcd = (_0RL_cd_61f5032497954561_40000000*)cd;
   SpiderDownloadApp::_impl_SpiderFootSide* impl = (SpiderDownloadApp::_impl_SpiderFootSide*) svnt->_ptrToInterface(SpiderDownloadApp::SpiderFootSide::_PD_repoId);
-  tcd->result = impl->deleteMappingChannel(tcd->arg_0);
+  tcd->result = impl->deleteMappingChannel(tcd->arg_0, tcd->arg_1);
 
 
 }
 
-::CORBA::Boolean SpiderDownloadApp::_objref_SpiderFootSide::deleteMappingChannel(::CORBA::Long timerId)
+::CORBA::Boolean SpiderDownloadApp::_objref_SpiderFootSide::deleteMappingChannel(::CORBA::Long timerId, const char* downloadClusterId)
 {
   _0RL_cd_61f5032497954561_40000000 _call_desc(_0RL_lcfn_61f5032497954561_50000000, "deleteMappingChannel", 21);
   _call_desc.arg_0 = timerId;
+  _call_desc.arg_1 = downloadClusterId;
 
   _invoke(_call_desc);
   return _call_desc.result;
@@ -583,15 +601,16 @@ _0RL_lcfn_61f5032497954561_60000000(omniCallDescriptor* cd, omniServant* svnt)
 {
   _0RL_cd_61f5032497954561_40000000* tcd = (_0RL_cd_61f5032497954561_40000000*)cd;
   SpiderRenderApp::_impl_SpiderFootSide* impl = (SpiderRenderApp::_impl_SpiderFootSide*) svnt->_ptrToInterface(SpiderRenderApp::SpiderFootSide::_PD_repoId);
-  tcd->result = impl->createRenderJob(tcd->arg_0);
+  tcd->result = impl->createRenderJob(tcd->arg_0, tcd->arg_1);
 
 
 }
 
-::CORBA::Boolean SpiderRenderApp::_objref_SpiderFootSide::createRenderJob(::CORBA::Long timerId)
+::CORBA::Boolean SpiderRenderApp::_objref_SpiderFootSide::createRenderJob(::CORBA::Long timerId, const char* renderClusterId)
 {
   _0RL_cd_61f5032497954561_40000000 _call_desc(_0RL_lcfn_61f5032497954561_60000000, "createRenderJob", 16);
   _call_desc.arg_0 = timerId;
+  _call_desc.arg_1 = renderClusterId;
 
   _invoke(_call_desc);
   return _call_desc.result;
@@ -609,15 +628,16 @@ _0RL_lcfn_61f5032497954561_70000000(omniCallDescriptor* cd, omniServant* svnt)
 {
   _0RL_cd_61f5032497954561_40000000* tcd = (_0RL_cd_61f5032497954561_40000000*)cd;
   SpiderRenderApp::_impl_SpiderFootSide* impl = (SpiderRenderApp::_impl_SpiderFootSide*) svnt->_ptrToInterface(SpiderRenderApp::SpiderFootSide::_PD_repoId);
-  tcd->result = impl->modifyRenderJob(tcd->arg_0);
+  tcd->result = impl->modifyRenderJob(tcd->arg_0, tcd->arg_1);
 
 
 }
 
-::CORBA::Boolean SpiderRenderApp::_objref_SpiderFootSide::modifyRenderJob(::CORBA::Long timerId)
+::CORBA::Boolean SpiderRenderApp::_objref_SpiderFootSide::modifyRenderJob(::CORBA::Long timerId, const char* renderClusterId)
 {
   _0RL_cd_61f5032497954561_40000000 _call_desc(_0RL_lcfn_61f5032497954561_70000000, "modifyRenderJob", 16);
   _call_desc.arg_0 = timerId;
+  _call_desc.arg_1 = renderClusterId;
 
   _invoke(_call_desc);
   return _call_desc.result;
@@ -635,15 +655,16 @@ _0RL_lcfn_61f5032497954561_80000000(omniCallDescriptor* cd, omniServant* svnt)
 {
   _0RL_cd_61f5032497954561_40000000* tcd = (_0RL_cd_61f5032497954561_40000000*)cd;
   SpiderRenderApp::_impl_SpiderFootSide* impl = (SpiderRenderApp::_impl_SpiderFootSide*) svnt->_ptrToInterface(SpiderRenderApp::SpiderFootSide::_PD_repoId);
-  tcd->result = impl->deleteRenderJob(tcd->arg_0);
+  tcd->result = impl->deleteRenderJob(tcd->arg_0, tcd->arg_1);
 
 
 }
 
-::CORBA::Boolean SpiderRenderApp::_objref_SpiderFootSide::deleteRenderJob(::CORBA::Long timerId)
+::CORBA::Boolean SpiderRenderApp::_objref_SpiderFootSide::deleteRenderJob(::CORBA::Long timerId, const char* renderClusterId)
 {
   _0RL_cd_61f5032497954561_40000000 _call_desc(_0RL_lcfn_61f5032497954561_80000000, "deleteRenderJob", 16);
   _call_desc.arg_0 = timerId;
+  _call_desc.arg_1 = renderClusterId;
 
   _invoke(_call_desc);
   return _call_desc.result;
@@ -844,15 +865,16 @@ _0RL_lcfn_61f5032497954561_90000000(omniCallDescriptor* cd, omniServant* svnt)
 {
   _0RL_cd_61f5032497954561_40000000* tcd = (_0RL_cd_61f5032497954561_40000000*)cd;
   SpiderUploadApp::_impl_SpiderFootSide* impl = (SpiderUploadApp::_impl_SpiderFootSide*) svnt->_ptrToInterface(SpiderUploadApp::SpiderFootSide::_PD_repoId);
-  tcd->result = impl->createUploadJob(tcd->arg_0);
+  tcd->result = impl->createUploadJob(tcd->arg_0, tcd->arg_1);
 
 
 }
 
-::CORBA::Boolean SpiderUploadApp::_objref_SpiderFootSide::createUploadJob(::CORBA::Long timerId)
+::CORBA::Boolean SpiderUploadApp::_objref_SpiderFootSide::createUploadJob(::CORBA::Long timerId, const char* uploadClusterId)
 {
   _0RL_cd_61f5032497954561_40000000 _call_desc(_0RL_lcfn_61f5032497954561_90000000, "createUploadJob", 16);
   _call_desc.arg_0 = timerId;
+  _call_desc.arg_1 = uploadClusterId;
 
   _invoke(_call_desc);
   return _call_desc.result;
@@ -870,15 +892,16 @@ _0RL_lcfn_61f5032497954561_a0000000(omniCallDescriptor* cd, omniServant* svnt)
 {
   _0RL_cd_61f5032497954561_40000000* tcd = (_0RL_cd_61f5032497954561_40000000*)cd;
   SpiderUploadApp::_impl_SpiderFootSide* impl = (SpiderUploadApp::_impl_SpiderFootSide*) svnt->_ptrToInterface(SpiderUploadApp::SpiderFootSide::_PD_repoId);
-  tcd->result = impl->modifyUploadJob(tcd->arg_0);
+  tcd->result = impl->modifyUploadJob(tcd->arg_0, tcd->arg_1);
 
 
 }
 
-::CORBA::Boolean SpiderUploadApp::_objref_SpiderFootSide::modifyUploadJob(::CORBA::Long timerId)
+::CORBA::Boolean SpiderUploadApp::_objref_SpiderFootSide::modifyUploadJob(::CORBA::Long timerId, const char* uploadClusterId)
 {
   _0RL_cd_61f5032497954561_40000000 _call_desc(_0RL_lcfn_61f5032497954561_a0000000, "modifyUploadJob", 16);
   _call_desc.arg_0 = timerId;
+  _call_desc.arg_1 = uploadClusterId;
 
   _invoke(_call_desc);
   return _call_desc.result;
@@ -896,15 +919,16 @@ _0RL_lcfn_61f5032497954561_b0000000(omniCallDescriptor* cd, omniServant* svnt)
 {
   _0RL_cd_61f5032497954561_40000000* tcd = (_0RL_cd_61f5032497954561_40000000*)cd;
   SpiderUploadApp::_impl_SpiderFootSide* impl = (SpiderUploadApp::_impl_SpiderFootSide*) svnt->_ptrToInterface(SpiderUploadApp::SpiderFootSide::_PD_repoId);
-  tcd->result = impl->deleteUploadJob(tcd->arg_0);
+  tcd->result = impl->deleteUploadJob(tcd->arg_0, tcd->arg_1);
 
 
 }
 
-::CORBA::Boolean SpiderUploadApp::_objref_SpiderFootSide::deleteUploadJob(::CORBA::Long timerId)
+::CORBA::Boolean SpiderUploadApp::_objref_SpiderFootSide::deleteUploadJob(::CORBA::Long timerId, const char* uploadClusterId)
 {
   _0RL_cd_61f5032497954561_40000000 _call_desc(_0RL_lcfn_61f5032497954561_b0000000, "deleteUploadJob", 16);
   _call_desc.arg_0 = timerId;
+  _call_desc.arg_1 = uploadClusterId;
 
   _invoke(_call_desc);
   return _call_desc.result;
@@ -995,16 +1019,15 @@ SpiderUploadApp::_impl_SpiderFootSide::_mostDerivedRepoId()
 void
 SpiderAgentApp::AgentSide::VideoInfo::operator>>= (cdrStream &_n) const
 {
-  videoId >>= _n;
+  _n.marshalString(videoId,0);
   _n.marshalString(title,0);
   _n.marshalString(tags,0);
   _n.marshalString(description,0);
   _n.marshalString(thumbnail,0);
-  _n.marshalString(videoDownloadedLocation,0);
-  _n.marshalString(videoRenderedLocation,0);
+  _n.marshalString(vDownloadPath,0);
+  _n.marshalString(vRenderPath,0);
   _n.marshalString(homeChannelId,0);
   _n.marshalString(monitorChannelId,0);
-  _n.marshalString(downloadedDate,0);
   processStatus >>= _n;
   license >>= _n;
 
@@ -1013,16 +1036,15 @@ SpiderAgentApp::AgentSide::VideoInfo::operator>>= (cdrStream &_n) const
 void
 SpiderAgentApp::AgentSide::VideoInfo::operator<<= (cdrStream &_n)
 {
-  (::CORBA::Long&)videoId <<= _n;
+  videoId = _n.unmarshalString(0);
   title = _n.unmarshalString(0);
   tags = _n.unmarshalString(0);
   description = _n.unmarshalString(0);
   thumbnail = _n.unmarshalString(0);
-  videoDownloadedLocation = _n.unmarshalString(0);
-  videoRenderedLocation = _n.unmarshalString(0);
+  vDownloadPath = _n.unmarshalString(0);
+  vRenderPath = _n.unmarshalString(0);
   homeChannelId = _n.unmarshalString(0);
   monitorChannelId = _n.unmarshalString(0);
-  downloadedDate = _n.unmarshalString(0);
   (::CORBA::Long&)processStatus <<= _n;
   (::CORBA::Long&)license <<= _n;
 
@@ -1136,7 +1158,7 @@ SpiderAgentApp::_objref_AgentSide::_ptrToObjRef(const char* id)
 // Code for SpiderAgentApp::AgentSide::onDownloadStartup
 
 // Proxy call descriptor class. Mangled signature:
-//  void
+//  void_i_cstring
 class _0RL_cd_61f5032497954561_c0000000
   : public omniCallDescriptor
 {
@@ -1147,13 +1169,29 @@ public:
     
   }
   
-  
+  void marshalArguments(cdrStream&);
+  void unmarshalArguments(cdrStream&);
+
     
   
   static const char* const _user_exns[];
 
-  
+  ::CORBA::String_var arg_0_;
+  const char* arg_0;
 };
+
+void _0RL_cd_61f5032497954561_c0000000::marshalArguments(cdrStream& _n)
+{
+  _n.marshalString(arg_0,0);
+
+}
+
+void _0RL_cd_61f5032497954561_c0000000::unmarshalArguments(cdrStream& _n)
+{
+  arg_0_ = _n.unmarshalString(0);
+  arg_0 = arg_0_.in();
+
+}
 
 const char* const _0RL_cd_61f5032497954561_c0000000::_user_exns[] = {
   0
@@ -1161,19 +1199,19 @@ const char* const _0RL_cd_61f5032497954561_c0000000::_user_exns[] = {
 
 // Local call call-back function.
 static void
-_0RL_lcfn_61f5032497954561_d0000000(omniCallDescriptor*, omniServant* svnt)
+_0RL_lcfn_61f5032497954561_d0000000(omniCallDescriptor* cd, omniServant* svnt)
 {
-  
+  _0RL_cd_61f5032497954561_c0000000* tcd = (_0RL_cd_61f5032497954561_c0000000*)cd;
   SpiderAgentApp::_impl_AgentSide* impl = (SpiderAgentApp::_impl_AgentSide*) svnt->_ptrToInterface(SpiderAgentApp::AgentSide::_PD_repoId);
-  impl->onDownloadStartup();
+  impl->onDownloadStartup(tcd->arg_0);
 
 
 }
 
-void SpiderAgentApp::_objref_AgentSide::onDownloadStartup()
+void SpiderAgentApp::_objref_AgentSide::onDownloadStartup(const char* appId)
 {
   _0RL_cd_61f5032497954561_c0000000 _call_desc(_0RL_lcfn_61f5032497954561_d0000000, "onDownloadStartup", 18);
-
+  _call_desc.arg_0 = appId;
 
   _invoke(_call_desc);
 
@@ -1187,19 +1225,19 @@ void SpiderAgentApp::_objref_AgentSide::onDownloadStartup()
 
 // Local call call-back function.
 static void
-_0RL_lcfn_61f5032497954561_e0000000(omniCallDescriptor*, omniServant* svnt)
+_0RL_lcfn_61f5032497954561_e0000000(omniCallDescriptor* cd, omniServant* svnt)
 {
-  
+  _0RL_cd_61f5032497954561_c0000000* tcd = (_0RL_cd_61f5032497954561_c0000000*)cd;
   SpiderAgentApp::_impl_AgentSide* impl = (SpiderAgentApp::_impl_AgentSide*) svnt->_ptrToInterface(SpiderAgentApp::AgentSide::_PD_repoId);
-  impl->onRenderStartup();
+  impl->onRenderStartup(tcd->arg_0);
 
 
 }
 
-void SpiderAgentApp::_objref_AgentSide::onRenderStartup()
+void SpiderAgentApp::_objref_AgentSide::onRenderStartup(const char* appId)
 {
   _0RL_cd_61f5032497954561_c0000000 _call_desc(_0RL_lcfn_61f5032497954561_e0000000, "onRenderStartup", 16);
-
+  _call_desc.arg_0 = appId;
 
   _invoke(_call_desc);
 
@@ -1213,19 +1251,19 @@ void SpiderAgentApp::_objref_AgentSide::onRenderStartup()
 
 // Local call call-back function.
 static void
-_0RL_lcfn_61f5032497954561_f0000000(omniCallDescriptor*, omniServant* svnt)
+_0RL_lcfn_61f5032497954561_f0000000(omniCallDescriptor* cd, omniServant* svnt)
 {
-  
+  _0RL_cd_61f5032497954561_c0000000* tcd = (_0RL_cd_61f5032497954561_c0000000*)cd;
   SpiderAgentApp::_impl_AgentSide* impl = (SpiderAgentApp::_impl_AgentSide*) svnt->_ptrToInterface(SpiderAgentApp::AgentSide::_PD_repoId);
-  impl->onUploadStartup();
+  impl->onUploadStartup(tcd->arg_0);
 
 
 }
 
-void SpiderAgentApp::_objref_AgentSide::onUploadStartup()
+void SpiderAgentApp::_objref_AgentSide::onUploadStartup(const char* appId)
 {
   _0RL_cd_61f5032497954561_c0000000 _call_desc(_0RL_lcfn_61f5032497954561_f0000000, "onUploadStartup", 16);
-
+  _call_desc.arg_0 = appId;
 
   _invoke(_call_desc);
 

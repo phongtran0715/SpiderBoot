@@ -139,7 +139,7 @@ public class Search {
 		return null;
 	}
 
-	public List<SearchResult> getVideoByPublishDate(String channelId, DateTime publishAfter) {
+	public List<SearchResult> getVideoByPublishDate(String channelId, DateTime publishAfter, long MaxResult) {
 		List<SearchResult> searchResult = new ArrayList<SearchResult>();
 		try{
 			// Define the API request for retrieving search results.
@@ -225,7 +225,7 @@ public class Search {
             VideoListResponse listResponse = listVideosRequest.execute();
 
             videoList = listResponse.getItems();
-            Iterator<Video> iteratorSearchResults = videoList.iterator();
+            //Iterator<Video> iteratorSearchResults = videoList.iterator();
             //logger.info("VIDEO INFO|" + videoList);
         } catch (GoogleJsonResponseException e) {
             System.out.println("ERR_VIDEO INFO|There was a service error: " + e.getDetails().getCode() + " : "

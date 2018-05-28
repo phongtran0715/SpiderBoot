@@ -3,20 +3,31 @@ package spiderboot.util;
 public class VideoWraper {
 
     public int recordId = 0;
-    public String vId = "";
+    public String videoId = "";
     public String title = "";
     public String tag = "";
     public String description = "";
     public String thumbnail = "";
-    public String vLocation = "";
+    public String vDownloadPath = "";
+    public String vRenderPath = "";
+    public String cHomeId = "";
+    public String cMonitorId = "";
+    public int processStatus = 0;
+    public int license = 0;
     
-    public VideoWraper(String vId, String title, String tag, String description,
-    		String thumbnail, String vLocation ) {
-    	this.vId = vId;
+    public VideoWraper(String videoId, String title, String tag, String description,
+    		String thumbnail, String vDownloadPath, String vRenderPath, String cHomeId, 
+    		String cMonitorId, int processStatus, int license) {
+    	this.videoId = videoId;
     	this.title = title;
     	this.tag = tag;
     	this.description = description;
     	this.thumbnail = thumbnail;
-    	this.vLocation = vLocation;
+    	this.vDownloadPath = vDownloadPath;
+    	this.vRenderPath = vRenderPath;
+    	this.cHomeId = cHomeId;
+    	this.cMonitorId = cMonitorId;
+    	this.processStatus = processStatus;
+    	this.license = license;
 	}
 }

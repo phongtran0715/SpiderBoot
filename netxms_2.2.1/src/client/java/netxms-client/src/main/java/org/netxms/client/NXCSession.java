@@ -4251,10 +4251,11 @@ public class NXCSession {
 					SessionNotification.MONITOR_CHANNEL_CHANGED, code));
 	}
 
-	public void deleteMappingChannel(int id) throws IOException, NXCException
+	public void deleteMappingChannel(int id, String downloadClusterId) throws IOException, NXCException
 	{
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_DEL_MAPPING_CHANNEL);
 		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_RECORD_ID, id);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID, downloadClusterId);
 		sendMessage(msg);
 		msg = waitForRCC(msg.getMessageId());
 		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);

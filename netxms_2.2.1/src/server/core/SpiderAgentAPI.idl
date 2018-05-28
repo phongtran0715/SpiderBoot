@@ -4,9 +4,9 @@ module SpiderDownloadApp
 {
   interface SpiderFootSide
   {
-        boolean createMappingChannel(in long timerId, in string cHomeId, in string cMonitorId,in long timerInterval );
-        boolean modifyMappingChannel(in long timerId, in string cHomeId, in string cMonitorId,in long timerInterval , in long synStatus);
-        boolean deleteMappingChannel(in long timerId);
+        boolean createMappingChannel(in long timerId, in string cHomeId, in string cMonitorId, in string downloadClusterId, in long timerInterval );
+        boolean modifyMappingChannel(in long timerId, in string cHomeId, in string cMonitorId, in string downloadClusterId, in long timerInterval, in long synStatus);
+        boolean deleteMappingChannel(in long timerId, in string downloadClusterId);
 
   };
 };
@@ -15,9 +15,9 @@ module SpiderRenderApp
 {
   interface SpiderFootSide
   {
-        boolean createRenderJob(in long timerId);
-        boolean modifyRenderJob(in long timerId);
-        boolean deleteRenderJob(in long timerId);
+        boolean createRenderJob(in long timerId, in string renderClusterId);
+        boolean modifyRenderJob(in long timerId, in string renderClusterId);
+        boolean deleteRenderJob(in long timerId, in string renderClusterId);
 
   };
 };
@@ -26,9 +26,9 @@ module SpiderUploadApp
 {
   interface SpiderFootSide
   {
-        boolean createUploadJob(in long timerId);
-        boolean modifyUploadJob(in long timerId);
-        boolean deleteUploadJob(in long timerId);
+        boolean createUploadJob(in long timerId, in string uploadClusterId);
+        boolean modifyUploadJob(in long timerId, in string uploadClusterId);
+        boolean deleteUploadJob(in long timerId, in string uploadClusterId);
 
   };
 };
@@ -39,23 +39,22 @@ module SpiderAgentApp
   interface AgentSide
   {
     struct VideoInfo {
-      long videoId;
+      string videoId;
       string title;
       string tags;
       string description;
       string thumbnail;
-      string videoDownloadedLocation;
-      string videoRenderedLocation;
+      string vDownloadPath;
+      string vRenderPath;
       string homeChannelId;
       string monitorChannelId;
-      string downloadedDate;
       long processStatus;
       long license;
     };
 
-    void onDownloadStartup();
-    void onRenderStartup();
-    void onUploadStartup();
+    void onDownloadStartup(in string appId);
+    void onRenderStartup(in string appId);
+    void onUploadStartup(in string appId);
 
     long long getLastSyncTime(in long mappingId);
     void updateLastSyntime(in long mappingId, in long long lastSyncTime);

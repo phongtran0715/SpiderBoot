@@ -64,9 +64,9 @@ public:
 class AgentSide_i : public POA_SpiderAgentApp::AgentSide
 {
 public:
-   void onDownloadStartup();
-   void onRenderStartup();
-   void onUploadStartup();
+   void onDownloadStartup(const char* appId);
+   void onRenderStartup(const char* appId);
+   void onUploadStartup(const char* appId);
    ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId);
    void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong lastSyncTime);
    void updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::VideoInfo& vInfo);

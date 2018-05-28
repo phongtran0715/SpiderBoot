@@ -15,11 +15,11 @@ public class DownloadCorbaClient {
 		//default constructor
 	}
 
-	public boolean initCorba() {
+	public boolean initCorba(String refStr) {
 		boolean isSuccess = false;
 		try{
 			// create and initialize the ORB
-			String [] args = new String[] { "-ORBInitRef", "NameService=corbaloc::localhost:2809/NameService" };
+			String [] args = new String[] { "-ORBInitRef", refStr };
 			ORB orb = ORB.init(args, null);
 
 			// get the root naming context

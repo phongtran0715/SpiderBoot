@@ -81,7 +81,7 @@
          </action>
          <action
                class="org.spider.ui.eclipse.spidermanager.actions.OpenDownloadClusterManager"
-               icon="icons/sample.gif"
+               icon="icons/download.png"
                id="SpiderManager.downloadCluster"
                label="&amp;Download Cluster"
                menubarPath="spiderManager/clusterGroup"
@@ -90,7 +90,7 @@
          </action>
          <action
                class="org.spider.ui.eclipse.spidermanager.actions.OpenRenderClusterManager"
-               icon="icons/sample.gif"
+               icon="icons/render.png"
                id="SpiderManager.renderCluster"
                label="&amp;Render Cluster"
                menubarPath="spiderManager/clusterGroup"
@@ -99,7 +99,7 @@
          </action>
          <action
                class="org.spider.ui.eclipse.spidermanager.actions.OpenUploadClusterManager"
-               icon="icons/sample.gif"
+               icon="icons/upload.png"
                id="SpiderManager.uploadCluster"
                label="&amp;Upload Cluster"
                menubarPath="spiderManager/clusterGroup"

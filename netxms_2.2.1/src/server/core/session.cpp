@@ -14426,7 +14426,10 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
                   debugPrintf(6, _T("ClientSession::[%s] Init corba for download client successful!"), __FUNCTION__);
                   try {
                      INT32 timerId = getMaxId(_T("channel_mapping"));
-                     downloadClient->mDownloadRef->createMappingChannel(timerId, (const char*)cHomeId, (const char*)cMonitorId, timeSync);
+                     debugPrintf(1, _T("create home channel ID = %s"), cHomeId);
+                     debugPrintf(1, _T("create monitor channel ID = %s"), cMonitorId);
+                     downloadClient->mDownloadRef->createMappingChannel(timerId, CORBA::string_dup((const char*)cHomeId),
+                           CORBA::string_dup((const char*)cMonitorId),CORBA::string_dup((const char*)downloadId), timeSync);
                   }
                   catch (CORBA::TRANSIENT&) {
                      debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
@@ -14630,7 +14633,8 @@ void ClientSession::modifyMappingChannel(NXCPMessage * request)
          {
             debugPrintf(6, _T("ClientSession::[%s] Init corba for download client successful!"), __FUNCTION__);
             try {
-               downloadClient->mDownloadRef->modifyMappingChannel(id, (const char*)cHomeId, (const char*)cMonitorId, timeSync, statusSync);
+               downloadClient->mDownloadRef->modifyMappingChannel(id, CORBA::string_dup((const char*)cHomeId), 
+                  CORBA::string_dup((const char*)cMonitorId), CORBA::string_dup((const char*)downloadId), timeSync, statusSync);
             }
             catch (CORBA::TRANSIENT&) {
                debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
@@ -14753,7 +14757,7 @@ void ClientSession::deleteMonitorAccount(NXCPMessage * request)
             msg.setField(VID_RCC, RCC_DB_FAILURE);
          }
       }
-   }else{
+   } else {
       msg.setField(VID_RCC, RCC_COMPONENT_LOCKED);
    }
 
@@ -14774,6 +14778,7 @@ void ClientSession::deleteMappingChannel(NXCPMessage * request)
    if (hdb != NULL)
    {
       INT32 id = request->getFieldAsInt32(VID_MAPPING_CHANNEL_RECORD_ID);
+      TCHAR* downloadId = request->getFieldAsString(VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID);
       debugPrintf(6, _T("ClientSession::[%s] id = %d"), __FUNCTION__, id);
       hStmt = DBPrepare(hdb, _T("DELETE FROM channel_mapping WHERE Id = ?"));
       DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)id);
@@ -14787,7 +14792,7 @@ void ClientSession::deleteMappingChannel(NXCPMessage * request)
          {
             debugPrintf(6, _T("ClientSession::[%s] Init corba for download client successful!"), __FUNCTION__);
             try {
-               downloadClient->mDownloadRef->deleteMappingChannel(id);
+               downloadClient->mDownloadRef->deleteMappingChannel(id, CORBA::string_dup((const char*) downloadId));
             }
             catch (CORBA::TRANSIENT&) {
                debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));

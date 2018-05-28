@@ -6,6 +6,8 @@ import java.util.TimerTask;
 
 import com.spider.corba.DownloadCorbaClient;
 
+import spiderboot.data.DataController;
+
 public class DownloadTimerManager {
 
 	private static DownloadTimerManager instance = null;
@@ -40,44 +42,60 @@ public class DownloadTimerManager {
 		return isSuccess;
 	}
 
-	public boolean modifyMappingChannel(int timerId, String cHomeId, String cMonitorId, int timerInterval, int synStatus) 
+	public boolean modifyMappingChannel(int timerId, String cHomeId, String cMonitorId, 
+			String downloadClusterId, int timerInterval, int synStatus) 
 	{
 		boolean isSuccess = false;
 		//check timer  id is existed
-		boolean isExisted = timerMap.get(timerId) != null;
-		if((isExisted == false) && (synStatus == 1))
+		boolean isIdExisted = timerMap.get(timerId) != null;
+		boolean isAppIdExisted = downloadClusterId.equals(DataController.getInstance().downloadConfig.appId);
+
+		if(isIdExisted == true && isAppIdExisted == true)
 		{
-			//create new tmer
-			createDownloadTimer(timerId, cHomeId, cMonitorId, timerInterval);
-		}else if((isExisted == true) && (synStatus == 1)){
 			//reset this timer
 			timerMap.get(timerId).cancel();
 			timerMap.get(timerId).purge();
 			timerMap.remove(timerId);
-			createDownloadTimer(timerId, cHomeId, cMonitorId, timerInterval);
-		}else if((isExisted == true) && (synStatus == 0))
+			if(synStatus == 1)
+			{
+				createDownloadTimer(timerId, cHomeId, cMonitorId, timerInterval);	
+			}else {
+
+			}
+		}else if(isIdExisted == true && isAppIdExisted == false)
 		{
 			//remove this timer
 			timerMap.get(timerId).cancel();
 			timerMap.get(timerId).purge();
 			timerMap.remove(timerId);
+		}else if(isIdExisted == false && isAppIdExisted == true)
+		{
+			if(synStatus == 1)
+			{
+				//create new timer
+				createDownloadTimer(timerId, cHomeId, cMonitorId, timerInterval);
+			}else {
+				//nothing to do
+			}
 		}else {
 			//nothing to do
 		}
 		return isSuccess;
 	}
 
-	public boolean deleteDownloadTimer(int taskId) 
+	public boolean deleteDownloadTimer(int timerId, String downloadClusterId) 
 	{
 		boolean isSuccess = false;
-		//check timer is existed
-		Timer timer = timerMap.get(taskId);
-		if(timer != null) {
+		boolean isIdExisted = timerMap.get(timerId) != null;
+		boolean isAppIdExisted = downloadClusterId.equals(DataController.getInstance().downloadConfig.appId);
+		if(isIdExisted == true && isAppIdExisted == true)
+		{
+			Timer timer = timerMap.get(timerId);
 			timer.cancel();
 			timer.purge();
-			timerMap.remove(taskId);
-			isSuccess = true;
+			timerMap.remove(timerId);
 		}
+		isSuccess = true;		
 		return isSuccess;
 	}
 }

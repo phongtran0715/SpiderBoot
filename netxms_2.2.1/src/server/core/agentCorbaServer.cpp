@@ -7,9 +7,10 @@ using namespace std;
 #  include <iostream.h>
 #endif
 
-void AgentSide_i::onDownloadStartup()
+void AgentSide_i::onDownloadStartup(const char* appId)
 {
-	DbgPrintf(1, _T("AgentSide_i::[%s]"), __func__);
+	DbgPrintf(1, _T("AgentSide_i::[onDownloadStartup]"));
+	DbgPrintf(1, _T("AgentSide_i::[DownloadStartup] appId = %s"), appId);
 	DB_RESULT hResult;
 	UINT32 i, dwNumRecords;
 	SpiderDownloadClient* downloadClient = new SpiderDownloadClient();
@@ -22,16 +23,17 @@ void AgentSide_i::onDownloadStartup()
 		if (hResult != NULL)
 		{
 			dwNumRecords = DBGetNumRows(hResult);
+			DbgPrintf(1, _T("AgentSide_i::[nDownloadStartup] numRecord = %d"), dwNumRecords);
 			for (i = 0; i < dwNumRecords; i++)
 			{
 				INT32 id = DBGetFieldInt64(hResult, i, 0);
 				TCHAR* cHomeId = DBGetField(hResult, i, 1, NULL, 0);
 				TCHAR* cMonitorId = DBGetField(hResult, i, 2, NULL, 0);
 				INT64 timeSync = DBGetFieldInt64(hResult, i, 3);
-				DbgPrintf(1, _T("AgentSide_i::[%s] : id = %d"), __func__, id);
-				DbgPrintf(1, _T("AgentSide_i::[%s] : home ID = %s"), __func__, (const char*)cHomeId);
-				DbgPrintf(1, _T("AgentSide_i::[%s] : monitor ID = %s"), __func__, (const char*)cMonitorId);
-				DbgPrintf(1, _T("AgentSide_i::[%s] : time sync = %d"), __func__, timeSync);
+				DbgPrintf(1, _T("AgentSide_i::[] : id = %d"), id);
+				DbgPrintf(1, _T("AgentSide_i::[] : home ID = %s"), (const char*)cHomeId);
+				DbgPrintf(1, _T("AgentSide_i::[] : monitor ID = %s"), (const char*)cMonitorId);
+				DbgPrintf(1, _T("AgentSide_i::[] : time sync = %d"), timeSync);
 				if (downloadClient->initSuccess)
 				{
 					if (downloadClient->mDownloadRef != NULL)
@@ -39,17 +41,19 @@ void AgentSide_i::onDownloadStartup()
 						try
 						{
 							downloadClient->mDownloadRef->createMappingChannel(id, CORBA::string_dup((const char*)cHomeId),
-							        CORBA::string_dup((const char*)cMonitorId), timeSync);
+							        CORBA::string_dup((const char*)cMonitorId), CORBA::string_dup(appId), timeSync);
+							DbgPrintf(1, _T("AgentSide_i::[onDownloadStartup] : home id = %s"), CORBA::string_dup((const char*)cHomeId));
+							DbgPrintf(1, _T("AgentSide_i::[onDownloadStartup] : monitor id = %s"), CORBA::string_dup((const char*)cMonitorId));
 						}
 						catch (CORBA::TRANSIENT&) {
-							DbgPrintf(1, _T("AgentSide_i::[%s] : Caught system exception TRANSIENT -- unable to contact the server"), __func__);
+							DbgPrintf(1, _T("AgentSide_i::[] : Caught system exception TRANSIENT -- unable to contact the server"));
 						}
 						catch (CORBA::SystemException& ex) {
-							DbgPrintf(1, _T("AgentSide_i::[%s] : Caught a CORBA:: %s"), __func__, ex._name());
+							DbgPrintf(1, _T("AgentSide_i::[] : Caught a CORBA:: %s"), ex._name());
 						}
 						catch (CORBA::Exception& ex)
 						{
-							DbgPrintf(1, _T("AgentSide_i::[%s] : Caught a CORBA:: %s"), __func__, ex._name());
+							DbgPrintf(1, _T("AgentSide_i::[] : Caught a CORBA:: %s"), ex._name());
 						}
 					}
 				} else {
@@ -61,17 +65,18 @@ void AgentSide_i::onDownloadStartup()
 	DBConnectionPoolReleaseConnection(hdb);
 }
 
-void AgentSide_i::onRenderStartup()
+void AgentSide_i::onRenderStartup(const char* appId)
 {
 	DB_RESULT hResult;
 	UINT32 i, dwNumRecords;
 	SpiderRenderClient* renderClient = new SpiderRenderClient();
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
-	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT * FROM video_container WHERE ProcessStatus = ?"));
+	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT * FROM video_container WHERE ProcessStatus = ? AND RenderClusterId = ?"));
 	if (hStmt != NULL)
 	{
 		//DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)VIDEO_DOWNLOADED);
 		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)1);
+		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR*) appId, DB_BIND_DYNAMIC);
 		hResult = DBSelectPrepared(hStmt);
 		if (hResult != NULL)
 		{
@@ -86,17 +91,18 @@ void AgentSide_i::onRenderStartup()
 	DBConnectionPoolReleaseConnection(hdb);
 }
 
-void AgentSide_i::onUploadStartup()
+void AgentSide_i::onUploadStartup(const char* appId)
 {
 	DB_RESULT hResult;
 	UINT32 i, dwNumRecords;
 	SpiderUploadClient* uploadClient = new SpiderUploadClient();
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
-	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT * FROM video_container WHERE ProcessStatus = ?"));
+	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT * FROM video_container WHERE ProcessStatus = ? AND UploadClusterId = ?"));
 	if (hStmt != NULL)
 	{
 		//DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)VIDEO_RENDERED);
 		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)2);
+		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR*) appId, DB_BIND_DYNAMIC);
 		hResult = DBSelectPrepared(hStmt);
 		if (hResult != NULL)
 		{
@@ -156,7 +162,36 @@ void AgentSide_i::updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong l
 
 void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::VideoInfo& vInfo)
 {
+	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+	DB_STATEMENT hStmt;
 
+	if (hdb != NULL)
+	{
+		DbgPrintf(1, _T("AgentSide_i::updateDownloadedVideo : videoId = %s"), vInfo.videoId);
+		DbgPrintf(1, _T("AgentSide_i::updateDownloadedVideo : title = %s"), vInfo.title);
+
+		hStmt = DBPrepare(hdb, _T("INSERT INTO video_container (VideoId, Title, Tag, ")
+		                  _T(" Description, Thumbnail, VDownloadedPath, HomeChannelId,")
+		                  _T(" MonitorChannelId, ProcessStatus, License) VALUES (?,?,?,?,?,?,?,?,?,?)"));
+		DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.videoId, DB_BIND_TRANSIENT);
+		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.title, DB_BIND_TRANSIENT);
+		DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.tags, DB_BIND_TRANSIENT);
+		DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.description, DB_BIND_TRANSIENT);
+		DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.thumbnail, DB_BIND_TRANSIENT);
+		DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.vDownloadPath, DB_BIND_TRANSIENT);
+		DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.homeChannelId, DB_BIND_TRANSIENT);
+		DBBind(hStmt, 8, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.monitorChannelId, DB_BIND_TRANSIENT);
+		DBBind(hStmt, 9, DB_SQLTYPE_INTEGER, (INT32)vInfo.processStatus);
+		DBBind(hStmt, 10, DB_SQLTYPE_INTEGER, (INT32)vInfo.license);
+
+		bool success = DBExecute(hStmt);
+
+		if (success == false)
+		{
+			DbgPrintf(1, _T("AgentSide_i::updateDownloadedVideo : insert new video info FALSE"));
+		}
+	}
+	DBConnectionPoolReleaseConnection(hdb);
 }
 
 void AgentSide_i::updateRenderedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const char* videoLocation)

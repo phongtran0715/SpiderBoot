@@ -1,33 +1,27 @@
 package com.spider.main;
 
 import java.io.File;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.TimerTask;
-import org.apache.log4j.Logger;
-import org.omg.CORBA.StringHolder;
 
 import com.github.axet.vget.DirectDownload;
 import com.google.api.client.util.DateTime;
-import com.google.api.client.util.Sleeper;
 import com.google.api.services.samples.youtube.cmdline.data.Search;
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Video;
 import com.spider.corba.DownloadCorbaClient;
 
-import spiderboot.configuration.Config;
-import spiderboot.util.SpiderTypeDef;
+import SpiderAgentApp.AgentSidePackage.VideoInfo;
+import spiderboot.configuration.DownloadConfig;
+import spiderboot.data.DataController;
 import spiderboot.util.Utility;
 import spiderboot.util.VideoWraper;
 import java.util.List;
-import SpiderDownloadApp.*;
 
 public class DownloadExecuteTimer extends TimerTask {
 	int timerId;
@@ -39,6 +33,7 @@ public class DownloadExecuteTimer extends TimerTask {
 	DateFormat dateFormat;
 	DownloadCorbaClient downloadClient;
 	boolean isInitCorba = false;
+	DownloadConfig downloadConfig;
 
 	public DownloadExecuteTimer(int timerId, String cHomeId, String cMonitorId) {
 		this.timerId = timerId;
@@ -48,8 +43,9 @@ public class DownloadExecuteTimer extends TimerTask {
 		util = new Utility();
 		videoFolderBase = "/home/phongtran0715/Downloads/Video/test";
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		downloadConfig = DataController.getInstance().downloadConfig;
 		downloadClient = new DownloadCorbaClient();
-		isInitCorba = downloadClient.initCorba();
+		isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);
 	}
 
 	@Override
@@ -60,11 +56,9 @@ public class DownloadExecuteTimer extends TimerTask {
 	private void completeTask() {
 		if (isComplete) {
 			isComplete = false;
-			System.out.println("Timer " + timerId + " started at " + new Date().toString());
 			Date lastSyncTime = getLastSyncTime(timerId);
-
 			DateTime ytbTime = new DateTime(lastSyncTime);
-			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(cMonitorId, ytbTime);
+			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(cMonitorId, ytbTime, downloadConfig.maxResult);
 			Iterator<SearchResult> iteratorSearchResults = result.iterator();
 			if (!iteratorSearchResults.hasNext()) {
 				isComplete = true;
@@ -78,22 +72,20 @@ public class DownloadExecuteTimer extends TimerTask {
 						String vId = rId.getVideoId();
 						//Download video
 						DirectDownload dowloadHandle = new DirectDownload();
-						String path = videoFolderBase + "/" + cHomeId + "-" + cMonitorId;
-						util.createFolderIfNotExist(path);
-						File theDir = new File(path);
+						String videoLocation = videoFolderBase + "/" + cHomeId + "-" + cMonitorId;
+						util.createFolderIfNotExist(videoLocation);
+						File theDir = new File(videoLocation);
 						if (theDir.exists()) {
-							//startTime = System.currentTimeMillis();
-							String lastSeq = genVideoName();
-							String ext = dowloadHandle.download(vId, path, "video_" + lastSeq);
+							String ext = dowloadHandle.download(vId, videoLocation);
 							// Get video info
-							List<Video> videoList = Search.getInstance().getVideoInfo(vId, Config.youtubeKey);
+							List<Video> videoList = Search.getInstance().getVideoInfo(vId, DataController.getInstance().downloadConfig.apiKey);
 							Iterator<Video> iteratorSRS = videoList.iterator();
 							if (videoList != null) {
 								if(iteratorSRS.hasNext()) {
 									Video sgVideo = iteratorSRS.next();
 									//Insert video info to data base
-									VideoWraper vWraper = getVideoInfor(sgVideo, lastSeq, ext);
-									//saveVideoInfo(vWraper);
+									VideoWraper vWraper = getVideoInfor(sgVideo, vId, ext);
+									saveVideoInfo(vWraper);
 								}
 							}
 						}
@@ -119,8 +111,7 @@ public class DownloadExecuteTimer extends TimerTask {
 			{
 				try {
 					long lastTime = downloadClient.downloadAppImpl.getLastSyncTime(timerId);
-					System.out.println("last sync time = " + lastTime);
-					Date date = new Date(lastTime);
+					Date date = new Date(lastTime * 1000);
 					result = date;
 				}catch (Exception e) {
 					System.out.println("Can not call corba agent server function");
@@ -156,12 +147,13 @@ public class DownloadExecuteTimer extends TimerTask {
 		}
 	}
 
-	private VideoWraper getVideoInfor(Video singleVideo, String lastSeq, String ext) {
-		String vId = singleVideo.getId();
+	private VideoWraper getVideoInfor(Video singleVideo, String videoName, String ext) {
+		String videoId = singleVideo.getId();
 		String title = singleVideo.getSnippet().getTitle();
 		String desc = singleVideo.getSnippet().getDescription();
 		String thumb = singleVideo.getSnippet().getThumbnails().getDefault().getUrl();
-		String vLocation = "video_" + lastSeq + "." + ext;
+		String vDownloadPath = videoFolderBase + "/" + cHomeId + "-" + cMonitorId + "/" + videoName + "." + ext;
+		String vRenderPath = "";
 		String tags = "";
 		List<String> lstTags = singleVideo.getSnippet().getTags();
 		if (lstTags != null) {
@@ -170,13 +162,36 @@ public class DownloadExecuteTimer extends TimerTask {
 				tags += iteratorTags.next() + System.getProperty("line.separator");
 			}
 		}
-		VideoWraper vWraper = new VideoWraper(vId, title, tags, desc, thumb, vLocation);
+		int processStatus = 1;
+		int license = 0;
+		VideoWraper vWraper = new VideoWraper(videoId, title, tags, desc, thumb, 
+				vDownloadPath, vRenderPath, cHomeId, cMonitorId, processStatus, license);
 		return vWraper;
 	}
 
-	private String genVideoName()
+	private void saveVideoInfo(VideoWraper videoWrapper)
 	{
-		String vName = Long.toString(System.currentTimeMillis());
-		return vName;
+		System.out.println("Function saveVideoInfo:: >>>>");
+		if(isInitCorba)
+		{
+			if(downloadClient.downloadAppImpl != null)
+			{
+				try {
+					System.out.println(videoWrapper.description);
+					SpiderAgentApp.AgentSidePackage.VideoInfo vInfo = new VideoInfo(videoWrapper.videoId, videoWrapper.title, 
+							videoWrapper.tag, "", videoWrapper.thumbnail, 
+							videoWrapper.vDownloadPath, videoWrapper.vRenderPath, videoWrapper.cHomeId, 
+							videoWrapper.cMonitorId, videoWrapper.processStatus, videoWrapper.license);
+					
+					downloadClient.downloadAppImpl.updateDownloadedVideo(vInfo);
+				}catch (Exception e) {
+					System.out.println(e.toString());
+				}
+			}else {
+				System.out.println("Download client implementation is NULL");
+			}
+		}else {
+			System.out.println("Init corba client FALSE");
+		}
 	}
 }
