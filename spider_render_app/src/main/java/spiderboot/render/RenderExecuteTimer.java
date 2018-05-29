@@ -1,45 +1,34 @@
 package spiderboot.render;
 
 import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Date;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
+import SpiderRenderApp.SpiderFootSidePackage.RenderInfo;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
-import spiderboot.configuration.DownloadConfig;
+import spiderboot.configuration.RenderConfig;
+import spiderboot.data.DataController;
 import spiderboot.util.Utility;
 
 public class RenderExecuteTimer extends TimerTask{
 
 	boolean isComplete = true;
-	String timerId;
-	String vIntro = "";
-	String vOutro = "";
-	String logo = "";
 	FFmpeg ffmpeg;
 	FFprobe ffprobe;
-	private Statement stmt;
-	private ResultSet rs;
-	String videoFolderBase;
+	String outputFolder;
 	static Utility util = new Utility();
-	private static final Logger logger = Logger.getLogger(RenderExecuteTimer.class);
+	RenderConfig renderConfig;
 
 	public RenderExecuteTimer(String timerId) {
-		// TODO Auto-generated constructor stub
-		this.timerId = timerId;
-		videoFolderBase = DownloadConfig.clientSecrect;
+		renderConfig = DataController.getInstance().renderConfig;
+		outputFolder = renderConfig.outputVideo;
 		try {
 			ffmpeg = new FFmpeg();
 			ffprobe = new FFprobe();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -55,50 +44,27 @@ public class RenderExecuteTimer extends TimerTask{
 	private void completeTask() {
 		if(isComplete){
 			isComplete = false;
-			String query = "SELECT Id, VideoLocation, HomeChannelId, MonitorChannelId "
-					+ "FROM video_container WHERE ProcessStatus = '0';";
-			System.out.println(query);
-			try {
-				//stmt = MySqlAccess.getInstance().connect.createStatement();
-				if(stmt != null) {
-					System.out.println("Create stm successful");
-				}
-				rs = stmt.executeQuery(query);
-				while (rs.next()) {
-					System.out.println("Detect new video to process");
-					int id = rs.getInt("Id");
-					String vName = rs.getString("VideoLocation");
-					String cHomeId = rs.getString("HomeChannelId");
-					String cMonitorId = rs.getString("MonitorChannelId");
-					vIntro = getStringAtrr(cHomeId, "VideoIntro");
-					vOutro = getStringAtrr(cHomeId, "VideoOutro");
-					logo  = getStringAtrr(cHomeId, "Logo");
+			if(RenderTimerManager.qRenderJob.isEmpty() == false)
+			{
+				RenderInfo vInfo = RenderTimerManager.qRenderJob.poll();				
+				//TODO: get render information
+				util.createFolderIfNotExist(outputFolder);
 
-					String vInputPath =  videoFolderBase + util.prefixOS() + cHomeId + "-" + cMonitorId;
-					String vRendered = vInputPath + util.prefixOS() + "rendered";
-					util.createFolderIfNotExist(vInputPath);
-					util.createFolderIfNotExist(vRendered);
-
-					String vInput = vInputPath + util.prefixOS() + vName;
-					String vOutput = vRendered + util.prefixOS() + vName;
-					//process video
-					processVideo(vInput, vInputPath + util.prefixOS() + "video_tmp1.mp4");
-					//convert video
-					convertVideo(vIntro, vInputPath + util.prefixOS() + "intro.ts");
-					convertVideo(vOutro, vInputPath + util.prefixOS() + "outro.ts");
-					convertVideo(vInputPath + util.prefixOS() + "video_tmp1.mp4", 
-							vInputPath + util.prefixOS() + "video_tmp1.ts");
-					//concast video 
-					concastVideo(vInputPath + util.prefixOS() + "intro.ts",
-							vInputPath + util.prefixOS() + "video_tmp1.ts",
-							vInputPath + util.prefixOS() + "outro.ts", 
-							vOutput);
-					//update process status 
-					updateProcessStatus(id, 1);
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				String vOutput = outputFolder + util.prefixOS() + vInfo.videoId + ".mp4";
+				//process video
+				processVideo(vInfo.vdownloadPath, outputFolder + util.prefixOS() + "video_tmp1.mp4", vInfo.vLogo);
+				//convert video
+				convertVideo(vInfo.vIntro, outputFolder + util.prefixOS() + "intro.ts");
+				convertVideo(vInfo.vOutro, outputFolder + util.prefixOS() + "outro.ts");
+				convertVideo(outputFolder + util.prefixOS() + "video_tmp1.mp4", 
+						outputFolder + util.prefixOS() + "video_tmp1.ts");
+				//concast video 
+				concastVideo(outputFolder + util.prefixOS() + "intro.ts",
+						outputFolder + util.prefixOS() + "video_tmp1.ts",
+						outputFolder + util.prefixOS() + "outro.ts", 
+						vOutput);
+				//update rendered video information
+				updateRenderedInfo(vInfo.jobId, 2, vOutput);
 			}
 			isComplete = true;
 		}
@@ -108,28 +74,7 @@ public class RenderExecuteTimer extends TimerTask{
 		}
 	}
 
-	private String getStringAtrr(String cHomeId, String key)
-	{
-		String result = null;
-		Statement stmt;
-		String query = "SELECT " + key + " FROM home_channel_list "
-				+ "WHERE ChannelId = '" + cHomeId + "'";
-		System.out.println(query);
-		try {
-			//stmt = MySqlAccess.getInstance().connect.createStatement();
-//			ResultSet rs = stmt.executeQuery(query);
-			while (rs.next()) {
-				result = rs.getString(1);
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
-		return result;
-	}
-
-
-	private String processVideo(String inputVideo, String outVideo)
+	private String processVideo(String inputVideo, String outVideo, String logo)
 	{
 		System.out.println("Beginning processVideo function");
 		String result = null;
@@ -192,21 +137,8 @@ public class RenderExecuteTimer extends TimerTask{
 		return result;
 	}
 
-	private void updateProcessStatus(int id, int processStatus) 
+	private void updateRenderedInfo(int jobId, int processStatus, String vRenderedPath)
 	{
-		System.out.println("Update Process Status");
-		PreparedStatement preparedStm = null;
-		String query = "UPDATE video_container SET ProcessStatus = ? WHERE Id = ? ";
-		try {
-//			preparedStm = MySqlAccess.getInstance().connect.prepareStatement(query);
-			// execute insert SQL statement
-			preparedStm.setInt(1, processStatus);
-			preparedStm.setInt(2, id);
-			preparedStm.executeUpdate();
-			logger.info("Update process status for video " + id + "successful!");
-		} catch (SQLException ex) {
-			// TODO Auto-generated catch block
-			logger.info("ERR_UPDATE_LASTSYNCTIME|" + ex.getMessage());
-		} 
+
 	}
 }

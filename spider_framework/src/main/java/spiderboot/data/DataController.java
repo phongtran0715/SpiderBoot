@@ -1,6 +1,7 @@
 package spiderboot.data;
 
 import spiderboot.configuration.DownloadConfig;
+import spiderboot.configuration.RenderConfig;
 
 public class DataController {
 
@@ -8,6 +9,7 @@ public class DataController {
 	private static DataController single_instance = null;
 
 	public DownloadConfig downloadConfig;
+	public RenderConfig renderConfig;
 	// private constructor restricted to this class itself
 	private DataController()
 	{
@@ -25,5 +27,10 @@ public class DataController {
 	public void setDownloadConfigObj(DownloadConfig downloadConfig)
 	{
 		this.downloadConfig = downloadConfig;
+	}
+	
+	public void setRenderConfigObj(RenderConfig renderConfig)
+	{
+		this.renderConfig = renderConfig;
 	}
 }

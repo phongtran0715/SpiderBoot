@@ -240,7 +240,33 @@ _CORBA_MODULE_BEG
     static _core_attr const char* _PD_repoId;
 
     // Other IDL defined within this scope.
+    struct RenderInfo {
+      typedef _CORBA_ConstrType_Variable_Var<RenderInfo> _var_type;
+
+      
+      ::CORBA::Long jobId;
+
+      ::CORBA::String_member videoId;
+
+      ::CORBA::String_member vIntro;
+
+      ::CORBA::String_member vOutro;
+
+      ::CORBA::String_member vLogo;
+
+      ::CORBA::String_member vdownloadPath;
+
     
+
+      void operator>>= (cdrStream &) const;
+      void operator<<= (cdrStream &);
+    };
+
+    typedef RenderInfo::_var_type RenderInfo_var;
+
+    typedef _CORBA_ConstrType_Variable_OUT_arg< RenderInfo,RenderInfo_var > RenderInfo_out;
+
+  
   };
 
   class _objref_SpiderFootSide :
@@ -249,9 +275,9 @@ _CORBA_MODULE_BEG
   {
   public:
     // IDL operations
-    ::CORBA::Boolean createRenderJob(::CORBA::Long timerId, const char* renderClusterId);
-    ::CORBA::Boolean modifyRenderJob(::CORBA::Long timerId, const char* renderClusterId);
-    ::CORBA::Boolean deleteRenderJob(::CORBA::Long timerId, const char* renderClusterId);
+    ::CORBA::Boolean createRenderJob(::CORBA::Long jobId, const ::SpiderRenderApp::SpiderFootSide::RenderInfo& vInfo);
+    ::CORBA::Boolean modifyRenderJob(::CORBA::Long jobId, const ::SpiderRenderApp::SpiderFootSide::RenderInfo& vInfo);
+    ::CORBA::Boolean deleteRenderJob(::CORBA::Long jobId, const ::SpiderRenderApp::SpiderFootSide::RenderInfo& vInfo);
 
     // Constructors
     inline _objref_SpiderFootSide()  { _PR_setobj(0); }  // nil
@@ -286,9 +312,9 @@ _CORBA_MODULE_BEG
   public:
     virtual ~_impl_SpiderFootSide();
 
-    virtual ::CORBA::Boolean createRenderJob(::CORBA::Long timerId, const char* renderClusterId) = 0;
-    virtual ::CORBA::Boolean modifyRenderJob(::CORBA::Long timerId, const char* renderClusterId) = 0;
-    virtual ::CORBA::Boolean deleteRenderJob(::CORBA::Long timerId, const char* renderClusterId) = 0;
+    virtual ::CORBA::Boolean createRenderJob(::CORBA::Long jobId, const ::SpiderRenderApp::SpiderFootSide::RenderInfo& vInfo) = 0;
+    virtual ::CORBA::Boolean modifyRenderJob(::CORBA::Long jobId, const ::SpiderRenderApp::SpiderFootSide::RenderInfo& vInfo) = 0;
+    virtual ::CORBA::Boolean deleteRenderJob(::CORBA::Long jobId, const ::SpiderRenderApp::SpiderFootSide::RenderInfo& vInfo) = 0;
     
   public:  // Really protected, workaround for xlC
     virtual _CORBA_Boolean _dispatch(omniCallHandle&);
@@ -541,7 +567,7 @@ _CORBA_MODULE_BEG
     ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId);
     void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong lastSyncTime);
     void updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::VideoInfo& vInfo);
-    void updateRenderedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const char* videoLocation);
+    void updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const char* vRenderPath);
     void updateUploadedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const char* videoLocation);
 
     // Constructors
@@ -583,7 +609,7 @@ _CORBA_MODULE_BEG
     virtual ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId) = 0;
     virtual void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong lastSyncTime) = 0;
     virtual void updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::VideoInfo& vInfo) = 0;
-    virtual void updateRenderedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const char* videoLocation) = 0;
+    virtual void updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const char* vRenderPath) = 0;
     virtual void updateUploadedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const char* videoLocation) = 0;
     
   public:  // Really protected, workaround for xlC

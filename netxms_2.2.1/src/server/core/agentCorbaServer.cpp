@@ -10,30 +10,26 @@ using namespace std;
 void AgentSide_i::onDownloadStartup(const char* appId)
 {
 	DbgPrintf(1, _T("AgentSide_i::[onDownloadStartup]"));
-	DbgPrintf(1, _T("AgentSide_i::[DownloadStartup] appId = %s"), appId);
 	DB_RESULT hResult;
 	UINT32 i, dwNumRecords;
 	SpiderDownloadClient* downloadClient = new SpiderDownloadClient();
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
-	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT * FROM channel_mapping WHERE StatusSync = ?"));
+	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT * FROM channel_mapping WHERE StatusSync = ? AND DownloadClusterId = ?"));
 	if (hStmt != NULL)
 	{
 		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)1);
+		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)appId, DB_BIND_TRANSIENT);
 		hResult = DBSelectPrepared(hStmt);
 		if (hResult != NULL)
 		{
 			dwNumRecords = DBGetNumRows(hResult);
-			DbgPrintf(1, _T("AgentSide_i::[nDownloadStartup] numRecord = %d"), dwNumRecords);
+			DbgPrintf(1, _T("AgentSide_i::[DownloadStartup] numRecord = %d"), dwNumRecords);
 			for (i = 0; i < dwNumRecords; i++)
 			{
 				INT32 id = DBGetFieldInt64(hResult, i, 0);
 				TCHAR* cHomeId = DBGetField(hResult, i, 1, NULL, 0);
 				TCHAR* cMonitorId = DBGetField(hResult, i, 2, NULL, 0);
 				INT64 timeSync = DBGetFieldInt64(hResult, i, 3);
-				DbgPrintf(1, _T("AgentSide_i::[] : id = %d"), id);
-				DbgPrintf(1, _T("AgentSide_i::[] : home ID = %s"), (const char*)cHomeId);
-				DbgPrintf(1, _T("AgentSide_i::[] : monitor ID = %s"), (const char*)cMonitorId);
-				DbgPrintf(1, _T("AgentSide_i::[] : time sync = %d"), timeSync);
 				if (downloadClient->initSuccess)
 				{
 					if (downloadClient->mDownloadRef != NULL)
@@ -67,23 +63,55 @@ void AgentSide_i::onDownloadStartup(const char* appId)
 
 void AgentSide_i::onRenderStartup(const char* appId)
 {
+	DbgPrintf(1, _T("AgentSide_i::[onDownloadStartup]"));
 	DB_RESULT hResult;
 	UINT32 i, dwNumRecords;
 	SpiderRenderClient* renderClient = new SpiderRenderClient();
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
-	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT * FROM video_container WHERE ProcessStatus = ? AND RenderClusterId = ?"));
+	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT Id, VideoId, HomeChannelId, VDownloadedPath FROM video_container WHERE ProcessStatus = ? "));
 	if (hStmt != NULL)
 	{
-		//DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)VIDEO_DOWNLOADED);
 		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)1);
-		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR*) appId, DB_BIND_DYNAMIC);
 		hResult = DBSelectPrepared(hStmt);
 		if (hResult != NULL)
 		{
 			dwNumRecords = DBGetNumRows(hResult);
+			DbgPrintf(1, _T("AgentSide_i::[DownloadStartup] numRecord = %d"), dwNumRecords);
 			for (i = 0; i < dwNumRecords; i++)
 			{
-				//TODO: send information to render app
+				INT32 id = DBGetFieldInt64(hResult, i, 0);
+				TCHAR* videoId = DBGetField(hResult, i, 1, NULL, 0);
+				TCHAR* cHomeId = DBGetField(hResult, i, 2, NULL, 0);
+				TCHAR* downloadPath = DBGetField(hResult, i, 3, NULL, 0);
+				if (renderClient->initSuccess)
+				{
+					if (renderClient->mRenderRef != NULL)
+					{
+						try
+						{
+							//TODO: create render info struct
+							::SpiderRenderApp::SpiderFootSide::RenderInfo vInfo;
+							vInfo.jobId = id;
+							vInfo.videoId = CORBA::string_dup((const char*)videoId);
+							vInfo.vIntro = CORBA::string_dup((const char*)"/home/phongtran0715/Downloads/Video/test/intro.mp4");
+							vInfo.vOutro = CORBA::string_dup((const char*)"/home/phongtran0715/Downloads/Video/test/outro.mp4");
+							vInfo.vLogo = CORBA::string_dup((const char*)"/home/phongtran0715/Downloads/Video/test/logo.png");
+							vInfo.vdownloadPath = CORBA::string_dup((const char*)"/home/phongtran0715/Downloads/Video/test/input.mp4");
+							renderClient->mRenderRef->createRenderJob(id, vInfo);
+						}
+						catch (CORBA::TRANSIENT&) {
+							DbgPrintf(1, _T("AgentSide_i::[] : Caught system exception TRANSIENT -- unable to contact the server"));
+						}
+						catch (CORBA::SystemException& ex) {
+							DbgPrintf(1, _T("AgentSide_i::[] : Caught a CORBA:: %s"), ex._name());
+						}
+						catch (CORBA::Exception& ex)
+						{
+							DbgPrintf(1, _T("AgentSide_i::[] : Caught a CORBA:: %s"), ex._name());
+						}
+					}
+				} else {
+				}
 			}
 			DBFreeResult(hResult);
 		}

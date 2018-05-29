@@ -32,9 +32,9 @@ public class MainDownload {
 		};
 		serverThread.start();
 
+		//Init corba client 
 		Thread clientThread = new Thread(){
 			public void run(){
-				//Init corba client 
 				System.out.println("Beginning to init download corba client...");
 				DownloadCorbaClient downloadClient = new DownloadCorbaClient();
 				boolean isInitClient = downloadClient.initCorba(downloadConfig.corbaRef);
@@ -57,12 +57,5 @@ public class MainDownload {
 		};
 
 		clientThread.start();
-
-		//Start download job
-		startJob();
-	}
-
-	public static void startJob() 
-	{
 	}
 }

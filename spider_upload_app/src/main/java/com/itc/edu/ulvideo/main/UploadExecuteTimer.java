@@ -25,7 +25,6 @@ public class UploadExecuteTimer extends TimerTask{
 
 	public UploadExecuteTimer(String timerId) {
 		this.timerId = timerId;
-		videoFolderBase = DownloadConfig.clientSecrect;
 	}
 
 	@Override

@@ -19,4 +19,9 @@ public class Constant {
     public static final String DOWNLOAD_MAX_RESULT	 		= "MaxResult";
     public static final String DOWNLOAD_CORBA_REF	 		= "CorbaRef";
     
+    //render configuration parameter
+    public static final String RENDER_APP_ID				= "AppId";
+    public static final String RENDER_OUTPUT_VIDEO_PATH		= "OutputVideo";
+    public static final String RENDER_VIDEO_FORMAT			= "VideoFormat";
+    public static final String RENDER_CORBA_REF	 			= "CorbaRef";
 }

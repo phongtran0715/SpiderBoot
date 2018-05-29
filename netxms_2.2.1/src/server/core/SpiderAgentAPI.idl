@@ -15,9 +15,19 @@ module SpiderRenderApp
 {
   interface SpiderFootSide
   {
-        boolean createRenderJob(in long timerId, in string renderClusterId);
-        boolean modifyRenderJob(in long timerId, in string renderClusterId);
-        boolean deleteRenderJob(in long timerId, in string renderClusterId);
+        struct RenderInfo
+        {
+            long jobId;
+            string videoId;
+            string vIntro;
+            string vOutro;
+            string vLogo;
+            string vdownloadPath;
+        };
+
+        boolean createRenderJob(in long jobId, in RenderInfo vInfo);
+        boolean modifyRenderJob(in long jobId, in RenderInfo vInfo);
+        boolean deleteRenderJob(in long jobId, in RenderInfo vInfo);
 
   };
 };
@@ -60,7 +70,7 @@ module SpiderAgentApp
     void updateLastSyntime(in long mappingId, in long long lastSyncTime);
 
     void updateDownloadedVideo(in VideoInfo vInfo);
-    void updateRenderedVideo(in long videoId, in long processStatus, in string videoLocation);
+    void updateRenderedVideo(in long jobId, in long processStatus, in string vRenderPath);
     void updateUploadedVideo (in long videoId, in long processStatus, in string videoLocation);
   };
 };

@@ -1,12 +1,15 @@
 package spiderboot.render;
 
-import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import SpiderRenderApp.SpiderFootSidePackage.RenderInfo;
+
 public class RenderTimerManager {
 	
-	public static HashMap<String, Timer> timerMap = new HashMap<String, Timer>();
+	public static Queue<RenderInfo> qRenderJob = new LinkedList<RenderInfo>();
 	private static RenderTimerManager instance = null;
 	public static RenderTimerManager getInstance() {
 		if (instance == null) {
@@ -20,14 +23,11 @@ public class RenderTimerManager {
 		TimerTask timerTask = new RenderExecuteTimer(taskId);
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(timerTask, 0, timerInterval);
-		if (timer != null) {
-			timerMap.put(taskId, timer);
-		}
 		isSuccess = true;
 		return isSuccess;
 	}
 
 	public void initTimerTask() {
-		startRenderTimer("RenderApp_01", 60 * 1000);
+		startRenderTimer("RenderApp_01", 5 * 1000);
 	}
 }
