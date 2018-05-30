@@ -124,7 +124,10 @@ public class EditGoogleAccoutDialog extends Dialog {
 				fd.setFilterNames(new String[] {
 				"All file" });
 				String fileName = fd.open();
-				txtClientSecret.setText(fileName);
+				if(fileName != null)
+				{
+					txtClientSecret.setText(fileName);	
+				}
 			}
 		});
 		btnClientSecret.setText("Browse...");

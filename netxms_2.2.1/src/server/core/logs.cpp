@@ -27,13 +27,13 @@
  */
 static NXCORE_LOG s_logs[] =
 {
-	{ _T("AlarmLog"), _T("alarms"), _T("alarm_id"), _T("source_object_id"), SYSTEM_ACCESS_VIEW_EVENT_LOG,
+	{	_T("AlarmLog"), _T("alarms"), _T("alarm_id"), _T("source_object_id"), SYSTEM_ACCESS_VIEW_EVENT_LOG,
 		{
 			{ _T("alarm_id"), _T("Alarm ID"), LC_INTEGER },
 			{ _T("alarm_state"), _T("State"), LC_ALARM_STATE },
 			{ _T("hd_state"), _T("Helpdesk State"), LC_ALARM_HD_STATE },
 			{ _T("source_object_id"), _T("Source"), LC_OBJECT_ID },
-         { _T("dci_id"), _T("DCI"), LC_INTEGER },
+			{ _T("dci_id"), _T("DCI"), LC_INTEGER },
 			{ _T("current_severity"), _T("Severity"), LC_SEVERITY },
 			{ _T("original_severity"), _T("Original Severity"), LC_SEVERITY },
 			{ _T("source_event_code"), _T("Event"), LC_EVENT_CODE },
@@ -48,37 +48,37 @@ static NXCORE_LOG s_logs[] =
 			{ NULL, NULL, 0 }
 		}
 	},
-	{ _T("AuditLog"), _T("audit_log"), _T("record_id"), _T("object_id"), SYSTEM_ACCESS_VIEW_AUDIT_LOG,
+	{	_T("AuditLog"), _T("audit_log"), _T("record_id"), _T("object_id"), SYSTEM_ACCESS_VIEW_AUDIT_LOG,
 		{
 			{ _T("record_id"), _T("Record ID"), LC_INTEGER },
 			{ _T("timestamp"), _T("Timestamp"), LC_TIMESTAMP },
 			{ _T("subsystem"), _T("Subsystem"), LC_TEXT },
-         { _T("object_id"), _T("Object"), LC_OBJECT_ID },
+			{ _T("object_id"), _T("Object"), LC_OBJECT_ID },
 			{ _T("user_id"), _T("User"), LC_USER_ID },
-         { _T("session_id"), _T("Session"), LC_INTEGER },
+			{ _T("session_id"), _T("Session"), LC_INTEGER },
 			{ _T("workstation"), _T("Workstation"), LC_TEXT },
 			{ _T("message"), _T("Message"), LC_TEXT },
-         { _T("old_value"), _T("Old value"), LC_TEXT },
-         { _T("new_value"), _T("New value"), LC_TEXT },
-         { _T("value_diff"), _T("Changes"), LC_TEXT },
+			{ _T("old_value"), _T("Old value"), LC_TEXT },
+			{ _T("new_value"), _T("New value"), LC_TEXT },
+			{ _T("value_diff"), _T("Changes"), LC_TEXT },
 			{ NULL, NULL, 0 }
 		}
 	},
-	{ _T("EventLog"), _T("event_log"), _T("event_id"), _T("event_source"), SYSTEM_ACCESS_VIEW_EVENT_LOG,
+	{	_T("EventLog"), _T("event_log"), _T("event_id"), _T("event_source"), SYSTEM_ACCESS_VIEW_EVENT_LOG,
 		{
-         { _T("event_id"), _T("ID"), LC_INTEGER },
+			{ _T("event_id"), _T("ID"), LC_INTEGER },
 			{ _T("event_timestamp"), _T("Time"), LC_TIMESTAMP },
 			{ _T("event_source"), _T("Source"), LC_OBJECT_ID },
-         { _T("dci_id"), _T("DCI"), LC_INTEGER },
+			{ _T("dci_id"), _T("DCI"), LC_INTEGER },
 			{ _T("event_code"), _T("Event"), LC_EVENT_CODE },
 			{ _T("event_severity"), _T("Severity"), LC_SEVERITY },
 			{ _T("event_message"), _T("Message"), LC_TEXT },
 			{ _T("user_tag"), _T("User tag"), LC_TEXT },
-         { _T("root_event_id"), _T("Root ID"), LC_INTEGER },
+			{ _T("root_event_id"), _T("Root ID"), LC_INTEGER },
 			{ NULL, NULL, 0 }
 		}
 	},
-	{ _T("SnmpTrapLog"), _T("snmp_trap_log"), _T("trap_id"), _T("object_id"), SYSTEM_ACCESS_VIEW_TRAP_LOG,
+	{	_T("SnmpTrapLog"), _T("snmp_trap_log"), _T("trap_id"), _T("object_id"), SYSTEM_ACCESS_VIEW_TRAP_LOG,
 		{
 			{ _T("trap_timestamp"), _T("Time"), LC_TIMESTAMP },
 			{ _T("ip_addr"), _T("Source IP"), LC_TEXT },
@@ -88,7 +88,7 @@ static NXCORE_LOG s_logs[] =
 			{ NULL, NULL, 0 }
 		}
 	},
-	{ _T("syslog"), _T("syslog"), _T("msg_id"), _T("source_object_id"), SYSTEM_ACCESS_VIEW_SYSLOG,
+	{	_T("syslog"), _T("syslog"), _T("msg_id"), _T("source_object_id"), SYSTEM_ACCESS_VIEW_SYSLOG,
 		{
 			{ _T("msg_timestamp"), _T("Time"), LC_TIMESTAMP },
 			{ _T("source_object_id"), _T("Source"), LC_OBJECT_ID },
@@ -97,6 +97,55 @@ static NXCORE_LOG s_logs[] =
 			{ _T("hostname"), _T("Host"), LC_TEXT },
 			{ _T("msg_tag"), _T("Tag"), LC_TEXT },
 			{ _T("msg_text"), _T("Text"), LC_TEXT },
+			{ NULL, NULL, 0 }
+		}
+	},
+	{	_T("GoogleAccount"), _T("google_account"), _T("Id"), _T("UserName"), SYSTEM_ACCESS_VIEW_SYSLOG,
+		{
+			{ _T("Id"), _T("ID"), LC_INTEGER },
+			{ _T("UserName"), _T("User Name"), LC_TEXT },
+			{ _T("Api"), _T("API Key"), LC_TEXT },
+			{ _T("ClientSecret"), _T("ClientSecret"), LC_TEXT },
+			{ _T("AccountType"), _T("Account Type"), LC_TEXT },
+			{ _T("AppName"), _T("App Name"), LC_TEXT },
+			{ NULL, NULL, 0 }
+		}
+	},
+	{	_T("HomeChannel"), _T("home_channel_list"), _T("Id"), _T("ChannelId"), SYSTEM_ACCESS_VIEW_SYSLOG,
+		{
+			{ _T("Id"), _T("ID"), LC_INTEGER },
+			{ _T("ChannelId"), _T("Channel Id"), LC_TEXT },
+			{ _T("ChannelName"), _T("Channel Name"), LC_TEXT },
+			{ _T("GoogleAccount"), _T("Google Account"), LC_TEXT },
+			{ _T("VideoIntro"), _T("Video Intro"), LC_TEXT },
+			{ _T("VideoOutro"), _T("Video Outro"), LC_TEXT },
+			{ _T("Logo"), _T("Logo"), LC_TEXT },
+			{ _T("DescriptionTemplate"), _T("Description"), LC_TEXT },
+			{ _T("TitleTemplate"), _T("Title"), LC_TEXT },
+			{ _T("TagsTemplate"), _T("Tags"), LC_TEXT },
+			{ NULL, NULL, 0 }
+		}
+	},
+	{	_T("MonitorChannel"), _T("monitor_channel_list"), _T("Id"), _T("ChannelId"), SYSTEM_ACCESS_VIEW_SYSLOG,
+		{
+			{ _T("Id"), _T("ID"), LC_INTEGER },
+			{ _T("ChannelId"), _T("Channel Id"), LC_TEXT },
+			{ _T("ChannelName"), _T("Channel Name"), LC_TEXT },
+			{ NULL, NULL, 0 }
+		}
+	},
+
+	{	_T("ChannelMapping"), _T("channel_mapping"), _T("Id"), _T("HomeChannelId"), SYSTEM_ACCESS_VIEW_SYSLOG,
+		{
+			{ _T("Id"), _T("ID"), LC_INTEGER },
+			{ _T("HomeChannelId"), _T("Home Channel Id"), LC_TEXT },
+			{ _T("MonitorChannelId"), _T("Monitor Channel Name"), LC_TEXT },
+			{ _T("TimeIntervalSync"), _T("Interval"), LC_TEXT },
+			{ _T("StatusSync"), _T("Status"), LC_INTEGER },
+			{ _T("LastSyncTime"), _T("LastSyncTime"), LC_INTEGER },
+			{ _T("DownloadClusterId"), _T("DownloadClusterId"), LC_TEXT },
+			{ _T("ProcessClusterId"), _T("ProcessClusterId"), LC_TEXT },
+			{ _T("UploadClusterId"), _T("UploadClusterId"), LC_TEXT },
 			{ NULL, NULL, 0 }
 		}
 	},
@@ -132,21 +181,21 @@ static int RegisterLogHandle(LogHandle *handle, ClientSession *session)
 
 	MutexLock(s_regListMutex);
 
-	for(i = 0; i < s_regListSize; i++)
+	for (i = 0; i < s_regListSize; i++)
 		if (s_regList[i].handle == NULL)
 			break;
 	if (i == s_regListSize)
 	{
 		s_regListSize += 10;
 		s_regList = (LOG_HANDLE_REGISTRATION *)realloc(s_regList, sizeof(LOG_HANDLE_REGISTRATION) * s_regListSize);
-      memset(&s_regList[i], 0, sizeof(LOG_HANDLE_REGISTRATION) * (s_regListSize - i));
+		memset(&s_regList[i], 0, sizeof(LOG_HANDLE_REGISTRATION) * (s_regListSize - i));
 	}
 
 	s_regList[i].handle = handle;
 	s_regList[i].sessionId = session->getId();
 
 	MutexUnlock(s_regListMutex);
-   DbgPrintf(6, _T("RegisterLogHandle: handle object %p registered as %d"), handle, i);
+	DbgPrintf(6, _T("RegisterLogHandle: handle object %p registered as %d"), handle, i);
 	return i;
 }
 
@@ -157,7 +206,7 @@ static int RegisterLogHandle(LogHandle *handle, ClientSession *session)
  */
 static int OpenLogInternal(NXCORE_LOG *logs, const TCHAR *name, ClientSession *session, UINT32 *rcc)
 {
-	for(int i = 0; logs[i].name != NULL; i++)
+	for (int i = 0; logs[i].name != NULL; i++)
 	{
 		if (!_tcsicmp(name, logs[i].name))
 		{
@@ -174,7 +223,7 @@ static int OpenLogInternal(NXCORE_LOG *logs, const TCHAR *name, ClientSession *s
 			}
 		}
 	}
-   return -2;
+	return -2;
 }
 
 /**
@@ -182,18 +231,18 @@ static int OpenLogInternal(NXCORE_LOG *logs, const TCHAR *name, ClientSession *s
  */
 int OpenLog(const TCHAR *name, ClientSession *session, UINT32 *rcc)
 {
-   int rc = OpenLogInternal(s_logs, name, session, rcc);
-   if (rc != -2)
-      return rc;
+	int rc = OpenLogInternal(s_logs, name, session, rcc);
+	if (rc != -2)
+		return rc;
 
-   // Try to find log definition in loaded modules
-   for(UINT32 i = 0; i < g_dwNumModules; i++)
+	// Try to find log definition in loaded modules
+	for (UINT32 i = 0; i < g_dwNumModules; i++)
 	{
 		if (g_pModuleList[i].logs != NULL)
 		{
-         rc = OpenLogInternal(g_pModuleList[i].logs, name, session, rcc);
-         if (rc != -2)
-            return rc;
+			rc = OpenLogInternal(g_pModuleList[i].logs, name, session, rcc);
+			if (rc != -2)
+				return rc;
 		}
 	}
 
@@ -207,26 +256,26 @@ int OpenLog(const TCHAR *name, ClientSession *session, UINT32 *rcc)
 UINT32 CloseLog(ClientSession *session, int logHandle)
 {
 	UINT32 rcc = RCC_INVALID_LOG_HANDLE;
-   LogHandle *log = NULL;
+	LogHandle *log = NULL;
 
-   DbgPrintf(6, _T("CloseLog: close request from session %d for handle %d"), session->getId(), logHandle);
+	DbgPrintf(6, _T("CloseLog: close request from session %d for handle %d"), session->getId(), logHandle);
 	MutexLock(s_regListMutex);
 
 	if ((logHandle >= 0) && (logHandle < s_regListSize) &&
-	    (s_regList[logHandle].sessionId == session->getId()) &&
-		 (s_regList[logHandle].handle != NULL))
+	        (s_regList[logHandle].sessionId == session->getId()) &&
+	        (s_regList[logHandle].handle != NULL))
 	{
-      log = s_regList[logHandle].handle;
-      s_regList[logHandle].handle = NULL;
+		log = s_regList[logHandle].handle;
+		s_regList[logHandle].handle = NULL;
 	}
 
 	MutexUnlock(s_regListMutex);
 
-   if (log != NULL)
-   {
-      log->decRefCount();
-      rcc = RCC_SUCCESS;
-   }
+	if (log != NULL)
+	{
+		log->decRefCount();
+		rcc = RCC_SUCCESS;
+	}
 	return rcc;
 }
 
@@ -238,19 +287,19 @@ LogHandle *AcquireLogHandleObject(ClientSession *session, int logHandle)
 {
 	LogHandle *object = NULL;
 
-   DbgPrintf(6, _T("AcquireLogHandleObject: request from session %d for handle %d"), session->getId(), logHandle);
+	DbgPrintf(6, _T("AcquireLogHandleObject: request from session %d for handle %d"), session->getId(), logHandle);
 	MutexLock(s_regListMutex);
 
 	if ((logHandle >= 0) && (logHandle < s_regListSize) &&
-	    (s_regList[logHandle].sessionId == session->getId()) &&
-		 (s_regList[logHandle].handle != NULL))
+	        (s_regList[logHandle].sessionId == session->getId()) &&
+	        (s_regList[logHandle].handle != NULL))
 	{
 		object = s_regList[logHandle].handle;
-      object->incRefCount();
+		object->incRefCount();
 	}
 
 	MutexUnlock(s_regListMutex);
-   if (object != NULL)
-      object->lock();
+	if (object != NULL)
+		object->lock();
 	return object;
 }

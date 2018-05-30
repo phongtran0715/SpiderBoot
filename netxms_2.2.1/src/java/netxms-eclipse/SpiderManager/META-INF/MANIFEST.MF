@@ -11,7 +11,9 @@ Require-Bundle: org.eclipse.ui,
  org.netxms.ui.eclipse.clientlibrary;bundle-version="2.2.0",
  org.netxms.ui.eclipse.console
 Bundle-ActivationPolicy: lazy
-Import-Package: org.netxms.ui.eclipse.jobs,
+Import-Package: org.netxms.ui.eclipse.alarmviewer.views,
+ org.netxms.ui.eclipse.jobs,
+ org.netxms.ui.eclipse.logviewer.views,
  org.netxms.ui.eclipse.shared,
  org.netxms.ui.eclipse.tools,
  org.netxms.ui.eclipse.widgets,

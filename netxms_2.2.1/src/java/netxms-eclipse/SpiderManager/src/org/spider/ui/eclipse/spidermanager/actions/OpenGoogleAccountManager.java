@@ -2,6 +2,7 @@ package org.spider.ui.eclipse.spidermanager.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
@@ -16,7 +17,8 @@ public class OpenGoogleAccountManager implements IWorkbenchWindowActionDelegate 
 		// TODO Auto-generated method stub
 		if (window != null) {
 			try {
-				window.getActivePage().showView(GoogleAccountManagerView.ID);
+				window.getActivePage().showView(GoogleAccountManagerView.ID,
+						"GoogleAccount", IWorkbenchPage.VIEW_ACTIVATE); //$NON-NLS-1$
 			} catch (PartInitException e) {
 				MessageDialogHelper.openError(
 						window.getShell(),

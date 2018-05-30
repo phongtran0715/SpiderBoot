@@ -110,7 +110,7 @@ public class LogViewer extends ViewPart {
 		super.init(site);
 		session = (NXCSession) ConsoleSharedData.getSession();
 		logName = site.getSecondaryId();
-		setPartName(Messages.getString("LogViewer_" + logName)); //$NON-NLS-1$
+		setPartName(Messages.getString(logName)); //$NON-NLS-1$
 		final ImageDescriptor img = Activator
 				.getImageDescriptor("icons/" + logName + ".png"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (img != null) {
@@ -525,7 +525,7 @@ public class LogViewer extends ViewPart {
 	/**
 	 * Refresh existing dataset
 	 */
-	private void refreshData() {
+	protected void refreshData() {
 		new ConsoleJob(Messages.get().LogViewer_RefreshJob, this,
 				Activator.PLUGIN_ID, JOB_FAMILY) {
 			@Override

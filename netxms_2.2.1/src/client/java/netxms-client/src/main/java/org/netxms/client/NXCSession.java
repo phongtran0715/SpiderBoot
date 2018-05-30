@@ -3762,7 +3762,6 @@ public class NXCSession {
 		msg = waitForRCC(rqId);
 		int count = msg.getFieldAsInt32(NXCPCodes.VID_NUM_VARIABLES);
 		long baseIndex = NXCPCodes.VID_VARLIST_BASE;
-		int stt = 0;
 		for (int i = 0; i < count; i++, baseIndex += 10) 
 		{
 			int id = msg.getFieldAsInt32(baseIndex);
@@ -3771,7 +3770,7 @@ public class NXCSession {
 			String clientSecret = msg.getFieldAsString(baseIndex + 3);
 			int accountType = msg.getFieldAsInt32(baseIndex + 4);
 			String appname = msg.getFieldAsString(baseIndex + 5);
-			googleAccountList.put(id, new GoogleAccountObject(++stt, id, userName, 
+			googleAccountList.put(id, new GoogleAccountObject(id, userName, 
 					api, clientSecret, accountType, appname));
 		}
 		return googleAccountList.values().toArray();
@@ -3791,7 +3790,6 @@ public class NXCSession {
 		msg = waitForRCC(rqId);
 		int count = msg.getFieldAsInt32(NXCPCodes.VID_NUM_VARIABLES);
 		long baseIndex = NXCPCodes.VID_VARLIST_BASE;
-		int stt = 0;
 		for (int i = 0; i < count; i++, baseIndex += 10) 
 		{
 			int id = msg.getFieldAsInt32(baseIndex);
@@ -3804,7 +3802,7 @@ public class NXCSession {
 			String  desc = msg.getFieldAsString(baseIndex + 7);
 			String  title = msg.getFieldAsString(baseIndex + 8);
 			String  tags = msg.getFieldAsString(baseIndex + 9);
-			homeChannelList.put(id , new HomeChannelObject(++stt, id, cId, cName, gAccount,
+			homeChannelList.put(id , new HomeChannelObject(id, cId, cName, gAccount,
 					vIntro, vOutro, logo, desc, title, tags));
 		}
 		return homeChannelList.values().toArray();
@@ -3826,13 +3824,12 @@ public class NXCSession {
 		msg = waitForRCC(rqId);
 		int count = msg.getFieldAsInt32(NXCPCodes.VID_NUM_VARIABLES);
 		long baseIndex = NXCPCodes.VID_VARLIST_BASE;
-		int stt = 0;
 		for (int i = 0; i < count; i++, baseIndex += 10) 
 		{
 			int id = msg.getFieldAsInt32(baseIndex);
 			String  cId = msg.getFieldAsString(baseIndex + 1);
 			String  cName = msg.getFieldAsString(baseIndex + 2);
-			monitorChannleList.put(id , new MonitorChannelObject(++stt, id, cId, cName));
+			monitorChannleList.put(id , new MonitorChannelObject(id, cId, cName));
 		}
 
 		return monitorChannleList.values().toArray();
@@ -3902,7 +3899,6 @@ public class NXCSession {
 		for (int i = 0; i < count; i++, baseIndex += 10) 
 		{
 			int recordId = msg.getFieldAsInt32(baseIndex);
-			System.out.println("record id = " + recordId);
 			String clusterId = msg.getFieldAsString(baseIndex + 1);
 			String clusterName = msg.getFieldAsString(baseIndex + 2);
 			String ipAddress = msg.getFieldAsString(baseIndex + 3);
@@ -3925,8 +3921,11 @@ public class NXCSession {
 		msg = waitForRCC(msg.getMessageId());
 		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
 		if (code == 0) //RCC_SUCCESS
-			sendNotification(new SessionNotification(
-					SessionNotification.GOOGLE_ACCOUNT_CHANGED, code));
+		{
+			System.out.println("create new google account successful");
+		}
+			//sendNotification(new SessionNotification(
+			//		SessionNotification.GOOGLE_ACCOUNT_CHANGED, code));
 			}
 
 	public void modifyGoogleAccount(int id, String userName, String api, 

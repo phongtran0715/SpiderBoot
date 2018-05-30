@@ -134,9 +134,9 @@ public class EditHomeChannelDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
 				fd.setText("Select video intro");
-				fd.setFilterExtensions(new String[] {"*.*" });
+				fd.setFilterExtensions(new String[] {"*.mp4;*.flv;*.avi;*.wmv;*.mov","*.*" });
 				fd.setFilterNames(new String[] {
-				"All file" });
+				"Video file","All file" });
 				String fileName = fd.open();
 				txtVideoIntro.setText(fileName);
 			}
@@ -186,9 +186,9 @@ public class EditHomeChannelDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
 				fd.setText("Select video outro");
-				fd.setFilterExtensions(new String[] {"*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
+				fd.setFilterExtensions(new String[] {"*.mp4;*.flv;*.avi;*.wmv;*.mov","*.*" });
 				fd.setFilterNames(new String[] {
-				"All file" });
+				"Video file","All file" });
 				String fileName = fd.open();
 				txtVideoOutro.setText(fileName);
 			}
@@ -202,9 +202,9 @@ public class EditHomeChannelDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
 				fd.setText("Select logo image");
-				fd.setFilterExtensions(new String[] {"*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
+				fd.setFilterExtensions(new String[] {"*.jpg; *.png","*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
 				fd.setFilterNames(new String[] {
-				"All file" });
+				"Image file","All file" });
 				String fileName = fd.open();
 				txtLogo.setText(fileName);
 			}
@@ -218,9 +218,9 @@ public class EditHomeChannelDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
 				fd.setText("Select title template file");
-				fd.setFilterExtensions(new String[] {"*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
+				fd.setFilterExtensions(new String[] {"*.txt","*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
 				fd.setFilterNames(new String[] {
-				"All file" });
+				"Text file (*.txt)", "All file" });
 				String fileName = fd.open();
 				txtTitleTemplate.setText(fileName);
 			}
@@ -234,9 +234,9 @@ public class EditHomeChannelDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
 				fd.setText("Select description template file");
-				fd.setFilterExtensions(new String[] {"*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
+				fd.setFilterExtensions(new String[] {"*.txt","*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
 				fd.setFilterNames(new String[] {
-				"All file" });
+				"Text file (*.txt)", "All file" });
 				String fileName = fd.open();
 				txtDesTemplate.setText(fileName);
 			}
@@ -268,9 +268,9 @@ public class EditHomeChannelDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
 				fd.setText("Select tag template file");
-				fd.setFilterExtensions(new String[] {"*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
+				fd.setFilterExtensions(new String[] {"*.txt","*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
 				fd.setFilterNames(new String[] {
-				"All file" });
+				"Text file (*.txt)", "All file" });
 				String fileName = fd.open();
 				txtTagsTemp.setText(fileName);
 			}

@@ -4,30 +4,21 @@ import java.io.IOException;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.ui.part.*;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.viewers.*;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.*;
 import org.eclipse.ui.*;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.SWT;
 import org.netxms.client.NXCException;
-import org.netxms.client.NXCSession;
 import org.netxms.client.SessionListener;
 import org.netxms.client.SessionNotification;
-import org.netxms.ui.eclipse.actions.RefreshAction;
 import org.netxms.ui.eclipse.jobs.ConsoleJob;
-import org.netxms.ui.eclipse.shared.ConsoleSharedData;
 import org.netxms.ui.eclipse.spidermanager.dialogs.CreateGoogleAccoutDialog;
 import org.netxms.ui.eclipse.spidermanager.dialogs.EditGoogleAccoutDialog;
-import org.netxms.ui.eclipse.widgets.SortableTableViewer;
-import org.spider.base.SpiderCodes;
-import org.spider.client.ClusterObject;
 import org.spider.client.GoogleAccountObject;
 import org.spider.ui.eclipse.spidermanager.Activator;
-import org.spider.ui.eclipse.spidermanager.helper.GoogleAccountLabelProvider;
+import org.netxms.ui.eclipse.logviewer.views.LogViewer;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -44,92 +35,32 @@ import org.spider.ui.eclipse.spidermanager.helper.GoogleAccountLabelProvider;
  * <p>
  */
 
-public class GoogleAccountManagerView extends ViewPart {
+//public class GoogleAccountManagerView extends ViewPart {
+public class GoogleAccountManagerView extends LogViewer {
 
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
 	public static final String ID = "org.spider.ui.eclipse.spidermanager.views.GoogleAccountManager";
 
-	private SortableTableViewer viewer;
 	private Action addNewAccount;
 	private Action editAccount;
 	private Action deleteAccount;
-	private RefreshAction actionRefresh;
-	private NXCSession session;
 	private SessionListener sessionListener;
 
 	// Columns
-	public static final int COLUMN_STT 				= 0;
-	public static final int COLUMN_ID 				= 1;
-	public static final int COLUMN_USER_NAME 		= 2;
-	public static final int COLUMN_API 				= 3;
-	public static final int COLUMN_CLIENT_SECRET 	= 4;
-	public static final int COLUMN_ACCOUNT_TYPE 	= 5;
-	public static final int COLUMN_APPNAME 			= 6;
+	public static final int COLUMN_ID 				= 0;
+	public static final int COLUMN_USER_NAME 		= 1;
+	public static final int COLUMN_API 				= 2;
+	public static final int COLUMN_CLIENT_SECRET 	= 3;
+	public static final int COLUMN_ACCOUNT_TYPE 	= 4;
+	public static final int COLUMN_APPNAME 			= 5;
 
-	class ViewLabelProvider extends LabelProvider implements
-	ITableLabelProvider {
-		public String getColumnText(Object obj, int index) {
-			return getText(obj);
-		}
 
-		public Image getColumnImage(Object obj, int index) {
-			return getImage(obj);
-		}
-
-		public Image getImage(Object obj) {
-			return PlatformUI.getWorkbench().getSharedImages()
-					.getImage(ISharedImages.IMG_OBJ_ELEMENT);
-		}
-	}
-
-	class NameSorter extends ViewerSorter {
-	}
-
-	/**
-	 * The constructor.
-	 */
-	public GoogleAccountManagerView() {
-	}
-
-	/**
-	 * This is a callback that will allow us to create the viewer and initialize
-	 * it.
-	 */
+	@Override
 	public void createPartControl(Composite parent) {
-		session = ConsoleSharedData.getSession();
-		final String[] names = { 
-				"STT",
-				"Id",
-				"UserName",
-				"Api",
-				"ClientSecrect",
-				"AccountType",
-		"AppName"};
-		final int[] widths = { 60, 0, 160, 160, 160, 160, 160 };
-		viewer = new SortableTableViewer(parent, names, widths, 0, SWT.UP, SortableTableViewer.DEFAULT_STYLE);
-
-		viewer.setContentProvider(new ArrayContentProvider());
-		viewer.setLabelProvider(new GoogleAccountLabelProvider());
-		//viewer.setSorter(new NameSorter());
-		try {
-			viewer.setInput(session.getGoogleAccount());
-		} catch (IOException | NXCException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-
-		// Create the help context id for the viewer's control
-		PlatformUI
-		.getWorkbench()
-		.getHelpSystem()
-		.setHelp(viewer.getControl(),
-				"org.spider.ui.eclipse.spider.viewer");
-		makeActions();
-		hookContextMenu();
-		contributeToActionBars();
-
+		// TODO Auto-generated method stub
+		super.createPartControl(parent);
 		// Listener for server's notifications
 		sessionListener = new SessionListener() {
 			@Override
@@ -138,18 +69,12 @@ public class GoogleAccountManagerView extends ViewPart {
 					viewer.getControl().getDisplay().asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							try {
-								viewer.setInput(session.getGoogleAccount());
-							} catch (IOException | NXCException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+							refreshData();
 						}
 					});
 				}
 			}
 		};
-
 		// Request server to lock user database, and on success refresh view
 		new ConsoleJob("", this,
 				Activator.PLUGIN_ID, null) {
@@ -159,12 +84,6 @@ public class GoogleAccountManagerView extends ViewPart {
 				runInUIThread(new Runnable() {
 					@Override
 					public void run() {
-						try {
-							viewer.setInput(session.getGoogleAccount());
-						} catch (IOException | NXCException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
 						session.addListener(sessionListener);
 					}
 				});
@@ -188,59 +107,17 @@ public class GoogleAccountManagerView extends ViewPart {
 		}.start();
 	}
 
-	private void hookContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				GoogleAccountManagerView.this.fillContextMenu(manager);
-			}
-		});
-		Menu menu = menuMgr.createContextMenu(viewer.getControl());
-		viewer.getControl().setMenu(menu);
-		getSite().registerContextMenu(menuMgr, viewer);
-	}
 
-	private void contributeToActionBars() {
-		IActionBars bars = getViewSite().getActionBars();
-		fillLocalPullDown(bars.getMenuManager());
-		fillLocalToolBar(bars.getToolBarManager());
-	}
-
-	private void fillLocalPullDown(IMenuManager manager) {
-		manager.add(addNewAccount);
-		manager.add(new Separator());
-		manager.add(editAccount);
-		manager.add(new Separator());
-		manager.add(deleteAccount);
-		manager.add(new Separator());
-		manager.add(actionRefresh);
-	}
-
-	private void fillContextMenu(IMenuManager manager) {
-		manager.add(addNewAccount);
-		manager.add(editAccount);
-		manager.add(deleteAccount);
-		manager.add(actionRefresh);
-		// Other plug-ins can contribute there actions here
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-	}
-
-	private void fillLocalToolBar(IToolBarManager manager) {
-		manager.add(addNewAccount);
-		manager.add(editAccount);
-		manager.add(deleteAccount);
-		manager.add(actionRefresh);
-	}
-
-	private void makeActions() {
-		addNewAccount = new Action("add_account", 
+	@Override
+	protected void createActions() {
+		super.createActions();
+		addNewAccount = new Action("Create new account", 
 				Activator.getImageDescriptor("icons/account_add.png")) {
 			public void run() {
 				addNewAccount();
 			}
 		};
-		addNewAccount.setToolTipText("Add account");
+		addNewAccount.setToolTipText("Create new account");
 
 		editAccount = new Action("edit_account", 
 				Activator.getImageDescriptor("icons/account_edit.png")) {
@@ -248,9 +125,9 @@ public class GoogleAccountManagerView extends ViewPart {
 				modifyAccount();
 			}
 		};
-		editAccount.setToolTipText("Edit account");
+		editAccount.setToolTipText("Modify account");
 
-		deleteAccount = new Action("delete_account", 
+		deleteAccount = new Action("Delete account", 
 				Activator.getImageDescriptor("icons/account_delete.png")) {
 			public void run() {
 				try {
@@ -262,25 +139,33 @@ public class GoogleAccountManagerView extends ViewPart {
 			}
 		};
 		deleteAccount.setToolTipText("Delete account");
-
-		actionRefresh = new RefreshAction(this) {
-			@Override
-			public void run() {
-				try {
-					viewer.setInput(session.getGoogleAccount());
-				} catch (IOException | NXCException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		};
 	}
 
-	/**
-	 * Passing the focus request to the viewer's control.
-	 */
-	public void setFocus() {
-		viewer.getControl().setFocus();
+	@Override
+	protected void fillLocalPullDown(IMenuManager manager) {
+		super.fillLocalPullDown(manager);
+		manager.add(addNewAccount);
+		manager.add(new Separator());
+		manager.add(editAccount);
+		manager.add(new Separator());
+		manager.add(deleteAccount);
+	}
+
+	@Override
+	protected void fillContextMenu(IMenuManager manager) {
+		super.fillContextMenu(manager);
+		manager.add(addNewAccount);
+		manager.add(editAccount);
+		manager.add(deleteAccount);
+		// Other plug-ins can contribute there actions here
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+	}
+	@Override
+	protected void fillLocalToolBar(IToolBarManager manager) {
+		super.fillLocalToolBar(manager);
+		manager.add(addNewAccount);
+		manager.add(editAccount);
+		manager.add(deleteAccount);
 	}
 
 	/**
@@ -311,19 +196,25 @@ public class GoogleAccountManagerView extends ViewPart {
 	 * Edit account
 	 */
 	private void modifyAccount() {
-		final IStructuredSelection selection = (IStructuredSelection) viewer
-				.getSelection();
-		if(selection.size() <= 0)
+		final TableItem[] selection = viewer.getTable().getSelection();
+		if(selection.length <= 0)
 		{
 			MessageBox dialog =
 					new MessageBox(getViewSite().getShell(), SWT.ICON_WARNING | SWT.OK);
 			dialog.setText("Warning");
-			dialog.setMessage("You must select at least one item to modify!");
+			dialog.setMessage("You must select at least one item to delete!");
 			dialog.open();
 			return;
 		}
-		final Object firstElement = selection.getFirstElement();
-		final EditGoogleAccoutDialog dlg = new EditGoogleAccoutDialog(getViewSite().getShell(), (GoogleAccountObject)firstElement);	
+		GoogleAccountObject selectedObj = new GoogleAccountObject(
+				Integer.parseInt(selection[0].getText(COLUMN_ID)),
+				selection[0].getText(COLUMN_USER_NAME),
+				selection[0].getText(COLUMN_API),
+				selection[0].getText(COLUMN_CLIENT_SECRET),
+				Integer.parseInt(selection[0].getText(COLUMN_ACCOUNT_TYPE)),
+				selection[0].getText(COLUMN_APPNAME));
+
+		final EditGoogleAccoutDialog dlg = new EditGoogleAccoutDialog(getViewSite().getShell(), selectedObj);	
 		if (dlg.open() == Window.OK) {
 			new ConsoleJob("Modify google account",
 					this, Activator.PLUGIN_ID, null) {
@@ -345,9 +236,8 @@ public class GoogleAccountManagerView extends ViewPart {
 
 	private void deleteAccount() throws NXCException, IOException
 	{
-		final IStructuredSelection selection = (IStructuredSelection) viewer
-				.getSelection();
-		if(selection.size() <= 0)
+		final TableItem[] selection = viewer.getTable().getSelection();
+		if(selection.length <= 0)
 		{
 			MessageBox dialog =
 					new MessageBox(getViewSite().getShell(), SWT.ICON_WARNING | SWT.OK);
@@ -361,23 +251,10 @@ public class GoogleAccountManagerView extends ViewPart {
 		dialog.setText("Confirm to delete item");
 		dialog.setMessage("Do you really want to do delete this item?");
 		if (dialog.open() == SWT.OK) {
-			new ConsoleJob("Delete google account", this,
-					Activator.PLUGIN_ID, null) {
-				@Override
-				protected void runInternal(IProgressMonitor monitor)
-						throws Exception {
-					for (Object object : selection.toList()) {					
-						session.deleteCluster(((ClusterObject)object).getRecordID(), 
-								SpiderCodes.CLUSTER_DOWNLOAD);
-						session.deleteGoogleAccount(((GoogleAccountObject)object).getId());
-					}
-				}
-
-				@Override
-				protected String getErrorMessage() {
-					return "Can not delete google account";
-				}
-			}.start();
+			for (int i = 0; i < selection.length; i++) {
+				session.deleteGoogleAccount(Integer.parseInt(selection[i].getText(COLUMN_ID)));
+				refreshData();
+			}
 		}
 	}
 }

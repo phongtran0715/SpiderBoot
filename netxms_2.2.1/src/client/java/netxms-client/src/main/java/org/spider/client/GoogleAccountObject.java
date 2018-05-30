@@ -1,7 +1,6 @@
 package org.spider.client;
 
 public class GoogleAccountObject {
-	private int stt;
 	private int id;
 	private String userName;
 	private String api;
@@ -14,10 +13,9 @@ public class GoogleAccountObject {
 		
 	}
 	
-	public GoogleAccountObject(int stt, int id, String userName, String api, 
+	public GoogleAccountObject(int id, String userName, String api, 
 			String clientSecret, int accountType, String appName)
 	{
-		this.stt = stt;
 		this.id = id;
 		this.userName = userName;
 		this.api =  api;
@@ -72,14 +70,5 @@ public class GoogleAccountObject {
 
 	public void setAppName(String appName) {
 		this.appName = appName;
-	}
-
-	public int getStt() {
-		return stt;
-	}
-
-	public void setStt(int stt) {
-		this.stt = stt;
-	}
-	
+	}	
 }
