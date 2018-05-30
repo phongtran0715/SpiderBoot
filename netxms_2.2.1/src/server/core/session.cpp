@@ -14429,7 +14429,7 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
                      debugPrintf(1, _T("create home channel ID = %s"), cHomeId);
                      debugPrintf(1, _T("create monitor channel ID = %s"), cMonitorId);
                      downloadClient->mDownloadRef->createMappingChannel(timerId, CORBA::string_dup((const char*)cHomeId),
-                           CORBA::string_dup((const char*)cMonitorId),CORBA::string_dup((const char*)downloadId), timeSync);
+                           CORBA::string_dup((const char*)cMonitorId), CORBA::string_dup((const char*)downloadId), timeSync);
                   }
                   catch (CORBA::TRANSIENT&) {
                      debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
@@ -14442,6 +14442,12 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
                   }
                } else {
                   debugPrintf(1, _T("ClientSession::[%s] Init corba for download client FALSE"), __FUNCTION__);
+               }
+               //Trelease corba connection
+               if (downloadClient != nullptr)
+               {
+                  delete downloadClient;
+                  downloadClient = nullptr;
                }
             }
          }
@@ -14633,8 +14639,8 @@ void ClientSession::modifyMappingChannel(NXCPMessage * request)
          {
             debugPrintf(6, _T("ClientSession::[%s] Init corba for download client successful!"), __FUNCTION__);
             try {
-               downloadClient->mDownloadRef->modifyMappingChannel(id, CORBA::string_dup((const char*)cHomeId), 
-                  CORBA::string_dup((const char*)cMonitorId), CORBA::string_dup((const char*)downloadId), timeSync, statusSync);
+               downloadClient->mDownloadRef->modifyMappingChannel(id, CORBA::string_dup((const char*)cHomeId),
+                     CORBA::string_dup((const char*)cMonitorId), CORBA::string_dup((const char*)downloadId), timeSync, statusSync);
             }
             catch (CORBA::TRANSIENT&) {
                debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
@@ -14647,6 +14653,12 @@ void ClientSession::modifyMappingChannel(NXCPMessage * request)
             }
          } else {
             debugPrintf(1, _T("ClientSession::[%s] Init corba for download client FALSE"), __FUNCTION__);
+         }
+         //Release corba connection
+         if (downloadClient != nullptr)
+         {
+            delete downloadClient;
+            downloadClient = nullptr;
          }
       }
       else
@@ -14805,6 +14817,12 @@ void ClientSession::deleteMappingChannel(NXCPMessage * request)
             }
          } else {
             debugPrintf(1, _T("ClientSession::[%s] Init corba for download client FALSE"), __FUNCTION__);
+         }
+         //Release corba connection
+         if (downloadClient != nullptr)
+         {
+            delete downloadClient;
+            downloadClient = nullptr;
          }
       }
       else
@@ -15159,7 +15177,7 @@ bool ClientSession::checkDeleteCondition(TCHAR* checkId, TCHAR* tbCheck, TCHAR* 
 
 INT32 ClientSession::getMaxId(TCHAR * tbName)
 {
-   INT32 result = -1;   
+   INT32 result = -1;
    DB_RESULT hResult;
    DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
    TCHAR query [MAX_DB_STRING];

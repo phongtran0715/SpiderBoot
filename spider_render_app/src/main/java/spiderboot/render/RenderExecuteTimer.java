@@ -72,7 +72,7 @@ public class RenderExecuteTimer extends TimerTask{
 						vOutput);
 				//update rendered video information
 				updateRenderedInfo(vInfo.jobId, 2, vOutput);
-				//TODO: remove all temp file
+				//remove all temp file
 				deleteTempFile(outputFolder + util.prefixOS() + "video_tmp1.mp4");
 				deleteTempFile(outputFolder + util.prefixOS() + "intro.ts");
 				deleteTempFile(outputFolder + util.prefixOS() + "outro.ts");
@@ -151,6 +151,7 @@ public class RenderExecuteTimer extends TimerTask{
 
 	private void updateRenderedInfo(int jobId, int processStatus, String videoRendered)
 	{
+		isInitCorba = renderClient.initCorba(renderConfig.corbaRef);
 		if(isInitCorba)
 		{
 			if(renderClient.renderAppImpl != null)

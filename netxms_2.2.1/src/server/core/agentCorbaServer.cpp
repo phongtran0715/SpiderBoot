@@ -58,6 +58,11 @@ void AgentSide_i::onDownloadStartup(const char* appId)
 			DBFreeResult(hResult);
 		}
 	}
+	if(downloadClient!= nullptr)
+	{
+		delete downloadClient;
+		downloadClient = nullptr;
+	}
 	DBConnectionPoolReleaseConnection(hdb);
 }
 
@@ -117,6 +122,11 @@ void AgentSide_i::onRenderStartup(const char* appId)
 			}
 			DBFreeResult(hResult);
 		}
+	}
+	if(renderClient != nullptr)
+	{
+		delete renderClient;
+		renderClient = nullptr;
 	}
 	DBConnectionPoolReleaseConnection(hdb);
 }
@@ -245,6 +255,11 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::Video
 				}
 			} else
 			{
+			}
+			if(renderClient != nullptr)
+			{
+				delete renderClient;
+				renderClient = nullptr;
 			}
 		} else
 		{

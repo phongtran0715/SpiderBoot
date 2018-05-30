@@ -27,25 +27,24 @@ public class DownloadExecuteTimer extends TimerTask {
 	int timerId;
 	String cHomeId;
 	String cMonitorId;
-	boolean isComplete = true;
 	static Utility util;;
 	String videoFolderBase;
 	DateFormat dateFormat;
 	DownloadCorbaClient downloadClient;
-	boolean isInitCorba = false;
 	DownloadConfig downloadConfig;
+	boolean isInitCorba = false;
+	boolean isComplete = true;
 
 	public DownloadExecuteTimer(int timerId, String cHomeId, String cMonitorId) {
 		this.timerId = timerId;
 		this.cHomeId = cHomeId;
 		this.cMonitorId = cMonitorId;
-		//TODO: set video folder base
 		util = new Utility();
-		videoFolderBase = "/home/phongtran0715/Downloads/Video/test";
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		downloadConfig = DataController.getInstance().downloadConfig;
 		downloadClient = new DownloadCorbaClient();
 		isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);
+		videoFolderBase = downloadConfig.outputVideo;
 	}
 
 	@Override
@@ -105,6 +104,7 @@ public class DownloadExecuteTimer extends TimerTask {
 	private Date getLastSyncTime(int timerId)
 	{
 		Date result = null;
+		isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);
 		if(isInitCorba)
 		{
 			if(downloadClient.downloadAppImpl != null)
@@ -128,6 +128,7 @@ public class DownloadExecuteTimer extends TimerTask {
 
 	private void updateLastSyncTime(Date lastSyncTime)
 	{
+		isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);
 		if(isInitCorba)
 		{
 			if(downloadClient.downloadAppImpl != null)
@@ -172,6 +173,7 @@ public class DownloadExecuteTimer extends TimerTask {
 	private void saveVideoInfo(VideoWraper videoWrapper)
 	{
 		System.out.println("Function saveVideoInfo:: >>>>");
+		isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);
 		if(isInitCorba)
 		{
 			if(downloadClient.downloadAppImpl != null)
