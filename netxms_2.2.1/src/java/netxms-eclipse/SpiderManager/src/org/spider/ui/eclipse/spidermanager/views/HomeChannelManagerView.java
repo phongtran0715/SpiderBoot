@@ -2,22 +2,23 @@ package org.spider.ui.eclipse.spidermanager.views;
 
 import java.io.IOException;
 
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.action.*;
 import org.eclipse.ui.*;
 import org.eclipse.swt.SWT;
 import org.netxms.client.NXCException;
+import org.netxms.client.SessionListener;
+import org.netxms.client.SessionNotification;
 import org.netxms.ui.eclipse.jobs.ConsoleJob;
 import org.netxms.ui.eclipse.logviewer.views.LogViewer;
-import org.netxms.ui.eclipse.shared.ConsoleSharedData;
 import org.netxms.ui.eclipse.spidermanager.dialogs.CreateHomeChannelDialog;
 import org.netxms.ui.eclipse.spidermanager.dialogs.EditHomeChannelDialog;
-import org.netxms.ui.eclipse.widgets.SortableTableViewer;
 import org.spider.client.HomeChannelObject;
-import org.spider.client.MonitorChannelObject;
 import org.spider.ui.eclipse.spidermanager.Activator;
 
 /**
@@ -45,6 +46,7 @@ public class HomeChannelManagerView extends LogViewer {
 	private Action actAddHomeChannel;
 	private Action actEditHomeChannel;
 	private Action actDeleteHomeChannel;
+	private SessionListener sessionListener;
 
 	public static final int COLUMN_ID 				= 0;
 	public static final int COLUMN_CHANNEL_ID 		= 1;
@@ -58,6 +60,56 @@ public class HomeChannelManagerView extends LogViewer {
 	public static final int COLUMN_TAGS 			= 9;
 
 	public HomeChannelManagerView() {
+	}
+	
+	@Override
+	public void createPartControl(Composite parent) {
+		// TODO Auto-generated method stub
+		super.createPartControl(parent);
+		// Listener for server's notifications
+		sessionListener = new SessionListener() {
+			@Override
+			public void notificationHandler(final SessionNotification n) {
+				if (n.getCode() == SessionNotification.HOME_CHANNEL_CHANGED) {
+					viewer.getControl().getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							doQuery();
+						}
+					});
+				}
+			}
+		};
+		// Request server to lock user database, and on success refresh view
+		new ConsoleJob("", this,
+				Activator.PLUGIN_ID, null) {
+			@Override
+			protected void runInternal(IProgressMonitor monitor)
+					throws Exception {
+				runInUIThread(new Runnable() {
+					@Override
+					public void run() {
+						session.addListener(sessionListener);
+					}
+				});
+			}
+
+			@Override
+			protected void jobFailureHandler() {
+				runInUIThread(new Runnable() {
+					@Override
+					public void run() {
+						HomeChannelManagerView.this.getViewSite().getPage()
+						.hideView(HomeChannelManagerView.this);
+					}
+				});
+			}
+
+			@Override
+			protected String getErrorMessage() {
+				return "Open home channel error!";
+			}
+		}.start();
 	}
 
 	@Override
@@ -190,8 +242,9 @@ public class HomeChannelManagerView extends LogViewer {
 
 	private void deleteHomeChannel() throws IOException, NXCException
 	{
-		final TableItem[] selection = viewer.getTable().getSelection();
-		if(selection.length <= 0)
+		final IStructuredSelection selection = (IStructuredSelection) viewer
+				.getSelection();
+		if(selection.size() <= 0)
 		{
 			MessageBox dialog =
 					new MessageBox(getViewSite().getShell(), SWT.ICON_WARNING | SWT.OK);
@@ -200,16 +253,32 @@ public class HomeChannelManagerView extends LogViewer {
 			dialog.open();
 			return;
 		}
+
 		MessageBox dialog =
 				new MessageBox(getViewSite().getShell(), SWT.ICON_QUESTION | SWT.OK| SWT.CANCEL);
 		dialog.setText("Confirm to delete item");
 		dialog.setMessage("Do you really want to do delete this item?");
 		if (dialog.open() == SWT.OK) {
-			for (int i = 0; i < selection.length; i++) {
-				session.deleteHomeChannel(Integer.parseInt(selection[i].getText(COLUMN_ID)), 
-						selection[i].getText(COLUMN_CHANNEL_ID));
-				refreshData();
-			}
+			new ConsoleJob("Delete mapping channel", this,
+					Activator.PLUGIN_ID, null) {
+				@Override
+				protected void runInternal(IProgressMonitor monitor)
+						throws Exception {
+					for (Object object : selection.toList()) {
+						System.out.println("delete home channel");
+						System.out.println(((org.netxms.client.TableRow)object).get(COLUMN_ID).getValue());
+						int id = Integer.parseInt(((org.netxms.client.TableRow)object).get(COLUMN_ID).getValue());
+						String channelId = ((org.netxms.client.TableRow)object).get(COLUMN_CHANNEL_ID).getValue();
+						session.deleteHomeChannel(id, channelId);
+						refreshData();
+					}
+				}
+
+				@Override
+				protected String getErrorMessage() {
+					return "Can not delete mapping channel";
+				}
+			}.start();
 		}
 	}
 }

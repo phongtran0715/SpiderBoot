@@ -2,12 +2,14 @@ package org.spider.ui.eclipse.spidermanager.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
 import org.spider.ui.eclipse.spidermanager.Messages;
 import org.spider.ui.eclipse.spidermanager.views.GoogleAccountManagerView;
 import org.spider.ui.eclipse.spidermanager.views.MappingChannelManagerView;
+import org.spider.ui.eclipse.spidermanager.views.MonitorChannelManagerView;
 import org.netxms.ui.eclipse.tools.MessageDialogHelper;
 
 public class OpenMappingChannelManager implements IWorkbenchWindowActionDelegate {
@@ -17,7 +19,8 @@ public class OpenMappingChannelManager implements IWorkbenchWindowActionDelegate
 		// TODO Auto-generated method stub
 		if (window != null) {
 			try {
-				window.getActivePage().showView(MappingChannelManagerView.ID);
+				window.getActivePage().showView(MappingChannelManagerView.ID,
+						"ChannelMapping", IWorkbenchPage.VIEW_ACTIVATE); //$NON-NLS-1$
 			} catch (PartInitException e) {
 				MessageDialogHelper.openError(
 						window.getShell(),

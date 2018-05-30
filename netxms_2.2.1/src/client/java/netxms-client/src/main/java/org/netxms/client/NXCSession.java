@@ -3845,7 +3845,6 @@ public class NXCSession {
 		msg = waitForRCC(rqId);
 		int count = msg.getFieldAsInt32(NXCPCodes.VID_NUM_VARIABLES);
 		long baseIndex = NXCPCodes.VID_VARLIST_BASE;
-		int stt = 0;
 		for (int i = 0; i < count; i++, baseIndex += 10) 
 		{
 			int  id = msg.getFieldAsInt32(baseIndex);
@@ -3859,7 +3858,7 @@ public class NXCSession {
 			String  downloadCusterID = msg.getFieldAsString(baseIndex + 8);
 			String  renderClusterId = msg.getFieldAsString(baseIndex + 9);
 			String  uploadClusterId = msg.getFieldAsString(baseIndex + 10);
-			mappingChannleList.put(id , new MappingChannelObject(++ stt, id, cHomeId, cHomeName, cMonitorId, cMonitorName,  
+			mappingChannleList.put(id , new MappingChannelObject( id, cHomeId, cMonitorId,  
 					timeSync, statusSync, lastSyncTime, downloadCusterID, renderClusterId, uploadClusterId));
 
 		}
@@ -3924,8 +3923,8 @@ public class NXCSession {
 		{
 			System.out.println("create new google account successful");
 		}
-			//sendNotification(new SessionNotification(
-			//		SessionNotification.GOOGLE_ACCOUNT_CHANGED, code));
+		sendNotification(new SessionNotification(
+				SessionNotification.GOOGLE_ACCOUNT_CHANGED, code));
 			}
 
 	public void modifyGoogleAccount(int id, String userName, String api, 

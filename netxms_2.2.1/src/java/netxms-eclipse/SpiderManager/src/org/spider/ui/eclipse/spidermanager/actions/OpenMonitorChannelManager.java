@@ -6,9 +6,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
-import org.spider.client.MonitorChannelObject;
 import org.spider.ui.eclipse.spidermanager.Messages;
-import org.spider.ui.eclipse.spidermanager.views.GoogleAccountManagerView;
 import org.spider.ui.eclipse.spidermanager.views.MonitorChannelManagerView;
 import org.netxms.ui.eclipse.tools.MessageDialogHelper;
 

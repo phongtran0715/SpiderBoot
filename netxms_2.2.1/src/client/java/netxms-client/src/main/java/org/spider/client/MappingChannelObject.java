@@ -1,12 +1,9 @@
 package org.spider.client;
 
 public class MappingChannelObject {
-	int stt;
 	int id;
 	String homeId;
-	String homeName;
 	String monitorId;
-	String monitorName;
 	long timeIntervalSync;
 	int statusSync;
 	String lastSyncTime;
@@ -17,18 +14,15 @@ public class MappingChannelObject {
 	public MappingChannelObject() {
 	}
 
-	public MappingChannelObject(int stt, int id, String homeId, 
-			String homeName, String monitorId, String monitorName,
-			long timeIntervalSync, int statusSync,
-			String lastSyncTime, String downloadClusterId,
-			String renderClusterId, String uploadClusterId) {
+	public MappingChannelObject( int id, String homeId, 
+			 String monitorId,long timeIntervalSync, 
+			 int statusSync, String lastSyncTime, 
+			 String downloadClusterId, String renderClusterId, 
+			 String uploadClusterId) {
 		super();
-		this.stt = stt;
 		this.id = id;
 		this.homeId = homeId;
-		this.homeName = homeName;
 		this.monitorId = monitorId;
-		this.monitorName = monitorName;
 		this.timeIntervalSync = timeIntervalSync;
 		this.statusSync = statusSync;
 		this.lastSyncTime = lastSyncTime;
@@ -43,21 +37,6 @@ public class MappingChannelObject {
 
 	public void setId(int id) {
 		this.id = id;
-	}
-	public String getHomeName() {
-		return homeName;
-	}
-
-	public void setHomeName(String homeName) {
-		this.homeName = homeName;
-	}
-
-	public String getMonitorName() {
-		return monitorName;
-	}
-
-	public void setMonitorName(String monitorName) {
-		this.monitorName = monitorName;
 	}
 
 	public String getHomeId() {
@@ -123,13 +102,4 @@ public class MappingChannelObject {
 	public void setUploadClusterId(String uploadClusterId) {
 		this.uploadClusterId = uploadClusterId;
 	}
-
-	public int getStt() {
-		return stt;
-	}
-
-	public void setStt(int stt) {
-		this.stt = stt;
-	}
-	
 }

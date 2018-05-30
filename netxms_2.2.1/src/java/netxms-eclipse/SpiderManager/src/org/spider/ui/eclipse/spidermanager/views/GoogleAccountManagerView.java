@@ -6,6 +6,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.action.*;
 import org.eclipse.ui.*;
@@ -69,7 +70,8 @@ public class GoogleAccountManagerView extends LogViewer {
 					viewer.getControl().getDisplay().asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							refreshData();
+							System.out.println("GOOGLE_ACCOUNT_CHANGED");
+							doQuery();
 						}
 					});
 				}
@@ -105,6 +107,11 @@ public class GoogleAccountManagerView extends LogViewer {
 				return "Open google account error!";
 			}
 		}.start();
+	}
+
+
+	public GoogleAccountManagerView() {
+		super();
 	}
 
 
@@ -236,8 +243,9 @@ public class GoogleAccountManagerView extends LogViewer {
 
 	private void deleteAccount() throws NXCException, IOException
 	{
-		final TableItem[] selection = viewer.getTable().getSelection();
-		if(selection.length <= 0)
+		final IStructuredSelection selection = (IStructuredSelection) viewer
+				.getSelection();
+		if(selection.size() <= 0)
 		{
 			MessageBox dialog =
 					new MessageBox(getViewSite().getShell(), SWT.ICON_WARNING | SWT.OK);
@@ -251,10 +259,25 @@ public class GoogleAccountManagerView extends LogViewer {
 		dialog.setText("Confirm to delete item");
 		dialog.setMessage("Do you really want to do delete this item?");
 		if (dialog.open() == SWT.OK) {
-			for (int i = 0; i < selection.length; i++) {
-				session.deleteGoogleAccount(Integer.parseInt(selection[i].getText(COLUMN_ID)));
-				refreshData();
-			}
+			new ConsoleJob("Delete google account", this,
+					Activator.PLUGIN_ID, null) {
+				@Override
+				protected void runInternal(IProgressMonitor monitor)
+						throws Exception {
+					for (Object object : selection.toList()) {
+						System.out.println("delete home channel");
+						System.out.println(((org.netxms.client.TableRow)object).get(COLUMN_ID).getValue());
+						int id = Integer.parseInt(((org.netxms.client.TableRow)object).get(COLUMN_ID).getValue());
+						session.deleteGoogleAccount(id);
+						refreshData();
+					}
+				}
+
+				@Override
+				protected String getErrorMessage() {
+					return "Can not delete google account";
+				}
+			}.start();
 		}
 	}
 }

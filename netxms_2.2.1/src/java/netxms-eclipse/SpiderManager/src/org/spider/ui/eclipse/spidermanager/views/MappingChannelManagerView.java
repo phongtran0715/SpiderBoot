@@ -4,30 +4,22 @@ import java.io.IOException;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.ui.part.*;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.viewers.*;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.*;
 import org.eclipse.ui.*;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.SWT;
 import org.netxms.client.NXCException;
-import org.netxms.client.NXCSession;
 import org.netxms.client.SessionListener;
 import org.netxms.client.SessionNotification;
-import org.netxms.ui.eclipse.actions.RefreshAction;
 import org.netxms.ui.eclipse.jobs.ConsoleJob;
-import org.netxms.ui.eclipse.shared.ConsoleSharedData;
+import org.netxms.ui.eclipse.logviewer.views.LogViewer;
 import org.netxms.ui.eclipse.spidermanager.dialogs.CreateMappingChannelDialog;
 import org.netxms.ui.eclipse.spidermanager.dialogs.EditMappingChannelDialog;
-import org.netxms.ui.eclipse.widgets.SortableTableViewer;
-import org.spider.client.HomeChannelObject;
 import org.spider.client.MappingChannelObject;
-import org.spider.client.MonitorChannelObject;
 import org.spider.ui.eclipse.spidermanager.Activator;
-import org.spider.ui.eclipse.spidermanager.helper.MappingChannelLabelProvider;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -44,108 +36,32 @@ import org.spider.ui.eclipse.spidermanager.helper.MappingChannelLabelProvider;
  * <p>
  */
 
-public class MappingChannelManagerView extends ViewPart {
+public class MappingChannelManagerView extends LogViewer {
 
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
 	public static final String ID = "org.spider.ui.eclipse.spidermanager.views.MappingChannelManager";
 
-	private TableViewer viewer;
 	private Action actAddMapping;
 	private Action actEditMapping;
 	private Action actDeleteMapping;
-	private RefreshAction actionRefresh;
-	private NXCSession session;
 	private SessionListener sessionListener;
 
-	public static final int COLUMN_STT 					= 0;
-	public static final int COLUMN_ID 					= 1;
-	public static final int COLUMN_HOME_CHANNEL_ID 		= 2;
-	public static final int COLUMN_HOME_CHANNEL_NAME 	= 3;
-	public static final int COLUMN_MONITOR_CHANNEL_ID 	= 4;
-	public static final int COLUMN_MONITOR_CHANNEL_NAME = 5;
-	public static final int COLUMN_TIME_SYNC 			= 6;
-	public static final int COLUMN_STATUS_SYNC 			= 7;
-	public static final int COLUMN_LAST_SYNC_TIME 		= 8;
-	public static final int COLUMN_DOWNLOAD_ID		 	= 9;
-	public static final int COLUMN_RENDER_ID		 	= 10;
-	public static final int COLUMN_UPLOAD_ID		 	= 11;
+	public static final int COLUMN_ID 					= 0;
+	public static final int COLUMN_HOME_CHANNEL_ID 		= 1;
+	public static final int COLUMN_MONITOR_CHANNEL_ID 	= 2;
+	public static final int COLUMN_TIME_SYNC 			= 3;
+	public static final int COLUMN_STATUS_SYNC 			= 4;
+	public static final int COLUMN_LAST_SYNC_TIME 		= 5;
+	public static final int COLUMN_DOWNLOAD_ID		 	= 6;
+	public static final int COLUMN_RENDER_ID		 	= 7;
+	public static final int COLUMN_UPLOAD_ID		 	= 8;
 
-	/*
-	 * The content provider class is responsible for providing objects to the
-	 * view. It can wrap existing objects in adapters or simply return objects
-	 * as-is. These objects may be sensitive to the current input of the view,
-	 * or ignore it and always show the same content (like Task List, for
-	 * example).
-	 */
-
-	class ViewLabelProvider extends LabelProvider implements
-	ITableLabelProvider {
-		public String getColumnText(Object obj, int index) {
-			return getText(obj);
-		}
-
-		public Image getColumnImage(Object obj, int index) {
-			return getImage(obj);
-		}
-
-		public Image getImage(Object obj) {
-			return PlatformUI.getWorkbench().getSharedImages()
-					.getImage(ISharedImages.IMG_OBJ_ELEMENT);
-		}
-	}
-
-	class NameSorter extends ViewerSorter {
-	}
-
-	/**
-	 * The constructor.
-	 */
-	public MappingChannelManagerView() {
-	}
-
-	/**
-	 * This is a callback that will allow us to create the viewer and initialize
-	 * it.
-	 */
+	@Override
 	public void createPartControl(Composite parent) {
-		session = ConsoleSharedData.getSession();
-		final String[] names = { 
-				"STT",
-				"Id",
-				"HomeChannelId",
-				"HomeChannelName",
-				"MonitorChannelId",
-				"MonitorChannelName",
-				"TimeInterval",
-				"StatusSync",
-				"LastSyncTime",
-				"DownloadClusterId", 
-				"ProcessClusterId",
-		"UploadClusterId"};
-		final int[] widths = {60, 0, 240, 240, 240, 240, 120, 120, 160, 160, 160, 160 };
-		viewer = new SortableTableViewer(parent, names, widths, 0, SWT.UP, SortableTableViewer.DEFAULT_STYLE);
-		viewer.setContentProvider(new ArrayContentProvider());
-		viewer.setLabelProvider(new MappingChannelLabelProvider());
-		viewer.setSorter(new NameSorter());
-		try {
-			viewer.setInput(session.getMappingChannelList());
-		} catch (IOException | NXCException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		// Create the help context id for the viewer's control
-		PlatformUI
-		.getWorkbench()
-		.getHelpSystem()
-		.setHelp(viewer.getControl(),
-				"org.spider.ui.eclipse.spider.viewer");
-		makeActions();
-		hookContextMenu();
-		hookDoubleClickAction();
-		contributeToActionBars();
+		// TODO Auto-generated method stub
+		super.createPartControl(parent);
 		// Listener for server's notifications
 		sessionListener = new SessionListener() {
 			@Override
@@ -154,20 +70,14 @@ public class MappingChannelManagerView extends ViewPart {
 					viewer.getControl().getDisplay().asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							try {
-								viewer.setInput(session.getMappingChannelList());
-							} catch (IOException | NXCException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+							doQuery();
 						}
 					});
 				}
 			}
 		};
-
 		// Request server to lock user database, and on success refresh view
-		new ConsoleJob("Refresh mapping channel list", this,
+		new ConsoleJob("", this,
 				Activator.PLUGIN_ID, null) {
 			@Override
 			protected void runInternal(IProgressMonitor monitor)
@@ -175,12 +85,6 @@ public class MappingChannelManagerView extends ViewPart {
 				runInUIThread(new Runnable() {
 					@Override
 					public void run() {
-						try {
-							viewer.setInput(session.getMappingChannelList());
-						} catch (IOException | NXCException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
 						session.addListener(sessionListener);
 					}
 				});
@@ -199,57 +103,43 @@ public class MappingChannelManagerView extends ViewPart {
 
 			@Override
 			protected String getErrorMessage() {
-				return "Open mapping channel error!";
+				return "Open monitor channel error!";
 			}
 		}.start();
 	}
-
-	private void hookContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				MappingChannelManagerView.this.fillContextMenu(manager);
-			}
-		});
-		Menu menu = menuMgr.createContextMenu(viewer.getControl());
-		viewer.getControl().setMenu(menu);
-		getSite().registerContextMenu(menuMgr, viewer);
-	}
-
-	private void contributeToActionBars() {
-		IActionBars bars = getViewSite().getActionBars();
-		fillLocalPullDown(bars.getMenuManager());
-		fillLocalToolBar(bars.getToolBarManager());
-	}
-
-	private void fillLocalPullDown(IMenuManager manager) {
+	
+	@Override
+	protected void fillLocalPullDown(IMenuManager manager) {
+		super.fillLocalPullDown(manager);
 		manager.add(actAddMapping);
 		manager.add(new Separator());
 		manager.add(actEditMapping);
 		manager.add(new Separator());
 		manager.add(actDeleteMapping);
-		manager.add(new Separator());
-		manager.add(actionRefresh);
 	}
 
-	private void fillContextMenu(IMenuManager manager) {
+	@Override
+	protected void fillContextMenu(IMenuManager manager) {
+		super.fillContextMenu(manager);
 		manager.add(actAddMapping);
 		manager.add(actEditMapping);
 		manager.add(actDeleteMapping);
-		manager.add(actionRefresh);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
-	private void fillLocalToolBar(IToolBarManager manager) {
+	@Override
+	protected void fillLocalToolBar(IToolBarManager manager) {
+		super.fillLocalToolBar(manager);
 		manager.add(actAddMapping);
 		manager.add(actEditMapping);
 		manager.add(actDeleteMapping);
-		manager.add(actionRefresh);
 	}
 
-	private void makeActions() {
+	@Override
+	protected void createActions() {
+		// TODO Auto-generated method stub
+		super.createActions();
 		actAddMapping = new Action("Add new mapping channel", 
 				Activator.getImageDescriptor("icons/account_add.png")) {
 			public void run() {
@@ -273,30 +163,8 @@ public class MappingChannelManagerView extends ViewPart {
 			}
 		};
 		actDeleteMapping.setToolTipText("Delete mapping channel");
-
-		actionRefresh = new RefreshAction(this) {
-			@Override
-			public void run() {
-				try {
-					viewer.setInput(session.getMappingChannelList());
-				} catch (IOException | NXCException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		};
 	}
 
-	private void hookDoubleClickAction() {
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
-			}
-		});
-	}
-
-	/**
-	 * Create new mapping channel
-	 */
 	private void addMappingChannel()
 	{
 		final CreateMappingChannelDialog dlg = new CreateMappingChannelDialog(getViewSite().getShell());
@@ -318,54 +186,45 @@ public class MappingChannelManagerView extends ViewPart {
 		}
 	}
 
-	/**
-	 * Edit mapping channel
-	 */
 	private void editMappingChannel()
 	{
-		final IStructuredSelection selection = (IStructuredSelection) viewer
-				.getSelection();
-		if(selection.size() <= 0)
+		final TableItem[] selection = viewer.getTable().getSelection();
+		if(selection.length <= 0)
 		{
 			MessageBox dialog =
 					new MessageBox(getViewSite().getShell(), SWT.ICON_WARNING | SWT.OK);
 			dialog.setText("Warning");
-			dialog.setMessage("You must select at least one item to modify!");
+			dialog.setMessage("You must select at least one item to delete!");
 			dialog.open();
 			return;
 		}
-		Object firstElement = selection.getFirstElement();
-		if(firstElement instanceof MappingChannelObject)
-		{
-			final EditMappingChannelDialog dlg = new EditMappingChannelDialog(getViewSite().getShell(), 
-					(MappingChannelObject)firstElement);
-			if (dlg.open() == Window.OK) {
-				new ConsoleJob("Edit mapping channel",
-						this, Activator.PLUGIN_ID, null) {
-					@Override
-					protected void runInternal(IProgressMonitor monitor)
-							throws Exception {
-						session.modifyMappingChannel(dlg.getRecordId(), dlg.getHomeChannelId(), 
-								dlg.getMonitorChannelId(), (int)dlg.getTimeSync(),dlg.getStatus(), 
-								dlg.getDownloadClusterId(), dlg.getRenderClusterId(), dlg.getUploadClusterId());
-					}
+		MappingChannelObject objSelected = new MappingChannelObject(
+				Integer.parseInt(selection[0].getText(COLUMN_ID)), 
+				selection[0].getText(COLUMN_HOME_CHANNEL_ID),
+				selection[0].getText(COLUMN_MONITOR_CHANNEL_ID),
+				Long.parseLong(selection[0].getText(COLUMN_TIME_SYNC)),
+				Integer.parseInt(selection[0].getText(COLUMN_STATUS_SYNC)),
+				selection[0].getText(COLUMN_LAST_SYNC_TIME), 
+				selection[0].getText(COLUMN_DOWNLOAD_ID), 
+				selection[0].getText(COLUMN_RENDER_ID), 
+				selection[0].getText(COLUMN_UPLOAD_ID));
 
-					@Override
-					protected String getErrorMessage() {
-						return "Can not edit mapping channel";
-					}
-				}.start();
+		final EditMappingChannelDialog dlg = new EditMappingChannelDialog(getViewSite().getShell(), objSelected);
+		if (dlg.open() == Window.OK) {
+			try {
+				session.modifyMappingChannel(dlg.getRecordId(), dlg.getHomeChannelId(), 
+						dlg.getMonitorChannelId(), (int)dlg.getTimeSync(),dlg.getStatus(), 
+						dlg.getDownloadClusterId(), dlg.getRenderClusterId(), dlg.getUploadClusterId());
+			} catch (IOException | NXCException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
 
-	/**
-	 * Delete home channel
-	 */
 	private void deleteMappingChannel()
 	{
-		final IStructuredSelection selection = (IStructuredSelection) viewer
-				.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		if(selection.size() <= 0)
 		{
 			MessageBox dialog =
@@ -380,44 +239,24 @@ public class MappingChannelManagerView extends ViewPart {
 		dialog.setText("Confirm to delete item");
 		dialog.setMessage("Do you really want to do delete this item?");
 		if (dialog.open() == SWT.OK) {
-			Object firstElement = selection.getFirstElement();
-			if(firstElement instanceof MappingChannelObject)
-			{
-				MappingChannelObject object = (MappingChannelObject)firstElement;
-				if(object.getStatusSync() == 1)
-				{
-					dialog =
-							new MessageBox(getViewSite().getShell(), SWT.ICON_WARNING | SWT.OK);
-					dialog.setText("Error");
-					dialog.setMessage("Can not delete mapping channel with sync status is enable. " +
-							"Please set sync status to disable and try again!");
-					dialog.open();
-					return;	
+			new ConsoleJob("Delete mapping channel", this,
+					Activator.PLUGIN_ID, null) {
+				@Override
+				protected void runInternal(IProgressMonitor monitor)
+						throws Exception {
+					for (Object object : selection.toList()) {
+						int id = Integer.parseInt(((org.netxms.client.TableRow)object).get(COLUMN_ID).getValue());
+						String downloadCluster = ((org.netxms.client.TableRow)object).get(COLUMN_DOWNLOAD_ID).getValue();
+						session.deleteMappingChannel(id, downloadCluster);
+						refreshData();
+					}
 				}
-				
-				new ConsoleJob("Delete channel mapping", this,
-						Activator.PLUGIN_ID, null) {
-					@Override
-					protected void runInternal(IProgressMonitor monitor)
-							throws Exception {
-						for (Object object : selection.toList()) {					
-							session.deleteMappingChannel(((MappingChannelObject)object).getId(), ((MappingChannelObject)object).getDownloadClusterId());
-						}
-					}
 
-					@Override
-					protected String getErrorMessage() {
-						return "Can not delete channel mapping";
-					}
-				}.start();
-			}
+				@Override
+				protected String getErrorMessage() {
+					return "Can not delete mapping channel";
+				}
+			}.start();
 		}
-	}
-
-	/**
-	 * Passing the focus request to the viewer's control.
-	 */
-	public void setFocus() {
-		viewer.getControl().setFocus();
 	}
 }

@@ -2,16 +2,18 @@ package org.spider.ui.eclipse.spidermanager.views;
 
 import java.io.IOException;
 
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.action.*;
 import org.eclipse.ui.*;
 import org.eclipse.swt.SWT;
 import org.netxms.client.NXCException;
 import org.netxms.client.SessionListener;
-import org.netxms.ui.eclipse.actions.RefreshAction;
+import org.netxms.client.SessionNotification;
 import org.netxms.ui.eclipse.jobs.ConsoleJob;
 import org.netxms.ui.eclipse.logviewer.views.LogViewer;
 import org.netxms.ui.eclipse.spidermanager.dialogs.CreateMonitorChannelDialog;
@@ -44,7 +46,6 @@ public class MonitorChannelManagerView extends LogViewer {
 	private Action actAddMonitorChannel;
 	private Action actEditMonitorChannel;
 	private Action actDeleteMonitorChannel;
-	private RefreshAction actionRefresh;
 	private SessionListener sessionListener;
 
 	public static final int COLUMN_ID 				= 0;
@@ -55,14 +56,61 @@ public class MonitorChannelManagerView extends LogViewer {
 	}
 
 	@Override
+	public void createPartControl(Composite parent) {
+		// TODO Auto-generated method stub
+		super.createPartControl(parent);
+		// Listener for server's notifications
+		sessionListener = new SessionListener() {
+			@Override
+			public void notificationHandler(final SessionNotification n) {
+				if (n.getCode() == SessionNotification.MONITOR_CHANNEL_CHANGED) {
+					viewer.getControl().getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							doQuery();
+						}
+					});
+				}
+			}
+		};
+		// Request server to lock user database, and on success refresh view
+		new ConsoleJob("", this,
+				Activator.PLUGIN_ID, null) {
+			@Override
+			protected void runInternal(IProgressMonitor monitor)
+					throws Exception {
+				runInUIThread(new Runnable() {
+					@Override
+					public void run() {
+						session.addListener(sessionListener);
+					}
+				});
+			}
+
+			@Override
+			protected void jobFailureHandler() {
+				runInUIThread(new Runnable() {
+					@Override
+					public void run() {
+						MonitorChannelManagerView.this.getViewSite().getPage()
+						.hideView(MonitorChannelManagerView.this);
+					}
+				});
+			}
+
+			@Override
+			protected String getErrorMessage() {
+				return "Open monitor channel error!";
+			}
+		}.start();
+	}
+	@Override
 	protected void fillLocalPullDown(IMenuManager manager) {
 		manager.add(actAddMonitorChannel);
 		manager.add(new Separator());
 		manager.add(actEditMonitorChannel);
 		manager.add(new Separator());
 		manager.add(actDeleteMonitorChannel);
-		manager.add(new Separator());
-		manager.add(actionRefresh);
 	}
 
 	@Override
@@ -70,7 +118,6 @@ public class MonitorChannelManagerView extends LogViewer {
 		manager.add(actAddMonitorChannel);
 		manager.add(actEditMonitorChannel);
 		manager.add(actDeleteMonitorChannel);
-		manager.add(actionRefresh);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -80,7 +127,6 @@ public class MonitorChannelManagerView extends LogViewer {
 		manager.add(actAddMonitorChannel);
 		manager.add(actEditMonitorChannel);
 		manager.add(actDeleteMonitorChannel);
-		manager.add(actionRefresh);
 	}
 
 
@@ -116,18 +162,6 @@ public class MonitorChannelManagerView extends LogViewer {
 			}
 		};
 		actDeleteMonitorChannel.setToolTipText("Delete monitor channel");
-
-		actionRefresh = new RefreshAction(this) {
-			@Override
-			public void run() {
-				try {
-					viewer.setInput(session.getMonitorChannelList());
-				} catch (IOException | NXCException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		};
 	}
 
 	private void addMonitorChannel()
@@ -181,9 +215,9 @@ public class MonitorChannelManagerView extends LogViewer {
 
 	private void deleteMonitorChannel() throws IOException, NXCException
 	{
-
-		final TableItem[] selection = viewer.getTable().getSelection();
-		if(selection.length <= 0)
+		final IStructuredSelection selection = (IStructuredSelection) viewer
+				.getSelection();
+		if(selection.size() <= 0)
 		{
 			MessageBox dialog =
 					new MessageBox(getViewSite().getShell(), SWT.ICON_WARNING | SWT.OK);
@@ -197,12 +231,24 @@ public class MonitorChannelManagerView extends LogViewer {
 		dialog.setText("Confirm to delete item");
 		dialog.setMessage("Do you really want to do delete this item?");
 		if (dialog.open() == SWT.OK) {
-			for (int i = 0; i < selection.length; i++) {
-				session.deleteMonitorChannel(
-						Integer.parseInt(selection[i].getText(COLUMN_ID)), 
-						selection[i].getText(COLUMN_ID));
-				refreshData();
-			}
+			new ConsoleJob("Delete monitor channel", this,
+					Activator.PLUGIN_ID, null) {
+				@Override
+				protected void runInternal(IProgressMonitor monitor)
+						throws Exception {
+					for (Object object : selection.toList()) {
+						int id = Integer.parseInt(((org.netxms.client.TableRow)object).get(COLUMN_ID).getValue());
+						String channelId = ((org.netxms.client.TableRow)object).get(COLUMN_CHANNEL_ID).getValue();
+						session.deleteMonitorChannel(id, channelId);
+						refreshData();
+					}
+				}
+
+				@Override
+				protected String getErrorMessage() {
+					return "Can not delete monitor channel";
+				}
+			}.start();
 		}
 	}
 }

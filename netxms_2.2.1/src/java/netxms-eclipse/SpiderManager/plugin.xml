@@ -145,6 +145,7 @@
             restorable="true">
       </view>
       <view
+     		allowMultiple="true"
             category="org.spider.ui.eclipse.channel_manager"
             class="org.spider.ui.eclipse.spidermanager.views.MappingChannelManagerView"
             icon="icons/settings_16x16.png"

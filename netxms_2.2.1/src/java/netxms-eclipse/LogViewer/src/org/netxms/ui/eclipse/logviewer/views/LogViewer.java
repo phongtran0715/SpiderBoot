@@ -460,7 +460,7 @@ public class LogViewer extends ViewPart {
 	/**
 	 * Prepare filter and execute query on server
 	 */
-	private void doQuery() {
+	public void doQuery() {
 		actionRefresh.setEnabled(false);
 		actionGetMoreData.setEnabled(false);
 		filter = filterBuilder.createFilter();
