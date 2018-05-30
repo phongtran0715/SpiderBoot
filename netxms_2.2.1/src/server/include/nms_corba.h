@@ -13,6 +13,13 @@
 #define LIBCORBA_EXPORTABLE
 #endif
 
+struct HomeInfo
+{
+   TCHAR* vIntro;
+   TCHAR* vOutro;
+   TCHAR* vLogo;
+};
+
 class LIBCORBA_EXPORTABLE SpiderDownloadClient
 {
 private:
@@ -53,6 +60,7 @@ class AgentCorbaServer
 {
 private:
    CORBA::Boolean bindObjectToName(CORBA::ORB_ptr, CORBA::Object_ptr);
+   INT32 getMaxId(TCHAR * tbName);
 public:
    void initCorba();
    bool initSuccess;
@@ -63,6 +71,9 @@ public:
 
 class AgentSide_i : public POA_SpiderAgentApp::AgentSide
 {
+private: 
+   HomeInfo getHomeChannelField(const TCHAR* cHomeId);
+   INT32 getMaxId(TCHAR * tbName);
 public:
    void onDownloadStartup(const char* appId);
    void onRenderStartup(const char* appId);

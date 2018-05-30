@@ -1,8 +1,11 @@
 package spiderboot.render;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.TimerTask;
+
+import com.spider.corba.RenderCorbaClient;
 
 import SpiderRenderApp.SpiderFootSidePackage.RenderInfo;
 import net.bramp.ffmpeg.FFmpeg;
@@ -21,8 +24,10 @@ public class RenderExecuteTimer extends TimerTask{
 	String outputFolder;
 	static Utility util = new Utility();
 	RenderConfig renderConfig;
+	boolean isInitCorba = false;
+	RenderCorbaClient renderClient;
 
-	public RenderExecuteTimer(String timerId) {
+	public RenderExecuteTimer(String appId) {
 		renderConfig = DataController.getInstance().renderConfig;
 		outputFolder = renderConfig.outputVideo;
 		try {
@@ -31,6 +36,8 @@ public class RenderExecuteTimer extends TimerTask{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		renderClient = new RenderCorbaClient();
+		isInitCorba = renderClient.initCorba(renderConfig.corbaRef);
 	}
 
 	@Override
@@ -65,6 +72,11 @@ public class RenderExecuteTimer extends TimerTask{
 						vOutput);
 				//update rendered video information
 				updateRenderedInfo(vInfo.jobId, 2, vOutput);
+				//TODO: remove all temp file
+				deleteTempFile(outputFolder + util.prefixOS() + "video_tmp1.mp4");
+				deleteTempFile(outputFolder + util.prefixOS() + "intro.ts");
+				deleteTempFile(outputFolder + util.prefixOS() + "outro.ts");
+				deleteTempFile(outputFolder + util.prefixOS() + "video_tmp1.ts");
 			}
 			isComplete = true;
 		}
@@ -137,8 +149,37 @@ public class RenderExecuteTimer extends TimerTask{
 		return result;
 	}
 
-	private void updateRenderedInfo(int jobId, int processStatus, String vRenderedPath)
+	private void updateRenderedInfo(int jobId, int processStatus, String videoRendered)
 	{
+		if(isInitCorba)
+		{
+			if(renderClient.renderAppImpl != null)
+			{
+				try {
+					renderClient.renderAppImpl.updateRenderedVideo(jobId, processStatus, videoRendered);
+				}catch (Exception e) {
+					System.out.println(e.toString());
+				}
+			}else {
+				System.out.println("Render client implementation is NULL");
+			}
+		}else {
+			System.out.println("Init corba client FALSE");
+		}
 
+	}
+	
+	private void deleteTempFile(String filePath)
+	{
+		File file = new File(filePath);
+        
+        if(file.delete())
+        {
+            System.out.println("File deleted successfully");
+        }
+        else
+        {
+            System.out.println("Failed to delete the file");
+        }
 	}
 }

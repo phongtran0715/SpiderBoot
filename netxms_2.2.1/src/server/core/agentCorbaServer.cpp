@@ -90,13 +90,15 @@ void AgentSide_i::onRenderStartup(const char* appId)
 						try
 						{
 							//TODO: create render info struct
+							HomeInfo homeInfo = getHomeChannelField(cHomeId);
 							::SpiderRenderApp::SpiderFootSide::RenderInfo vInfo;
 							vInfo.jobId = id;
 							vInfo.videoId = CORBA::string_dup((const char*)videoId);
-							vInfo.vIntro = CORBA::string_dup((const char*)"/home/phongtran0715/Downloads/Video/test/intro.mp4");
-							vInfo.vOutro = CORBA::string_dup((const char*)"/home/phongtran0715/Downloads/Video/test/outro.mp4");
-							vInfo.vLogo = CORBA::string_dup((const char*)"/home/phongtran0715/Downloads/Video/test/logo.png");
-							vInfo.vdownloadPath = CORBA::string_dup((const char*)"/home/phongtran0715/Downloads/Video/test/input.mp4");
+							vInfo.vIntro = CORBA::string_dup((const char*)homeInfo.vIntro);
+							vInfo.vOutro = CORBA::string_dup((const char*)homeInfo.vOutro);
+							vInfo.vLogo = CORBA::string_dup((const char*)homeInfo.vLogo);
+							vInfo.vdownloadPath = CORBA::string_dup((const char*)downloadPath);
+
 							renderClient->mRenderRef->createRenderJob(id, vInfo);
 						}
 						catch (CORBA::TRANSIENT&) {
@@ -173,9 +175,7 @@ void AgentSide_i::onUploadStartup(const char* appId)
 
 void AgentSide_i::updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong lastSyncTime)
 {
-	DbgPrintf(1, _T("AgentSide_i::updateLastSyntime : mappingId = %ld"), mappingId);
-	DbgPrintf(1, _T("AgentSide_i::updateLastSyntime : lastSyncTime = %ld"), lastSyncTime);
-
+	DbgPrintf(6, _T("AgentSide_i::[updateLastSyntime]"));
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
 	DB_STATEMENT hStmt;
 	if (hdb != NULL)
@@ -190,14 +190,12 @@ void AgentSide_i::updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong l
 
 void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::VideoInfo& vInfo)
 {
+	DbgPrintf(6, _T("AgentSide_i::[updateDownloadedVideo]"));
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
 	DB_STATEMENT hStmt;
 
 	if (hdb != NULL)
 	{
-		DbgPrintf(1, _T("AgentSide_i::updateDownloadedVideo : videoId = %s"), vInfo.videoId);
-		DbgPrintf(1, _T("AgentSide_i::updateDownloadedVideo : title = %s"), vInfo.title);
-
 		hStmt = DBPrepare(hdb, _T("INSERT INTO video_container (VideoId, Title, Tag, ")
 		                  _T(" Description, Thumbnail, VDownloadedPath, HomeChannelId,")
 		                  _T(" MonitorChannelId, ProcessStatus, License) VALUES (?,?,?,?,?,?,?,?,?,?)"));
@@ -213,18 +211,65 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::Video
 		DBBind(hStmt, 10, DB_SQLTYPE_INTEGER, (INT32)vInfo.license);
 
 		bool success = DBExecute(hStmt);
+		if (success == true)
+		{
+			//notify to render app
+			SpiderRenderClient* renderClient = new SpiderRenderClient();
+			if (renderClient->initSuccess)
+			{
+				if (renderClient->mRenderRef != NULL)
+				{
+					try
+					{
+						HomeInfo homeInfo = getHomeChannelField((const TCHAR*)vInfo.homeChannelId);
+						::SpiderRenderApp::SpiderFootSide::RenderInfo renderInfo;
+						renderInfo.jobId = getMaxId(_T("video_container"));
+						renderInfo.videoId = CORBA::string_dup((const char*)vInfo.videoId);
+						renderInfo.vIntro = CORBA::string_dup((const char*)homeInfo.vIntro);
+						renderInfo.vOutro = CORBA::string_dup((const char*)homeInfo.vOutro);
+						renderInfo.vLogo = CORBA::string_dup((const char*)homeInfo.vLogo);
+						renderInfo.vdownloadPath = CORBA::string_dup((const char*)vInfo.vDownloadPath);
 
-		if (success == false)
+						renderClient->mRenderRef->createRenderJob(renderInfo.jobId, renderInfo);
+					}
+					catch (CORBA::TRANSIENT&) {
+						DbgPrintf(1, _T("AgentSide_i::[] : Caught system exception TRANSIENT -- unable to contact the server"));
+					}
+					catch (CORBA::SystemException& ex) {
+						DbgPrintf(1, _T("AgentSide_i::[] : Caught a CORBA:: %s"), ex._name());
+					}
+					catch (CORBA::Exception& ex)
+					{
+						DbgPrintf(1, _T("AgentSide_i::[] : Caught a CORBA:: %s"), ex._name());
+					}
+				}
+			} else
+			{
+			}
+		} else
 		{
 			DbgPrintf(1, _T("AgentSide_i::updateDownloadedVideo : insert new video info FALSE"));
 		}
 	}
+
 	DBConnectionPoolReleaseConnection(hdb);
 }
 
-void AgentSide_i::updateRenderedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const char* videoLocation)
+void AgentSide_i::updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const char* videoLocation)
 {
+	DbgPrintf(6, _T("AgentSide_i::[updateRenderedVideo] jobId = %d"), (INT32)jobId);
+	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+	DB_STATEMENT hStmt;
 
+	if (hdb != NULL)
+	{
+		hStmt = DBPrepare(hdb, _T("UPDATE video_container SET ProcessStatus = ?, VRenderedPath = ? WHERE Id = ?"));
+		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)processStatus);
+		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)videoLocation, DB_BIND_TRANSIENT);
+		DBBind(hStmt, 3, DB_SQLTYPE_INTEGER, (INT32)jobId);
+		DBExecute(hStmt);
+	}
+	DBConnectionPoolReleaseConnection(hdb);
 }
 
 void AgentSide_i::updateUploadedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const char* videoLocation)
@@ -339,6 +384,50 @@ AgentCorbaServer::bindObjectToName(CORBA::ORB_ptr orb, CORBA::Object_ptr objref)
 		return false;
 	}
 	return true;
+}
+
+INT32 AgentSide_i::getMaxId(TCHAR * tbName)
+{
+	INT32 result = -1;
+	DB_RESULT hResult;
+	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+	TCHAR query [MAX_DB_STRING];
+	_sntprintf(query, sizeof query, _T("SELECT MAX(Id) FROM %s"), tbName);
+	DB_STATEMENT hStmt = DBPrepare(hdb, query);
+	if (hStmt != NULL)
+	{
+		hResult = DBSelectPrepared(hStmt);
+		if (hResult != NULL)
+		{
+			result = DBGetFieldInt64(hResult, 0, 0);
+			DBFreeResult(hResult);
+		}
+	}
+	DBConnectionPoolReleaseConnection(hdb);
+	return result;
+}
+
+HomeInfo AgentSide_i::getHomeChannelField(const TCHAR* cHomeId)
+{
+	HomeInfo homeInfo;
+	DB_RESULT hResult;
+	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+	TCHAR query [MAX_DB_STRING];
+	_sntprintf(query, sizeof query, _T("SELECT VideoIntro, VideoOutro , Logo FROM home_channel_list WHERE ChannelId = '%s'"), cHomeId);
+	DB_STATEMENT hStmt = DBPrepare(hdb, query);
+	if (hStmt != NULL)
+	{
+		hResult = DBSelectPrepared(hStmt);
+		if (hResult != NULL)
+		{
+			homeInfo.vIntro = DBGetField(hResult, 0, 0, NULL, 0);
+			homeInfo.vOutro = DBGetField(hResult, 0, 1, NULL, 0);
+			homeInfo.vLogo = DBGetField(hResult, 0, 2, NULL, 0);
+			DBFreeResult(hResult);
+		}
+	}
+	DBConnectionPoolReleaseConnection(hdb);
+	return homeInfo;
 }
 
 AgentCorbaServer::~AgentCorbaServer()

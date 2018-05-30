@@ -15159,10 +15159,12 @@ bool ClientSession::checkDeleteCondition(TCHAR* checkId, TCHAR* tbCheck, TCHAR* 
 
 INT32 ClientSession::getMaxId(TCHAR * tbName)
 {
-   INT32 result = -1;
+   INT32 result = -1;   
    DB_RESULT hResult;
    DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
-   DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT MAX(Id) FROM channel_mapping"));
+   TCHAR query [MAX_DB_STRING];
+   _sntprintf(query, sizeof query, _T("SELECT MAX(Id) FROM %s"), tbName);
+   DB_STATEMENT hStmt = DBPrepare(hdb, query);
    if (hStmt != NULL)
    {
       hResult = DBSelectPrepared(hStmt);
