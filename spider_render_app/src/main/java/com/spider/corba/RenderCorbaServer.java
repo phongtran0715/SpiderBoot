@@ -1,6 +1,7 @@
 package com.spider.corba;
 
 import org.omg.CosNaming.*;
+import org.apache.log4j.Logger;
 import org.omg.CORBA.*;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
@@ -35,8 +36,8 @@ class RenderImpl extends SpiderFootSidePOA {
 public class RenderCorbaServer {
 
 	public final String COMPONENT_NAME = "Spider_Foot_Render_Server";
-	public final String PORT = "2809";
-	public final String HOST = "localhost";
+	private static final Logger logger = Logger.getLogger(RenderCorbaServer.class);
+	
 	public RenderCorbaServer()
 	{
 		//default constructor
@@ -73,17 +74,16 @@ public class RenderCorbaServer {
 			NameComponent path[] = ncRef.to_name( COMPONENT_NAME );
 			ncRef.rebind(path, href);
 
-			System.out.println("Render server ready and waiting ...");
+			logger.info("Render server ready and waiting ...");
 
 			// wait for invocations from clients
 			orb.run();
-			System.out.println("Render server Exiting ...");
+			logger.info("Render server Exiting ...");
 			isSuccess = true;
 		}
 		catch (Exception e) 
 		{
-			System.err.println("ERROR: " + e);
-			e.printStackTrace(System.out);
+			logger.error(e.toString());
 		}
 		return isSuccess;
 	}

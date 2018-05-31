@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.spider.corba.DownloadCorbaClient;
+import org.apache.log4j.Logger;
 
 import spiderboot.data.DataController;
 
@@ -12,6 +12,7 @@ public class DownloadTimerManager {
 
 	private static DownloadTimerManager instance = null;
 	public static HashMap<Integer, Timer> timerMap = new HashMap<Integer, Timer>();
+	private static final Logger logger = Logger.getLogger(DownloadTimerManager.class);
 
 	public DownloadTimerManager() {
 	}

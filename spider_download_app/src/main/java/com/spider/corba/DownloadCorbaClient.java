@@ -3,12 +3,14 @@ package com.spider.corba;
 // Copyright and License 
 import SpiderAgentApp.*;
 import org.omg.CosNaming.*;
+import org.apache.log4j.Logger;
 import org.omg.CORBA.*;
 
 public class DownloadCorbaClient {
 
 	public AgentSide downloadAppImpl;
 	public final String COMPONENT_NAME = "AgentSide";
+	private static final Logger logger = Logger.getLogger(DownloadCorbaClient.class);
 	
 	public DownloadCorbaClient()
 	{
@@ -34,12 +36,11 @@ public class DownloadCorbaClient {
 			org.omg.CORBA.Object obj = ncRef.resolve_str(name);
 			downloadAppImpl = AgentSideHelper.narrow(obj);
 
-			System.out.println("Obtained a handle on server object: " + downloadAppImpl);
+			logger.info("Obtained a handle on server object: " + downloadAppImpl);
 			isSuccess = true;
 
 		} catch (Exception e) {
-			System.out.println("ERROR : " + e) ;
-			e.printStackTrace(System.out);
+			logger.error("ERROR : " + e.toString());
 		}
 		return isSuccess;
 	}

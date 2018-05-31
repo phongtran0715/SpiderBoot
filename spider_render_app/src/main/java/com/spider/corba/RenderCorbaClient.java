@@ -2,17 +2,19 @@ package com.spider.corba;
 
 // Copyright and License 
 import SpiderAgentApp.*;
+
 import org.omg.CosNaming.*;
+import org.apache.log4j.Logger;
 import org.omg.CORBA.*;
 
 public class RenderCorbaClient {
 
 	public AgentSide renderAppImpl;
 	public final String COMPONENT_NAME = "AgentSide";
+	private static final Logger logger = Logger.getLogger(RenderCorbaClient.class);
 	
 	public RenderCorbaClient()
 	{
-		//default constructor
 	}
 
 	public boolean initCorba(String refStr) {
@@ -34,12 +36,11 @@ public class RenderCorbaClient {
 			org.omg.CORBA.Object obj = ncRef.resolve_str(name);
 			renderAppImpl = AgentSideHelper.narrow(obj);
 
-			System.out.println("Obtained a handle on server object: " + renderAppImpl);
+			logger.info("Obtained a handle on server object: " + renderAppImpl);
 			isSuccess = true;
 
 		} catch (Exception e) {
-			System.out.println("ERROR : " + e) ;
-			e.printStackTrace(System.out);
+			logger.error("ERROR : " + e.toString());
 		}
 		return isSuccess;
 	}

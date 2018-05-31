@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
+
 import com.spider.corba.RenderCorbaClient;
 
 import SpiderRenderApp.SpiderFootSidePackage.RenderInfo;
@@ -26,8 +28,10 @@ public class RenderExecuteTimer extends TimerTask{
 	RenderConfig renderConfig;
 	boolean isInitCorba = false;
 	RenderCorbaClient renderClient;
+	private static final Logger logger = Logger.getLogger(RenderExecuteTimer.class);
 
 	public RenderExecuteTimer(String appId) {
+		logger.info("Function RenderExecuteTimer >>>");
 		renderConfig = DataController.getInstance().renderConfig;
 		outputFolder = renderConfig.outputVideo;
 		try {
@@ -43,9 +47,9 @@ public class RenderExecuteTimer extends TimerTask{
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		System.out.println("Timer task started at:" + new Date());
+		logger.info("Timer task started at:" + new Date());
 		completeTask();
-		System.out.println("Timer task finished at:" + new Date());
+		logger.info("Timer task finished at:" + new Date());
 	}
 
 	private void completeTask() {
@@ -88,7 +92,7 @@ public class RenderExecuteTimer extends TimerTask{
 
 	private String processVideo(String inputVideo, String outVideo, String logo)
 	{
-		System.out.println("Beginning processVideo function");
+		logger.info("Beginning processVideo : " + inputVideo);
 		String result = null;
 		FFmpegBuilder builder = new FFmpegBuilder()
 				.setInput(inputVideo)
@@ -103,13 +107,13 @@ public class RenderExecuteTimer extends TimerTask{
 		// Run a one-pass encode
 		executor.createJob(builder).run();
 		result = outVideo;
-		System.out.println("Finish processVideo function");
+		logger.info("Finish processVideo : " + inputVideo);
 		return result;
 	}
 
 	private String convertVideo(String inputVideo, String outVideo)
 	{
-		System.out.println("Beginning convertVideo function");
+		logger.info("Beginning convertVideo video : " + inputVideo);
 		String result = null;
 		FFmpegBuilder builder = new FFmpegBuilder()
 				.setInput(inputVideo)
@@ -125,13 +129,13 @@ public class RenderExecuteTimer extends TimerTask{
 		// Run a one-pass encode
 		executor.createJob(builder).run();
 		result = outVideo;
-		System.out.println("Finish convertVideo function");
+		logger.info("Finish convertVideo : " + inputVideo);
 		return result;
 	}
 
 	private String concastVideo(String vIntro, String vMain, String vOutro, String vOutput)
 	{
-		System.out.println("Beginning concastVideo function");
+		logger.info("Beginning concastVideo >>> ");
 		String result = null;
 		FFmpegBuilder builder = new FFmpegBuilder()
 				.setInput("concat:" + vIntro + "|" + vMain + "|" +  vOutro + "")
@@ -145,12 +149,13 @@ public class RenderExecuteTimer extends TimerTask{
 		// Run a one-pass encode
 		executor.createJob(builder).run();
 		result = vOutput;
-		System.out.println("Finish concastVideo function");
+		logger.info("Finish concastVideo <<< Output video : " + vOutput);
 		return result;
 	}
 
 	private void updateRenderedInfo(int jobId, int processStatus, String videoRendered)
 	{
+		logger.info(">>> Function [updateRenderedInfo] : job Id = " + jobId);
 		isInitCorba = renderClient.initCorba(renderConfig.corbaRef);
 		if(isInitCorba)
 		{
@@ -162,25 +167,19 @@ public class RenderExecuteTimer extends TimerTask{
 					System.out.println(e.toString());
 				}
 			}else {
-				System.out.println("Render client implementation is NULL");
+				logger.error("Render client implementation is NULL");
 			}
 		}else {
-			System.out.println("Init corba client FALSE");
+			logger.error("Init corba client FALSE");
 		}
-
 	}
 	
 	private void deleteTempFile(String filePath)
 	{
 		File file = new File(filePath);
-        
-        if(file.delete())
+        if(file.delete() == false)
         {
-            System.out.println("File deleted successfully");
-        }
-        else
-        {
-            System.out.println("Failed to delete the file");
+        	logger.error("Failed to delete the file : " + filePath);
         }
 	}
 }

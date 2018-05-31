@@ -6,6 +6,7 @@ import SpiderDownloadApp.*;
 import spiderboot.data.DataController;
 
 import org.omg.CosNaming.*;
+import org.apache.log4j.Logger;
 import org.omg.CORBA.*;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
@@ -13,20 +14,16 @@ import com.spider.main.*;
 
 
 class DownloadImpl extends SpiderFootSidePOA {
-	private ORB orb;
-
-	public void setORB(ORB orb_val) {
-		orb = orb_val; 
-	}
+	private static final Logger logger = Logger.getLogger(DownloadImpl.class);
 
 	@Override
 	public boolean createMappingChannel(int timerId, String cHomeId, String cMonitorId, String downloadClusterId, int timerInterval) 
 	{
-		System.out.println("DownloadImpl::createMappingChannel ");
-		System.out.println("timer id = " + timerId);
-		System.out.println("home channel id = " + cHomeId);
-		System.out.println("monitor id = " + cMonitorId);
-		System.out.println("time interval id = " + timerInterval);
+		logger.info("DownloadImpl::createMappingChannel: >>> ");
+		logger.info("timer id = " + timerId);
+		logger.info("monitor id = " + cMonitorId);
+		logger.info("time interval id = " + timerInterval);
+		
 		if(downloadClusterId.equals(DataController.getInstance().downloadConfig.appId))
 		{
 			DownloadTimerManager.getInstance().createDownloadTimer(timerId, cHomeId, cMonitorId, timerInterval);	
@@ -37,7 +34,7 @@ class DownloadImpl extends SpiderFootSidePOA {
 	@Override
 	public boolean modifyMappingChannel(int timerId, String cHomeId, String cMonitorId, String downloadClusterId, int timerInterval, int synStatus) 
 	{
-		System.out.println("DownloadImpl::modifyMappingChannel ");
+		logger.error("DownloadImpl::modifyMappingChannel : >>>");
 		//check timer id
 		DownloadTimerManager.getInstance().modifyMappingChannel(timerId, cHomeId, cMonitorId, downloadClusterId, timerInterval, synStatus);	
 		return false;
@@ -45,7 +42,7 @@ class DownloadImpl extends SpiderFootSidePOA {
 
 	@Override
 	public boolean deleteMappingChannel(int timerId, String downloadClusterId) {
-		System.out.println("DownloadImpl::deleteMappingChannel ");
+		logger.info("DownloadImpl::deleteMappingChannel : >>>");
 		DownloadTimerManager.getInstance().deleteDownloadTimer(timerId, downloadClusterId);	
 		return false;
 	}
@@ -55,12 +52,7 @@ class DownloadImpl extends SpiderFootSidePOA {
 public class DownloadCorbaServer {
 
 	public final String COMPONENT_NAME = "Spider_Foot_Download_Server";
-	public final String PORT = "2809";
-	public final String HOST = "localhost";
-	public DownloadCorbaServer()
-	{
-		//default constructor
-	}
+	private static final Logger logger = Logger.getLogger(DownloadCorbaServer.class);
 
 	public boolean initCorba(String refStr) {
 		boolean isSuccess = false;
@@ -75,8 +67,7 @@ public class DownloadCorbaServer {
 			rootpoa.the_POAManager().activate();
 
 			// create servant and register it with the ORB
-			DownloadImpl downloadImpl = new DownloadImpl();
-			downloadImpl.setORB(orb); 
+			DownloadImpl downloadImpl = new DownloadImpl(); 
 
 			// get object reference from the servant
 			org.omg.CORBA.Object ref = rootpoa.servant_to_reference(downloadImpl);
@@ -94,17 +85,16 @@ public class DownloadCorbaServer {
 			NameComponent path[] = ncRef.to_name( COMPONENT_NAME );
 			ncRef.rebind(path, href);
 
-			System.out.println("Download server ready and waiting ...");
+			logger.info("Download server ready and waiting ...");
 
 			// wait for invocations from clients
 			orb.run();
-			System.out.println("Download server Exiting ...");
+			logger.info("Download server Exiting ...");
 			isSuccess = true;
 		}
 		catch (Exception e) 
 		{
-			System.err.println("ERROR: " + e);
-			e.printStackTrace(System.out);
+			logger.error("ERROR: " + e.toString());
 		}
 		return isSuccess;
 	}

@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
+
 import com.github.axet.vget.DirectDownload;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.samples.youtube.cmdline.data.Search;
@@ -34,6 +36,7 @@ public class DownloadExecuteTimer extends TimerTask {
 	DownloadConfig downloadConfig;
 	boolean isInitCorba = false;
 	boolean isComplete = true;
+	private static final Logger logger = Logger.getLogger(DownloadExecuteTimer.class);
 
 	public DownloadExecuteTimer(int timerId, String cHomeId, String cMonitorId) {
 		this.timerId = timerId;
@@ -95,7 +98,7 @@ public class DownloadExecuteTimer extends TimerTask {
 			//Update last sync time
 			lastSyncTime = new Date();
 			updateLastSyncTime(lastSyncTime);
-			System.out.println("Timer " + timerId + " finished at " + new Date().toString());
+			logger.info("Timer " + timerId + " finished at " + new Date().toString());
 			isComplete = true;
 		} else {
 		}
@@ -114,14 +117,14 @@ public class DownloadExecuteTimer extends TimerTask {
 					Date date = new Date(lastTime * 1000);
 					result = date;
 				}catch (Exception e) {
-					System.out.println("Can not call corba agent server function");
-					System.out.println(e.toString());
+					logger.error("Can not call corba agent server function");
+					logger.error(e.toString());
 				}
 			}else {
-				System.out.println("Download client implementation is NULL");
+				logger.error("Download client implementation is NULL");
 			}
 		}else {
-			System.out.println("Init corba client FALSE");
+			logger.error("Init corba client FALSE");
 		}
 		return result;
 	}
@@ -141,14 +144,15 @@ public class DownloadExecuteTimer extends TimerTask {
 					System.out.println(e.toString());
 				}
 			}else {
-				System.out.println("Download client implementation is NULL");
+				logger.error("Download client implementation is NULL");
 			}
 		}else {
-			System.out.println("Init corba client FALSE");
+			logger.error("Init corba client FALSE");
 		}
 	}
 
 	private VideoWraper getVideoInfor(Video singleVideo, String videoName, String ext) {
+		logger.info("Function getVideoInfor : >>>");
 		String videoId = singleVideo.getId();
 		String title = singleVideo.getSnippet().getTitle();
 		String desc = singleVideo.getSnippet().getDescription();
@@ -172,7 +176,7 @@ public class DownloadExecuteTimer extends TimerTask {
 
 	private void saveVideoInfo(VideoWraper videoWrapper)
 	{
-		System.out.println("Function saveVideoInfo:: >>>>");
+		logger.info("Function saveVideoInfo:: >>>>");
 		isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);
 		if(isInitCorba)
 		{
@@ -190,10 +194,10 @@ public class DownloadExecuteTimer extends TimerTask {
 					System.out.println(e.toString());
 				}
 			}else {
-				System.out.println("Download client implementation is NULL");
+				logger.error("Download client implementation is NULL");
 			}
 		}else {
-			System.out.println("Init corba client FALSE");
+			logger.error("Init corba client FALSE");
 		}
 	}
 }

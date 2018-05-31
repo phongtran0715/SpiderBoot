@@ -1,19 +1,18 @@
 package spiderboot.render;
-
 import java.io.IOException;
-
+import org.apache.log4j.Logger;
 import com.spider.corba.RenderCorbaClient;
 import com.spider.corba.RenderCorbaServer;
-
 import spiderboot.configuration.RenderConfig;
 import spiderboot.data.DataController;
 
 public class MainRender 
 {
+	private static final Logger logger = Logger.getLogger(MainRender.class);
 	public static void main( String[] args ) throws IOException
 	{
 		if (args.length <= 0){
-			System.out.println("You must set config file for application");
+			logger.error("You must set config file for application");
 			return;
 		}
 		//Load configuration file
@@ -25,7 +24,7 @@ public class MainRender
 
 		Thread serverThread = new Thread(){
 			public void run(){
-				System.out.println("Beginning to init render corba server...");
+				logger.info("Beginning to init render corba server >>>");
 				RenderCorbaServer renderServer = new RenderCorbaServer();
 				renderServer.initCorba(renderConfig.corbaRef);
 			}
@@ -35,22 +34,20 @@ public class MainRender
 		//Init corba client 
 		Thread clientThread = new Thread(){
 			public void run(){
-				System.out.println("Beginning to init render corba client...");
+				logger.info("Beginning to init render corba client >>>");
 				RenderCorbaClient renderClient = new RenderCorbaClient();
 				boolean isInitClient = renderClient.initCorba(renderConfig.corbaRef);
 				if(isInitClient == false)
 				{
-					System.out.println("Error! Can not init render corba client connection.");
+					logger.error("Error! Can not init render corba client connection.");
 				}else {
-					System.out.println("Init render corba client connection successful!");
-
-					System.out.println("Notify startup status to agent");
+					logger.info("Init render corba client connection successful!");
+					logger.info("Notify startup status to agent");
 					try
 					{
-						System.out.println("appID = " + renderConfig.appId);
 						renderClient.renderAppImpl.onRenderStartup(renderConfig.appId);	
 					}catch (Exception e) {
-						System.err.println(e.toString());
+						logger.error(e.toString());
 					}
 				}
 			}

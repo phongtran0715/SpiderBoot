@@ -4,6 +4,8 @@
  */
 package com.spider.main;
 
+import org.apache.log4j.Logger;
+
 import com.spider.corba.DownloadCorbaClient;
 import com.spider.corba.DownloadCorbaServer;
 
@@ -11,10 +13,10 @@ import spiderboot.configuration.DownloadConfig;
 import spiderboot.data.DataController;
 
 public class MainDownload {
-
+	private static final Logger logger = Logger.getLogger(MainDownload.class);
 	public static void main(String[] args) {
 		if (args.length <= 0){
-			System.out.println("You must set config file for application");
+			logger.error("You must set config file for application");
 			return;
 		}
 		//Load configuration file
@@ -25,7 +27,7 @@ public class MainDownload {
 
 		Thread serverThread = new Thread(){
 			public void run(){
-				System.out.println("Beginning to init download corba server...");
+				logger.info("Beginning to init download corba server >>>");
 				DownloadCorbaServer downloadServer = new DownloadCorbaServer();
 				downloadServer.initCorba(downloadConfig.corbaRef);
 			}
@@ -35,19 +37,17 @@ public class MainDownload {
 		//Init corba client 
 		Thread clientThread = new Thread(){
 			public void run(){
-				System.out.println("Beginning to init download corba client...");
+				logger.info("Beginning to init download corba client >>>");
 				DownloadCorbaClient downloadClient = new DownloadCorbaClient();
 				boolean isInitClient = downloadClient.initCorba(downloadConfig.corbaRef);
 				if(isInitClient == false)
 				{
-					System.out.println("Error! Can not init download corba client connection.");
+					logger.error("Error! Can not init download corba client connection.");
 				}else {
-					System.out.println("Init download corba client connection successful!");
-
-					System.out.println("Notify startup status to agent");
+					logger.info("Init download corba client connection successful!");
+					logger.info("Notify startup status to agent");
 					try
 					{
-						System.out.println("appID = " + downloadConfig.appId);
 						downloadClient.downloadAppImpl.onDownloadStartup(downloadConfig.appId);	
 					}catch (Exception e) {
 						System.err.println(e.toString());
