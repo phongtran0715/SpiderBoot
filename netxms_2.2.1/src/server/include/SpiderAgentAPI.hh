@@ -125,8 +125,8 @@ _CORBA_MODULE_BEG
   public:
     // IDL operations
     ::CORBA::Boolean createMappingChannel(::CORBA::Long timerId, const ::CORBA::WChar* cHomeId, const ::CORBA::WChar* cMonitorId, const ::CORBA::WChar* downloadClusterId, ::CORBA::Long timerInterval);
-    ::CORBA::Boolean modifyMappingChannel(::CORBA::Long timerId, const char* cHomeId, const char* cMonitorId, const char* downloadClusterId, ::CORBA::Long timerInterval, ::CORBA::Long synStatus);
-    ::CORBA::Boolean deleteMappingChannel(::CORBA::Long timerId, const char* downloadClusterId);
+    ::CORBA::Boolean modifyMappingChannel(::CORBA::Long timerId, const ::CORBA::WChar* cHomeId, const ::CORBA::WChar* cMonitorId, const ::CORBA::WChar* downloadClusterId, ::CORBA::Long timerInterval, ::CORBA::Long synStatus);
+    ::CORBA::Boolean deleteMappingChannel(::CORBA::Long timerId, const ::CORBA::WChar* downloadClusterId);
 
     // Constructors
     inline _objref_SpiderFootSide()  { _PR_setobj(0); }  // nil
@@ -162,8 +162,8 @@ _CORBA_MODULE_BEG
     virtual ~_impl_SpiderFootSide();
 
     virtual ::CORBA::Boolean createMappingChannel(::CORBA::Long timerId, const ::CORBA::WChar* cHomeId, const ::CORBA::WChar* cMonitorId, const ::CORBA::WChar* downloadClusterId, ::CORBA::Long timerInterval) = 0;
-    virtual ::CORBA::Boolean modifyMappingChannel(::CORBA::Long timerId, const char* cHomeId, const char* cMonitorId, const char* downloadClusterId, ::CORBA::Long timerInterval, ::CORBA::Long synStatus) = 0;
-    virtual ::CORBA::Boolean deleteMappingChannel(::CORBA::Long timerId, const char* downloadClusterId) = 0;
+    virtual ::CORBA::Boolean modifyMappingChannel(::CORBA::Long timerId, const ::CORBA::WChar* cHomeId, const ::CORBA::WChar* cMonitorId, const ::CORBA::WChar* downloadClusterId, ::CORBA::Long timerInterval, ::CORBA::Long synStatus) = 0;
+    virtual ::CORBA::Boolean deleteMappingChannel(::CORBA::Long timerId, const ::CORBA::WChar* downloadClusterId) = 0;
     
   public:  // Really protected, workaround for xlC
     virtual _CORBA_Boolean _dispatch(omniCallHandle&);
@@ -246,15 +246,15 @@ _CORBA_MODULE_BEG
       
       ::CORBA::Long jobId;
 
-      ::CORBA::String_member videoId;
+      ::CORBA::WString_member videoId;
 
-      ::CORBA::String_member vIntro;
+      ::CORBA::WString_member vIntro;
 
-      ::CORBA::String_member vOutro;
+      ::CORBA::WString_member vOutro;
 
-      ::CORBA::String_member vLogo;
+      ::CORBA::WString_member vLogo;
 
-      ::CORBA::String_member vdownloadPath;
+      ::CORBA::WString_member vdownloadPath;
 
     
 
@@ -400,9 +400,9 @@ _CORBA_MODULE_BEG
   {
   public:
     // IDL operations
-    ::CORBA::Boolean createUploadJob(::CORBA::Long timerId, const char* uploadClusterId);
-    ::CORBA::Boolean modifyUploadJob(::CORBA::Long timerId, const char* uploadClusterId);
-    ::CORBA::Boolean deleteUploadJob(::CORBA::Long timerId, const char* uploadClusterId);
+    ::CORBA::Boolean createUploadJob(::CORBA::Long timerId, const ::CORBA::WChar* uploadClusterId);
+    ::CORBA::Boolean modifyUploadJob(::CORBA::Long timerId, const ::CORBA::WChar* uploadClusterId);
+    ::CORBA::Boolean deleteUploadJob(::CORBA::Long timerId, const ::CORBA::WChar* uploadClusterId);
 
     // Constructors
     inline _objref_SpiderFootSide()  { _PR_setobj(0); }  // nil
@@ -437,9 +437,9 @@ _CORBA_MODULE_BEG
   public:
     virtual ~_impl_SpiderFootSide();
 
-    virtual ::CORBA::Boolean createUploadJob(::CORBA::Long timerId, const char* uploadClusterId) = 0;
-    virtual ::CORBA::Boolean modifyUploadJob(::CORBA::Long timerId, const char* uploadClusterId) = 0;
-    virtual ::CORBA::Boolean deleteUploadJob(::CORBA::Long timerId, const char* uploadClusterId) = 0;
+    virtual ::CORBA::Boolean createUploadJob(::CORBA::Long timerId, const ::CORBA::WChar* uploadClusterId) = 0;
+    virtual ::CORBA::Boolean modifyUploadJob(::CORBA::Long timerId, const ::CORBA::WChar* uploadClusterId) = 0;
+    virtual ::CORBA::Boolean deleteUploadJob(::CORBA::Long timerId, const ::CORBA::WChar* uploadClusterId) = 0;
     
   public:  // Really protected, workaround for xlC
     virtual _CORBA_Boolean _dispatch(omniCallHandle&);
@@ -520,23 +520,23 @@ _CORBA_MODULE_BEG
       typedef _CORBA_ConstrType_Variable_Var<VideoInfo> _var_type;
 
       
-      ::CORBA::String_member videoId;
+      ::CORBA::WString_member videoId;
 
-      ::CORBA::String_member title;
+      ::CORBA::WString_member title;
 
-      ::CORBA::String_member tags;
+      ::CORBA::WString_member tags;
 
-      ::CORBA::String_member description;
+      ::CORBA::WString_member description;
 
-      ::CORBA::String_member thumbnail;
+      ::CORBA::WString_member thumbnail;
 
-      ::CORBA::String_member vDownloadPath;
+      ::CORBA::WString_member vDownloadPath;
 
-      ::CORBA::String_member vRenderPath;
+      ::CORBA::WString_member vRenderPath;
 
-      ::CORBA::String_member homeChannelId;
+      ::CORBA::WString_member homeChannelId;
 
-      ::CORBA::String_member monitorChannelId;
+      ::CORBA::WString_member monitorChannelId;
 
       ::CORBA::Long processStatus;
 
@@ -561,14 +561,14 @@ _CORBA_MODULE_BEG
   {
   public:
     // IDL operations
-    void onDownloadStartup(const char* appId);
-    void onRenderStartup(const char* appId);
-    void onUploadStartup(const char* appId);
+    void onDownloadStartup(const ::CORBA::WChar* appId);
+    void onRenderStartup(const ::CORBA::WChar* appId);
+    void onUploadStartup(const ::CORBA::WChar* appId);
     ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId);
     void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong lastSyncTime);
     void updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::VideoInfo& vInfo);
-    void updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const char* vRenderPath);
-    void updateUploadedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const char* videoLocation);
+    void updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const ::CORBA::WChar* vRenderPath);
+    void updateUploadedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const ::CORBA::WChar* videoLocation);
 
     // Constructors
     inline _objref_AgentSide()  { _PR_setobj(0); }  // nil
@@ -603,14 +603,14 @@ _CORBA_MODULE_BEG
   public:
     virtual ~_impl_AgentSide();
 
-    virtual void onDownloadStartup(const char* appId) = 0;
-    virtual void onRenderStartup(const char* appId) = 0;
-    virtual void onUploadStartup(const char* appId) = 0;
+    virtual void onDownloadStartup(const ::CORBA::WChar* appId) = 0;
+    virtual void onRenderStartup(const ::CORBA::WChar* appId) = 0;
+    virtual void onUploadStartup(const ::CORBA::WChar* appId) = 0;
     virtual ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId) = 0;
     virtual void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong lastSyncTime) = 0;
     virtual void updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::VideoInfo& vInfo) = 0;
-    virtual void updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const char* vRenderPath) = 0;
-    virtual void updateUploadedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const char* videoLocation) = 0;
+    virtual void updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const ::CORBA::WChar* vRenderPath) = 0;
+    virtual void updateUploadedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const ::CORBA::WChar* videoLocation) = 0;
     
   public:  // Really protected, workaround for xlC
     virtual _CORBA_Boolean _dispatch(omniCallHandle&);

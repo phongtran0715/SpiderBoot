@@ -71,18 +71,19 @@ public:
 
 class AgentSide_i : public POA_SpiderAgentApp::AgentSide
 {
-private: 
+private:
    HomeInfo getHomeChannelField(const TCHAR* cHomeId);
    INT32 getMaxId(TCHAR * tbName);
 public:
-   void onDownloadStartup(const char* appId);
-   void onRenderStartup(const char* appId);
-   void onUploadStartup(const char* appId);
+
+   void onDownloadStartup(const ::CORBA::WChar* appId);
+   void onRenderStartup(const ::CORBA::WChar* appId);
+   void onUploadStartup(const ::CORBA::WChar* appId);
    ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId);
    void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong lastSyncTime);
    void updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::VideoInfo& vInfo);
-   void updateRenderedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const char* videoLocation);
-   void updateUploadedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const char* videoLocation);
+   void updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const ::CORBA::WChar* vRenderPath);
+   void updateUploadedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const ::CORBA::WChar* videoLocation);
 };
 
 #endif /* _nms_corba_h_ */

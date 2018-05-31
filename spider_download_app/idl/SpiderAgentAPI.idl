@@ -5,8 +5,8 @@ module SpiderDownloadApp
   interface SpiderFootSide
   {
         boolean createMappingChannel(in long timerId, in wstring cHomeId, in wstring cMonitorId, in wstring downloadClusterId, in long timerInterval );
-        boolean modifyMappingChannel(in long timerId, in string cHomeId, in string cMonitorId, in string downloadClusterId, in long timerInterval, in long synStatus);
-        boolean deleteMappingChannel(in long timerId, in string downloadClusterId);
+        boolean modifyMappingChannel(in long timerId, in wstring cHomeId, in wstring cMonitorId, in wstring downloadClusterId, in long timerInterval, in long synStatus);
+        boolean deleteMappingChannel(in long timerId, in wstring downloadClusterId);
 
   };
 };
@@ -17,29 +17,30 @@ module SpiderAgentApp
   interface AgentSide
   {
     struct VideoInfo {
-      string videoId;
-      string title;
-      string tags;
-      string description;
-      string thumbnail;
-      string vDownloadPath;
-      string vRenderPath;
-      string homeChannelId;
-      string monitorChannelId;
+      wstring videoId;
+      wstring title;
+      wstring tags;
+      wstring description;
+      wstring thumbnail;
+      wstring vDownloadPath;
+      wstring vRenderPath;
+      wstring homeChannelId;
+      wstring monitorChannelId;
       long processStatus;
       long license;
     };
 
-    void onDownloadStartup(in string appId);
-    void onRenderStartup(in string appId);
-    void onUploadStartup(in string appId);
+    void onDownloadStartup(in wstring appId);
+    void onRenderStartup(in wstring appId);
+    void onUploadStartup(in wstring appId);
 
     long long getLastSyncTime(in long mappingId);
     void updateLastSyntime(in long mappingId, in long long lastSyncTime);
 
     void updateDownloadedVideo(in VideoInfo vInfo);
-    void updateRenderedVideo(in long videoId, in long processStatus, in string videoLocation);
-    void updateUploadedVideo (in long videoId, in long processStatus, in string videoLocation);
+    void updateRenderedVideo(in long jobId, in long processStatus, in wstring vRenderPath);
+    void updateUploadedVideo (in long videoId, in long processStatus, in wstring videoLocation);
   };
 };
+
 

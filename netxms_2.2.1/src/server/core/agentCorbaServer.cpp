@@ -7,7 +7,7 @@ using namespace std;
 #  include <iostream.h>
 #endif
 
-void AgentSide_i::onDownloadStartup(const char* appId)
+void AgentSide_i::onDownloadStartup(const ::CORBA::WChar* appId)
 {
 	DbgPrintf(1, _T("AgentSide_i::[onDownloadStartup] Download cluster"));
 	DB_RESULT hResult;
@@ -58,17 +58,10 @@ void AgentSide_i::onDownloadStartup(const char* appId)
 			DBFreeResult(hResult);
 		}
 	}
-	/*
-	if(downloadClient!= nullptr)
-	{
-		delete downloadClient;
-		downloadClient = nullptr;
-	}
-	*/
 	DBConnectionPoolReleaseConnection(hdb);
 }
 
-void AgentSide_i::onRenderStartup(const char* appId)
+void AgentSide_i::onRenderStartup(const ::CORBA::WChar* appId)
 {
 	DbgPrintf(1, _T("AgentSide_i::[onDownloadStartup]"));
 	DB_RESULT hResult;
@@ -100,11 +93,11 @@ void AgentSide_i::onRenderStartup(const char* appId)
 							HomeInfo homeInfo = getHomeChannelField(cHomeId);
 							::SpiderRenderApp::SpiderFootSide::RenderInfo vInfo;
 							vInfo.jobId = id;
-							vInfo.videoId = CORBA::string_dup((const char*)videoId);
-							vInfo.vIntro = CORBA::string_dup((const char*)homeInfo.vIntro);
-							vInfo.vOutro = CORBA::string_dup((const char*)homeInfo.vOutro);
-							vInfo.vLogo = CORBA::string_dup((const char*)homeInfo.vLogo);
-							vInfo.vdownloadPath = CORBA::string_dup((const char*)downloadPath);
+							vInfo.videoId = CORBA::wstring_dup(videoId);
+							vInfo.vIntro = CORBA::wstring_dup(homeInfo.vIntro);
+							vInfo.vOutro = CORBA::wstring_dup(homeInfo.vOutro);
+							vInfo.vLogo = CORBA::wstring_dup(homeInfo.vLogo);
+							vInfo.vdownloadPath = CORBA::wstring_dup(downloadPath);
 
 							renderClient->mRenderRef->createRenderJob(id, vInfo);
 						}
@@ -135,7 +128,7 @@ void AgentSide_i::onRenderStartup(const char* appId)
 	DBConnectionPoolReleaseConnection(hdb);
 }
 
-void AgentSide_i::onUploadStartup(const char* appId)
+void AgentSide_i::onUploadStartup(const ::CORBA::WChar* appId)
 {
 	DB_RESULT hResult;
 	UINT32 i, dwNumRecords;
@@ -214,14 +207,14 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::Video
 		                  _T(" Description, Thumbnail, VDownloadedPath, HomeChannelId,")
 		                  _T(" MonitorChannelId, ProcessStatus, License) VALUES (?,?,?,?,?,?,?,?,?,?)"));
 
-		DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.videoId), DB_BIND_TRANSIENT);
-		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.title), DB_BIND_TRANSIENT);
-		DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.tags), DB_BIND_TRANSIENT);
-		DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.description), DB_BIND_TRANSIENT);
-		DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.thumbnail), DB_BIND_TRANSIENT);
-		DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.vDownloadPath), DB_BIND_TRANSIENT);
-		DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.homeChannelId), DB_BIND_TRANSIENT);
-		DBBind(hStmt, 8, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.monitorChannelId), DB_BIND_TRANSIENT);
+		DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.videoId), DB_BIND_TRANSIENT);
+		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.title), DB_BIND_TRANSIENT);
+		DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.tags), DB_BIND_TRANSIENT);
+		DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.description), DB_BIND_TRANSIENT);
+		DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.thumbnail), DB_BIND_TRANSIENT);
+		DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.vDownloadPath), DB_BIND_TRANSIENT);
+		DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.homeChannelId), DB_BIND_TRANSIENT);
+		DBBind(hStmt, 8, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.monitorChannelId), DB_BIND_TRANSIENT);
 		DBBind(hStmt, 9, DB_SQLTYPE_INTEGER, (INT32)vInfo.processStatus);
 		DBBind(hStmt, 10, DB_SQLTYPE_INTEGER, (INT32)vInfo.license);
 
@@ -238,14 +231,14 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::Video
 					try
 					{
 
-						HomeInfo homeInfo = getHomeChannelField((const TCHAR*)CORBA::string_dup(vInfo.homeChannelId));
+						HomeInfo homeInfo = getHomeChannelField((const TCHAR*)CORBA::wstring_dup(vInfo.homeChannelId));
 						::SpiderRenderApp::SpiderFootSide::RenderInfo renderInfo;
 						renderInfo.jobId = getMaxId(_T("video_container"));
-						renderInfo.videoId = CORBA::string_dup((const char*)vInfo.videoId);
-						renderInfo.vIntro = CORBA::string_dup((const char*)homeInfo.vIntro);
-						renderInfo.vOutro = CORBA::string_dup((const char*)homeInfo.vOutro);
-						renderInfo.vLogo = CORBA::string_dup((const char*)homeInfo.vLogo);
-						renderInfo.vdownloadPath = CORBA::string_dup((const char*)vInfo.vDownloadPath);
+						renderInfo.videoId = CORBA::wstring_dup(vInfo.videoId);
+						renderInfo.vIntro = CORBA::wstring_dup(homeInfo.vIntro);
+						renderInfo.vOutro = CORBA::wstring_dup(homeInfo.vOutro);
+						renderInfo.vLogo = CORBA::wstring_dup(homeInfo.vLogo);
+						renderInfo.vdownloadPath = CORBA::wstring_dup(vInfo.vDownloadPath);
 
 						renderClient->mRenderRef->createRenderJob(renderInfo.jobId, renderInfo);
 
@@ -280,7 +273,7 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::Video
 	DBConnectionPoolReleaseConnection(hdb);
 }
 
-void AgentSide_i::updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const char* videoLocation)
+void AgentSide_i::updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const ::CORBA::WChar* vRenderPath)
 {
 	DbgPrintf(6, _T("AgentSide_i::[updateRenderedVideo] jobId = %d"), (INT32)jobId);
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
@@ -290,14 +283,14 @@ void AgentSide_i::updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long process
 	{
 		hStmt = DBPrepare(hdb, _T("UPDATE video_container SET ProcessStatus = ?, VRenderedPath = ? WHERE Id = ?"));
 		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)processStatus);
-		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)videoLocation, DB_BIND_TRANSIENT);
+		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)vRenderPath, DB_BIND_TRANSIENT);
 		DBBind(hStmt, 3, DB_SQLTYPE_INTEGER, (INT32)jobId);
 		DBExecute(hStmt);
 	}
 	DBConnectionPoolReleaseConnection(hdb);
 }
 
-void AgentSide_i::updateUploadedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const char* videoLocation)
+void AgentSide_i::updateUploadedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const ::CORBA::WChar* videoLocation)
 {
 
 }

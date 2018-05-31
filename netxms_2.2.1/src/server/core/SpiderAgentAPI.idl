@@ -5,8 +5,8 @@ module SpiderDownloadApp
   interface SpiderFootSide
   {
         boolean createMappingChannel(in long timerId, in wstring cHomeId, in wstring cMonitorId, in wstring downloadClusterId, in long timerInterval );
-        boolean modifyMappingChannel(in long timerId, in string cHomeId, in string cMonitorId, in string downloadClusterId, in long timerInterval, in long synStatus);
-        boolean deleteMappingChannel(in long timerId, in string downloadClusterId);
+        boolean modifyMappingChannel(in long timerId, in wstring cHomeId, in wstring cMonitorId, in wstring downloadClusterId, in long timerInterval, in long synStatus);
+        boolean deleteMappingChannel(in long timerId, in wstring downloadClusterId);
 
   };
 };
@@ -18,11 +18,11 @@ module SpiderRenderApp
         struct RenderInfo
         {
             long jobId;
-            string videoId;
-            string vIntro;
-            string vOutro;
-            string vLogo;
-            string vdownloadPath;
+            wstring videoId;
+            wstring vIntro;
+            wstring vOutro;
+            wstring vLogo;
+            wstring vdownloadPath;
         };
 
         boolean createRenderJob(in long jobId, in RenderInfo vInfo);
@@ -36,9 +36,9 @@ module SpiderUploadApp
 {
   interface SpiderFootSide
   {
-        boolean createUploadJob(in long timerId, in string uploadClusterId);
-        boolean modifyUploadJob(in long timerId, in string uploadClusterId);
-        boolean deleteUploadJob(in long timerId, in string uploadClusterId);
+        boolean createUploadJob(in long timerId, in wstring uploadClusterId);
+        boolean modifyUploadJob(in long timerId, in wstring uploadClusterId);
+        boolean deleteUploadJob(in long timerId, in wstring uploadClusterId);
 
   };
 };
@@ -49,28 +49,28 @@ module SpiderAgentApp
   interface AgentSide
   {
     struct VideoInfo {
-      string videoId;
-      string title;
-      string tags;
-      string description;
-      string thumbnail;
-      string vDownloadPath;
-      string vRenderPath;
-      string homeChannelId;
-      string monitorChannelId;
+      wstring videoId;
+      wstring title;
+      wstring tags;
+      wstring description;
+      wstring thumbnail;
+      wstring vDownloadPath;
+      wstring vRenderPath;
+      wstring homeChannelId;
+      wstring monitorChannelId;
       long processStatus;
       long license;
     };
 
-    void onDownloadStartup(in string appId);
-    void onRenderStartup(in string appId);
-    void onUploadStartup(in string appId);
+    void onDownloadStartup(in wstring appId);
+    void onRenderStartup(in wstring appId);
+    void onUploadStartup(in wstring appId);
 
     long long getLastSyncTime(in long mappingId);
     void updateLastSyntime(in long mappingId, in long long lastSyncTime);
 
     void updateDownloadedVideo(in VideoInfo vInfo);
-    void updateRenderedVideo(in long jobId, in long processStatus, in string vRenderPath);
-    void updateUploadedVideo (in long videoId, in long processStatus, in string videoLocation);
+    void updateRenderedVideo(in long jobId, in long processStatus, in wstring vRenderPath);
+    void updateUploadedVideo (in long videoId, in long processStatus, in wstring videoLocation);
   };
 };
