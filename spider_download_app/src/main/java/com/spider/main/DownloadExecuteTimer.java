@@ -59,6 +59,11 @@ public class DownloadExecuteTimer extends TimerTask {
 		if (isComplete) {
 			isComplete = false;
 			Date lastSyncTime = getLastSyncTime(timerId);
+			if(lastSyncTime == null)
+			{
+				logger.error("Error! Can not get last sync time.");
+				return;
+			}
 			DateTime ytbTime = new DateTime(lastSyncTime);
 			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(cMonitorId, ytbTime, downloadConfig.maxResult);
 			Iterator<SearchResult> iteratorSearchResults = result.iterator();
@@ -106,8 +111,14 @@ public class DownloadExecuteTimer extends TimerTask {
 
 	private Date getLastSyncTime(int timerId)
 	{
+		logger.info("Function getLastSyncTime: timerId = " + timerId);
 		Date result = null;
-		isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);
+		//Reinit corba connection if need
+		if(isInitCorba == false)
+		{
+			isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);	
+		}
+		
 		if(isInitCorba)
 		{
 			if(downloadClient.downloadAppImpl != null)
@@ -131,17 +142,21 @@ public class DownloadExecuteTimer extends TimerTask {
 
 	private void updateLastSyncTime(Date lastSyncTime)
 	{
-		isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);
+		logger.info("Function updateLastSyncTime : time = " + lastSyncTime.toString());
+		if(isInitCorba == false)
+		{
+			isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);	
+		}
+		
 		if(isInitCorba)
 		{
 			if(downloadClient.downloadAppImpl != null)
 			{
 				try {
 					Timestamp ts = new Timestamp(new Date().getTime());
-					System.out.println("---> Update last Sync time by time stamp = " + ts.getTime() / 1000);
 					downloadClient.downloadAppImpl.updateLastSyntime(this.timerId, ts.getTime() / 1000);
 				}catch (Exception e) {
-					System.out.println(e.toString());
+					logger.error(e.toString());
 				}
 			}else {
 				logger.error("Download client implementation is NULL");
@@ -177,21 +192,24 @@ public class DownloadExecuteTimer extends TimerTask {
 	private void saveVideoInfo(VideoWraper videoWrapper)
 	{
 		logger.info("Function saveVideoInfo:: >>>>");
-		isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);
+		if(isInitCorba == false)
+		{
+			isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);	
+		}
 		if(isInitCorba)
 		{
 			if(downloadClient.downloadAppImpl != null)
 			{
 				try {
-					System.out.println(videoWrapper.description);
+					logger.info(videoWrapper.description);
 					SpiderAgentApp.AgentSidePackage.VideoInfo vInfo = new VideoInfo(videoWrapper.videoId, videoWrapper.title, 
-							videoWrapper.tag, "", videoWrapper.thumbnail, 
+							videoWrapper.tag, videoWrapper.description, videoWrapper.thumbnail, 
 							videoWrapper.vDownloadPath, videoWrapper.vRenderPath, videoWrapper.cHomeId, 
 							videoWrapper.cMonitorId, videoWrapper.processStatus, videoWrapper.license);
 					
 					downloadClient.downloadAppImpl.updateDownloadedVideo(vInfo);
 				}catch (Exception e) {
-					System.out.println(e.toString());
+					logger.error(e.toString());
 				}
 			}else {
 				logger.error("Download client implementation is NULL");

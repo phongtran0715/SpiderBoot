@@ -122,7 +122,7 @@ SpiderDownloadApp::_objref_SpiderFootSide::_ptrToObjRef(const char* id)
 // Code for SpiderDownloadApp::SpiderFootSide::createMappingChannel
 
 // Proxy call descriptor class. Mangled signature:
-//  _cboolean_i_clong_i_cstring_i_cstring_i_cstring_i_clong
+//  _cboolean_i_clong_i_cwstring_i_cwstring_i_cwstring_i_clong
 class _0RL_cd_61f5032497954561_00000000
   : public omniCallDescriptor
 {
@@ -143,12 +143,12 @@ public:
   static const char* const _user_exns[];
 
   ::CORBA::Long arg_0;
-  ::CORBA::String_var arg_1_;
-  const char* arg_1;
-  ::CORBA::String_var arg_2_;
-  const char* arg_2;
-  ::CORBA::String_var arg_3_;
-  const char* arg_3;
+  ::CORBA::WString_var arg_1_;
+  const ::CORBA::WChar* arg_1;
+  ::CORBA::WString_var arg_2_;
+  const ::CORBA::WChar* arg_2;
+  ::CORBA::WString_var arg_3_;
+  const ::CORBA::WChar* arg_3;
   ::CORBA::Long arg_4;
   ::CORBA::Boolean result;
 };
@@ -156,9 +156,9 @@ public:
 void _0RL_cd_61f5032497954561_00000000::marshalArguments(cdrStream& _n)
 {
   arg_0 >>= _n;
-  _n.marshalString(arg_1,0);
-  _n.marshalString(arg_2,0);
-  _n.marshalString(arg_3,0);
+  _n.marshalWString(arg_1,0);
+  _n.marshalWString(arg_2,0);
+  _n.marshalWString(arg_3,0);
   arg_4 >>= _n;
 
 }
@@ -166,11 +166,11 @@ void _0RL_cd_61f5032497954561_00000000::marshalArguments(cdrStream& _n)
 void _0RL_cd_61f5032497954561_00000000::unmarshalArguments(cdrStream& _n)
 {
   (::CORBA::Long&)arg_0 <<= _n;
-  arg_1_ = _n.unmarshalString(0);
+  arg_1_ = _n.unmarshalWString(0);
   arg_1 = arg_1_.in();
-  arg_2_ = _n.unmarshalString(0);
+  arg_2_ = _n.unmarshalWString(0);
   arg_2 = arg_2_.in();
-  arg_3_ = _n.unmarshalString(0);
+  arg_3_ = _n.unmarshalWString(0);
   arg_3 = arg_3_.in();
   (::CORBA::Long&)arg_4 <<= _n;
 
@@ -203,7 +203,7 @@ _0RL_lcfn_61f5032497954561_10000000(omniCallDescriptor* cd, omniServant* svnt)
 
 }
 
-::CORBA::Boolean SpiderDownloadApp::_objref_SpiderFootSide::createMappingChannel(::CORBA::Long timerId, const char* cHomeId, const char* cMonitorId, const char* downloadClusterId, ::CORBA::Long timerInterval)
+::CORBA::Boolean SpiderDownloadApp::_objref_SpiderFootSide::createMappingChannel(::CORBA::Long timerId, const ::CORBA::WChar* cHomeId, const ::CORBA::WChar* cMonitorId, const ::CORBA::WChar* downloadClusterId, ::CORBA::Long timerInterval)
 {
   _0RL_cd_61f5032497954561_00000000 _call_desc(_0RL_lcfn_61f5032497954561_10000000, "createMappingChannel", 21);
   _call_desc.arg_0 = timerId;

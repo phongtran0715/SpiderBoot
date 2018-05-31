@@ -14278,6 +14278,8 @@ void ClientSession::createGoogleAccount(NXCPMessage *request)
       UINT32 accountType = request->getFieldAsUInt32(VID_GOOGLE_ACCOUNT_TYPE);
       TCHAR* appName = request->getFieldAsString(VID_GOOGLE_APP_NAME);
 
+      debugPrintf(6, _T("ClientSession::[createGoogleAccount] ==== appName = %s"), appName);
+
       hStmt = DBPrepare(hdb, _T("INSERT INTO google_account (UserName,Api,ClientSecret,AccountType,AppName) VALUES (?,?,?,?,?)"));
       DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)userName, DB_BIND_TRANSIENT);
       DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)api, DB_BIND_TRANSIENT);
@@ -14428,8 +14430,8 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
                      INT32 timerId = getMaxId(_T("channel_mapping"));
                      debugPrintf(1, _T("create home channel ID = %s"), cHomeId);
                      debugPrintf(1, _T("create monitor channel ID = %s"), cMonitorId);
-                     downloadClient->mDownloadRef->createMappingChannel(timerId, CORBA::string_dup((const char*)cHomeId),
-                           CORBA::string_dup((const char*)cMonitorId), CORBA::string_dup((const char*)downloadId), timeSync);
+                     downloadClient->mDownloadRef->createMappingChannel(timerId, CORBA::wstring_dup(cHomeId),
+                           CORBA::wstring_dup(cMonitorId), CORBA::wstring_dup(downloadId), timeSync);
                   }
                   catch (CORBA::TRANSIENT&) {
                      debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
@@ -14444,11 +14446,13 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
                   debugPrintf(1, _T("ClientSession::[%s] Init corba for download client FALSE"), __FUNCTION__);
                }
                //Trelease corba connection
+               /*
                if (downloadClient != nullptr)
                {
                   delete downloadClient;
                   downloadClient = nullptr;
                }
+               */
             }
          }
          else
@@ -14655,11 +14659,13 @@ void ClientSession::modifyMappingChannel(NXCPMessage * request)
             debugPrintf(1, _T("ClientSession::[%s] Init corba for download client FALSE"), __FUNCTION__);
          }
          //Release corba connection
+         /*
          if (downloadClient != nullptr)
          {
             delete downloadClient;
             downloadClient = nullptr;
          }
+         */
       }
       else
       {
@@ -14819,11 +14825,13 @@ void ClientSession::deleteMappingChannel(NXCPMessage * request)
             debugPrintf(1, _T("ClientSession::[%s] Init corba for download client FALSE"), __FUNCTION__);
          }
          //Release corba connection
+         /*
          if (downloadClient != nullptr)
          {
             delete downloadClient;
             downloadClient = nullptr;
          }
+         */
       }
       else
       {

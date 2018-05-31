@@ -9,7 +9,7 @@ using namespace std;
 
 void AgentSide_i::onDownloadStartup(const char* appId)
 {
-	DbgPrintf(1, _T("AgentSide_i::[onDownloadStartup]"));
+	DbgPrintf(1, _T("AgentSide_i::[onDownloadStartup] Download cluster"));
 	DB_RESULT hResult;
 	UINT32 i, dwNumRecords;
 	SpiderDownloadClient* downloadClient = new SpiderDownloadClient();
@@ -36,10 +36,10 @@ void AgentSide_i::onDownloadStartup(const char* appId)
 					{
 						try
 						{
-							downloadClient->mDownloadRef->createMappingChannel(id, CORBA::string_dup((const char*)cHomeId),
-							        CORBA::string_dup((const char*)cMonitorId), CORBA::string_dup(appId), timeSync);
-							DbgPrintf(1, _T("AgentSide_i::[onDownloadStartup] : home id = %s"), CORBA::string_dup((const char*)cHomeId));
-							DbgPrintf(1, _T("AgentSide_i::[onDownloadStartup] : monitor id = %s"), CORBA::string_dup((const char*)cMonitorId));
+							downloadClient->mDownloadRef->createMappingChannel(id, CORBA::wstring_dup(cHomeId),
+							        CORBA::wstring_dup(cMonitorId), CORBA::wstring_dup((TCHAR*)appId), timeSync);
+							DbgPrintf(1, _T("AgentSide_i::[onDownloadStartup] : home id = %s"), CORBA::wstring_dup(cHomeId));
+							DbgPrintf(1, _T("AgentSide_i::[onDownloadStartup] : monitor id = %s"), CORBA::wstring_dup(cMonitorId));
 						}
 						catch (CORBA::TRANSIENT&) {
 							DbgPrintf(1, _T("AgentSide_i::[] : Caught system exception TRANSIENT -- unable to contact the server"));
@@ -58,11 +58,13 @@ void AgentSide_i::onDownloadStartup(const char* appId)
 			DBFreeResult(hResult);
 		}
 	}
+	/*
 	if(downloadClient!= nullptr)
 	{
 		delete downloadClient;
 		downloadClient = nullptr;
 	}
+	*/
 	DBConnectionPoolReleaseConnection(hdb);
 }
 
@@ -123,11 +125,13 @@ void AgentSide_i::onRenderStartup(const char* appId)
 			DBFreeResult(hResult);
 		}
 	}
+	/*
 	if(renderClient != nullptr)
 	{
 		delete renderClient;
 		renderClient = nullptr;
 	}
+	*/
 	DBConnectionPoolReleaseConnection(hdb);
 }
 
@@ -209,16 +213,18 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::Video
 		hStmt = DBPrepare(hdb, _T("INSERT INTO video_container (VideoId, Title, Tag, ")
 		                  _T(" Description, Thumbnail, VDownloadedPath, HomeChannelId,")
 		                  _T(" MonitorChannelId, ProcessStatus, License) VALUES (?,?,?,?,?,?,?,?,?,?)"));
-		DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.videoId, DB_BIND_TRANSIENT);
-		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.title, DB_BIND_TRANSIENT);
-		DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.tags, DB_BIND_TRANSIENT);
-		DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.description, DB_BIND_TRANSIENT);
-		DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.thumbnail, DB_BIND_TRANSIENT);
-		DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.vDownloadPath, DB_BIND_TRANSIENT);
-		DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.homeChannelId, DB_BIND_TRANSIENT);
-		DBBind(hStmt, 8, DB_SQLTYPE_VARCHAR, (const TCHAR *)vInfo.monitorChannelId, DB_BIND_TRANSIENT);
+
+		DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.videoId), DB_BIND_TRANSIENT);
+		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.title), DB_BIND_TRANSIENT);
+		DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.tags), DB_BIND_TRANSIENT);
+		DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.description), DB_BIND_TRANSIENT);
+		DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.thumbnail), DB_BIND_TRANSIENT);
+		DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.vDownloadPath), DB_BIND_TRANSIENT);
+		DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.homeChannelId), DB_BIND_TRANSIENT);
+		DBBind(hStmt, 8, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::string_dup(vInfo.monitorChannelId), DB_BIND_TRANSIENT);
 		DBBind(hStmt, 9, DB_SQLTYPE_INTEGER, (INT32)vInfo.processStatus);
 		DBBind(hStmt, 10, DB_SQLTYPE_INTEGER, (INT32)vInfo.license);
+
 
 		bool success = DBExecute(hStmt);
 		if (success == true)
@@ -231,7 +237,8 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::Video
 				{
 					try
 					{
-						HomeInfo homeInfo = getHomeChannelField((const TCHAR*)vInfo.homeChannelId);
+
+						HomeInfo homeInfo = getHomeChannelField((const TCHAR*)CORBA::string_dup(vInfo.homeChannelId));
 						::SpiderRenderApp::SpiderFootSide::RenderInfo renderInfo;
 						renderInfo.jobId = getMaxId(_T("video_container"));
 						renderInfo.videoId = CORBA::string_dup((const char*)vInfo.videoId);
@@ -241,6 +248,7 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::Video
 						renderInfo.vdownloadPath = CORBA::string_dup((const char*)vInfo.vDownloadPath);
 
 						renderClient->mRenderRef->createRenderJob(renderInfo.jobId, renderInfo);
+
 					}
 					catch (CORBA::TRANSIENT&) {
 						DbgPrintf(1, _T("AgentSide_i::[] : Caught system exception TRANSIENT -- unable to contact the server"));
@@ -256,11 +264,13 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::Video
 			} else
 			{
 			}
+			/*
 			if(renderClient != nullptr)
 			{
 				delete renderClient;
 				renderClient = nullptr;
 			}
+			*/
 		} else
 		{
 			DbgPrintf(1, _T("AgentSide_i::updateDownloadedVideo : insert new video info FALSE"));
@@ -319,21 +329,21 @@ void AgentCorbaServer::initCorba()
 
 		if (!bindObjectToName(orb, obj))
 		{
-			cout << "ERROR ! scan not bind object to name... " << endl;
+			DbgPrintf(1, _T("AgentCorbaServer::initCorba: ERROR ! scan not bind object to name..."));
 			return;
 		}
 
 		PortableServer::POAManager_var pman = poa->the_POAManager();
 		pman->activate();
-		cout << "server is running and waiting connection from client... " << endl;
+		DbgPrintf(1, _T("server is running and waiting connection from client..."));
 
 		orb->run();
 	}
 	catch (CORBA::SystemException& ex) {
-		cerr << "Caught CORBA::" << ex._name() << endl;
+		DbgPrintf(1, _T("AgentCorbaServer::initCorba: Caught CORBA:: %s"), ex._name());
 	}
 	catch (CORBA::Exception& ex) {
-		cerr << "Caught CORBA::Exception: " << ex._name() << endl;
+		DbgPrintf(1, _T("AgentCorbaServer::initCorba: Caught CORBA::Exception: %s"), ex._name());
 	}
 }
 
@@ -350,19 +360,18 @@ AgentCorbaServer::bindObjectToName(CORBA::ORB_ptr orb, CORBA::Object_ptr objref)
 		// Narrow the reference returned.
 		rootContext = CosNaming::NamingContext::_narrow(obj);
 		if (CORBA::is_nil(rootContext)) {
-			cerr << "Failed to narrow the root naming context." << endl;
+			DbgPrintf(1, _T("Failed to narrow the root naming context."));
 			return false;
 		}
 	}
 	catch (CORBA::NO_RESOURCES&) {
-		cerr << "Caught NO_RESOURCES exception. You must configure omniORB "
-		     << "with the location" << endl
-		     << "of the naming service." << endl;
+		DbgPrintf(1, _T("Caught NO_RESOURCES exception. You must configure omniORB "));
+		DbgPrintf(1, _T("with the location of the naming service."));
 		return false;
 	}
 	catch (CORBA::ORB::InvalidName&) {
 		// This should not happen!
-		cerr << "Service required is invalid [does not exist]." << endl;
+		DbgPrintf(1, _T("Service required is invalid [does not exist]."));
 		return false;
 	}
 
@@ -386,16 +395,12 @@ AgentCorbaServer::bindObjectToName(CORBA::ORB_ptr orb, CORBA::Object_ptr objref)
 		//       supplied is already bound to an object.
 	}
 	catch (CORBA::TRANSIENT& ex) {
-		cerr << "Caught system exception TRANSIENT -- unable to contact the "
-		     << "naming service." << endl
-		     << "Make sure the naming server is running and that omniORB is "
-		     << "configured correctly." << endl;
-
+		DbgPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the naming service."));
+		DbgPrintf(1, _T(" Make sure the naming server is running and that omniORB is configured correctly."));
 		return false;
 	}
 	catch (CORBA::SystemException& ex) {
-		cerr << "Caught a CORBA::" << ex._name()
-		     << " while using the naming service." << endl;
+		DbgPrintf(1, _T("Caught a CORBA::"), ex._name());
 		return false;
 	}
 	return true;

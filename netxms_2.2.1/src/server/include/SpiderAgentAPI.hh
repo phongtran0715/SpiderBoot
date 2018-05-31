@@ -124,7 +124,7 @@ _CORBA_MODULE_BEG
   {
   public:
     // IDL operations
-    ::CORBA::Boolean createMappingChannel(::CORBA::Long timerId, const char* cHomeId, const char* cMonitorId, const char* downloadClusterId, ::CORBA::Long timerInterval);
+    ::CORBA::Boolean createMappingChannel(::CORBA::Long timerId, const ::CORBA::WChar* cHomeId, const ::CORBA::WChar* cMonitorId, const ::CORBA::WChar* downloadClusterId, ::CORBA::Long timerInterval);
     ::CORBA::Boolean modifyMappingChannel(::CORBA::Long timerId, const char* cHomeId, const char* cMonitorId, const char* downloadClusterId, ::CORBA::Long timerInterval, ::CORBA::Long synStatus);
     ::CORBA::Boolean deleteMappingChannel(::CORBA::Long timerId, const char* downloadClusterId);
 
@@ -161,7 +161,7 @@ _CORBA_MODULE_BEG
   public:
     virtual ~_impl_SpiderFootSide();
 
-    virtual ::CORBA::Boolean createMappingChannel(::CORBA::Long timerId, const char* cHomeId, const char* cMonitorId, const char* downloadClusterId, ::CORBA::Long timerInterval) = 0;
+    virtual ::CORBA::Boolean createMappingChannel(::CORBA::Long timerId, const ::CORBA::WChar* cHomeId, const ::CORBA::WChar* cMonitorId, const ::CORBA::WChar* downloadClusterId, ::CORBA::Long timerInterval) = 0;
     virtual ::CORBA::Boolean modifyMappingChannel(::CORBA::Long timerId, const char* cHomeId, const char* cMonitorId, const char* downloadClusterId, ::CORBA::Long timerInterval, ::CORBA::Long synStatus) = 0;
     virtual ::CORBA::Boolean deleteMappingChannel(::CORBA::Long timerId, const char* downloadClusterId) = 0;
     

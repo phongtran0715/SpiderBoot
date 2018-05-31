@@ -106,6 +106,7 @@ public class MonitorChannelManagerView extends LogViewer {
 	}
 	@Override
 	protected void fillLocalPullDown(IMenuManager manager) {
+		super.fillLocalPullDown(manager);
 		manager.add(actAddMonitorChannel);
 		manager.add(new Separator());
 		manager.add(actEditMonitorChannel);
@@ -115,6 +116,7 @@ public class MonitorChannelManagerView extends LogViewer {
 
 	@Override
 	protected void fillContextMenu(IMenuManager manager) {
+		super.fillContextMenu(manager);
 		manager.add(actAddMonitorChannel);
 		manager.add(actEditMonitorChannel);
 		manager.add(actDeleteMonitorChannel);
@@ -124,6 +126,7 @@ public class MonitorChannelManagerView extends LogViewer {
 
 	@Override
 	protected void fillLocalToolBar(IToolBarManager manager) {
+		super.fillLocalToolBar(manager);
 		manager.add(actAddMonitorChannel);
 		manager.add(actEditMonitorChannel);
 		manager.add(actDeleteMonitorChannel);

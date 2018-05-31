@@ -4,31 +4,9 @@ module SpiderDownloadApp
 {
   interface SpiderFootSide
   {
-        boolean createMappingChannel(in long timerId, in string cHomeId, in string cMonitorId, in string downloadClusterId, in long timerInterval );
+        boolean createMappingChannel(in long timerId, in wstring cHomeId, in wstring cMonitorId, in wstring downloadClusterId, in long timerInterval );
         boolean modifyMappingChannel(in long timerId, in string cHomeId, in string cMonitorId, in string downloadClusterId, in long timerInterval, in long synStatus);
         boolean deleteMappingChannel(in long timerId, in string downloadClusterId);
-
-  };
-};
-
-module SpiderRenderApp
-{
-  interface SpiderFootSide
-  {
-        boolean createRenderJob(in long timerId, in string renderClusterId);
-        boolean modifyRenderJob(in long timerId, in string renderClusterId);
-        boolean deleteRenderJob(in long timerId, in string renderClusterId);
-
-  };
-};
-
-module SpiderUploadApp
-{
-  interface SpiderFootSide
-  {
-        boolean createUploadJob(in long timerId, in string uploadClusterId);
-        boolean modifyUploadJob(in long timerId, in string uploadClusterId);
-        boolean deleteUploadJob(in long timerId, in string uploadClusterId);
 
   };
 };

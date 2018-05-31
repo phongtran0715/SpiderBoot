@@ -10,15 +10,11 @@ public class DownloadCorbaClient {
 
 	public AgentSide downloadAppImpl;
 	public final String COMPONENT_NAME = "AgentSide";
-	private static final Logger logger = Logger.getLogger(DownloadCorbaClient.class);
-	
-	public DownloadCorbaClient()
-	{
-		//default constructor
-	}
+	private Logger logger = Logger.getLogger(DownloadCorbaClient.class);
 
 	public boolean initCorba(String refStr) {
 		boolean isSuccess = false;
+		logger.info("Function initCorba with refStr = " + refStr);
 		try{
 			// create and initialize the ORB
 			String [] args = new String[] { "-ORBInitRef", refStr };
