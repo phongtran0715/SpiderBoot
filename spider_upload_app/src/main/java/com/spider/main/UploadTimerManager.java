@@ -1,13 +1,15 @@
-package com.itc.edu.ulvideo.main;
+package com.spider.main;
 
-import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
+import SpiderUploadApp.SpiderFootSidePackage.UploadInfo;
 
 public class UploadTimerManager {
 
 	private static UploadTimerManager instance = null;
-	public static HashMap<String, Timer> timerMap = new HashMap<String, Timer>();
+	public static Queue<UploadInfo> qUploadJob = new LinkedList<UploadInfo>();
 
 	public UploadTimerManager() {
 	}
@@ -24,9 +26,6 @@ public class UploadTimerManager {
 		TimerTask timerTask = new UploadExecuteTimer(taskId);
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(timerTask, 0, timerInterval);
-		if (timer != null) {
-			timerMap.put(taskId, timer);
-		}
 		isSuccess = true;
 		return isSuccess;
 	}

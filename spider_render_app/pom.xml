@@ -79,7 +79,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass> spiderboot.render.MainRender</mainClass>
+							<mainClass> com.spider.main.MainRender</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

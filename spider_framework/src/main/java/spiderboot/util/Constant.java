@@ -24,4 +24,9 @@ public class Constant {
     public static final String RENDER_OUTPUT_VIDEO_PATH		= "OutputVideo";
     public static final String RENDER_VIDEO_FORMAT			= "VideoFormat";
     public static final String RENDER_CORBA_REF	 			= "CorbaRef";
+    
+    //upload configuration parameter
+    public static final String UPLOAD_APP_ID				= "AppId";
+    public static final String UPLOAD_CORBA_REF				= "CorbaRef";
+    public static final String UPLOAD_DELAY_TIME			= "UploadDelayTime";
 }

@@ -1,16 +1,5 @@
 
 //IDL for java server side
-module SpiderDownloadApp
-{
-  interface SpiderFootSide
-  {
-        boolean createMappingChannel(in long timerId, in wstring cHomeId, in wstring cMonitorId, in wstring downloadClusterId, in long timerInterval );
-        boolean modifyMappingChannel(in long timerId, in wstring cHomeId, in wstring cMonitorId, in wstring downloadClusterId, in long timerInterval, in long synStatus);
-        boolean deleteMappingChannel(in long timerId, in wstring downloadClusterId);
-
-  };
-};
-
 module SpiderRenderApp
 {
   interface SpiderFootSide
@@ -25,29 +14,13 @@ module SpiderRenderApp
             wstring vdownloadPath;
         };
 
-        boolean createRenderJob(in RenderInfo vInfo);
+        boolean createRenderJob(in long jobId, in RenderInfo vInfo);
+        boolean modifyRenderJob(in long jobId, in RenderInfo vInfo);
+        boolean deleteRenderJob(in long jobId, in RenderInfo vInfo);
+
   };
 };
 
-module SpiderUploadApp
-{
-  interface SpiderFootSide
-  {
-        struct UploadInfo
-        {
-            long jobId;
-            wstring videoId;
-            wstring vTitle;
-            wstring vDesc;
-            wstring vTags;
-            wstring vThumbnail;
-            wstring vLocation;
-            wstring cHomeId;
-            wstring cMonitorId;
-        };
-        boolean createUploadJob(in long timerId, in UploadInfo vInfo);
-  };
-};
 //IDL for C++ server side
 
 module SpiderAgentApp
@@ -77,6 +50,6 @@ module SpiderAgentApp
 
     void updateDownloadedVideo(in VideoInfo vInfo);
     void updateRenderedVideo(in long jobId, in long processStatus, in wstring vRenderPath);
-    void updateUploadedVideo (in long jobId);
+    void updateUploadedVideo (in long videoId, in long processStatus, in wstring videoLocation);
   };
 };

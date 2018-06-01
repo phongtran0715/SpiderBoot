@@ -1,6 +1,9 @@
 package com.spider.main;
 
 import java.io.File;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -118,7 +121,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		{
 			isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);	
 		}
-		
+
 		if(isInitCorba)
 		{
 			if(downloadClient.downloadAppImpl != null)
@@ -147,7 +150,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		{
 			isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);	
 		}
-		
+
 		if(isInitCorba)
 		{
 			if(downloadClient.downloadAppImpl != null)
@@ -201,12 +204,11 @@ public class DownloadExecuteTimer extends TimerTask {
 			if(downloadClient.downloadAppImpl != null)
 			{
 				try {
-					logger.info(videoWrapper.description);
 					SpiderAgentApp.AgentSidePackage.VideoInfo vInfo = new VideoInfo(videoWrapper.videoId, videoWrapper.title, 
 							videoWrapper.tag, videoWrapper.description, videoWrapper.thumbnail, 
 							videoWrapper.vDownloadPath, videoWrapper.vRenderPath, videoWrapper.cHomeId, 
 							videoWrapper.cMonitorId, videoWrapper.processStatus, videoWrapper.license);
-					
+
 					downloadClient.downloadAppImpl.updateDownloadedVideo(vInfo);
 				}catch (Exception e) {
 					logger.error(e.toString());

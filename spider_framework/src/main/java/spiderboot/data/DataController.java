@@ -2,6 +2,7 @@ package spiderboot.data;
 
 import spiderboot.configuration.DownloadConfig;
 import spiderboot.configuration.RenderConfig;
+import spiderboot.configuration.UploadConfig;
 
 public class DataController {
 
@@ -10,10 +11,7 @@ public class DataController {
 
 	public DownloadConfig downloadConfig;
 	public RenderConfig renderConfig;
-	// private constructor restricted to this class itself
-	private DataController()
-	{
-	}
+	public UploadConfig uploadConfig;
 
 	// static method to create instance of Singleton class
 	public static DataController getInstance()
@@ -32,5 +30,10 @@ public class DataController {
 	public void setRenderConfigObj(RenderConfig renderConfig)
 	{
 		this.renderConfig = renderConfig;
+	}
+	
+	public void setUploadConfigObj(UploadConfig uploadConfig)
+	{
+		this.uploadConfig = uploadConfig;
 	}
 }

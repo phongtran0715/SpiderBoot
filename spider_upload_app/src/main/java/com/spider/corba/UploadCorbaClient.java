@@ -2,23 +2,19 @@ package com.spider.corba;
 
 // Copyright and License 
 import SpiderAgentApp.*;
-
 import org.omg.CosNaming.*;
 import org.apache.log4j.Logger;
 import org.omg.CORBA.*;
 
-public class RenderCorbaClient {
+public class UploadCorbaClient {
 
-	public AgentSide renderAppImpl;
+	public AgentSide uploadAppImpl;
 	public final String COMPONENT_NAME = "AgentSide";
-	private static final Logger logger = Logger.getLogger(RenderCorbaClient.class);
-	
-	public RenderCorbaClient()
-	{
-	}
+	private Logger logger = Logger.getLogger(UploadCorbaClient.class);
 
 	public boolean initCorba(String refStr) {
 		boolean isSuccess = false;
+		logger.info("Function initCorba with refStr = " + refStr);
 		try{
 			// create and initialize the ORB
 			String [] args = new String[] { "-ORBInitRef", refStr };
@@ -34,7 +30,9 @@ public class RenderCorbaClient {
 			// lookup name
 			String name = "AgentSide";
 			org.omg.CORBA.Object obj = ncRef.resolve_str(name);
-			renderAppImpl = AgentSideHelper.narrow(obj);
+			uploadAppImpl = AgentSideHelper.narrow(obj);
+
+			logger.info("Obtained a handle on server object: " + uploadAppImpl);
 			isSuccess = true;
 
 		} catch (Exception e) {

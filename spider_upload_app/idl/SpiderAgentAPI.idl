@@ -1,34 +1,5 @@
 
 //IDL for java server side
-module SpiderDownloadApp
-{
-  interface SpiderFootSide
-  {
-        boolean createMappingChannel(in long timerId, in wstring cHomeId, in wstring cMonitorId, in wstring downloadClusterId, in long timerInterval );
-        boolean modifyMappingChannel(in long timerId, in wstring cHomeId, in wstring cMonitorId, in wstring downloadClusterId, in long timerInterval, in long synStatus);
-        boolean deleteMappingChannel(in long timerId, in wstring downloadClusterId);
-
-  };
-};
-
-module SpiderRenderApp
-{
-  interface SpiderFootSide
-  {
-        struct RenderInfo
-        {
-            long jobId;
-            wstring videoId;
-            wstring vIntro;
-            wstring vOutro;
-            wstring vLogo;
-            wstring vdownloadPath;
-        };
-
-        boolean createRenderJob(in RenderInfo vInfo);
-  };
-};
-
 module SpiderUploadApp
 {
   interface SpiderFootSide
@@ -45,7 +16,7 @@ module SpiderUploadApp
             wstring cHomeId;
             wstring cMonitorId;
         };
-        boolean createUploadJob(in long timerId, in UploadInfo vInfo);
+        boolean createUploadJob(in UploadInfo vInfo);
   };
 };
 //IDL for C++ server side
