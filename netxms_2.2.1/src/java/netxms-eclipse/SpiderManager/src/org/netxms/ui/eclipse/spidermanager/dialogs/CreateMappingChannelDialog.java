@@ -39,9 +39,15 @@ import org.spider.base.SpiderCodes;
 import org.spider.client.ClusterObject;
 import org.spider.client.HomeChannelObject;
 import org.spider.client.MonitorChannelObject;
+import org.spider.client.SpiderDefine;
+import org.spider.client.SpiderDefine.*;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.wb.swt.ResourceManager;
 
 public class CreateMappingChannelDialog extends Dialog {
 	private Text txtTimeSync;
@@ -62,16 +68,37 @@ public class CreateMappingChannelDialog extends Dialog {
 	Object [] renderClusters;
 	Object [] uploadClusters;
 	private NXCSession session;
-	
-	private String homeChannelId;
-	private String monitorChannelId;
-	private int status;
-	private long timeSync;
-	private String downloadClusterId;
-	private String renderClusterId;
-	private String uploadClusterId;
+	private TabFolder tabFolder;
+	private TabItem tbtmUploadConfig;
+	private TabItem tbtmMappingConfig;
+	private Group grpAbc;
+	private Text txtTitle;
+	private Label lblDescTemplate;
+	private Button cbDesc;
+	private Label lblTagsTemplate;
+	private Button cbTag;
+	private Text txtDesc;
+	private Text txtTags;
+	private TabItem tbtmRenderConfig;
+	private Group grpRender;
+	private Text txtVideoIntro;
+	private Button cbIntro;
+	private Label lblVideoOutro;
+	private Text txtVideoOutro;
+	private Button cbOutro;
+	private Label lblVideoLogo;
+	private Text txtLogo;
+	private Button cbLogo;
+	Button cbTitle;
+	private Label lblLogoPosition;
+	private Text txtLogoPosX;
+	private Text txtLogoPosY;
+	private Label label;
 
-
+	SpiderDefine spiderDefine = new SpiderDefine();
+	MappingConfig mappingConfig = spiderDefine.new MappingConfig();
+	RenderConfig renderConfig = spiderDefine.new RenderConfig();
+	UploadConfig uploadConfig = spiderDefine.new UploadConfig();
 
 	public CreateMappingChannelDialog(Shell parentShell) {
 		super(parentShell);
@@ -83,17 +110,24 @@ public class CreateMappingChannelDialog extends Dialog {
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
 
 		GridData gridData;
-		dialogArea.setLayout(null);
 		gridData = new GridData(GridData.VERTICAL_ALIGN_END);
 		gridData.horizontalAlignment = GridData.FILL;
 		gridData.horizontalSpan = 4;
 		gridData = new GridData(GridData.VERTICAL_ALIGN_END);
 		gridData.horizontalAlignment = GridData.FILL;
 		gridData.horizontalSpan = 2;
+		dialogArea.setLayout(null);
 
-		Group grpCreateNewAccount = new Group(dialogArea, SWT.NONE);
+		tabFolder = new TabFolder(dialogArea, SWT.NONE);
+		tabFolder.setBounds(10, 10, 509, 414);
+
+		tbtmMappingConfig = new TabItem(tabFolder, SWT.NONE);
+		tbtmMappingConfig.setImage(ResourceManager.getPluginImage("org.spider.ui.eclipse.spidermanager", "icons/settings_16x16.png"));
+		tbtmMappingConfig.setText("Mapping Config");
+
+		Group grpCreateNewAccount = new Group(tabFolder, SWT.NONE);
+		tbtmMappingConfig.setControl(grpCreateNewAccount);
 		grpCreateNewAccount.setText("Create new mapping channel");
-		grpCreateNewAccount.setBounds(5, 10, 432, 372);
 
 		Label lblChannelId = new Label(grpCreateNewAccount, SWT.NONE);
 		lblChannelId.setAlignment(SWT.RIGHT);
@@ -146,7 +180,7 @@ public class CreateMappingChannelDialog extends Dialog {
 		});
 		cbMonitor.setItems(new String[] {});
 		cbMonitor.setBounds(132, 77, 289, 29);
-		
+
 		linkHomeChanel = new Link(grpCreateNewAccount, SWT.NONE);
 		linkHomeChanel.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -159,7 +193,7 @@ public class CreateMappingChannelDialog extends Dialog {
 		});
 		linkHomeChanel.setBounds(131, 54, 290, 17);
 		linkHomeChanel.setText("<a></a>");
-		
+
 		linkMonitorChanel = new Link(grpCreateNewAccount, 0);
 		linkMonitorChanel.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -172,33 +206,133 @@ public class CreateMappingChannelDialog extends Dialog {
 		});
 		linkMonitorChanel.setText("<a></a>");
 		linkMonitorChanel.setBounds(131, 113, 290, 17);
-		
+
 		cbDownload = new Combo(grpCreateNewAccount, SWT.NONE);
 		cbDownload.setItems(new String[] {});
 		cbDownload.setBounds(132, 228, 289, 29);
-		
+
 		lblDownloadCluster = new Label(grpCreateNewAccount, SWT.NONE);
 		lblDownloadCluster.setText("Download CID");
 		lblDownloadCluster.setAlignment(SWT.RIGHT);
 		lblDownloadCluster.setBounds(10, 240, 109, 17);
-		
+
 		lblRenderCid = new Label(grpCreateNewAccount, SWT.NONE);
 		lblRenderCid.setText("Render CID");
 		lblRenderCid.setAlignment(SWT.RIGHT);
 		lblRenderCid.setBounds(10, 286, 109, 17);
-		
+
 		cbRender = new Combo(grpCreateNewAccount, SWT.NONE);
 		cbRender.setItems(new String[] {});
 		cbRender.setBounds(132, 274, 289, 29);
-		
+
 		lblUploadCid = new Label(grpCreateNewAccount, SWT.NONE);
 		lblUploadCid.setText("Upload CID");
 		lblUploadCid.setAlignment(SWT.RIGHT);
 		lblUploadCid.setBounds(10, 329, 109, 17);
-		
+
 		cbUpload = new Combo(grpCreateNewAccount, SWT.NONE);
 		cbUpload.setItems(new String[] {});
 		cbUpload.setBounds(132, 317, 289, 29);
+
+		tbtmRenderConfig = new TabItem(tabFolder, SWT.NONE);
+		tbtmRenderConfig.setImage(ResourceManager.getPluginImage("org.spider.ui.eclipse.spidermanager", "icons/render.png"));
+		tbtmRenderConfig.setText("Render Config");
+
+		grpRender = new Group(tabFolder, SWT.NONE);
+		grpRender.setText("Render");
+		tbtmRenderConfig.setControl(grpRender);
+		grpRender.setLayout(null);
+
+		Label lblNewLabel_1 = new Label(grpRender, SWT.NONE);
+		lblNewLabel_1.setAlignment(SWT.RIGHT);
+		lblNewLabel_1.setBounds(10, 27, 96, 17);
+		lblNewLabel_1.setText("Video Intro");
+
+		txtVideoIntro = new Text(grpRender, SWT.BORDER);
+		txtVideoIntro.setBounds(112, 22, 342, 27);
+
+		cbIntro = new Button(grpRender, SWT.CHECK);
+		cbIntro.setBounds(460, 22, 20, 24);
+
+		lblVideoOutro = new Label(grpRender, SWT.NONE);
+		lblVideoOutro.setText("Video Outro");
+		lblVideoOutro.setAlignment(SWT.RIGHT);
+		lblVideoOutro.setBounds(10, 66, 96, 17);
+
+		txtVideoOutro = new Text(grpRender, SWT.BORDER);
+		txtVideoOutro.setBounds(112, 61, 342, 27);
+
+		cbOutro = new Button(grpRender, SWT.CHECK);
+		cbOutro.setBounds(460, 61, 20, 24);
+
+		lblVideoLogo = new Label(grpRender, SWT.NONE);
+		lblVideoLogo.setText("Video Logo");
+		lblVideoLogo.setAlignment(SWT.RIGHT);
+		lblVideoLogo.setBounds(10, 105, 96, 17);
+
+		txtLogo = new Text(grpRender, SWT.BORDER);
+		txtLogo.setBounds(112, 100, 342, 27);
+
+		cbLogo = new Button(grpRender, SWT.CHECK);
+		cbLogo.setBounds(460, 100, 20, 24);
+
+		lblLogoPosition = new Label(grpRender, SWT.NONE);
+		lblLogoPosition.setText("Logo Position");
+		lblLogoPosition.setAlignment(SWT.RIGHT);
+		lblLogoPosition.setBounds(10, 148, 96, 17);
+
+		txtLogoPosX = new Text(grpRender, SWT.BORDER);
+		txtLogoPosX.setBounds(112, 142, 96, 27);
+
+		txtLogoPosY = new Text(grpRender, SWT.BORDER);
+		txtLogoPosY.setBounds(243, 142, 96, 27);
+
+		label = new Label(grpRender, SWT.NONE);
+		label.setText(":");
+		label.setAlignment(SWT.CENTER);
+		label.setBounds(217, 148, 20, 17);
+
+		tbtmUploadConfig = new TabItem(tabFolder, SWT.NONE);
+		tbtmUploadConfig.setImage(ResourceManager.getPluginImage("org.spider.ui.eclipse.spidermanager", "icons/upload.png"));
+		tbtmUploadConfig.setText("Upload Config");
+
+		grpAbc = new Group(tabFolder, SWT.NONE);
+		grpAbc.setText("Upload");
+		tbtmUploadConfig.setControl(grpAbc);
+		grpAbc.setLayout(null);
+
+		Label lblNewLabel = new Label(grpAbc, SWT.CENTER);
+		lblNewLabel.setAlignment(SWT.RIGHT);
+		lblNewLabel.setBounds(23, 74, 109, 17);
+		lblNewLabel.setText("Title template");
+
+		txtTitle = new Text(grpAbc, SWT.BORDER | SWT.WRAP);
+		txtTitle.setBounds(138, 31, 301, 102);
+
+		cbTitle = new Button(grpAbc, SWT.CHECK);
+		cbTitle.setBounds(445, 78, 26, 24);
+
+		lblDescTemplate = new Label(grpAbc, SWT.CENTER);
+		lblDescTemplate.setText("Desc template");
+		lblDescTemplate.setAlignment(SWT.RIGHT);
+		lblDescTemplate.setBounds(23, 192, 109, 17);
+
+		cbDesc = new Button(grpAbc, SWT.CHECK);
+		cbDesc.setBounds(445, 192, 26, 24);
+
+		lblTagsTemplate = new Label(grpAbc, SWT.CENTER);
+		lblTagsTemplate.setText("Tags template");
+		lblTagsTemplate.setAlignment(SWT.RIGHT);
+		lblTagsTemplate.setBounds(23, 319, 109, 17);
+
+		cbTag = new Button(grpAbc, SWT.CHECK);
+		cbTag.setBounds(445, 312, 26, 24);
+
+		txtDesc = new Text(grpAbc, SWT.BORDER | SWT.WRAP);
+		txtDesc.setBounds(138, 148, 301, 102);
+
+		txtTags = new Text(grpAbc, SWT.BORDER | SWT.WRAP);
+		txtTags.setBounds(138, 271, 301, 102);
 
 		initialData();
 		return dialogArea;
@@ -212,8 +346,8 @@ public class CreateMappingChannelDialog extends Dialog {
 
 	@Override
 	protected void okPressed() {
-		homeChannelId = cbHome.getText();
-		if(homeChannelId == null || homeChannelId.isEmpty())
+		mappingConfig.cHomeId = cbHome.getText();
+		if(mappingConfig.cHomeId == null || mappingConfig.cHomeId.isEmpty())
 		{
 			MessageBox dialog =
 					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
@@ -222,9 +356,9 @@ public class CreateMappingChannelDialog extends Dialog {
 			dialog.open();
 			return;
 		}
-		
-		monitorChannelId = cbMonitor.getText();
-		if(monitorChannelId == null || monitorChannelId.isEmpty())
+
+		mappingConfig.cMonitorId = cbMonitor.getText();
+		if(mappingConfig.cMonitorId == null || mappingConfig.cMonitorId.isEmpty())
 		{
 			MessageBox dialog =
 					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
@@ -233,7 +367,7 @@ public class CreateMappingChannelDialog extends Dialog {
 			dialog.open();
 			return;
 		}
-		
+
 		String strTime = txtTimeSync.getText();
 		if(strTime == null || strTime.isEmpty())
 		{
@@ -244,18 +378,33 @@ public class CreateMappingChannelDialog extends Dialog {
 			dialog.open();
 			return;
 		}
-		timeSync = Integer.parseInt(strTime);
-		
+		mappingConfig.timeSync = Integer.parseInt(strTime);
+
 		if(cbStatus.getText().equals("disable"))
 		{
-			status = 0;
+			mappingConfig.statusSync = 0;
 		}
 		else{
-			status = 1;
+			mappingConfig.statusSync = 1;
 		}
-		downloadClusterId = cbDownload.getText();
-		renderClusterId = cbRender.getText();
-		uploadClusterId = cbUpload.getText();
+		mappingConfig.downloadClusterId = cbDownload.getText();
+		mappingConfig.renderClusterId = cbRender.getText();
+		mappingConfig.uploadClusterId = cbUpload.getText();
+		
+		renderConfig.vIntro = txtVideoIntro.getText();
+		renderConfig.vOutro = txtVideoOutro.getText();
+		renderConfig.vLogo = txtLogo.getText();
+		renderConfig.enableIntro = cbIntro.getSelection();
+		renderConfig.enableOutro = cbOutro.getSelection();
+		renderConfig.enableLogo = cbLogo.getSelection();
+		
+		uploadConfig.titleTemp = txtTitle.getText();
+		uploadConfig.descTemp = txtDesc.getText();
+		uploadConfig.tagTemp = txtTags.getText();
+		uploadConfig.enableTitle = cbTitle.getSelection();
+		uploadConfig.enableDesc = cbDesc.getSelection();
+		uploadConfig.enableTag = cbTag.getSelection();
+		
 		super.okPressed();
 	}
 
@@ -283,7 +432,7 @@ public class CreateMappingChannelDialog extends Dialog {
 				e1.printStackTrace();
 			}
 		}
-		
+
 		if(downloadClusters == null)
 		{
 			try {
@@ -345,7 +494,7 @@ public class CreateMappingChannelDialog extends Dialog {
 			}
 		}
 	}
-	
+
 	private void setDownloadCluster()
 	{
 		if(downloadClusters != null)
@@ -360,7 +509,7 @@ public class CreateMappingChannelDialog extends Dialog {
 			}
 		}
 	}
-	
+
 	private void setRenderCluster()
 	{
 		if(renderClusters != null)
@@ -375,7 +524,7 @@ public class CreateMappingChannelDialog extends Dialog {
 			}
 		}
 	}
-	
+
 	private void setUploadCluster()
 	{
 		if(uploadClusters != null)
@@ -420,33 +569,28 @@ public class CreateMappingChannelDialog extends Dialog {
 		}
 		return result;
 	}
-	
-	public String getHomeChannelId() {
-		return homeChannelId;
+
+	public MappingConfig getMappingConfig() {
+		return mappingConfig;
 	}
 
-	public String getMonitorChannelId() {
-		return monitorChannelId;
+	public void setMappingConfig(MappingConfig mappingConfig) {
+		this.mappingConfig = mappingConfig;
 	}
 
-	public int getStatus() {
-		return status;
+	public RenderConfig getRenderConfig() {
+		return renderConfig;
 	}
 
-	public long getTimeSync() {
-		return timeSync;
+	public void setRenderConfig(RenderConfig renderConfig) {
+		this.renderConfig = renderConfig;
 	}
 
-	public String getDownloadClusterId() {
-		return downloadClusterId;
+	public UploadConfig getUploadConfig() {
+		return uploadConfig;
 	}
 
-	public String getRenderClusterId() {
-		return renderClusterId;
+	public void setUploadConfig(UploadConfig uploadConfig) {
+		this.uploadConfig = uploadConfig;
 	}
-
-	public String getUploadClusterId() {
-		return uploadClusterId;
-	}
-	
 }

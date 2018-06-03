@@ -191,6 +191,10 @@ import org.spider.client.GoogleAccountObject;
 import org.spider.client.HomeChannelObject;
 import org.spider.client.MappingChannelObject;
 import org.spider.client.MonitorChannelObject;
+import org.spider.client.SpiderDefine;
+import org.spider.client.SpiderDefine.MappingConfig;
+import org.spider.client.SpiderDefine.RenderConfig;
+import org.spider.client.SpiderDefine.UploadConfig;
 
 import com.jcraft.jzlib.Deflater;
 import com.jcraft.jzlib.JZlib;
@@ -3768,10 +3772,11 @@ public class NXCSession {
 			String userName = msg.getFieldAsString(baseIndex + 1);
 			String api = msg.getFieldAsString(baseIndex + 2);
 			String clientSecret = msg.getFieldAsString(baseIndex + 3);
-			int accountType = msg.getFieldAsInt32(baseIndex + 4);
-			String appname = msg.getFieldAsString(baseIndex + 5);
+			String clientId = msg.getFieldAsString(baseIndex + 4);
+			int accountType = msg.getFieldAsInt32(baseIndex + 5);
+			String appname = msg.getFieldAsString(baseIndex + 6);
 			googleAccountList.put(id, new GoogleAccountObject(id, userName, 
-					api, clientSecret, accountType, appname));
+					api, clientSecret, clientId, accountType, appname));
 		}
 		return googleAccountList.values().toArray();
 	}
@@ -3835,34 +3840,39 @@ public class NXCSession {
 		return monitorChannleList.values().toArray();
 	}
 
-	public Object [] getMappingChannelList() throws IOException, NXCException
+	public Object getMappingConfigById(int mappingId) throws IOException, NXCException
 	{
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_GET_MAPPING_CHANNEL);
 		final long rqId = msg.getMessageId();
+		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_RECORD_ID, mappingId);
 		sendMessage(msg);
 
-		final Map<Integer, MappingChannelObject> mappingChannleList = new HashMap<Integer, MappingChannelObject>();
 		msg = waitForRCC(rqId);
-		int count = msg.getFieldAsInt32(NXCPCodes.VID_NUM_VARIABLES);
 		long baseIndex = NXCPCodes.VID_VARLIST_BASE;
-		for (int i = 0; i < count; i++, baseIndex += 10) 
-		{
-			int  id = msg.getFieldAsInt32(baseIndex);
-			String  cHomeId = msg.getFieldAsString(baseIndex + 1);
-			String cHomeName = msg.getFieldAsString(baseIndex + 2);
-			String  cMonitorId = msg.getFieldAsString(baseIndex + 3);
-			String cMonitorName = msg.getFieldAsString(baseIndex + 4);
-			long  timeSync = msg.getFieldAsInt64(baseIndex + 5);
-			int  statusSync = msg.getFieldAsInt32(baseIndex + 6);
-			String  lastSyncTime = msg.getFieldAsString(baseIndex + 7);
-			String  downloadCusterID = msg.getFieldAsString(baseIndex + 8);
-			String  renderClusterId = msg.getFieldAsString(baseIndex + 9);
-			String  uploadClusterId = msg.getFieldAsString(baseIndex + 10);
-			mappingChannleList.put(id , new MappingChannelObject( id, cHomeId, cMonitorId,  
-					timeSync, statusSync, lastSyncTime, downloadCusterID, renderClusterId, uploadClusterId));
+		int  id = msg.getFieldAsInt32(baseIndex);
+		String  vIntro = msg.getFieldAsString(baseIndex + 1);
+		String  vOutro = msg.getFieldAsString(baseIndex + 2);
+		String  vLogo = msg.getFieldAsString(baseIndex + 3);
+		String  titleTemp = msg.getFieldAsString(baseIndex + 4);
+		String  descTemp = msg.getFieldAsString(baseIndex + 5);
+		String  tagTemp = msg.getFieldAsString(baseIndex + 6);	
+		int  enableIntro = msg.getFieldAsInt32(baseIndex + 7);
+		int  enableOutro = msg.getFieldAsInt32(baseIndex + 8);
+		int  enableLogo = msg.getFieldAsInt32(baseIndex + 9);
+		int  enableTitle = msg.getFieldAsInt32(baseIndex + 10);
+		int  enableDesc = msg.getFieldAsInt32(baseIndex + 11);
+		int  enableTags = msg.getFieldAsInt32(baseIndex + 12);
 
-		}
-		return mappingChannleList.values().toArray();
+
+		SpiderDefine spiderDefine = new SpiderDefine();
+		MappingConfig mappingConfig = null;
+		RenderConfig renderConfig = spiderDefine.new RenderConfig(vIntro, vOutro, 
+				vLogo, enableIntro == 1, enableOutro == 1, enableLogo == 1);
+		UploadConfig uploadConfig = spiderDefine.new UploadConfig(titleTemp, descTemp, 
+				tagTemp, enableTitle == 1, enableDesc == 1, enableTags == 1);
+		MappingChannelObject object = new MappingChannelObject( mappingConfig, 
+				renderConfig, uploadConfig);
+		return object;
 	}
 
 	/**
@@ -3908,12 +3918,14 @@ public class NXCSession {
 	}
 
 	public void createGoogleAccount(String userName, String api, 
-			String clientSecret, int accountType, String appName) throws IOException, NXCException
-			{
+			String clientSecret, String clientId, int accountType, String appName) 
+					throws IOException, NXCException
+					{
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_CREATE_GOOGLE_ACCOUNT);
 		msg.setField(SpiderCodes.VID_GOOGLE_USER_NAME, userName);
 		msg.setField(SpiderCodes.VID_GOOGLE_API, api);
 		msg.setField(SpiderCodes.VID_GOOGLE_CLIENT_SECRET, clientSecret);
+		msg.setField(SpiderCodes.VID_GOOGLE_CLIENT_ID, clientId);
 		msg.setFieldInt32(SpiderCodes.VID_GOOGLE_ACCOUNT_TYPE, accountType);
 		msg.setField(SpiderCodes.VID_GOOGLE_APP_NAME, appName);
 		sendMessage(msg);
@@ -3925,16 +3937,18 @@ public class NXCSession {
 		}
 		sendNotification(new SessionNotification(
 				SessionNotification.GOOGLE_ACCOUNT_CHANGED, code));
-			}
+					}
 
 	public void modifyGoogleAccount(int id, String userName, String api, 
-			String clientSecret, int accountType, String appName) throws IOException, NXCException
-			{
+			String clientSecret, String clientId,  int accountType, String appName) 
+					throws IOException, NXCException
+					{
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_MOD_GOOGLE_ACCOUNT);
 		msg.setFieldInt32(SpiderCodes.VID_GOOGLE_RECORD_ID, id);
 		msg.setField(SpiderCodes.VID_GOOGLE_USER_NAME, userName);
 		msg.setField(SpiderCodes.VID_GOOGLE_API, api);
 		msg.setField(SpiderCodes.VID_GOOGLE_CLIENT_SECRET, clientSecret);
+		msg.setField(SpiderCodes.VID_GOOGLE_CLIENT_ID, clientId);
 		msg.setFieldInt32(SpiderCodes.VID_GOOGLE_ACCOUNT_TYPE, accountType);
 		msg.setField(SpiderCodes.VID_GOOGLE_APP_NAME, appName);
 		sendMessage(msg);
@@ -3944,53 +3958,37 @@ public class NXCSession {
 		if (code == 0) //RCC_SUCCESS
 			sendNotification(new SessionNotification(
 					SessionNotification.GOOGLE_ACCOUNT_CHANGED, code));
-			}
+					}
 
-	public void createHomeCHannel(String cId, String cName, String gAccount, 
-			String vIntro, String vOutro, String logo, String desc, String title, String tags) 
-					throws IOException, NXCException
-					{
+	public void createHomeCHannel(String cId, String cName, String gAccount) 
+			throws IOException, NXCException
+			{
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_CREATE_HOME_CHANNEL);
 		msg.setField(SpiderCodes.VID_HOME_CHANNEL_ID, cId);
 		msg.setField(SpiderCodes.VID_HOME_CHANNEL_NAME, cName);
 		msg.setField(SpiderCodes.VID_HOME_CHANNEL_GACCOUNT, gAccount);
-		msg.setField(SpiderCodes.VID_HOME_CHANNEL_VINTRO, vIntro);
-		msg.setField(SpiderCodes.VID_HOME_CHANNEL_VOUTRO, vOutro);
-		msg.setField(SpiderCodes.VID_HOME_CHANNEL_LOGO, logo);
-		msg.setField(SpiderCodes.VID_HOME_CHANNEL_DESC, desc);
-		msg.setField(SpiderCodes.VID_HOME_CHANNEL_TITLE, title);
-		msg.setField(SpiderCodes.VID_HOME_CHANNEL_TAGS, tags);
-		System.out.println("tags = " + tags);
 		sendMessage(msg);
 		msg = waitForRCC(msg.getMessageId());
 		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
 		if (code == 0) //RCC_SUCCESS
 			sendNotification(new SessionNotification(
 					SessionNotification.HOME_CHANNEL_CHANGED, code));
-					}
+			}
 
-	public void modifyHomeCHannel(int id, String cId, String cName, String gAccount, 
-			String vIntro, String vOutro, String logo, String desc, String title, String tags) 
-					throws IOException, NXCException
-					{
+	public void modifyHomeCHannel(int id, String cId, String cName, String gAccount) 
+			throws IOException, NXCException
+			{
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_MOD_HOME_CHANNEL);
 		msg.setFieldInt32(SpiderCodes.VID_HOME_CHANNEL_RECORD_ID, id);
 		msg.setField(SpiderCodes.VID_HOME_CHANNEL_ID, cId);
 		msg.setField(SpiderCodes.VID_HOME_CHANNEL_NAME, cName);
-		msg.setField(SpiderCodes.VID_HOME_CHANNEL_GACCOUNT, gAccount);
-		msg.setField(SpiderCodes.VID_HOME_CHANNEL_VINTRO, vIntro);
-		msg.setField(SpiderCodes.VID_HOME_CHANNEL_VOUTRO, vOutro);
-		msg.setField(SpiderCodes.VID_HOME_CHANNEL_LOGO, logo);
-		msg.setField(SpiderCodes.VID_HOME_CHANNEL_DESC, desc);
-		msg.setField(SpiderCodes.VID_HOME_CHANNEL_TITLE, title);
-		msg.setField(SpiderCodes.VID_HOME_CHANNEL_TAGS, tags);
 		sendMessage(msg);
 		msg = waitForRCC(msg.getMessageId());
 		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
 		if (code == 0) //RCC_SUCCESS
 			sendNotification(new SessionNotification(
 					SessionNotification.HOME_CHANNEL_CHANGED, code));
-					}
+			}
 
 	public void modifyCluster(int recordId, String clusterId, String clusterName, String ipAddress, int port, int clusterType) 
 			throws IOException, NXCException
@@ -4067,20 +4065,35 @@ public class NXCSession {
 	}
 
 
-	public int createMappingChannel(String cHomeId, String cMonitorId, int timeSync, int statusSync, 
-			int lastSyncTime, String downloadCluster, String renderCluster, String uploadCluster) 
-					throws IOException, NXCException
-					{
+	public int createMappingChannel(MappingConfig mappingConfig, RenderConfig renderConfig, 
+			UploadConfig uploadConfig) throws IOException, NXCException
+			{
 		int errorCode = 0;
+		//mapping config
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_CREATE_MAPPING_CHANNEL);
-		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_HOME_ID, cHomeId);
-		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_MONITOR_ID, cMonitorId);
-		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_TIME_SYNC, timeSync);
-		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_STATUS_SYNC, statusSync);
-		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_LAST_SYNC_TIME, lastSyncTime);
-		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID, downloadCluster);
-		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID, renderCluster);
-		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID, uploadCluster);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_HOME_ID, mappingConfig.cHomeId);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_MONITOR_ID, mappingConfig.cMonitorId);
+		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_TIME_SYNC, (int) mappingConfig.timeSync);
+		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_STATUS_SYNC, mappingConfig.statusSync);
+		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_LAST_SYNC_TIME, 0);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID, mappingConfig.downloadClusterId);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID, mappingConfig.renderClusterId);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID, mappingConfig.uploadClusterId);
+		//render config
+		msg.setField(SpiderCodes.VID_VIDEO_INTRO, renderConfig.vIntro);
+		msg.setField(SpiderCodes.VID_VIDEO_OUTRO, renderConfig.vOutro);
+		msg.setField(SpiderCodes.VID_VIDEO_LOGO, renderConfig.vLogo);
+		msg.setFieldInt32(SpiderCodes.VID_ENABLE_VIDEO_INTRO, renderConfig.enableIntro ? 1: 0);
+		msg.setFieldInt32(SpiderCodes.VID_ENABLE_VIDEO_OUTRO, renderConfig.enableOutro ? 1: 0);
+		msg.setFieldInt32(SpiderCodes.VID_ENABLE_VIDEO_LOGO, renderConfig.enableLogo ? 1: 0);
+		//upload config
+		msg.setField(SpiderCodes.VID_VIDEO_TITLE_TEMPLATE, uploadConfig.titleTemp);
+		msg.setField(SpiderCodes.VID_VIDEO_DESC_TEMPLATE, uploadConfig.descTemp);
+		msg.setField(SpiderCodes.VID_VIDEO_TAGS_TEMPLATE, uploadConfig.tagTemp);
+		msg.setFieldInt32(SpiderCodes.VID_ENABLE_TITLE_TEMPLATE, uploadConfig.enableTitle ? 1: 0);
+		msg.setFieldInt32(SpiderCodes.VID_ENABLE_DESC_TEMPLATE, uploadConfig.enableDesc ? 1: 0);
+		msg.setFieldInt32(SpiderCodes.VID_ENABLE_TAGS_TEMPLATE, uploadConfig.enableTag ? 1: 0);
+
 		sendMessage(msg);
 		msg = waitForRCC(msg.getMessageId());
 		errorCode = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
@@ -4091,7 +4104,7 @@ public class NXCSession {
 			sendNotification(new SessionNotification(
 					SessionNotification.MAPPING_CHANNEL_CHANGED, errorCode));
 		return errorCode;
-					}
+			}
 
 	public int createCluster(String clusterId, String clusterName, String ipAddress, 
 			int port, int clusterType)  throws IOException, NXCException
@@ -4143,19 +4156,37 @@ public class NXCSession {
 		return code;
 			}
 
-	public void modifyMappingChannel(int id, String cHomeId, String cMonitorId, int timeSync, int statusSync, 
-			String downloadCluster, String renderCluster, String uploadCluster) 
+	public void modifyMappingChannel(MappingConfig mappingConifg, 
+			RenderConfig renderConfig, UploadConfig uploadConfig) 
 					throws IOException, NXCException
 					{
+		//mapping config
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_MOD_MAPPING_CHANNEL);
-		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_RECORD_ID, id);
-		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_HOME_ID, cHomeId);
-		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_MONITOR_ID, cMonitorId);
-		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_TIME_SYNC, timeSync);
-		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_STATUS_SYNC, statusSync);
-		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID, downloadCluster);
-		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID, renderCluster);
-		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID, uploadCluster);
+		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_RECORD_ID, mappingConifg.mappingId);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_HOME_ID, mappingConifg.cHomeId);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_MONITOR_ID, mappingConifg.cMonitorId);
+		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_TIME_SYNC, (int) mappingConifg.timeSync);
+		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_STATUS_SYNC, mappingConifg.statusSync);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID, mappingConifg.downloadClusterId);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID, mappingConifg.renderClusterId);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID, mappingConifg.uploadClusterId);
+		
+		//render config
+		msg.setField(SpiderCodes.VID_VIDEO_INTRO, renderConfig.vIntro);
+		msg.setField(SpiderCodes.VID_VIDEO_OUTRO, renderConfig.vOutro);
+		msg.setField(SpiderCodes.VID_VIDEO_LOGO, renderConfig.vLogo);
+		msg.setFieldInt32(SpiderCodes.VID_ENABLE_VIDEO_INTRO,renderConfig.enableIntro ? 1 : 0);
+		msg.setFieldInt32(SpiderCodes.VID_ENABLE_VIDEO_OUTRO, renderConfig.enableOutro ? 1 : 0);
+		msg.setFieldInt32(SpiderCodes.VID_ENABLE_VIDEO_LOGO, renderConfig.enableLogo ? 1 : 0);
+		
+		//Upload config
+		msg.setField(SpiderCodes.VID_VIDEO_TITLE_TEMPLATE, uploadConfig.titleTemp);
+		msg.setField(SpiderCodes.VID_VIDEO_DESC_TEMPLATE, uploadConfig.descTemp);
+		msg.setField(SpiderCodes.VID_VIDEO_TAGS_TEMPLATE, uploadConfig.tagTemp);
+		msg.setFieldInt32(SpiderCodes.VID_ENABLE_TITLE_TEMPLATE,uploadConfig.enableTitle ? 1 : 0);
+		msg.setFieldInt32(SpiderCodes.VID_ENABLE_DESC_TEMPLATE,uploadConfig.enableDesc ? 1 : 0);
+		msg.setFieldInt32(SpiderCodes.VID_ENABLE_TAGS_TEMPLATE,uploadConfig.enableTag ? 1 : 0);
+		
 		sendMessage(msg);
 		msg = waitForRCC(msg.getMessageId());
 		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);

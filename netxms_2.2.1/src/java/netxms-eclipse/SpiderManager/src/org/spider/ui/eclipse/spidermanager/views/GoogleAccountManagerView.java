@@ -54,8 +54,9 @@ public class GoogleAccountManagerView extends LogViewer {
 	public static final int COLUMN_USER_NAME 		= 1;
 	public static final int COLUMN_API 				= 2;
 	public static final int COLUMN_CLIENT_SECRET 	= 3;
-	public static final int COLUMN_ACCOUNT_TYPE 	= 4;
-	public static final int COLUMN_APPNAME 			= 5;
+	public static final int COLUMN_CLIENT_ID	 	= 4;
+	public static final int COLUMN_ACCOUNT_TYPE 	= 5;
+	public static final int COLUMN_APPNAME 			= 6;
 
 
 	@Override
@@ -187,7 +188,7 @@ public class GoogleAccountManagerView extends LogViewer {
 				protected void runInternal(IProgressMonitor monitor)
 						throws Exception {
 					session.createGoogleAccount(dlg.getUserName(), dlg.getApiKey(), 
-							dlg.getClientSecret(), dlg.getAccountType(), dlg.getAppName());
+							dlg.getClientSecret(), dlg.getClientId(), dlg.getAccountType(), dlg.getAppName());
 				}
 
 				@Override
@@ -218,6 +219,7 @@ public class GoogleAccountManagerView extends LogViewer {
 				selection[0].getText(COLUMN_USER_NAME),
 				selection[0].getText(COLUMN_API),
 				selection[0].getText(COLUMN_CLIENT_SECRET),
+				selection[0].getText(COLUMN_CLIENT_ID),
 				Integer.parseInt(selection[0].getText(COLUMN_ACCOUNT_TYPE)),
 				selection[0].getText(COLUMN_APPNAME));
 
@@ -229,7 +231,7 @@ public class GoogleAccountManagerView extends LogViewer {
 				protected void runInternal(IProgressMonitor monitor)
 						throws Exception {
 					session.modifyGoogleAccount(dlg.getId(), dlg.getUserName(), dlg.getApiKey(), 
-							dlg.getClientSecret(), dlg.getAccountType(),dlg.getAppName());
+							dlg.getClientSecret(), dlg.getClientId(), dlg.getAccountType(),dlg.getAppName());
 				}
 
 				@Override

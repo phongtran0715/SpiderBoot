@@ -1252,22 +1252,18 @@ typedef struct
 #define VID_GOOGLE_CLIENT_SECRET    ((UINT32)1005)
 #define VID_GOOGLE_ACCOUNT_TYPE     ((UINT32)1006)
 #define VID_GOOGLE_APP_NAME         ((UINT32)1007)
+#define VID_GOOGLE_CLIENT_ID        ((UINT32)1008)
 #define VID_GOOGLE_END              ((UINT32)1015)
 //end google account
 
 //home channel variable
 #define VID_HOME_CHANNEL_START       ((UINT32)1016)
-#define VID_HOME_CHANNEL_ID          ((UINT32)1017)
-#define VID_HOME_CHANNEL_NAME        ((UINT32)1018)
-#define VID_HOME_CHANNEL_GACCOUNT    ((UINT32)1019)
-#define VID_HOME_CHANNEL_VINTRO      ((UINT32)1020)
-#define VID_HOME_CHANNEL_VOUTRO      ((UINT32)1021)
-#define VID_HOME_CHANNEL_LOGO        ((UINT32)1022)
-#define VID_HOME_CHANNEL_DESC        ((UINT32)1023)
-#define VID_HOME_CHANNEL_TITLE       ((UINT32)1024)
-#define VID_HOME_CHANNEL_RECORD_ID   ((UINT32)1025)
-#define VID_HOME_CHANNEL_TAGS        ((UINT32)1026)
+#define VID_HOME_CHANNEL_RECORD_ID   ((UINT32)1017)
+#define VID_HOME_CHANNEL_ID          ((UINT32)1018)
+#define VID_HOME_CHANNEL_NAME        ((UINT32)1019)
+#define VID_HOME_CHANNEL_GACCOUNT    ((UINT32)1020)
 #define VID_HOME_CHANNEL_END         ((UINT32)1030)
+
 //end home channel variable
 
 //monitor channel variable
@@ -1290,17 +1286,29 @@ typedef struct
 #define VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID    ((UINT32)1054)
 #define VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID      ((UINT32)1055)
 #define VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID      ((UINT32)1056)
-#define VID_MAPPING_CHANNEL_END                    ((UINT32)1060)
+#define VID_VIDEO_INTRO                            ((UINT32)1057)
+#define VID_VIDEO_OUTRO                            ((UINT32)1058)
+#define VID_VIDEO_LOGO                             ((UINT32)1059)
+#define VID_VIDEO_TITLE_TEMPLATE                   ((UINT32)1060)
+#define VID_VIDEO_DESC_TEMPLATE                    ((UINT32)1061)
+#define VID_VIDEO_TAGS_TEMPLATE                    ((UINT32)1062)
+#define VID_ENABLE_VIDEO_INTRO                     ((UINT32)1063)
+#define VID_ENABLE_VIDEO_OUTRO                     ((UINT32)1064)
+#define VID_ENABLE_VIDEO_LOGO                      ((UINT32)1065)
+#define VID_ENABLE_TITLE_TEMPLATE                  ((UINT32)1066)
+#define VID_ENABLE_DESC_TEMPLATE                   ((UINT32)1067)
+#define VID_ENABLE_TAGS_TEMPLATE                   ((UINT32)1068)
+#define VID_MAPPING_CHANNEL_END                    ((UINT32)1100)
 
 //cluster variable
-#define VID_SPIDER_CLUSTER_START                   ((UINT32)1061)
-#define VID_SPIDER_CLUSTER_RECORD_ID               ((UINT32)1062)
-#define VID_SPIDER_CLUSTER_ID                      ((UINT32)1063)
-#define VID_SPIDER_CLUSTER_NAME                    ((UINT32)1064)
-#define VID_SPIDER_CLUSTER_IP_ADDRESS              ((UINT32)1065)
-#define VID_SPIDER_CLUSTER_PORT                    ((UINT32)1066)
-#define VID_SPIDER_CLUSTER_TYPE                    ((UINT32)1067)
-#define VID_SPIDER_CLUSTER_END                     ((UINT32)1075)
+#define VID_SPIDER_CLUSTER_START                   ((UINT32)1101)
+#define VID_SPIDER_CLUSTER_RECORD_ID               ((UINT32)1102)
+#define VID_SPIDER_CLUSTER_ID                      ((UINT32)1103)
+#define VID_SPIDER_CLUSTER_NAME                    ((UINT32)1104)
+#define VID_SPIDER_CLUSTER_IP_ADDRESS              ((UINT32)1105)
+#define VID_SPIDER_CLUSTER_PORT                    ((UINT32)1106)
+#define VID_SPIDER_CLUSTER_TYPE                    ((UINT32)1107)
+#define VID_SPIDER_CLUSTER_END                     ((UINT32)1120)
 //end cluster variable
 
 #define VID_SPIDER_END              ((UINT32)2000)

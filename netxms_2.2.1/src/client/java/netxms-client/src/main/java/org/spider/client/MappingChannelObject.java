@@ -1,105 +1,43 @@
 package org.spider.client;
 
+import org.spider.client.SpiderDefine.MappingConfig;
+import org.spider.client.SpiderDefine.RenderConfig;
+import org.spider.client.SpiderDefine.UploadConfig;
+
 public class MappingChannelObject {
-	int id;
-	String homeId;
-	String monitorId;
-	long timeIntervalSync;
-	int statusSync;
-	String lastSyncTime;
-	String downloadClusterId;
-	String renderClusterId;
-	String uploadClusterId;
-	
-	public MappingChannelObject() {
-	}
+	MappingConfig mappingConfig;
+	RenderConfig renderConfig;
+	UploadConfig uploadConfig;
 
-	public MappingChannelObject( int id, String homeId, 
-			 String monitorId,long timeIntervalSync, 
-			 int statusSync, String lastSyncTime, 
-			 String downloadClusterId, String renderClusterId, 
-			 String uploadClusterId) {
+	public MappingChannelObject(MappingConfig mappingConfig, 
+			RenderConfig renderConfig, UploadConfig uploadConfig) {
 		super();
-		this.id = id;
-		this.homeId = homeId;
-		this.monitorId = monitorId;
-		this.timeIntervalSync = timeIntervalSync;
-		this.statusSync = statusSync;
-		this.lastSyncTime = lastSyncTime;
-		this.downloadClusterId = downloadClusterId;
-		this.renderClusterId = renderClusterId;
-		this.uploadClusterId = uploadClusterId;
+		this.mappingConfig = mappingConfig;
+		this.renderConfig = renderConfig;
+		this.uploadConfig = uploadConfig;
 	}
 
-	public int getId() {
-		return id;
+	public MappingConfig getMappingConfig() {
+		return mappingConfig;
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public void setMappingConfig(MappingConfig mappingConfig) {
+		this.mappingConfig = mappingConfig;
 	}
 
-	public String getHomeId() {
-		return homeId;
+	public RenderConfig getRenderConfig() {
+		return renderConfig;
 	}
 
-	public void setHomeId(String homeId) {
-		this.homeId = homeId;
+	public void setRenderConfig(RenderConfig renderConfig) {
+		this.renderConfig = renderConfig;
 	}
 
-	public String getMonitorId() {
-		return monitorId;
+	public UploadConfig getUploadConfig() {
+		return uploadConfig;
 	}
 
-	public void setMonitorId(String monitorId) {
-		this.monitorId = monitorId;
-	}
-
-	public long getTimeIntervalSync() {
-		return timeIntervalSync;
-	}
-
-	public void setTimeIntervalSync(long timeIntervalSync) {
-		this.timeIntervalSync = timeIntervalSync;
-	}
-
-	public int getStatusSync() {
-		return statusSync;
-	}
-
-	public void setStatusSync(int statusSync) {
-		this.statusSync = statusSync;
-	}
-
-	public String getLastSyncTime() {
-		return lastSyncTime;
-	}
-
-	public void setLastSyncTime(String lastSyncTime) {
-		this.lastSyncTime = lastSyncTime;
-	}
-
-	public String getDownloadClusterId() {
-		return downloadClusterId;
-	}
-
-	public void setDownloadClusterId(String downloadClusterId) {
-		this.downloadClusterId = downloadClusterId;
-	}
-
-	public String getRenderClusterId() {
-		return renderClusterId;
-	}
-
-	public void setRenderClusterId(String renderClusterId) {
-		this.renderClusterId = renderClusterId;
-	}
-
-	public String getUploadClusterId() {
-		return uploadClusterId;
-	}
-
-	public void setUploadClusterId(String uploadClusterId) {
-		this.uploadClusterId = uploadClusterId;
+	public void setUploadConfig(UploadConfig uploadConfig) {
+		this.uploadConfig = uploadConfig;
 	}
 }

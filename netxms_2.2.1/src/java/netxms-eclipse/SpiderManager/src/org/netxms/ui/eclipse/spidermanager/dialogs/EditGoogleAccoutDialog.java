@@ -24,15 +24,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Combo;
 import org.spider.base.SpiderCodes;
 import org.spider.client.GoogleAccountObject;
@@ -45,6 +41,7 @@ public class EditGoogleAccoutDialog extends Dialog {
 	GoogleAccountObject object;
 	private Text txtUserName;
 	private Text txtClientSecret;
+	private Text txtClientId;
 	private Text txtAppName;
 	private Text txtApiKey;
 	Combo cbAccountType;
@@ -52,6 +49,7 @@ public class EditGoogleAccoutDialog extends Dialog {
 	private int id;
 	private String userName;
 	private String clientSecret;
+	private String clientId;
 	private String appName;
 	private String apiKey;
 	private int accountType;
@@ -76,7 +74,7 @@ public class EditGoogleAccoutDialog extends Dialog {
 
 		Group grpCreateNewAccount = new Group(dialogArea, SWT.NONE);
 		grpCreateNewAccount.setText("Create new account");
-		grpCreateNewAccount.setBounds(5, 10, 516, 217);
+		grpCreateNewAccount.setBounds(5, 10, 435, 236);
 
 		Label label = new Label(grpCreateNewAccount, SWT.NONE);
 		label.setAlignment(SWT.RIGHT);
@@ -99,49 +97,39 @@ public class EditGoogleAccoutDialog extends Dialog {
 		Label label_2 = new Label(grpCreateNewAccount, SWT.NONE);
 		label_2.setAlignment(SWT.RIGHT);
 		label_2.setText("App Name");
-		label_2.setBounds(10, 101, 95, 17);
+		label_2.setBounds(10, 132, 95, 17);
 
 		txtAppName = new Text(grpCreateNewAccount, SWT.BORDER);
 		txtAppName.setTextLimit(150);
-		txtAppName.setBounds(111, 96, 310, 27);
+		txtAppName.setBounds(111, 127, 310, 27);
 
 		Label label_3 = new Label(grpCreateNewAccount, SWT.NONE);
 		label_3.setAlignment(SWT.RIGHT);
 		label_3.setText("API Key");
-		label_3.setBounds(10, 134, 95, 17);
+		label_3.setBounds(10, 165, 95, 17);
 
 		txtApiKey = new Text(grpCreateNewAccount, SWT.BORDER);
 		txtApiKey.setTextLimit(150);
-		txtApiKey.setBounds(111, 129, 310, 27);
-
-		Button btnClientSecret = new Button(grpCreateNewAccount, SWT.NONE);
-		btnClientSecret.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
-				fd.setText("Select client secret file");
-				fd.setFilterExtensions(new String[] {"*.*" });
-				fd.setFilterNames(new String[] {
-				"All file" });
-				String fileName = fd.open();
-				if(fileName != null)
-				{
-					txtClientSecret.setText(fileName);	
-				}
-			}
-		});
-		btnClientSecret.setText("Browse...");
-		btnClientSecret.setBounds(427, 60, 71, 29);
+		txtApiKey.setBounds(111, 160, 310, 27);
 		
 		Label lblAccountType = new Label(grpCreateNewAccount, SWT.NONE);
 		lblAccountType.setAlignment(SWT.RIGHT);
 		lblAccountType.setText("Account Type");
-		lblAccountType.setBounds(10, 167, 95, 17);
+		lblAccountType.setBounds(10, 201, 95, 17);
 		
 		cbAccountType = new Combo(grpCreateNewAccount, SWT.NONE);
 		cbAccountType.setItems(new String[] {"Helper", "SEO", "Adsend"});
-		cbAccountType.setBounds(111, 162, 310, 29);
+		cbAccountType.setBounds(111, 196, 310, 29);
 		cbAccountType.select(0);
+		
+		Label lblClientId = new Label(grpCreateNewAccount, SWT.NONE);
+		lblClientId.setText("Client Id");
+		lblClientId.setAlignment(SWT.RIGHT);
+		lblClientId.setBounds(10, 99, 95, 17);
+		
+		txtClientId = new Text(grpCreateNewAccount, SWT.BORDER);
+		txtClientId.setTextLimit(150);
+		txtClientId.setBounds(111, 94, 310, 27);
 		initData();
 		return dialogArea;
 	}
@@ -151,6 +139,7 @@ public class EditGoogleAccoutDialog extends Dialog {
 		id = object.getId();
 		txtUserName.setText(object.getUserName());
 		txtClientSecret.setText(object.getClientSecret());
+		txtClientId.setText(object.getClientId());
 		txtApiKey.setText(object.getApi());
 		txtAppName.setText(object.getAppName());
 		switch (object.getAccountType()) {
@@ -167,8 +156,6 @@ public class EditGoogleAccoutDialog extends Dialog {
 			break;
 		}
 	}
-	
-
 
 	@Override
 	protected void configureShell(Shell newShell) {
@@ -180,6 +167,7 @@ public class EditGoogleAccoutDialog extends Dialog {
 	protected void okPressed() {
 		userName = txtUserName.getText();
 		clientSecret = txtClientSecret.getText();
+		clientId = txtClientId.getText();
 		appName = txtAppName.getText();
 		apiKey = txtApiKey.getText();
 		
@@ -226,5 +214,12 @@ public class EditGoogleAccoutDialog extends Dialog {
 	public int getId() {
 		return id;
 	}
-	
+
+	public String getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
+	}
 }

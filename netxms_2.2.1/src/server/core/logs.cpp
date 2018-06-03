@@ -106,7 +106,8 @@ static NXCORE_LOG s_logs[] =
 			{ _T("UserName"), _T("User Name"), LC_TEXT },
 			{ _T("Api"), _T("API Key"), LC_TEXT },
 			{ _T("ClientSecret"), _T("ClientSecret"), LC_TEXT },
-			{ _T("AccountType"), _T("Account Type"), LC_TEXT },
+			{ _T("ClientId"), _T("ClientId"), LC_TEXT },
+			{ _T("AccountType"), _T("Account Type"), LC_INTEGER },
 			{ _T("AppName"), _T("App Name"), LC_TEXT },
 			{ NULL, NULL, 0 }
 		}
@@ -117,12 +118,6 @@ static NXCORE_LOG s_logs[] =
 			{ _T("ChannelId"), _T("Channel Id"), LC_TEXT },
 			{ _T("ChannelName"), _T("Channel Name"), LC_TEXT },
 			{ _T("GoogleAccount"), _T("Google Account"), LC_TEXT },
-			{ _T("VideoIntro"), _T("Video Intro"), LC_TEXT },
-			{ _T("VideoOutro"), _T("Video Outro"), LC_TEXT },
-			{ _T("Logo"), _T("Logo"), LC_TEXT },
-			{ _T("DescriptionTemplate"), _T("Description"), LC_TEXT },
-			{ _T("TitleTemplate"), _T("Title"), LC_TEXT },
-			{ _T("TagsTemplate"), _T("Tags"), LC_TEXT },
 			{ NULL, NULL, 0 }
 		}
 	},
@@ -140,7 +135,7 @@ static NXCORE_LOG s_logs[] =
 			{ _T("Id"), _T("ID"), LC_INTEGER },
 			{ _T("HomeChannelId"), _T("Home Channel Id"), LC_TEXT },
 			{ _T("MonitorChannelId"), _T("Monitor Channel Name"), LC_TEXT },
-			{ _T("TimeIntervalSync"), _T("Interval"), LC_TEXT },
+			{ _T("TimeIntervalSync"), _T("Interval"), LC_INTEGER },
 			{ _T("StatusSync"), _T("Status"), LC_INTEGER },
 			{ _T("LastSyncTime"), _T("LastSyncTime"), LC_INTEGER },
 			{ _T("DownloadClusterId"), _T("DownloadClusterId"), LC_TEXT },

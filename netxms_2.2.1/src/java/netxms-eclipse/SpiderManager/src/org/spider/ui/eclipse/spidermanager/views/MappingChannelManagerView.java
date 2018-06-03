@@ -19,6 +19,8 @@ import org.netxms.ui.eclipse.logviewer.views.LogViewer;
 import org.netxms.ui.eclipse.spidermanager.dialogs.CreateMappingChannelDialog;
 import org.netxms.ui.eclipse.spidermanager.dialogs.EditMappingChannelDialog;
 import org.spider.client.MappingChannelObject;
+import org.spider.client.SpiderDefine;
+import org.spider.client.SpiderDefine.MappingConfig;
 import org.spider.ui.eclipse.spidermanager.Activator;
 
 /**
@@ -174,8 +176,8 @@ public class MappingChannelManagerView extends LogViewer {
 				@Override
 				protected void runInternal(IProgressMonitor monitor)
 						throws Exception {
-					session.createMappingChannel(dlg.getHomeChannelId(), dlg.getMonitorChannelId(), (int)dlg.getTimeSync(), 
-							dlg.getStatus(), 0, dlg.getDownloadClusterId(), dlg.getRenderClusterId(), dlg.getUploadClusterId());
+					session.createMappingChannel(dlg.getMappingConfig(), 
+							dlg.getRenderConfig(), dlg.getUploadConfig());
 				}
 
 				@Override
@@ -198,23 +200,33 @@ public class MappingChannelManagerView extends LogViewer {
 			dialog.open();
 			return;
 		}
-		MappingChannelObject objSelected = new MappingChannelObject(
+		SpiderDefine spiderDefine = new SpiderDefine();
+		MappingConfig mappingConfig = spiderDefine.new MappingConfig(
 				Integer.parseInt(selection[0].getText(COLUMN_ID)), 
 				selection[0].getText(COLUMN_HOME_CHANNEL_ID),
 				selection[0].getText(COLUMN_MONITOR_CHANNEL_ID),
 				Long.parseLong(selection[0].getText(COLUMN_TIME_SYNC)),
 				Integer.parseInt(selection[0].getText(COLUMN_STATUS_SYNC)),
-				selection[0].getText(COLUMN_LAST_SYNC_TIME), 
 				selection[0].getText(COLUMN_DOWNLOAD_ID), 
 				selection[0].getText(COLUMN_RENDER_ID), 
 				selection[0].getText(COLUMN_UPLOAD_ID));
-
-		final EditMappingChannelDialog dlg = new EditMappingChannelDialog(getViewSite().getShell(), objSelected);
+		int mappingId = Integer.parseInt(selection[0].getText(COLUMN_ID));
+		MappingChannelObject object = null;
+		try {
+			object = (MappingChannelObject) session.getMappingConfigById(mappingId);
+			object.setMappingConfig(mappingConfig);
+		} catch (IOException | NXCException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			System.out.println(e1.toString());
+			return;
+		}
+		
+		final EditMappingChannelDialog dlg = new EditMappingChannelDialog(getViewSite().getShell(), object);
 		if (dlg.open() == Window.OK) {
 			try {
-				session.modifyMappingChannel(dlg.getRecordId(), dlg.getHomeChannelId(), 
-						dlg.getMonitorChannelId(), (int)dlg.getTimeSync(),dlg.getStatus(), 
-						dlg.getDownloadClusterId(), dlg.getRenderClusterId(), dlg.getUploadClusterId());
+				session.modifyMappingChannel(dlg.getMappingConfig(), 
+						dlg.getRenderConfig(), dlg.getUploadConfig());
 			} catch (IOException | NXCException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

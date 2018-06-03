@@ -14116,8 +14116,9 @@ void ClientSession::getGoogleAccount(NXCPMessage *request)
             msg.setField(dwId + 1, DBGetField(hResult, i, 1, NULL, 0));    //UserName
             msg.setField(dwId + 2, DBGetField(hResult, i, 2, NULL, 0));    //API
             msg.setField(dwId + 3, DBGetField(hResult, i, 3, NULL, 0));    //Client Secrect
-            msg.setField(dwId + 4, DBGetFieldInt64(hResult, i, 4));        //Account Type
-            msg.setField(dwId + 5, DBGetField(hResult, i, 5, NULL, 0));    //AppName
+            msg.setField(dwId + 4, DBGetField(hResult, i, 4, NULL, 0));    //Client Id
+            msg.setField(dwId + 5, DBGetFieldInt64(hResult, i, 5));        //Account Type
+            msg.setField(dwId + 6, DBGetField(hResult, i, 6, NULL, 0));    //AppName
          }
          DBFreeResult(hResult);
       }
@@ -14213,7 +14214,9 @@ void ClientSession::getMappingChannels(NXCPMessage *request)
    msg.setId(request->getId());
 
    DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
-   DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT * FROM channel_mapping"));
+   DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT MappingId, VideoIntro, VideoOutro, Logo,  ")
+      _T(" TitleTemplate, DescTemplate, TagTemplate, EnableIntro, EnableOutro, EnableLogo, EnableTitle, ")
+      _T(" EnableDesc, EnableTag FROM spider_mapping_config"));
    if (hStmt != NULL)
    {
       hResult = DBSelectPrepared(hStmt);
@@ -14224,33 +14227,33 @@ void ClientSession::getMappingChannels(NXCPMessage *request)
          msg.setField(VID_RCC, RCC_SUCCESS);
          for (i = 0, dwId = VID_VARLIST_BASE; i < dwNumRecords; i++, dwId += 10)
          {
-            INT32 id             = DBGetFieldInt64(hResult, i, 0);
-            TCHAR* cHomeId       = DBGetField(hResult, i, 1, NULL, 0);
-            TCHAR* cMonitorId    = DBGetField(hResult, i, 2, NULL, 0);
-            INT32 timeSync       = DBGetFieldInt64(hResult, i, 3);
-            INT32 statusSync     = DBGetFieldInt64(hResult, i, 4);
-            INT32 lastSyncTime   = DBGetFieldInt64(hResult, i, 5);
-            TCHAR* downloadId    = DBGetField(hResult, i, 6, NULL, 0);
-            TCHAR* renderId      = DBGetField(hResult, i, 7, NULL, 0);
-            TCHAR* uploadId      = DBGetField(hResult, i, 8, NULL, 0);
-            TCHAR* cHomeName     = getChannelNameById(cHomeId, _T("home_channel_list"));
-            TCHAR* cMonitorName  = getChannelNameById(cMonitorId, _T("monitor_channel_list"));
-            char strLastSyncTime[20];
-            time_t temp = lastSyncTime;
-            struct tm ts = *localtime(&temp);
-            strftime(strLastSyncTime, sizeof(strLastSyncTime), "%Y-%m-%d %H:%M:%S ", &ts);
+            INT32 id             = DBGetFieldInt64(hResult, i, 0);            //Mapping Id     
+            TCHAR* vIntro        = DBGetField(hResult, i, 1, NULL, 0);        //Video Intro 
+            TCHAR* vOutro        = DBGetField(hResult, i, 2, NULL, 0);        //Video Outro
+            TCHAR* vLogo          = DBGetField(hResult, i, 3, NULL, 0);       //Logo
+            TCHAR* titleTemp     = DBGetField(hResult, i, 4, NULL, 0);        //Title template
+            TCHAR* descTemp      = DBGetField(hResult, i, 5, NULL, 0);        //Desc Template
+            TCHAR* tagTemp       = DBGetField(hResult, i, 6, NULL, 0);        //Tag Template
+            INT32 enableIntro    = DBGetFieldInt64(hResult, i, 7);            //Enable Intro
+            INT32 enableOutro    = DBGetFieldInt64(hResult, i, 8);            //Enable Outro
+            INT32 enableLogo     = DBGetFieldInt64(hResult, i, 9);            //Enable Logo
+            INT32 enableTitle    = DBGetFieldInt64(hResult, i, 10);           //Enable Title
+            INT32 enableDesc     = DBGetFieldInt64(hResult, i, 11);           //Enable Desc
+            INT32 enableTags     = DBGetFieldInt64(hResult, i, 12);           //Enable ags
 
             msg.setField(dwId, id);
-            msg.setField(dwId + 1, cHomeId);
-            msg.setField(dwId + 2, cHomeName);
-            msg.setField(dwId + 3, cMonitorId);
-            msg.setField(dwId + 4, cMonitorName);
-            msg.setField(dwId + 5, timeSync);
-            msg.setField(dwId + 6, statusSync);
-            msg.setField(dwId + 7, strLastSyncTime);
-            msg.setField(dwId + 8, downloadId);
-            msg.setField(dwId + 9, renderId);
-            msg.setField(dwId + 10, uploadId);
+            msg.setField(dwId + 1, vIntro);
+            msg.setField(dwId + 2, vOutro);
+            msg.setField(dwId + 3, vLogo);
+            msg.setField(dwId + 4, titleTemp);
+            msg.setField(dwId + 5, descTemp);
+            msg.setField(dwId + 6, tagTemp);
+            msg.setField(dwId + 7, enableIntro);
+            msg.setField(dwId + 8, enableOutro);
+            msg.setField(dwId + 9, enableLogo);
+            msg.setField(dwId + 10, enableTitle);
+            msg.setField(dwId + 11, enableDesc);
+            msg.setField(dwId + 12, enableTags);
          }
          DBFreeResult(hResult);
       }
@@ -14275,17 +14278,19 @@ void ClientSession::createGoogleAccount(NXCPMessage *request)
       TCHAR* userName = request->getFieldAsString(VID_GOOGLE_USER_NAME);
       TCHAR* api = request->getFieldAsString(VID_GOOGLE_API);
       TCHAR* clientSecret = request->getFieldAsString(VID_GOOGLE_CLIENT_SECRET);
+      TCHAR* clientId = request->getFieldAsString(VID_GOOGLE_CLIENT_ID);
       UINT32 accountType = request->getFieldAsUInt32(VID_GOOGLE_ACCOUNT_TYPE);
       TCHAR* appName = request->getFieldAsString(VID_GOOGLE_APP_NAME);
 
       debugPrintf(6, _T("ClientSession::[createGoogleAccount] ==== appName = %s"), appName);
 
-      hStmt = DBPrepare(hdb, _T("INSERT INTO google_account (UserName,Api,ClientSecret,AccountType,AppName) VALUES (?,?,?,?,?)"));
+      hStmt = DBPrepare(hdb, _T("INSERT INTO google_account (UserName,Api,ClientSecret,ClientId, AccountType,AppName) VALUES (?,?,?,?,?,?)"));
       DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)userName, DB_BIND_TRANSIENT);
       DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)api, DB_BIND_TRANSIENT);
       DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)clientSecret, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 4, DB_SQLTYPE_INTEGER, (INT32)accountType);
-      DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)appName, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)clientId, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 5, DB_SQLTYPE_INTEGER, (INT32)accountType);
+      DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)appName, DB_BIND_TRANSIENT);
       bool success = DBExecute(hStmt);
       if (success == true)
       {
@@ -14315,24 +14320,11 @@ void ClientSession::createHomeChannel(NXCPMessage *request)
       TCHAR* cId = request->getFieldAsString(VID_HOME_CHANNEL_ID);
       TCHAR* cName = request->getFieldAsString(VID_HOME_CHANNEL_NAME);
       TCHAR* googleAcc = request->getFieldAsString(VID_HOME_CHANNEL_GACCOUNT);
-      TCHAR* vIntro = request->getFieldAsString(VID_HOME_CHANNEL_VINTRO);
-      TCHAR* vOutro = request->getFieldAsString(VID_HOME_CHANNEL_VOUTRO);
-      TCHAR* logo = request->getFieldAsString(VID_HOME_CHANNEL_LOGO);
-      TCHAR* desc = request->getFieldAsString(VID_HOME_CHANNEL_DESC);
-      TCHAR* title = request->getFieldAsString(VID_HOME_CHANNEL_TITLE);
-      TCHAR* tags = request->getFieldAsString(VID_HOME_CHANNEL_TAGS);
 
-      hStmt = DBPrepare(hdb, _T("INSERT INTO home_channel_list (ChannelId, ChannelName, GoogleAccount, " )
-                        _T("VideoIntro, VideoOutro, Logo, DescriptionTemplate, TitleTemplate, TagsTemplate) VALUES (?,?,?,?,?,?,?,?,?)"));
+      hStmt = DBPrepare(hdb, _T("INSERT INTO home_channel_list (ChannelId, ChannelName, GoogleAccount) VALUES (?,?,?)"));
       DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)cId, DB_BIND_TRANSIENT);
       DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)cName, DB_BIND_TRANSIENT);
       DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)googleAcc, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)vIntro, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)vOutro, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)logo, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)desc, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 8, DB_SQLTYPE_VARCHAR, (const TCHAR *)title, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 9, DB_SQLTYPE_VARCHAR, (const TCHAR *)tags, DB_BIND_TRANSIENT);
       bool success = DBExecute(hStmt);
       if (success == true)
       {
@@ -14418,7 +14410,9 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
          if (success == true)
          {
             msg.setField(VID_RCC, RCC_SUCCESS);
-
+            INT32 mappingId = getMaxId(_T("channel_mapping"));
+            //Insert to spider mapping config
+            createSpiderMappingConfig(mappingId, request);
             if (statusSync == 1) //enable timer
             {
                //notify to download app
@@ -14427,10 +14421,10 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
                {
                   debugPrintf(6, _T("ClientSession::[%s] Init corba for download client successful!"), __FUNCTION__);
                   try {
-                     INT32 timerId = getMaxId(_T("channel_mapping"));
+
                      debugPrintf(1, _T("create home channel ID = %s"), cHomeId);
                      debugPrintf(1, _T("create monitor channel ID = %s"), cMonitorId);
-                     downloadClient->mDownloadRef->createMappingChannel(timerId, CORBA::wstring_dup(cHomeId),
+                     downloadClient->mDownloadRef->createMappingChannel(mappingId, CORBA::wstring_dup(cHomeId),
                            CORBA::wstring_dup(cMonitorId), CORBA::wstring_dup(downloadId), timeSync);
                   }
                   catch (CORBA::TRANSIENT&) {
@@ -14445,14 +14439,6 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
                } else {
                   debugPrintf(1, _T("ClientSession::[%s] Init corba for download client FALSE"), __FUNCTION__);
                }
-               //Trelease corba connection
-               /*
-               if (downloadClient != nullptr)
-               {
-                  delete downloadClient;
-                  downloadClient = nullptr;
-               }
-               */
             }
          }
          else
@@ -14472,6 +14458,109 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
    sendMessage(&msg);
 }
 
+void ClientSession::createSpiderMappingConfig(UINT32 mappingId, NXCPMessage *request)
+{
+   debugPrintf(1, _T("ClientSession::[%s]"), __FUNCTION__);
+   NXCPMessage msg;
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+
+   if (hdb != NULL)
+   {
+      // Prepare and execute INSERT or UPDATE query
+      //render config
+      TCHAR* vIntro = request->getFieldAsString(VID_VIDEO_INTRO);
+      TCHAR* vOutro = request->getFieldAsString(VID_VIDEO_OUTRO);
+      TCHAR* vLogo  = request->getFieldAsString(VID_VIDEO_LOGO);
+      INT32 enableIntro = request->getFieldAsInt32(VID_ENABLE_VIDEO_INTRO);
+      INT32 enableOutro = request->getFieldAsInt32(VID_ENABLE_VIDEO_OUTRO);
+      INT32 enableLogo = request->getFieldAsInt32(VID_ENABLE_VIDEO_LOGO);
+      //upload config
+      TCHAR* titleTemp = request->getFieldAsString(VID_VIDEO_TITLE_TEMPLATE);
+      TCHAR* descTemp = request->getFieldAsString(VID_VIDEO_DESC_TEMPLATE);
+      TCHAR* tagsTemp = request->getFieldAsString(VID_VIDEO_TAGS_TEMPLATE);
+      INT32 enableTitle = request->getFieldAsInt32(VID_ENABLE_TITLE_TEMPLATE);
+      INT32 enableDesc = request->getFieldAsInt32(VID_ENABLE_DESC_TEMPLATE);
+      INT32 enableTags = request->getFieldAsInt32(VID_ENABLE_TAGS_TEMPLATE);
+
+      hStmt = DBPrepare(hdb, _T("INSERT INTO spider_mapping_config (MappingId, VideoIntro, VideoOutro, ")
+                        _T(" Logo, TitleTemplate, DescTemplate, TagTemplate, ")
+                        _T(" EnableIntro, EnableOutro, EnableLogo, EnableTitle, EnableDesc, EnableTag)")
+                        _T(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"));
+      DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, mappingId);
+      DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)vIntro, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)vOutro, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)vLogo, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)titleTemp, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)descTemp, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)tagsTemp, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 8, DB_SQLTYPE_INTEGER, enableIntro);
+      DBBind(hStmt, 9, DB_SQLTYPE_INTEGER, enableOutro);
+      DBBind(hStmt, 10, DB_SQLTYPE_INTEGER, enableLogo);
+      DBBind(hStmt, 11, DB_SQLTYPE_INTEGER, enableTitle);
+      DBBind(hStmt, 12, DB_SQLTYPE_INTEGER, enableDesc);
+      DBBind(hStmt, 13, DB_SQLTYPE_INTEGER, enableLogo);
+      bool success = DBExecute(hStmt);
+      if (success == true)
+      {
+         msg.setField(VID_RCC, RCC_SUCCESS);
+      }
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+}
+
+void ClientSession::modifySpiderMappingConfig(UINT32 mappingId, NXCPMessage * request)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+
+   if (hdb != NULL)
+   {
+      // Prepare and execute INSERT or UPDATE query
+      //render config
+      TCHAR* vIntro = request->getFieldAsString(VID_VIDEO_INTRO);
+      TCHAR* vOutro = request->getFieldAsString(VID_VIDEO_OUTRO);
+      TCHAR* vLogo  = request->getFieldAsString(VID_VIDEO_LOGO);
+      INT32 enableIntro = request->getFieldAsInt32(VID_ENABLE_VIDEO_INTRO);
+      INT32 enableOutro = request->getFieldAsInt32(VID_ENABLE_VIDEO_OUTRO);
+      INT32 enableLogo = request->getFieldAsInt32(VID_ENABLE_VIDEO_LOGO);
+      //upload config
+      TCHAR* titleTemp = request->getFieldAsString(VID_VIDEO_TITLE_TEMPLATE);
+      TCHAR* descTemp = request->getFieldAsString(VID_VIDEO_DESC_TEMPLATE);
+      TCHAR* tagsTemp = request->getFieldAsString(VID_VIDEO_TAGS_TEMPLATE);
+      INT32 enableTitle = request->getFieldAsInt32(VID_ENABLE_TITLE_TEMPLATE);
+      INT32 enableDesc = request->getFieldAsInt32(VID_ENABLE_DESC_TEMPLATE);
+      INT32 enableTags = request->getFieldAsInt32(VID_ENABLE_TAGS_TEMPLATE);
+
+      hStmt = DBPrepare(hdb, _T("UPDATE spider_mapping_config SET VideoIntro = ?, VideoOutro = ?, Logo = ?, ")
+                        _T(" TitleTemplate = ?, DescTemplate = ?, TagTemplate = ?, EnableIntro = ?, ")
+                        _T(" EnableOutro = ?, EnableLogo = ?, EnableTitle = ?, EnableDesc = ?, EnableTag = ? WHERE MappingId = ?"));
+      
+      DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)vIntro, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)vOutro, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)vLogo, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)titleTemp, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)descTemp, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)tagsTemp, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 7, DB_SQLTYPE_INTEGER, enableIntro);
+      DBBind(hStmt, 8, DB_SQLTYPE_INTEGER, enableOutro);
+      DBBind(hStmt, 9, DB_SQLTYPE_INTEGER, enableLogo);
+      DBBind(hStmt, 10, DB_SQLTYPE_INTEGER, enableTitle);
+      DBBind(hStmt, 11, DB_SQLTYPE_INTEGER, enableDesc);
+      DBBind(hStmt, 12, DB_SQLTYPE_INTEGER, enableLogo);
+      DBBind(hStmt, 13, DB_SQLTYPE_INTEGER, mappingId);
+
+      bool success = DBExecute(hStmt);
+      if(success == false)
+      {
+         debugPrintf(1, _T("Function :: [modifySpiderMappingConfig] Execte database query FALSE!!!"));
+      }
+
+   }
+   DBConnectionPoolReleaseConnection(hdb);
+}
+
 void ClientSession::modifyGoogleAccount(NXCPMessage * request)
 {
    debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
@@ -14489,17 +14578,19 @@ void ClientSession::modifyGoogleAccount(NXCPMessage * request)
       TCHAR* userName = request->getFieldAsString(VID_GOOGLE_USER_NAME);
       TCHAR* api = request->getFieldAsString(VID_GOOGLE_API);
       TCHAR* clientSecret = request->getFieldAsString(VID_GOOGLE_CLIENT_SECRET);
+      TCHAR* clientId = request->getFieldAsString(VID_GOOGLE_CLIENT_ID);
       UINT32 accountType = request->getFieldAsUInt32(VID_GOOGLE_ACCOUNT_TYPE);
       TCHAR* appName = request->getFieldAsString(VID_GOOGLE_APP_NAME);
 
       hStmt = DBPrepare(hdb, _T("UPDATE google_account SET UserName = ?, Api = ?, ClientSecret = ?, ")
-                        _T(" AccountType = ?, AppName = ? WHERE Id = ?"));
+                        _T(" ClientId = ?, AccountType = ?, AppName = ? WHERE Id = ?"));
       DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)userName, DB_BIND_TRANSIENT);
       DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)api, DB_BIND_TRANSIENT);
       DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)clientSecret, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 4, DB_SQLTYPE_INTEGER, (INT32)accountType);
-      DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)appName, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 6, DB_SQLTYPE_INTEGER, (INT32)id);
+      DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)clientId, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 5, DB_SQLTYPE_INTEGER, (INT32)accountType);
+      DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)appName, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 7, DB_SQLTYPE_INTEGER, (INT32)id);
       bool success = DBExecute(hStmt);
       if (success == true)
       {
@@ -14531,25 +14622,12 @@ void ClientSession::modifyHomeChannel(NXCPMessage * request)
       TCHAR* cId = request->getFieldAsString(VID_HOME_CHANNEL_ID);
       TCHAR* cName = request->getFieldAsString(VID_HOME_CHANNEL_NAME);
       TCHAR* googleAcc = request->getFieldAsString(VID_HOME_CHANNEL_GACCOUNT);
-      TCHAR* vIntro = request->getFieldAsString(VID_HOME_CHANNEL_VINTRO);
-      TCHAR* vOutro = request->getFieldAsString(VID_HOME_CHANNEL_VOUTRO);
-      TCHAR* logo = request->getFieldAsString(VID_HOME_CHANNEL_LOGO);
-      TCHAR* desc = request->getFieldAsString(VID_HOME_CHANNEL_DESC);
-      TCHAR* title = request->getFieldAsString(VID_HOME_CHANNEL_TITLE);
-      TCHAR* tags = request->getFieldAsString(VID_HOME_CHANNEL_TAGS);
 
-      hStmt = DBPrepare(hdb, _T("UPDATE home_channel_list SET ChannelId = ?, ChannelName = ?, GoogleAccount= ?, " )
-                        _T("VideoIntro = ?, VideoOutro = ?, Logo = ?, DescriptionTemplate = ?, TitleTemplate = ?, TagsTemplate = ? WHERE Id = ?"));
+      hStmt = DBPrepare(hdb, _T("UPDATE home_channel_list SET ChannelId = ?, ChannelName = ?, GoogleAccount= ? WHERE Id = ?"));
       DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)cId, DB_BIND_TRANSIENT);
       DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)cName, DB_BIND_TRANSIENT);
       DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)googleAcc, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)vIntro, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)vOutro, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)logo, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)desc, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 8, DB_SQLTYPE_VARCHAR, (const TCHAR *)title, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 9, DB_SQLTYPE_VARCHAR, (const TCHAR *)tags, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 10, DB_SQLTYPE_INTEGER, (INT32)id);
+      DBBind(hStmt, 4, DB_SQLTYPE_INTEGER, (INT32)id);
       bool success = DBExecute(hStmt);
       if (success == true)
       {
@@ -14630,13 +14708,21 @@ void ClientSession::modifyMappingChannel(NXCPMessage * request)
       DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)uploadId, DB_BIND_TRANSIENT);
       DBBind(hStmt, 8, DB_SQLTYPE_INTEGER, (INT32)id);
 
-      debugPrintf(6, _T("ClientSession::[%s] id = %d"), __FUNCTION__, id);
-      debugPrintf(6, _T("ClientSession::[%s] cHomeId = %s"), __FUNCTION__, cHomeId);
+      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] id = %d"), id);
+      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] cHomeId = %s"), cHomeId);
+      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] cMonitorId = %s"), cMonitorId);
+      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] timeSync = %d"), timeSync);
+      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] statusSync = %d"), statusSync);
+      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] statusSync = %s"), downloadId);
+      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] statusSync = %s"), renderId);
+      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] statusSync = %s"), uploadId);
 
       bool success = DBExecute(hStmt);
       if (success == true)
       {
          msg.setField(VID_RCC, RCC_SUCCESS);
+         //modify spider mapping config
+         modifySpiderMappingConfig(id, request);
          //notify information to download app
          SpiderDownloadClient* downloadClient = new SpiderDownloadClient();
          if (downloadClient->initSuccess)
@@ -14658,14 +14744,6 @@ void ClientSession::modifyMappingChannel(NXCPMessage * request)
          } else {
             debugPrintf(1, _T("ClientSession::[%s] Init corba for download client FALSE"), __FUNCTION__);
          }
-         //Release corba connection
-         /*
-         if (downloadClient != nullptr)
-         {
-            delete downloadClient;
-            downloadClient = nullptr;
-         }
-         */
       }
       else
       {
@@ -14804,6 +14882,7 @@ void ClientSession::deleteMappingChannel(NXCPMessage * request)
       if (success == true)
       {
          msg.setField(VID_RCC, RCC_SUCCESS);
+         deleteSpiderMappingConfig(id);
          //notify information to download app
          SpiderDownloadClient* downloadClient = new SpiderDownloadClient();
          if (downloadClient->initSuccess)
@@ -14883,7 +14962,7 @@ AgentConnection * ClientSession::getAgentConnectionByObjectName(TCHAR * objectNa
    return agentConn;
 }
 
-bool ClientSession::checkMappingIsExisted(TCHAR* cHomeId, TCHAR* cMonitorId)
+bool ClientSession::checkMappingIsExisted(TCHAR * cHomeId, TCHAR * cMonitorId)
 {
    debugPrintf(6, _T("ClientSession::[%s]"), __func__);
    bool isExisted = false;
@@ -14911,7 +14990,7 @@ bool ClientSession::checkMappingIsExisted(TCHAR* cHomeId, TCHAR* cMonitorId)
    return isExisted;
 }
 
-void ClientSession::getCluster(NXCPMessage *request)
+void ClientSession::getCluster(NXCPMessage * request)
 {
    debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
    NXCPMessage msg;
@@ -14962,7 +15041,7 @@ void ClientSession::getCluster(NXCPMessage *request)
    sendMessage(&msg);
 }
 
-void ClientSession::createCluster(NXCPMessage *request)
+void ClientSession::createCluster(NXCPMessage * request)
 {
    debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
    NXCPMessage msg;
@@ -15012,7 +15091,7 @@ void ClientSession::createCluster(NXCPMessage *request)
 
 }
 
-void ClientSession::modifyCluster(NXCPMessage *request)
+void ClientSession::modifyCluster(NXCPMessage * request)
 {
    debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
    NXCPMessage msg;
@@ -15067,7 +15146,7 @@ void ClientSession::modifyCluster(NXCPMessage *request)
 
 }
 
-void ClientSession::deleteCluster(NXCPMessage *request)
+void ClientSession::deleteCluster(NXCPMessage * request)
 {
    debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
    NXCPMessage msg;
@@ -15111,7 +15190,21 @@ void ClientSession::deleteCluster(NXCPMessage *request)
    sendMessage(&msg);
 }
 
-TCHAR* ClientSession::getChannelNameById(TCHAR* channelId, TCHAR* tbName)
+void ClientSession::deleteSpiderMappingConfig(UINT32 mappingId)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+
+   if (hdb != NULL)
+   {
+      hStmt = DBPrepare(hdb, _T("DELETE FROM spider_mapping_config WHERE MappingId = ?"));
+      DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)mappingId);
+      bool success = DBExecute(hStmt);
+   }
+}
+
+TCHAR* ClientSession::getChannelNameById(TCHAR * channelId, TCHAR * tbName)
 {
    debugPrintf(6, _T("ClientSession::[getChannelNameById]"));
    DB_RESULT hResult;
@@ -15141,7 +15234,7 @@ TCHAR* ClientSession::getChannelNameById(TCHAR* channelId, TCHAR* tbName)
    return result;
 }
 
-bool ClientSession::checkDeleteCondition(TCHAR* checkId, TCHAR* tbCheck, TCHAR* fieldCheck)
+bool ClientSession::checkDeleteCondition(TCHAR * checkId, TCHAR * tbCheck, TCHAR * fieldCheck)
 {
    debugPrintf(6, _T("ClientSession::[checkDeleteChannel]"));
    DB_RESULT hResult;

@@ -49,24 +49,12 @@ import org.eclipse.swt.widgets.Combo;
 public class EditHomeChannelDialog extends Dialog {
 	private Text txtChannelId;
 	private Text txtChannelName;
-	private Text txtVideoIntro;
-	private Text txtVideoOutro;
-	private Text txtLogo;
-	private Text txtTitleTemplate;
-	private Text txtDesTemplate;
-	private Text txtTagsTemp;
 	Combo cbGoogleAccount;
 
 	private int id;
 	private String cId;
 	private String cName; 
 	private String gAccount;
-	private String vIntro;
-	private String vOutro;
-	private String logo;
-	private String desc;
-	private String title;
-	private String tags;
 	HomeChannelObject object;
 	Object[] objGoogleAccount;
 	private NXCSession session;
@@ -94,7 +82,7 @@ public class EditHomeChannelDialog extends Dialog {
 
 		Group grpCreateNewAccount = new Group(dialogArea, SWT.NONE);
 		grpCreateNewAccount.setText("Edit home channel");
-		grpCreateNewAccount.setBounds(5, 10, 516, 336);
+		grpCreateNewAccount.setBounds(5, 10, 516, 143);
 
 		Label lblChannelId = new Label(grpCreateNewAccount, SWT.NONE);
 		lblChannelId.setAlignment(SWT.RIGHT);
@@ -118,131 +106,6 @@ public class EditHomeChannelDialog extends Dialog {
 		lblGoogleAccount.setAlignment(SWT.RIGHT);
 		lblGoogleAccount.setText("Google Account");
 		lblGoogleAccount.setBounds(10, 97, 109, 17);
-
-		Label lblVideoIntro = new Label(grpCreateNewAccount, SWT.NONE);
-		lblVideoIntro.setAlignment(SWT.RIGHT);
-		lblVideoIntro.setText("Video Intro");
-		lblVideoIntro.setBounds(10, 130, 109, 17);
-
-		txtVideoIntro = new Text(grpCreateNewAccount, SWT.BORDER);
-		txtVideoIntro.setTextLimit(150);
-		txtVideoIntro.setBounds(131, 125, 290, 27);
-
-		Button btnVideoIntro = new Button(grpCreateNewAccount, SWT.NONE);
-		btnVideoIntro.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
-				fd.setText("Select video intro");
-				fd.setFilterExtensions(new String[] {"*.mp4;*.flv;*.avi;*.wmv;*.mov","*.*" });
-				fd.setFilterNames(new String[] {
-				"Video file","All file" });
-				String fileName = fd.open();
-				txtVideoIntro.setText(fileName);
-			}
-		});
-		btnVideoIntro.setText("Browse...");
-		btnVideoIntro.setBounds(427, 123, 79, 29);
-
-		Label lblVideoOutro = new Label(grpCreateNewAccount, SWT.NONE);
-		lblVideoOutro.setAlignment(SWT.RIGHT);
-		lblVideoOutro.setText("Video Outro");
-		lblVideoOutro.setBounds(10, 163, 109, 17);
-
-		txtVideoOutro = new Text(grpCreateNewAccount, SWT.BORDER);
-		txtVideoOutro.setTextLimit(150);
-		txtVideoOutro.setBounds(131, 158, 290, 27);
-
-		Label lblLogo = new Label(grpCreateNewAccount, SWT.NONE);
-		lblLogo.setAlignment(SWT.RIGHT);
-		lblLogo.setText("Logo");
-		lblLogo.setBounds(10, 196, 109, 17);
-
-		txtLogo = new Text(grpCreateNewAccount, SWT.BORDER);
-		txtLogo.setTextLimit(150);
-		txtLogo.setBounds(131, 191, 290, 27);
-
-		Label lblTitleTelplate = new Label(grpCreateNewAccount, SWT.NONE);
-		lblTitleTelplate.setText("Title Telplate");
-		lblTitleTelplate.setAlignment(SWT.RIGHT);
-		lblTitleTelplate.setBounds(10, 229, 109, 17);
-
-		txtTitleTemplate = new Text(grpCreateNewAccount, SWT.BORDER);
-		txtTitleTemplate.setTextLimit(150);
-		txtTitleTemplate.setBounds(131, 224, 290, 27);
-
-		Label lblDescTemplate = new Label(grpCreateNewAccount, SWT.NONE);
-		lblDescTemplate.setText("Desc Template");
-		lblDescTemplate.setAlignment(SWT.RIGHT);
-		lblDescTemplate.setBounds(10, 262, 109, 17);
-
-		txtDesTemplate = new Text(grpCreateNewAccount, SWT.BORDER);
-		txtDesTemplate.setTextLimit(150);
-		txtDesTemplate.setBounds(131, 257, 290, 27);
-
-		Button btnVideoOutro = new Button(grpCreateNewAccount, SWT.NONE);
-		btnVideoOutro.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
-				fd.setText("Select video outro");
-				fd.setFilterExtensions(new String[] {"*.mp4;*.flv;*.avi;*.wmv;*.mov","*.*" });
-				fd.setFilterNames(new String[] {
-				"Video file","All file" });
-				String fileName = fd.open();
-				txtVideoOutro.setText(fileName);
-			}
-		});
-		btnVideoOutro.setText("Browse...");
-		btnVideoOutro.setBounds(427, 156, 79, 29);
-
-		Button btnLogo = new Button(grpCreateNewAccount, SWT.NONE);
-		btnLogo.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
-				fd.setText("Select logo image");
-				fd.setFilterExtensions(new String[] {"*.jpg; *.png","*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
-				fd.setFilterNames(new String[] {
-				"Image file","All file" });
-				String fileName = fd.open();
-				txtLogo.setText(fileName);
-			}
-		});
-		btnLogo.setText("Browse...");
-		btnLogo.setBounds(427, 191, 79, 29);
-
-		Button btnTitle = new Button(grpCreateNewAccount, SWT.NONE);
-		btnTitle.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
-				fd.setText("Select title template file");
-				fd.setFilterExtensions(new String[] {"*.txt","*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
-				fd.setFilterNames(new String[] {
-				"Text file (*.txt)", "All file" });
-				String fileName = fd.open();
-				txtTitleTemplate.setText(fileName);
-			}
-		});
-		btnTitle.setText("Browse...");
-		btnTitle.setBounds(427, 222, 79, 29);
-
-		Button btnDesc = new Button(grpCreateNewAccount, SWT.NONE);
-		btnDesc.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
-				fd.setText("Select description template file");
-				fd.setFilterExtensions(new String[] {"*.txt","*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
-				fd.setFilterNames(new String[] {
-				"Text file (*.txt)", "All file" });
-				String fileName = fd.open();
-				txtDesTemplate.setText(fileName);
-			}
-		});
-		btnDesc.setText("Browse...");
-		btnDesc.setBounds(427, 257, 79, 29);
 		Button btnView = new Button(grpCreateNewAccount, SWT.NONE);
 		btnView.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -252,31 +115,6 @@ public class EditHomeChannelDialog extends Dialog {
 		});
 		btnView.setText("View");
 		btnView.setBounds(427, 26, 79, 29);
-
-		Label lblTagsTemplate = new Label(grpCreateNewAccount, SWT.NONE);
-		lblTagsTemplate.setText("Tags Template");
-		lblTagsTemplate.setAlignment(SWT.RIGHT);
-		lblTagsTemplate.setBounds(10, 297, 109, 17);
-
-		txtTagsTemp = new Text(grpCreateNewAccount, SWT.BORDER);
-		txtTagsTemp.setTextLimit(150);
-		txtTagsTemp.setBounds(131, 292, 290, 27);
-
-		Button btnTagsTemp = new Button(grpCreateNewAccount, SWT.NONE);
-		btnTagsTemp.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
-				fd.setText("Select tag template file");
-				fd.setFilterExtensions(new String[] {"*.txt","*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
-				fd.setFilterNames(new String[] {
-				"Text file (*.txt)", "All file" });
-				String fileName = fd.open();
-				txtTagsTemp.setText(fileName);
-			}
-		});
-		btnTagsTemp.setText("Browse...");
-		btnTagsTemp.setBounds(427, 292, 79, 29);
 		cbGoogleAccount = new Combo(grpCreateNewAccount, SWT.NONE);
 		cbGoogleAccount.setBounds(131, 92, 290, 29);
 		
@@ -290,12 +128,6 @@ public class EditHomeChannelDialog extends Dialog {
 		txtChannelId.setText(this.object.getChannelId());
 		txtChannelName.setText(this.object.getChannelName());
 		cbGoogleAccount.setText(object.getGoogleAccount());
-		txtDesTemplate.setText(this.object.getDescTemp());
-		txtLogo.setText(this.object.getLogo());
-		txtTitleTemplate.setText(this.object.getTitleTemp());
-		txtVideoIntro.setText(this.object.getvIntro());
-		txtVideoOutro.setText(this.object.getvOutro());
-		txtTagsTemp.setText(this.object.getTagsTemp());
 		
 		try {
 			if(objGoogleAccount == null)
@@ -334,12 +166,6 @@ public class EditHomeChannelDialog extends Dialog {
 		cId = txtChannelId.getText();
 		cName = txtChannelName.getText();
 		gAccount = cbGoogleAccount.getText();
-		vIntro = txtVideoIntro.getText();
-		vOutro = txtVideoOutro.getText();
-		logo = txtLogo.getText();
-		desc = txtDesTemplate.getText();
-		title = txtTitleTemplate.getText();
-		tags = txtTagsTemp.getText();
 		if(cId == null || cId.isEmpty())
 		{
 			MessageBox dialog =
@@ -375,33 +201,5 @@ public class EditHomeChannelDialog extends Dialog {
 
 	public String getgAccount() {
 		return gAccount;
-	}
-
-	public String getvIntro() {
-		return vIntro;
-	}
-
-	public String getvOutro() {
-		return vOutro;
-	}
-
-	public String getLogo() {
-		return logo;
-	}
-
-	public String getDesc() {
-		return desc;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public HomeChannelObject getObject() {
-		return object;
-	}
-
-	public String getTags() {
-		return tags;
 	}
 }

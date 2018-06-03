@@ -86,9 +86,9 @@
 struct __console_ctx
 {
    SOCKET hSocket;
-	MUTEX socketMutex;
+   MUTEX socketMutex;
    NXCPMessage *pMsg;
-	ClientSession *session;
+   ClientSession *session;
    String *output;
 };
 
@@ -155,8 +155,8 @@ typedef void * HSNMPSESSION;
 #define IDG_OBJECT_TOOL       14
 #define IDG_SCRIPT            15
 #define IDG_AGENT_CONFIG      16
-#define IDG_GRAPH					17
-#define IDG_CERTIFICATE			18
+#define IDG_GRAPH             17
+#define IDG_CERTIFICATE       18
 #define IDG_DCT_COLUMN        19
 #define IDG_MAPPING_TABLE     20
 #define IDG_DCI_SUMMARY_TABLE 21
@@ -247,9 +247,9 @@ enum ClusterType
 typedef struct
 {
    InetAddress ipAddr;
-	UINT32 zoneUIN;
-	BOOL ignoreFilter;
-	BYTE bMacAddr[MAC_ADDR_LENGTH];
+   UINT32 zoneUIN;
+   BOOL ignoreFilter;
+   BYTE bMacAddr[MAC_ADDR_LENGTH];
 } NEW_NODE;
 
 /**
@@ -333,22 +333,22 @@ private:
    int m_state;
    WORD m_wCurrentCmd;
    UINT32 m_dwUserId;
-	UINT32 m_deviceObjectId;
+   UINT32 m_deviceObjectId;
    NXCP_BUFFER *m_pMsgBuffer;
    NXCPEncryptionContext *m_pCtx;
-	BYTE m_challenge[CLIENT_CHALLENGE_SIZE];
+   BYTE m_challenge[CLIENT_CHALLENGE_SIZE];
    THREAD m_hWriteThread;
    THREAD m_hProcessingThread;
-	MUTEX m_mutexSocketWrite;
-	InetAddress m_clientAddr;
-	TCHAR m_szHostName[256]; // IP address of name of conneced host in textual form
+   MUTEX m_mutexSocketWrite;
+   InetAddress m_clientAddr;
+   TCHAR m_szHostName[256]; // IP address of name of conneced host in textual form
    TCHAR m_szUserName[MAX_SESSION_NAME];   // String in form login_name@host
    TCHAR m_szClientInfo[96];  // Client app info string
    UINT32 m_dwEncryptionRqId;
    UINT32 m_dwEncryptionResult;
    CONDITION m_condEncryptionSetup;
    UINT32 m_dwRefCount;
-	bool m_isAuthenticated;
+   bool m_isAuthenticated;
 
    static THREAD_RESULT THREAD_CALL readThreadStarter(void *);
    static THREAD_RESULT THREAD_CALL writeThreadStarter(void *);
@@ -376,12 +376,12 @@ public:
    void postMessage(NXCPMessage *pMsg) { m_pSendQueue->put(pMsg->serialize()); }
    void sendMessage(NXCPMessage *pMsg);
 
-	int getId() { return m_id; }
+   int getId() { return m_id; }
    void setId(int id) { if (m_id == -1) m_id = id; }
    int getState() { return m_state; }
    const TCHAR *getUserName() { return m_szUserName; }
    const TCHAR *getClientInfo() { return m_szClientInfo; }
-	const TCHAR *getHostName() { return m_szHostName; }
+   const TCHAR *getHostName() { return m_szHostName; }
    UINT32 getUserId() { return m_dwUserId; }
    bool isAuthenticated() { return m_isAuthenticated; }
    WORD getCurrentCmd() { return m_wCurrentCmd; }
@@ -429,19 +429,19 @@ private:
    UINT32 m_dwUserId;
    UINT64 m_dwSystemAccess;    // User's system access rights
    UINT32 m_dwFlags;           // Session flags
-	int m_clientType;				// Client system type - desktop, web, mobile, etc.
+   int m_clientType;          // Client system type - desktop, web, mobile, etc.
    NXCPEncryptionContext *m_pCtx;
-	BYTE m_challenge[CLIENT_CHALLENGE_SIZE];
+   BYTE m_challenge[CLIENT_CHALLENGE_SIZE];
    THREAD m_hWriteThread;
    THREAD m_hProcessingThread;
-	MUTEX m_mutexSocketWrite;
+   MUTEX m_mutexSocketWrite;
    MUTEX m_mutexSendObjects;
    MUTEX m_mutexSendAlarms;
    MUTEX m_mutexSendActions;
-	MUTEX m_mutexSendAuditLog;
+   MUTEX m_mutexSendAuditLog;
    MUTEX m_mutexPollerInit;
-	InetAddress m_clientAddr;
-	TCHAR m_workstation[256];      // IP address or name of connected host in textual form
+   InetAddress m_clientAddr;
+   TCHAR m_workstation[256];      // IP address or name of connected host in textual form
    TCHAR m_webServerAddress[256]; // IP address or name of web server for web sessions
    TCHAR m_loginName[MAX_USER_NAME];
    TCHAR m_sessionName[MAX_SESSION_NAME];   // String in form login_name@host
@@ -458,12 +458,12 @@ private:
    UINT32 m_dwEncryptionRqId;
    UINT32 m_dwEncryptionResult;
    CONDITION m_condEncryptionSetup;
-	CONSOLE_CTX m_console;			// Server console context
-	StringList m_musicTypeList;
-	ObjectIndex m_agentConn;
-	StringObjectMap<UINT32> *m_subscriptions;
-	MUTEX m_subscriptionLock;
-	HashMap<UINT32, CommandExec> *m_serverCommands;
+   CONSOLE_CTX m_console;        // Server console context
+   StringList m_musicTypeList;
+   ObjectIndex m_agentConn;
+   StringObjectMap<UINT32> *m_subscriptions;
+   MUTEX m_subscriptionLock;
+   HashMap<UINT32, CommandExec> *m_serverCommands;
 
    static THREAD_RESULT THREAD_CALL readThreadStarter(void *);
    static THREAD_RESULT THREAD_CALL writeThreadStarter(void *);
@@ -554,14 +554,14 @@ private:
    void applyTemplate(NXCPMessage *pRequest);
    void getCollectedData(NXCPMessage *pRequest);
    void getTableCollectedData(NXCPMessage *pRequest);
-	bool getCollectedDataFromDB(NXCPMessage *request, NXCPMessage *response, DataCollectionTarget *object, int dciType);
-	void clearDCIData(NXCPMessage *pRequest);
-	void forceDCIPoll(NXCPMessage *pRequest);
+   bool getCollectedDataFromDB(NXCPMessage *request, NXCPMessage *response, DataCollectionTarget *object, int dciType);
+   void clearDCIData(NXCPMessage *pRequest);
+   void forceDCIPoll(NXCPMessage *pRequest);
    void changeDCIStatus(NXCPMessage *pRequest);
    void getLastValues(NXCPMessage *pRequest);
    void getLastValuesByDciId(NXCPMessage *pRequest);
    void getTableLastValues(NXCPMessage *pRequest);
-	void getThresholdSummary(NXCPMessage *request);
+   void getThresholdSummary(NXCPMessage *request);
    void openEPP(NXCPMessage *request);
    void closeEPP(UINT32 dwRqId);
    void saveEPP(NXCPMessage *pRequest);
@@ -581,10 +581,10 @@ private:
    void openHelpdeskIssue(NXCPMessage *request);
    void getHelpdeskUrl(NXCPMessage *request);
    void unlinkHelpdeskIssue(NXCPMessage *request);
-	void getAlarmComments(NXCPMessage *pRequest);
-	void updateAlarmComment(NXCPMessage *pRequest);
-	void deleteAlarmComment(NXCPMessage *request);
-	void updateAlarmStatusFlow(NXCPMessage *request);
+   void getAlarmComments(NXCPMessage *pRequest);
+   void updateAlarmComment(NXCPMessage *pRequest);
+   void deleteAlarmComment(NXCPMessage *request);
+   void updateAlarmStatusFlow(NXCPMessage *request);
    void createAction(NXCPMessage *pRequest);
    void updateAction(NXCPMessage *pRequest);
    void deleteAction(NXCPMessage *pRequest);
@@ -646,73 +646,73 @@ private:
    void resetComponent(NXCPMessage *pRequest);
    void getDCIEventList(NXCPMessage *request);
    void getDCIScriptList(NXCPMessage *request);
-	void SendDCIInfo(NXCPMessage *pRequest);
+   void SendDCIInfo(NXCPMessage *pRequest);
    void sendPerfTabDCIList(NXCPMessage *pRequest);
    void exportConfiguration(NXCPMessage *pRequest);
    void importConfiguration(NXCPMessage *pRequest);
-	void sendGraphList(NXCPMessage *request);
-	void saveGraph(NXCPMessage *pRequest);
-	void deleteGraph(NXCPMessage *pRequest);
-	void addCACertificate(NXCPMessage *pRequest);
-	void deleteCertificate(NXCPMessage *pRequest);
-	void updateCertificateComments(NXCPMessage *pRequest);
-	void getCertificateList(UINT32 dwRqId);
-	void queryL2Topology(NXCPMessage *pRequest);
-	void sendSMS(NXCPMessage *pRequest);
-	void SendCommunityList(UINT32 dwRqId);
-	void UpdateCommunityList(NXCPMessage *pRequest);
-	void getPersistantStorage(UINT32 dwRqId);
-	void setPstorageValue(NXCPMessage *pRequest);
-	void deletePstorageValue(NXCPMessage *pRequest);
-	void setConfigCLOB(NXCPMessage *pRequest);
-	void getConfigCLOB(NXCPMessage *pRequest);
-	void registerAgent(NXCPMessage *pRequest);
-	void getServerFile(NXCPMessage *pRequest);
-	void cancelFileMonitoring(NXCPMessage *request);
-	void getAgentFile(NXCPMessage *pRequest);
-	void testDCITransformation(NXCPMessage *pRequest);
-	void sendJobList(UINT32 dwRqId);
-	void cancelJob(NXCPMessage *pRequest);
-	void holdJob(NXCPMessage *pRequest);
-	void unholdJob(NXCPMessage *pRequest);
-	void deployAgentPolicy(NXCPMessage *pRequest, bool uninstallFlag);
-	void getUserCustomAttribute(NXCPMessage *request);
-	void setUserCustomAttribute(NXCPMessage *request);
-	void openServerLog(NXCPMessage *request);
-	void closeServerLog(NXCPMessage *request);
-	void queryServerLog(NXCPMessage *request);
-	void getServerLogQueryData(NXCPMessage *request);
-	void sendUsmCredentials(UINT32 dwRqId);
-	void updateUsmCredentials(NXCPMessage *pRequest);
-	void sendDCIThresholds(NXCPMessage *request);
-	void addClusterNode(NXCPMessage *request);
-	void findNodeConnection(NXCPMessage *request);
-	void findMacAddress(NXCPMessage *request);
-	void findIpAddress(NXCPMessage *request);
-	void findHostname(NXCPMessage *request);
-	void sendLibraryImage(NXCPMessage *request);
-	void updateLibraryImage(NXCPMessage *request);
-	void listLibraryImages(NXCPMessage *request);
-	void deleteLibraryImage(NXCPMessage *request);
-	void executeServerCommand(NXCPMessage *request);
-	void stopServerCommand(NXCPMessage *request);
-	void uploadFileToAgent(NXCPMessage *request);
-	void listServerFileStore(NXCPMessage *request);
-	void processConsoleCommand(NXCPMessage *msg);
-	void openConsole(UINT32 rqId);
-	void closeConsole(UINT32 rqId);
-	void getVlans(NXCPMessage *msg);
-	void receiveFile(NXCPMessage *request);
-	void deleteFile(NXCPMessage *request);
-	void getNetworkPath(NXCPMessage *request);
-	void getNodeComponents(NXCPMessage *request);
-	void getNodeSoftware(NXCPMessage *request);
-	void getWinPerfObjects(NXCPMessage *request);
-	void listMappingTables(NXCPMessage *request);
-	void getMappingTable(NXCPMessage *request);
-	void updateMappingTable(NXCPMessage *request);
-	void deleteMappingTable(NXCPMessage *request);
-	void getWirelessStations(NXCPMessage *request);
+   void sendGraphList(NXCPMessage *request);
+   void saveGraph(NXCPMessage *pRequest);
+   void deleteGraph(NXCPMessage *pRequest);
+   void addCACertificate(NXCPMessage *pRequest);
+   void deleteCertificate(NXCPMessage *pRequest);
+   void updateCertificateComments(NXCPMessage *pRequest);
+   void getCertificateList(UINT32 dwRqId);
+   void queryL2Topology(NXCPMessage *pRequest);
+   void sendSMS(NXCPMessage *pRequest);
+   void SendCommunityList(UINT32 dwRqId);
+   void UpdateCommunityList(NXCPMessage *pRequest);
+   void getPersistantStorage(UINT32 dwRqId);
+   void setPstorageValue(NXCPMessage *pRequest);
+   void deletePstorageValue(NXCPMessage *pRequest);
+   void setConfigCLOB(NXCPMessage *pRequest);
+   void getConfigCLOB(NXCPMessage *pRequest);
+   void registerAgent(NXCPMessage *pRequest);
+   void getServerFile(NXCPMessage *pRequest);
+   void cancelFileMonitoring(NXCPMessage *request);
+   void getAgentFile(NXCPMessage *pRequest);
+   void testDCITransformation(NXCPMessage *pRequest);
+   void sendJobList(UINT32 dwRqId);
+   void cancelJob(NXCPMessage *pRequest);
+   void holdJob(NXCPMessage *pRequest);
+   void unholdJob(NXCPMessage *pRequest);
+   void deployAgentPolicy(NXCPMessage *pRequest, bool uninstallFlag);
+   void getUserCustomAttribute(NXCPMessage *request);
+   void setUserCustomAttribute(NXCPMessage *request);
+   void openServerLog(NXCPMessage *request);
+   void closeServerLog(NXCPMessage *request);
+   void queryServerLog(NXCPMessage *request);
+   void getServerLogQueryData(NXCPMessage *request);
+   void sendUsmCredentials(UINT32 dwRqId);
+   void updateUsmCredentials(NXCPMessage *pRequest);
+   void sendDCIThresholds(NXCPMessage *request);
+   void addClusterNode(NXCPMessage *request);
+   void findNodeConnection(NXCPMessage *request);
+   void findMacAddress(NXCPMessage *request);
+   void findIpAddress(NXCPMessage *request);
+   void findHostname(NXCPMessage *request);
+   void sendLibraryImage(NXCPMessage *request);
+   void updateLibraryImage(NXCPMessage *request);
+   void listLibraryImages(NXCPMessage *request);
+   void deleteLibraryImage(NXCPMessage *request);
+   void executeServerCommand(NXCPMessage *request);
+   void stopServerCommand(NXCPMessage *request);
+   void uploadFileToAgent(NXCPMessage *request);
+   void listServerFileStore(NXCPMessage *request);
+   void processConsoleCommand(NXCPMessage *msg);
+   void openConsole(UINT32 rqId);
+   void closeConsole(UINT32 rqId);
+   void getVlans(NXCPMessage *msg);
+   void receiveFile(NXCPMessage *request);
+   void deleteFile(NXCPMessage *request);
+   void getNetworkPath(NXCPMessage *request);
+   void getNodeComponents(NXCPMessage *request);
+   void getNodeSoftware(NXCPMessage *request);
+   void getWinPerfObjects(NXCPMessage *request);
+   void listMappingTables(NXCPMessage *request);
+   void getMappingTable(NXCPMessage *request);
+   void updateMappingTable(NXCPMessage *request);
+   void deleteMappingTable(NXCPMessage *request);
+   void getWirelessStations(NXCPMessage *request);
    void getSummaryTables(UINT32 rqId);
    void getSummaryTableDetails(NXCPMessage *request);
    void modifySummaryTable(NXCPMessage *request);
@@ -728,10 +728,10 @@ private:
    void getRoutingTable(NXCPMessage *request);
    void getLocationHistory(NXCPMessage *request);
    void getScreenshot(NXCPMessage *request);
-	void executeScript(NXCPMessage *request);
+   void executeScript(NXCPMessage *request);
    void executeLibraryScript(NXCPMessage *request);
    void compileScript(NXCPMessage *request);
-	void resyncAgentDciConfiguration(NXCPMessage *request);
+   void resyncAgentDciConfiguration(NXCPMessage *request);
    void cleanAgentDciConfiguration(NXCPMessage *request);
    void getSchedulerTaskHandlers(NXCPMessage *request);
    void getScheduledTasks(NXCPMessage *request);
@@ -776,6 +776,9 @@ private:
    void createCluster(NXCPMessage *request);
    void modifyCluster(NXCPMessage *request);
    void deleteCluster(NXCPMessage *request);
+   void createSpiderMappingConfig(UINT32 mappingId, NXCPMessage *request);
+   void modifySpiderMappingConfig(UINT32 mappingId, NXCPMessage *request);
+   void deleteSpiderMappingConfig(UINT32 mappingId);
    TCHAR* getChannelNameById(TCHAR* channelId, TCHAR* tbName);
    bool checkDeleteCondition(TCHAR* checkId, TCHAR* tbCheck, TCHAR* fieldCheck);
    INT32 getLastestInsertId(TCHAR* tbName);
@@ -796,7 +799,7 @@ public:
    bool sendMessage(NXCPMessage *pMsg);
    void sendRawMessage(NXCP_MESSAGE *pMsg);
    void sendPollerMsg(UINT32 dwRqId, const TCHAR *pszMsg);
-	BOOL sendFile(const TCHAR *file, UINT32 dwRqId, long offset);
+   BOOL sendFile(const TCHAR *file, UINT32 dwRqId, long offset);
 
    void writeAuditLog(const TCHAR *subsys, bool success, UINT32 objectId, const TCHAR *format, ...);
    void writeAuditLogWithValues(const TCHAR *subsys, bool success, UINT32 objectId, const TCHAR *oldValue, const TCHAR *newValue, const TCHAR *format, ...);
@@ -809,10 +812,10 @@ public:
    const TCHAR *getLoginName() const { return m_loginName; }
    const TCHAR *getSessionName() const { return m_sessionName; }
    const TCHAR *getClientInfo() const { return m_clientInfo; }
-	const TCHAR *getWorkstation() const { return m_workstation; }
+   const TCHAR *getWorkstation() const { return m_workstation; }
    const TCHAR *getWebServerAddress() const { return m_webServerAddress; }
    UINT32 getUserId() const { return m_dwUserId; }
-	UINT64 getSystemRights() const { return m_dwSystemAccess; }
+   UINT64 getSystemRights() const { return m_dwSystemAccess; }
    UINT32 getFlags() const { return m_dwFlags; }
    bool isAuthenticated() const { return (m_dwFlags & CSF_AUTHENTICATED) ? true : false; }
    bool isTerminated() const { return (m_dwFlags & CSF_TERMINATED) ? true : false; }
@@ -820,14 +823,14 @@ public:
    bool isCompressionEnabled() const { return (m_dwFlags & CSF_COMPRESSION_ENABLED) ? true : false; }
    UINT16 getCurrentCmd() const { return m_wCurrentCmd; }
    int getCipher() const { return (m_pCtx == NULL) ? -1 : m_pCtx->getCipher(); }
-	int getClientType() const { return m_clientType; }
+   int getClientType() const { return m_clientType; }
    time_t getLoginTime() const { return m_loginTime; }
    bool isSubscribedTo(const TCHAR *channel) const;
 
-	bool checkSysAccessRights(UINT64 requiredAccess) const
+   bool checkSysAccessRights(UINT64 requiredAccess) const
    {
       return (m_dwUserId == 0) ? true :
-         ((requiredAccess & m_dwSystemAccess) == requiredAccess);
+             ((requiredAccess & m_dwSystemAccess) == requiredAccess);
    }
 
    void setCustomLock(UINT32 bit, bool value)
@@ -855,10 +858,10 @@ public:
  */
 typedef struct
 {
-	TCHAR *query;
-	int bindCount;
-	BYTE *sqlTypes;
-	TCHAR *bindings[1]; /* actual size determined by bindCount field */
+   TCHAR *query;
+   int bindCount;
+   BYTE *sqlTypes;
+   TCHAR *bindings[1]; /* actual size determined by bindCount field */
 } DELAYED_SQL_REQUEST;
 
 /**
@@ -866,10 +869,10 @@ typedef struct
  */
 typedef struct
 {
-	time_t timestamp;
-	UINT32 nodeId;
-	UINT32 dciId;
-	TCHAR value[MAX_RESULT_LENGTH];
+   time_t timestamp;
+   UINT32 nodeId;
+   UINT32 dciId;
+   TCHAR value[MAX_RESULT_LENGTH];
 } DELAYED_IDATA_INSERT;
 
 /**
@@ -877,10 +880,10 @@ typedef struct
  */
 typedef struct
 {
-	time_t timestamp;
-	UINT32 dciId;
-	TCHAR rawValue[MAX_RESULT_LENGTH];
-	TCHAR transformedValue[MAX_RESULT_LENGTH];
+   time_t timestamp;
+   UINT32 dciId;
+   TCHAR rawValue[MAX_RESULT_LENGTH];
+   TCHAR transformedValue[MAX_RESULT_LENGTH];
 } DELAYED_RAW_DATA_UPDATE;
 
 /**
@@ -1054,7 +1057,7 @@ bool NXCORE_EXPORTABLE SleepAndCheckForShutdown(int iSeconds);
 
 void ConsolePrintf(CONSOLE_CTX pCtx, const TCHAR *pszFormat, ...)
 #if !defined(UNICODE) && (defined(__GNUC__) || defined(__clang__))
-   __attribute__ ((format(printf, 2, 3)))
+__attribute__ ((format(printf, 2, 3)))
 #endif
 ;
 void ConsoleWrite(CONSOLE_CTX pCtx, const TCHAR *text);
@@ -1174,21 +1177,21 @@ void NXCORE_EXPORTABLE WriteAuditLog2(const TCHAR *subsys, bool isSuccess, UINT3
                                       const TCHAR *workstation, int sessionId, UINT32 objectId,
                                       const TCHAR *format, va_list args);
 void NXCORE_EXPORTABLE WriteAuditLogWithValues(const TCHAR *subsys, bool isSuccess, UINT32 userId,
-                                               const TCHAR *workstation, int sessionId, UINT32 objectId,
-                                               const TCHAR *oldValue, const TCHAR *newValue,
-                                               const TCHAR *format, ...);
+      const TCHAR *workstation, int sessionId, UINT32 objectId,
+      const TCHAR *oldValue, const TCHAR *newValue,
+      const TCHAR *format, ...);
 void NXCORE_EXPORTABLE WriteAuditLogWithJsonValues(const TCHAR *subsys, bool isSuccess, UINT32 userId,
-                                                   const TCHAR *workstation, int sessionId, UINT32 objectId,
-                                                   json_t *oldValue, json_t *newValue,
-                                                   const TCHAR *format, ...);
+      const TCHAR *workstation, int sessionId, UINT32 objectId,
+      json_t *oldValue, json_t *newValue,
+      const TCHAR *format, ...);
 void NXCORE_EXPORTABLE WriteAuditLogWithValues2(const TCHAR *subsys, bool isSuccess, UINT32 userId,
-                                                const TCHAR *workstation, int sessionId, UINT32 objectId,
-                                                const TCHAR *oldValue, const TCHAR *newValue,
-                                                const TCHAR *format, va_list args);
+      const TCHAR *workstation, int sessionId, UINT32 objectId,
+      const TCHAR *oldValue, const TCHAR *newValue,
+      const TCHAR *format, va_list args);
 void NXCORE_EXPORTABLE WriteAuditLogWithJsonValues2(const TCHAR *subsys, bool isSuccess, UINT32 userId,
-                                                    const TCHAR *workstation, int sessionId, UINT32 objectId,
-                                                    json_t *oldValue, json_t *newValue,
-                                                    const TCHAR *format, va_list args);
+      const TCHAR *workstation, int sessionId, UINT32 objectId,
+      json_t *oldValue, json_t *newValue,
+      const TCHAR *format, va_list args);
 
 bool ValidateConfig(Config *config, UINT32 flags, TCHAR *errorText, int errorTextLen);
 UINT32 ImportConfig(Config *config, UINT32 flags);
@@ -1196,8 +1199,8 @@ UINT32 ImportConfig(Config *config, UINT32 flags);
 #ifdef _WITH_ENCRYPTION
 X509 *CertificateFromLoginMessage(NXCPMessage *pMsg);
 bool ValidateUserCertificate(X509 *cert, const TCHAR *login, const BYTE *challenge,
-									  const BYTE *signature, size_t sigLen, int mappingMethod,
-									  const TCHAR *mappingData);
+                             const BYTE *signature, size_t sigLen, int mappingMethod,
+                             const TCHAR *mappingData);
 bool ValidateAgentCertificate(X509 *cert);
 void ReloadCertificates();
 bool GetCertificateSubjectField(X509 *cert, int nid, TCHAR *buffer, size_t size);
