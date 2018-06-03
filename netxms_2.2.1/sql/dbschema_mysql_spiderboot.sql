@@ -3,13 +3,15 @@ USE netxms_db;
 DROP TABLE IF EXISTS `google_account`;
 CREATE TABLE `google_account` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `UserName` varchar(250) NOT NULL,
-  `Api` varchar(250) NOT NULL,
-  `ClientSecret` varchar(250) NOT NULL,
+  `UserName` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `Api` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `ClientSecret` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `ClientId` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
   `AccountType` int(11) DEFAULT NULL,
-  `AppName` varchar(30) DEFAULT NULL,
+  `AppName` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`Id`,`UserName`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 
 -- home_channel_list
 DROP TABLE IF EXISTS `home_channel_list`;
@@ -17,15 +19,10 @@ CREATE TABLE `home_channel_list` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `ChannelId` varchar(30) NOT NULL,
   `ChannelName` varchar(25) DEFAULT NULL,
-  `GoogleAccount` varchar(250) DEFAULT NULL,
-  `VideoIntro` varchar(250) DEFAULT NULL,
-  `VideoOutro` varchar(250) DEFAULT NULL,
-  `Logo` varchar(250) DEFAULT NULL,
-  `DescriptionTemplate` varchar(250) DEFAULT NULL,
-  `TitleTemplate` varchar(250) DEFAULT NULL,
-  `TagsTemplate` varchar(250) DEFAULT NULL,
+  `GoogleAccount` varchar(250) NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+
 
 -- monitor_channel_list
 DROP TABLE IF EXISTS `monitor_channel_list`;
@@ -34,7 +31,8 @@ CREATE TABLE `monitor_channel_list` (
   `ChannelId` varchar(30) NOT NULL,
   `ChannelName` varchar(25) DEFAULT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+
 
 -- channel_mapping
 DROP TABLE IF EXISTS `channel_mapping`;
@@ -49,7 +47,8 @@ CREATE TABLE `channel_mapping` (
   `ProcessClusterId` varchar(50) DEFAULT NULL,
   `UploadClusterId` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+
 
 -- video_container
 DROP TABLE IF EXISTS `video_container`;
@@ -60,47 +59,71 @@ CREATE TABLE `video_container` (
   `Tag` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
   `Description` varchar(4096) COLLATE utf8_unicode_ci DEFAULT NULL,
   `Thumbnail` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `VideoDownloadedLocation` varchar(250) CHARACTER SET utf8 DEFAULT NULL,
-  `VideoRebderedLocation` varchar(250) CHARACTER SET utf8 DEFAULT NULL,
+  `VideoDownloadedLocation` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `VideoRebderedLocation` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
   `HomeChannelId` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
   `DownloadDate` datetime DEFAULT NULL,
-  `MonitorChannelId` varchar(30) CHARACTER SET utf8 DEFAULT NULL,
+  `MonitorChannelId` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
   `ProcessStatus` int(11) DEFAULT '0',
   `LICENSE` tinyint(1) DEFAULT NULL COMMENT 'Video license or not',
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
+
 -- download_cluster
 DROP TABLE IF EXISTS `download_cluster`;
 CREATE TABLE `download_cluster` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `ClusterId` varchar(45) NOT NULL,
-  `ClusterName` varchar(45) DEFAULT NULL,
-  `IpAddress` varchar(45) DEFAULT NULL,
+  `ClusterId` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
+  `ClusterName` varchar(45) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `IpAddress` varchar(45) COLLATE utf8_unicode_ci DEFAULT NULL,
   `Port` int(5) DEFAULT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 
 -- render_cluster
 DROP TABLE IF EXISTS `render_cluster`;
 CREATE TABLE `render_cluster` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `ClusterId` varchar(45) NOT NULL,
-  `ClusterName` varchar(45) DEFAULT NULL,
-  `IpAddress` varchar(45) DEFAULT NULL,
+  `ClusterId` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
+  `ClusterName` varchar(45) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `IpAddress` varchar(45) COLLATE utf8_unicode_ci DEFAULT NULL,
   `Port` int(5) DEFAULT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 
 -- upload_cluster
 DROP TABLE IF EXISTS `upload_cluster`;
 CREATE TABLE `upload_cluster` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `ClusterId` varchar(45) NOT NULL,
-  `ClusterName` varchar(45) DEFAULT NULL,
-  `IpAddress` varchar(45) DEFAULT NULL,
+  `ClusterId` varchar(150) CHARACTER SET utf8 NOT NULL,
+  `ClusterName` varchar(150) CHARACTER SET utf8 DEFAULT NULL,
+  `IpAddress` varchar(150) CHARACTER SET utf8 DEFAULT NULL,
   `Port` int(5) DEFAULT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- spider_mapping_config
+DROP TABLE IF EXISTS `spider_mapping_config`;
+CREATE TABLE `spider_mapping_config` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `MappingId` int(11) NOT NULL,
+  `VideoIntro` varchar(150) CHARACTER SET utf8 DEFAULT NULL,
+  `VideoOutro` varchar(150) CHARACTER SET utf8 DEFAULT NULL,
+  `Logo` varchar(150) CHARACTER SET utf8 DEFAULT NULL,
+  `TitleTemplate` varchar(250) CHARACTER SET utf8 DEFAULT NULL,
+  `DescTemplate` varchar(250) CHARACTER SET utf8 DEFAULT NULL,
+  `TagTemplate` varchar(250) CHARACTER SET utf8 DEFAULT NULL,
+  `LogoPosition` varchar(45) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `EnableIntro` int(11) DEFAULT NULL,
+  `EnableOutro` int(11) DEFAULT NULL,
+  `EnableLogo` int(11) DEFAULT NULL,
+  `EnableTitle` int(11) DEFAULT NULL,
+  `EnableDesc` int(11) DEFAULT NULL,
+  `EnableTag` int(11) DEFAULT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
