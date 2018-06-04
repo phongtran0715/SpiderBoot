@@ -13,11 +13,14 @@
 #define LIBCORBA_EXPORTABLE
 #endif
 
-struct HomeInfo
+struct RenderConifgParam
 {
    TCHAR* vIntro;
    TCHAR* vOutro;
    TCHAR* vLogo;
+   bool enableIntro;
+   bool enableOutro;
+   bool enableLogo;
 };
 
 class LIBCORBA_EXPORTABLE SpiderDownloadClient
@@ -72,10 +75,9 @@ public:
 class AgentSide_i : public POA_SpiderAgentApp::AgentSide
 {
 private:
-   HomeInfo getHomeChannelField(const TCHAR* cHomeId);
+   RenderConifgParam* getRenderConfig(INT32 mappingId);
    INT32 getMaxId(TCHAR * tbName);
 public:
-
    void onDownloadStartup(const ::CORBA::WChar* appId);
    void onRenderStartup(const ::CORBA::WChar* appId);
    void onUploadStartup(const ::CORBA::WChar* appId);
@@ -83,7 +85,8 @@ public:
    void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong lastSyncTime);
    void updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::VideoInfo& vInfo);
    void updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const ::CORBA::WChar* vRenderPath);
-   void updateUploadedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const ::CORBA::WChar* videoLocation);
+   void updateUploadedVideo(::CORBA::Long jobId);
+   ::CORBA::WChar* getMonitorChannelId(::CORBA::Long mappingId);
 };
 
 #endif /* _nms_corba_h_ */

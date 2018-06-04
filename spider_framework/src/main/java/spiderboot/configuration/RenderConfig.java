@@ -15,6 +15,7 @@ public class RenderConfig {
 	public String outputVideo;
 	public String videoFormat;
 	public String corbaRef;
+	public String ip;
 
 	public RenderConfig (String configFile)
 	{
@@ -45,6 +46,7 @@ public class RenderConfig {
 			appId = prop.getProperty(Constant.RENDER_APP_ID, "").trim();
 			outputVideo = prop.getProperty(Constant.RENDER_OUTPUT_VIDEO_PATH, "").trim();
 			corbaRef = prop.getProperty(Constant.RENDER_CORBA_REF, "").trim();
+			ip = prop.getProperty(Constant.RENDER_IP, "127.0.0.1").trim();
 			result = true;
 		} catch (Exception e) {
 			result = false;

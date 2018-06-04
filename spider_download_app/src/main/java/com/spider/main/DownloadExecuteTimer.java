@@ -1,9 +1,6 @@
 package com.spider.main;
 
 import java.io.File;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -12,6 +9,7 @@ import java.util.Iterator;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
+import org.omg.CORBA.StringHolder;
 
 import com.github.axet.vget.DirectDownload;
 import com.google.api.client.util.DateTime;
@@ -30,8 +28,6 @@ import java.util.List;
 
 public class DownloadExecuteTimer extends TimerTask {
 	int timerId;
-	String cHomeId;
-	String cMonitorId;
 	static Utility util;;
 	String videoFolderBase;
 	DateFormat dateFormat;
@@ -41,10 +37,8 @@ public class DownloadExecuteTimer extends TimerTask {
 	boolean isComplete = true;
 	private static final Logger logger = Logger.getLogger(DownloadExecuteTimer.class);
 
-	public DownloadExecuteTimer(int timerId, String cHomeId, String cMonitorId) {
+	public DownloadExecuteTimer(int timerId) {
 		this.timerId = timerId;
-		this.cHomeId = cHomeId;
-		this.cMonitorId = cMonitorId;
 		util = new Utility();
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		downloadConfig = DataController.getInstance().downloadConfig;
@@ -68,6 +62,8 @@ public class DownloadExecuteTimer extends TimerTask {
 				return;
 			}
 			DateTime ytbTime = new DateTime(lastSyncTime);
+			String cMonitorId = getMonitorChannelId(timerId);
+			logger.info("cmonitor  = " + cMonitorId);
 			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(cMonitorId, ytbTime, downloadConfig.maxResult);
 			Iterator<SearchResult> iteratorSearchResults = result.iterator();
 			if (!iteratorSearchResults.hasNext()) {
@@ -82,7 +78,7 @@ public class DownloadExecuteTimer extends TimerTask {
 						String vId = rId.getVideoId();
 						//Download video
 						DirectDownload dowloadHandle = new DirectDownload();
-						String videoLocation = videoFolderBase + "/" + cHomeId + "-" + cMonitorId;
+						String videoLocation = videoFolderBase + "/" + timerId;
 						util.createFolderIfNotExist(videoLocation);
 						File theDir = new File(videoLocation);
 						if (theDir.exists()) {
@@ -175,7 +171,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		String title = singleVideo.getSnippet().getTitle();
 		String desc = singleVideo.getSnippet().getDescription();
 		String thumb = singleVideo.getSnippet().getThumbnails().getDefault().getUrl();
-		String vDownloadPath = videoFolderBase + "/" + cHomeId + "-" + cMonitorId + "/" + videoName + "." + ext;
+		String vDownloadPath = videoFolderBase + "/" + timerId + "/" + videoName + "." + ext;
 		String vRenderPath = "";
 		String tags = "";
 		List<String> lstTags = singleVideo.getSnippet().getTags();
@@ -188,7 +184,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		int processStatus = 1;
 		int license = 0;
 		VideoWraper vWraper = new VideoWraper(videoId, title, tags, desc, thumb, 
-				vDownloadPath, vRenderPath, cHomeId, cMonitorId, processStatus, license);
+				vDownloadPath, vRenderPath, timerId, processStatus, license);
 		return vWraper;
 	}
 
@@ -206,8 +202,8 @@ public class DownloadExecuteTimer extends TimerTask {
 				try {
 					SpiderAgentApp.AgentSidePackage.VideoInfo vInfo = new VideoInfo(videoWrapper.videoId, videoWrapper.title, 
 							videoWrapper.tag, videoWrapper.description, videoWrapper.thumbnail, 
-							videoWrapper.vDownloadPath, videoWrapper.vRenderPath, videoWrapper.cHomeId, 
-							videoWrapper.cMonitorId, videoWrapper.processStatus, videoWrapper.license);
+							videoWrapper.vDownloadPath, videoWrapper.vRenderPath, videoWrapper.mappingId,
+							videoWrapper.processStatus, videoWrapper.license);
 
 					downloadClient.downloadAppImpl.updateDownloadedVideo(vInfo);
 				}catch (Exception e) {
@@ -219,5 +215,32 @@ public class DownloadExecuteTimer extends TimerTask {
 		}else {
 			logger.error("Init corba client FALSE");
 		}
+	}
+
+	private String getMonitorChannelId(int mappingId)
+	{
+		String result = null;
+		logger.info("Function getCMonitorIdByMapping:: >>>>");
+		if(isInitCorba == false)
+		{
+			isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);	
+		}
+		if(isInitCorba)
+		{
+			if(downloadClient.downloadAppImpl != null)
+			{
+				try {
+					result = downloadClient.downloadAppImpl.getMonitorChannelId(mappingId);
+					System.out.println("result = " +  result);
+				}catch (Exception e) {
+					logger.error(e.toString());
+				}
+			}else {
+				logger.error("Download client implementation is NULL");
+			}
+		}else {
+			logger.error("Init corba client FALSE");
+		}
+		return result;
 	}
 }

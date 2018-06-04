@@ -779,6 +779,7 @@ private:
    void createSpiderMappingConfig(UINT32 mappingId, NXCPMessage *request);
    void modifySpiderMappingConfig(UINT32 mappingId, NXCPMessage *request);
    void deleteSpiderMappingConfig(UINT32 mappingId);
+   void deleteVideoContainer(UINT32 mappingId);
    TCHAR* getChannelNameById(TCHAR* channelId, TCHAR* tbName);
    bool checkDeleteCondition(TCHAR* checkId, TCHAR* tbCheck, TCHAR* fieldCheck);
    INT32 getLastestInsertId(TCHAR* tbName);

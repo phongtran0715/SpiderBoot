@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import com.spider.corba.RenderCorbaClient;
 
+import SpiderAgentApp.AgentSidePackage.ClusterInfo;
 import SpiderRenderApp.SpiderFootSidePackage.RenderInfo;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
@@ -61,18 +62,25 @@ public class RenderExecuteTimer extends TimerTask{
 				//TODO: get render information
 				util.createFolderIfNotExist(outputFolder);
 
-				String vOutput = outputFolder + util.prefixOS() + vInfo.videoId + ".mp4";
+				String vOutput = outputFolder + util.prefixOS() + vInfo.videoId + "_" + new Date().getTime() +   ".mp4";
 				//process video
-				processVideo(vInfo.vdownloadPath, outputFolder + util.prefixOS() + "video_tmp1.mp4", vInfo.vLogo);
+				String vProcessedInput = processVideo(vInfo.vLocation, outputFolder + util.prefixOS() + "video_tmp1.mp4", vInfo.vLogo, vInfo.enableLogo);
 				//convert video
-				convertVideo(vInfo.vIntro, outputFolder + util.prefixOS() + "intro.ts");
-				convertVideo(vInfo.vOutro, outputFolder + util.prefixOS() + "outro.ts");
-				convertVideo(outputFolder + util.prefixOS() + "video_tmp1.mp4", 
-						outputFolder + util.prefixOS() + "video_tmp1.ts");
+				String vProcessIntro = "";
+				String vProcessOutro = "";
+				if(vInfo.enableIntro)
+				{
+					vProcessIntro = convertVideo(vInfo.vIntro, outputFolder + util.prefixOS() + "intro.ts");	
+				}
+				if(vInfo.enableOutro)
+				{
+					vProcessOutro = convertVideo(vInfo.vOutro, outputFolder + util.prefixOS() + "outro.ts");	
+				}
+				convertVideo(vProcessedInput,  outputFolder + util.prefixOS() + "video_tmp1.ts");
 				//concast video 
-				concastVideo(outputFolder + util.prefixOS() + "intro.ts",
+				concastVideo(vProcessIntro,
 						outputFolder + util.prefixOS() + "video_tmp1.ts",
-						outputFolder + util.prefixOS() + "outro.ts", 
+						vProcessOutro, 
 						vOutput);
 				//update rendered video information
 				updateRenderedInfo(vInfo.jobId, 2, vOutput);
@@ -90,23 +98,29 @@ public class RenderExecuteTimer extends TimerTask{
 		}
 	}
 
-	private String processVideo(String inputVideo, String outVideo, String logo)
+	private String processVideo(String inputVideo, String outVideo, String logo, boolean enableLogo)
 	{
 		logger.info("Beginning processVideo : " + inputVideo);
 		String result = null;
-		FFmpegBuilder builder = new FFmpegBuilder()
-				.setInput(inputVideo)
-				.addInput(logo)
-				.setComplexFilter("overlay=main_w-overlay_w-10:10")
-				.overrideOutputFiles(true)
-				.addOutput(outVideo)
-				.done();
+		if (enableLogo)
+		{
+			FFmpegBuilder builder;
+			builder = new FFmpegBuilder();
+			builder = builder.setInput(inputVideo);	
+			builder = builder.addInput(logo);
+			builder = builder.setComplexFilter("overlay=main_w-overlay_w-10:10");
+			builder = builder.overrideOutputFiles(true);
+			builder.addOutput(outVideo).done();
 
-		FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
+			FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
 
-		// Run a one-pass encode
-		executor.createJob(builder).run();
-		result = outVideo;
+			// Run a one-pass encode
+			executor.createJob(builder).run();
+			result = outVideo;
+		}else {
+			result = inputVideo;
+		}
+
 		logger.info("Finish processVideo : " + inputVideo);
 		return result;
 	}
@@ -156,7 +170,10 @@ public class RenderExecuteTimer extends TimerTask{
 	private void updateRenderedInfo(int jobId, int processStatus, String videoRendered)
 	{
 		logger.info(">>> Function [updateRenderedInfo] : job Id = " + jobId);
-		isInitCorba = renderClient.initCorba(renderConfig.corbaRef);
+		if(isInitCorba == false)
+		{
+			isInitCorba = renderClient.initCorba(renderConfig.corbaRef);	
+		}
 		if(isInitCorba)
 		{
 			if(renderClient.renderAppImpl != null)
@@ -173,13 +190,39 @@ public class RenderExecuteTimer extends TimerTask{
 			logger.error("Init corba client FALSE");
 		}
 	}
-	
+
 	private void deleteTempFile(String filePath)
 	{
 		File file = new File(filePath);
-        if(file.delete() == false)
-        {
-        	logger.error("Failed to delete the file : " + filePath);
-        }
+		if(file.delete() == false)
+		{
+			logger.error("Failed to delete the file : " + filePath);
+		}
+	}
+
+	private ClusterInfo getClusterInfo(int jobId)
+	{
+		ClusterInfo clusterInfo = null;
+		if(isInitCorba == false)
+		{
+			isInitCorba = renderClient.initCorba(renderConfig.corbaRef);	
+		}
+		if(isInitCorba)
+		{
+			if(renderClient.renderAppImpl != null)
+			{
+				try {
+
+					//clusterInfo = renderClient.renderAppImpl.getClusterInfor(jobId);
+				}catch (Exception e) {
+					System.out.println(e.toString());
+				}
+			}else {
+				logger.error("Render client implementation is NULL");
+			}
+		}else {
+			logger.error("Init corba client FALSE");
+		}
+		return clusterInfo;
 	}
 }

@@ -10,14 +10,13 @@ public class VideoWraper {
     public String thumbnail = "";
     public String vDownloadPath = "";
     public String vRenderPath = "";
-    public String cHomeId = "";
-    public String cMonitorId = "";
+    public int mappingId = 0;
     public int processStatus = 0;
     public int license = 0;
     
     public VideoWraper(String videoId, String title, String tag, String description,
-    		String thumbnail, String vDownloadPath, String vRenderPath, String cHomeId, 
-    		String cMonitorId, int processStatus, int license) {
+    		String thumbnail, String vDownloadPath, String vRenderPath, int mappingId,
+    		int processStatus, int license) {
     	this.videoId = videoId;
     	this.title = title;
     	this.tag = tag;
@@ -25,8 +24,7 @@ public class VideoWraper {
     	this.thumbnail = thumbnail;
     	this.vDownloadPath = vDownloadPath;
     	this.vRenderPath = vRenderPath;
-    	this.cHomeId = cHomeId;
-    	this.cMonitorId = cMonitorId;
+    	this.mappingId = mappingId;
     	this.processStatus = processStatus;
     	this.license = license;
 	}

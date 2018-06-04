@@ -59,16 +59,13 @@ CREATE TABLE `video_container` (
   `Tag` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
   `Description` varchar(4096) COLLATE utf8_unicode_ci DEFAULT NULL,
   `Thumbnail` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `VideoDownloadedLocation` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `VideoRebderedLocation` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `HomeChannelId` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `DownloadDate` datetime DEFAULT NULL,
-  `MonitorChannelId` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `VDownloadedPath` varchar(250) CHARACTER SET utf8 DEFAULT NULL,
+  `VRenderedPath` varchar(250) CHARACTER SET utf8 DEFAULT NULL,
+  `MappingId` int(11) DEFAULT NULL,
   `ProcessStatus` int(11) DEFAULT '0',
-  `LICENSE` tinyint(1) DEFAULT NULL COMMENT 'Video license or not',
+  `License` tinyint(1) DEFAULT NULL COMMENT 'Video license or not',
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
 -- download_cluster

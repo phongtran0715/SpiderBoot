@@ -20,20 +20,20 @@ public class DownloadTimerManager {
 		return instance;
 	}
 
-	public boolean createDownloadTimer(int taskId, String cHomeId, String cMonitorId, int timerInterval) {
+	public boolean createDownloadTimer(int timerId, String cHomeId, String cMonitorId, int timerInterval) {
 		boolean isSuccess = false;
 		//check timer is existed
-		if(timerMap.get(taskId)!= null)
+		if(timerMap.get(timerId)!= null)
 		{
-			timerMap.get(taskId).cancel();
-			timerMap.get(taskId).purge();
-			timerMap.remove(taskId);
+			timerMap.get(timerId).cancel();
+			timerMap.get(timerId).purge();
+			timerMap.remove(timerId);
 		}
-		TimerTask timerTask = new DownloadExecuteTimer(taskId, cHomeId, cMonitorId);
+		TimerTask timerTask = new DownloadExecuteTimer(timerId);
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(timerTask, 0, timerInterval * 1000);
 		if (timer != null) {
-			timerMap.put(taskId, timer);
+			timerMap.put(timerId, timer);
 		}
 		isSuccess = true;
 		return isSuccess;

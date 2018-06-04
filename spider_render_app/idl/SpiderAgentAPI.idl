@@ -11,13 +11,13 @@ module SpiderRenderApp
             wstring vIntro;
             wstring vOutro;
             wstring vLogo;
-            wstring vdownloadPath;
+            boolean enableIntro;
+            boolean enableOutro;
+            boolean enableLogo;
+            wstring vLocation;
         };
 
-        boolean createRenderJob(in long jobId, in RenderInfo vInfo);
-        boolean modifyRenderJob(in long jobId, in RenderInfo vInfo);
-        boolean deleteRenderJob(in long jobId, in RenderInfo vInfo);
-
+        boolean createRenderJob(in RenderInfo vInfo);
   };
 };
 
@@ -35,8 +35,7 @@ module SpiderAgentApp
       wstring thumbnail;
       wstring vDownloadPath;
       wstring vRenderPath;
-      wstring homeChannelId;
-      wstring monitorChannelId;
+      long mappingId;
       long processStatus;
       long license;
     };
@@ -50,6 +49,8 @@ module SpiderAgentApp
 
     void updateDownloadedVideo(in VideoInfo vInfo);
     void updateRenderedVideo(in long jobId, in long processStatus, in wstring vRenderPath);
-    void updateUploadedVideo (in long videoId, in long processStatus, in wstring videoLocation);
+    void updateUploadedVideo (in long jobId);
+	string getMonitorChannelId(in long mappingId);
   };
 };
+

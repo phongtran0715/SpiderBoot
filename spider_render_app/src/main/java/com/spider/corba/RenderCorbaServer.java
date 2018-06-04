@@ -15,20 +15,11 @@ import spiderboot.render.RenderTimerManager;
 
 class RenderImpl extends SpiderFootSidePOA {
 	private static final Logger logger = Logger.getLogger(RenderImpl.class);
-	public boolean createRenderJob(int jobId, RenderInfo vInfo) {
-		logger.info("createRenderJob:: jobId = " + jobId);
+	@Override
+	public boolean createRenderJob(RenderInfo vInfo) {
+		logger.info("createRenderJob:: jobId = " + vInfo.jobId);
 		RenderTimerManager.qRenderJob.add(vInfo);
 		return true;
-	}
-
-	public boolean modifyRenderJob(int jobId, RenderInfo vInfo) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public boolean deleteRenderJob(int jobId, RenderInfo vInfo) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }
 

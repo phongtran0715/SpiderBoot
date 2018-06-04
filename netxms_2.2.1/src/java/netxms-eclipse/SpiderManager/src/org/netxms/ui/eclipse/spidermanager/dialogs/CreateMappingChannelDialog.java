@@ -291,6 +291,21 @@ public class CreateMappingChannelDialog extends Dialog {
 		label.setText(":");
 		label.setAlignment(SWT.CENTER);
 		label.setBounds(217, 148, 20, 17);
+		
+		Button btnDefault = new Button(grpRender, SWT.NONE);
+		btnDefault.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				txtVideoIntro.setText("/home/phongtran0715/Downloads/Video/test/render_resource/intro.mp4");
+				txtVideoOutro.setText("/home/phongtran0715/Downloads/Video/test/render_resource/outro.mp4");
+				txtLogo.setText("/home/phongtran0715/Downloads/Video/test/render_resource/logo.png");
+				cbIntro.setSelection(true);
+				cbOutro.setSelection(true);
+				cbLogo.setSelection(true);
+			}
+		});
+		btnDefault.setBounds(113, 283, 95, 29);
+		btnDefault.setText("default");
 
 		tbtmUploadConfig = new TabItem(tabFolder, SWT.NONE);
 		tbtmUploadConfig.setImage(ResourceManager.getPluginImage("org.spider.ui.eclipse.spidermanager", "icons/upload.png"));

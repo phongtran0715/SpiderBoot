@@ -63,12 +63,12 @@ void AgentSide_i::onDownloadStartup(const ::CORBA::WChar* appId)
 
 void AgentSide_i::onRenderStartup(const ::CORBA::WChar* appId)
 {
-	DbgPrintf(1, _T("AgentSide_i::[onDownloadStartup]"));
+	DbgPrintf(1, _T("AgentSide_i::[onRenderStartup]"));
 	DB_RESULT hResult;
 	UINT32 i, dwNumRecords;
 	SpiderRenderClient* renderClient = new SpiderRenderClient();
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
-	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT Id, VideoId, HomeChannelId, VDownloadedPath FROM video_container WHERE ProcessStatus = ? "));
+	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT Id, VideoId, MappingId, VDownloadedPath FROM video_container WHERE ProcessStatus = ? "));
 	if (hStmt != NULL)
 	{
 		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)1);
@@ -76,12 +76,12 @@ void AgentSide_i::onRenderStartup(const ::CORBA::WChar* appId)
 		if (hResult != NULL)
 		{
 			dwNumRecords = DBGetNumRows(hResult);
-			DbgPrintf(1, _T("AgentSide_i::[DownloadStartup] numRecord = %d"), dwNumRecords);
+			DbgPrintf(1, _T("AgentSide_i::[onRenderStartup] numRecord = %d"), dwNumRecords);
 			for (i = 0; i < dwNumRecords; i++)
 			{
 				INT32 id = DBGetFieldInt64(hResult, i, 0);
 				TCHAR* videoId = DBGetField(hResult, i, 1, NULL, 0);
-				TCHAR* cHomeId = DBGetField(hResult, i, 2, NULL, 0);
+				INT32 mappingId = DBGetFieldInt64(hResult, i, 2);
 				TCHAR* downloadPath = DBGetField(hResult, i, 3, NULL, 0);
 				if (renderClient->initSuccess)
 				{
@@ -89,17 +89,24 @@ void AgentSide_i::onRenderStartup(const ::CORBA::WChar* appId)
 					{
 						try
 						{
-							//TODO: create render info struct
-							HomeInfo homeInfo = getHomeChannelField(cHomeId);
-							::SpiderRenderApp::SpiderFootSide::RenderInfo vInfo;
-							vInfo.jobId = id;
-							vInfo.videoId = CORBA::wstring_dup(videoId);
-							vInfo.vIntro = CORBA::wstring_dup(homeInfo.vIntro);
-							vInfo.vOutro = CORBA::wstring_dup(homeInfo.vOutro);
-							vInfo.vLogo = CORBA::wstring_dup(homeInfo.vLogo);
-							vInfo.vdownloadPath = CORBA::wstring_dup(downloadPath);
+							RenderConifgParam* renderConfig =  getRenderConfig(mappingId);
+							if(renderConfig == nullptr)
+							{
+								DbgPrintf(1, _T("AgentSide_i::[onRenderStartup] : Can not get render config for mappingId = %d"), mappingId);	
+								return;
+							}
+							::SpiderRenderApp::SpiderFootSide::RenderInfo renderInfo;
+							renderInfo.jobId = id;
+							renderInfo.videoId = CORBA::wstring_dup(videoId);
+							renderInfo.vIntro = CORBA::wstring_dup(renderConfig->vIntro);
+							renderInfo.vOutro = CORBA::wstring_dup(renderConfig->vOutro);
+							renderInfo.vLogo = CORBA::wstring_dup(renderConfig->vLogo);
+							renderInfo.enableIntro = renderConfig->enableIntro;
+							renderInfo.enableOutro = renderConfig->enableOutro;
+							renderInfo.enableLogo = renderConfig->enableLogo;
+							renderInfo.vLocation = CORBA::wstring_dup(downloadPath);
 
-							renderClient->mRenderRef->createRenderJob(id, vInfo);
+							renderClient->mRenderRef->createRenderJob(renderInfo);
 						}
 						catch (CORBA::TRANSIENT&) {
 							DbgPrintf(1, _T("AgentSide_i::[] : Caught system exception TRANSIENT -- unable to contact the server"));
@@ -204,8 +211,8 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::Video
 	if (hdb != NULL)
 	{
 		hStmt = DBPrepare(hdb, _T("INSERT INTO video_container (VideoId, Title, Tag, ")
-		                  _T(" Description, Thumbnail, VDownloadedPath, HomeChannelId,")
-		                  _T(" MonitorChannelId, ProcessStatus, License) VALUES (?,?,?,?,?,?,?,?,?,?)"));
+		                  _T(" Description, Thumbnail, VDownloadedPath,")
+		                  _T("MappingId, ProcessStatus, License) VALUES (?,?,?,?,?,?,?,?,?)"));
 
 		DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.videoId), DB_BIND_TRANSIENT);
 		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.title), DB_BIND_TRANSIENT);
@@ -213,10 +220,9 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::Video
 		DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.description), DB_BIND_TRANSIENT);
 		DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.thumbnail), DB_BIND_TRANSIENT);
 		DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.vDownloadPath), DB_BIND_TRANSIENT);
-		DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.homeChannelId), DB_BIND_TRANSIENT);
-		DBBind(hStmt, 8, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.monitorChannelId), DB_BIND_TRANSIENT);
-		DBBind(hStmt, 9, DB_SQLTYPE_INTEGER, (INT32)vInfo.processStatus);
-		DBBind(hStmt, 10, DB_SQLTYPE_INTEGER, (INT32)vInfo.license);
+		DBBind(hStmt, 7, DB_SQLTYPE_INTEGER, (INT32)vInfo.mappingId);
+		DBBind(hStmt, 8, DB_SQLTYPE_INTEGER, (INT32)vInfo.processStatus);
+		DBBind(hStmt, 9, DB_SQLTYPE_INTEGER, (INT32)vInfo.license);
 
 
 		bool success = DBExecute(hStmt);
@@ -231,16 +237,26 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::Video
 					try
 					{
 
-						HomeInfo homeInfo = getHomeChannelField((const TCHAR*)CORBA::wstring_dup(vInfo.homeChannelId));
+						RenderConifgParam* renderConfig =  getRenderConfig(vInfo.mappingId);
+						if(renderConfig == nullptr)
+						{
+							DbgPrintf(1, _T("AgentSide_i::[] : Can not get render config for mapping id = %d"), vInfo.mappingId);
+							return;
+						}else{
+							DbgPrintf(1, _T("AgentSide_i::[] : Get render config ok"));
+						}
 						::SpiderRenderApp::SpiderFootSide::RenderInfo renderInfo;
 						renderInfo.jobId = getMaxId(_T("video_container"));
 						renderInfo.videoId = CORBA::wstring_dup(vInfo.videoId);
-						renderInfo.vIntro = CORBA::wstring_dup(homeInfo.vIntro);
-						renderInfo.vOutro = CORBA::wstring_dup(homeInfo.vOutro);
-						renderInfo.vLogo = CORBA::wstring_dup(homeInfo.vLogo);
-						renderInfo.vdownloadPath = CORBA::wstring_dup(vInfo.vDownloadPath);
+						renderInfo.vIntro = CORBA::wstring_dup(renderConfig->vIntro);
+						renderInfo.vOutro = CORBA::wstring_dup(renderConfig->vOutro);
+						renderInfo.vLogo = CORBA::wstring_dup(renderConfig->vLogo);
+						renderInfo.enableIntro = renderConfig->enableIntro;
+						renderInfo.enableOutro = renderConfig->enableOutro;
+						renderInfo.enableLogo = renderConfig->enableLogo;
+						renderInfo.vLocation = CORBA::wstring_dup(vInfo.vDownloadPath);
 
-						renderClient->mRenderRef->createRenderJob(renderInfo.jobId, renderInfo);
+						renderClient->mRenderRef->createRenderJob(renderInfo);
 
 					}
 					catch (CORBA::TRANSIENT&) {
@@ -288,11 +304,6 @@ void AgentSide_i::updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long process
 		DBExecute(hStmt);
 	}
 	DBConnectionPoolReleaseConnection(hdb);
-}
-
-void AgentSide_i::updateUploadedVideo(::CORBA::Long videoId, ::CORBA::Long processStatus, const ::CORBA::WChar* videoLocation)
-{
-
 }
 
 AgentCorbaServer::AgentCorbaServer(): initSuccess(false)
@@ -419,29 +430,76 @@ INT32 AgentSide_i::getMaxId(TCHAR * tbName)
 	DBConnectionPoolReleaseConnection(hdb);
 	return result;
 }
-
-HomeInfo AgentSide_i::getHomeChannelField(const TCHAR* cHomeId)
+void AgentSide_i::updateUploadedVideo(::CORBA::Long jobId)
 {
-	HomeInfo homeInfo;
+
+}
+
+RenderConifgParam* AgentSide_i::getRenderConfig(INT32 mappingId)
+{
+	DbgPrintf(1, _T(" AgentSide_i::[getRenderConfig] mappingId = %d"), mappingId);
+	RenderConifgParam* renderConfig = new RenderConifgParam();
 	DB_RESULT hResult;
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
 	TCHAR query [MAX_DB_STRING];
-	_sntprintf(query, sizeof query, _T("SELECT VideoIntro, VideoOutro , Logo FROM home_channel_list WHERE ChannelId = '%s'"), cHomeId);
+	_sntprintf(query, sizeof query, _T("SELECT VideoIntro, VideoOutro , Logo, EnableIntro, EnableOutro, EnableLogo ")
+	           _T(" FROM spider_mapping_config WHERE MappingId = '%d'"), mappingId);
 	DB_STATEMENT hStmt = DBPrepare(hdb, query);
 	if (hStmt != NULL)
 	{
 		hResult = DBSelectPrepared(hStmt);
 		if (hResult != NULL)
 		{
-			homeInfo.vIntro = DBGetField(hResult, 0, 0, NULL, 0);
-			homeInfo.vOutro = DBGetField(hResult, 0, 1, NULL, 0);
-			homeInfo.vLogo = DBGetField(hResult, 0, 2, NULL, 0);
+			renderConfig->vIntro = DBGetField(hResult, 0, 0, NULL, 0);
+			renderConfig->vOutro = DBGetField(hResult, 0, 1, NULL, 0);
+			renderConfig->vLogo = DBGetField(hResult, 0, 2, NULL, 0);
+			renderConfig->enableIntro = DBGetFieldInt64(hResult, 0, 3) == 1;
+			renderConfig->enableOutro = DBGetFieldInt64(hResult, 0, 4) == 1;
+			renderConfig->enableLogo = DBGetFieldInt64(hResult, 0, 5) == 1;
+			DBFreeResult(hResult);
+			DbgPrintf(1, _T(" AgentSide_i::[getRenderConfig] renderConfig->vIntro = %s"), renderConfig->vIntro);
+			DbgPrintf(1, _T(" AgentSide_i::[getRenderConfig] Complete"));	
+		}
+		else{
+			DbgPrintf(1, _T(" AgentSide_i::[getRenderConfig] result is NULL"));	
+		}
+	}
+	else{
+		DbgPrintf(1, _T(" AgentSide_i::[getRenderConfig] mappingId = Can not prepare query command"));
+	}
+	DBConnectionPoolReleaseConnection(hdb);
+	return renderConfig;
+}
+
+::CORBA::WChar* AgentSide_i::getMonitorChannelId(::CORBA::Long mappingId)
+{
+	DbgPrintf(6, _T(" Function [getMonitorChannelId] mappingId = %d"), mappingId);
+	TCHAR* result = _T("");
+	DB_RESULT hResult;
+	UINT32 i, dwId, dwNumRecords;
+
+	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT MonitorChannelId FROM channel_mapping WHERE Id = ?"));
+	if (hStmt != NULL)
+	{
+		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)mappingId);
+		hResult = DBSelectPrepared(hStmt);
+		if (hResult != NULL)
+		{
+			dwNumRecords = DBGetNumRows(hResult);
+			if(dwNumRecords > 0)
+			{
+				result = DBGetField(hResult, 0, 0, NULL, 0);
+
+				DbgPrintf(1, _T(" Function [getMonitorChannelId] result = %s"), result);
+			}
 			DBFreeResult(hResult);
 		}
 	}
 	DBConnectionPoolReleaseConnection(hdb);
-	return homeInfo;
+	return CORBA::wstring_dup(result);
 }
+
 
 AgentCorbaServer::~AgentCorbaServer()
 {

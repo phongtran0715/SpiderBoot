@@ -14215,8 +14215,8 @@ void ClientSession::getMappingChannels(NXCPMessage *request)
 
    DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
    DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT MappingId, VideoIntro, VideoOutro, Logo,  ")
-      _T(" TitleTemplate, DescTemplate, TagTemplate, EnableIntro, EnableOutro, EnableLogo, EnableTitle, ")
-      _T(" EnableDesc, EnableTag FROM spider_mapping_config"));
+                                  _T(" TitleTemplate, DescTemplate, TagTemplate, EnableIntro, EnableOutro, EnableLogo, EnableTitle, ")
+                                  _T(" EnableDesc, EnableTag FROM spider_mapping_config"));
    if (hStmt != NULL)
    {
       hResult = DBSelectPrepared(hStmt);
@@ -14227,8 +14227,8 @@ void ClientSession::getMappingChannels(NXCPMessage *request)
          msg.setField(VID_RCC, RCC_SUCCESS);
          for (i = 0, dwId = VID_VARLIST_BASE; i < dwNumRecords; i++, dwId += 10)
          {
-            INT32 id             = DBGetFieldInt64(hResult, i, 0);            //Mapping Id     
-            TCHAR* vIntro        = DBGetField(hResult, i, 1, NULL, 0);        //Video Intro 
+            INT32 id             = DBGetFieldInt64(hResult, i, 0);            //Mapping Id
+            TCHAR* vIntro        = DBGetField(hResult, i, 1, NULL, 0);        //Video Intro
             TCHAR* vOutro        = DBGetField(hResult, i, 2, NULL, 0);        //Video Outro
             TCHAR* vLogo          = DBGetField(hResult, i, 3, NULL, 0);       //Logo
             TCHAR* titleTemp     = DBGetField(hResult, i, 4, NULL, 0);        //Title template
@@ -14536,7 +14536,7 @@ void ClientSession::modifySpiderMappingConfig(UINT32 mappingId, NXCPMessage * re
       hStmt = DBPrepare(hdb, _T("UPDATE spider_mapping_config SET VideoIntro = ?, VideoOutro = ?, Logo = ?, ")
                         _T(" TitleTemplate = ?, DescTemplate = ?, TagTemplate = ?, EnableIntro = ?, ")
                         _T(" EnableOutro = ?, EnableLogo = ?, EnableTitle = ?, EnableDesc = ?, EnableTag = ? WHERE MappingId = ?"));
-      
+
       DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)vIntro, DB_BIND_TRANSIENT);
       DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)vOutro, DB_BIND_TRANSIENT);
       DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)vLogo, DB_BIND_TRANSIENT);
@@ -14548,11 +14548,11 @@ void ClientSession::modifySpiderMappingConfig(UINT32 mappingId, NXCPMessage * re
       DBBind(hStmt, 9, DB_SQLTYPE_INTEGER, enableLogo);
       DBBind(hStmt, 10, DB_SQLTYPE_INTEGER, enableTitle);
       DBBind(hStmt, 11, DB_SQLTYPE_INTEGER, enableDesc);
-      DBBind(hStmt, 12, DB_SQLTYPE_INTEGER, enableLogo);
+      DBBind(hStmt, 12, DB_SQLTYPE_INTEGER, enableTags);
       DBBind(hStmt, 13, DB_SQLTYPE_INTEGER, mappingId);
 
       bool success = DBExecute(hStmt);
-      if(success == false)
+      if (success == false)
       {
          debugPrintf(1, _T("Function :: [modifySpiderMappingConfig] Execte database query FALSE!!!"));
       }
@@ -14883,6 +14883,7 @@ void ClientSession::deleteMappingChannel(NXCPMessage * request)
       {
          msg.setField(VID_RCC, RCC_SUCCESS);
          deleteSpiderMappingConfig(id);
+         deleteVideoContainer(id);
          //notify information to download app
          SpiderDownloadClient* downloadClient = new SpiderDownloadClient();
          if (downloadClient->initSuccess)
@@ -15201,6 +15202,33 @@ void ClientSession::deleteSpiderMappingConfig(UINT32 mappingId)
       hStmt = DBPrepare(hdb, _T("DELETE FROM spider_mapping_config WHERE MappingId = ?"));
       DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)mappingId);
       bool success = DBExecute(hStmt);
+      if (success == false)
+      {
+         debugPrintf(6, _T("ClientSession::[%s] Execute delete query false"), __FUNCTION__);
+      }
+   }
+   else {
+      debugPrintf(6, _T("ClientSession::[%s] can not create database connection"), __FUNCTION__);
+   }
+}
+void ClientSession::deleteVideoContainer(UINT32 mappingId)
+{
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+   DB_STATEMENT hStmt;
+
+   if (hdb != NULL)
+   {
+      hStmt = DBPrepare(hdb, _T("DELETE FROM video_container WHERE MappingId = ?"));
+      DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)mappingId);
+      bool success = DBExecute(hStmt);
+      if (success == false)
+      {
+         debugPrintf(6, _T("ClientSession::[%s] Execute delete query false"), __FUNCTION__);
+      }
+   }
+   else {
+      debugPrintf(6, _T("ClientSession::[%s] can not create database connection"), __FUNCTION__);
    }
 }
 

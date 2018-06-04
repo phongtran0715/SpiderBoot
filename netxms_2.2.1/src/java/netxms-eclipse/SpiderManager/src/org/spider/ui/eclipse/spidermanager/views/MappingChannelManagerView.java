@@ -2,6 +2,7 @@ package org.spider.ui.eclipse.spidermanager.views;
 
 import java.io.IOException;
 
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.TableItem;

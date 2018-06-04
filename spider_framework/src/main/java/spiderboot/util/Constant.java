@@ -23,6 +23,7 @@ public class Constant {
     public static final String RENDER_APP_ID				= "AppId";
     public static final String RENDER_OUTPUT_VIDEO_PATH		= "OutputVideo";
     public static final String RENDER_VIDEO_FORMAT			= "VideoFormat";
+    public static final String RENDER_IP					= "IP";
     public static final String RENDER_CORBA_REF	 			= "CorbaRef";
     
     //upload configuration parameter

@@ -51,7 +51,7 @@ public class UploadExecuteTimer extends TimerTask{
 					logger.error("File " + vInfo.vLocation + " not Exist");
 					return;
 				}
-				
+				/*
 				logger.info("Beginning get authen file >>>>");
 				String clientFile = getAuthAtr(vInfo.cHomeId,"ClientSecret");
 				String userName = getHomeAtrr(vInfo.cHomeId,"GoogleAccount");
@@ -71,7 +71,7 @@ public class UploadExecuteTimer extends TimerTask{
 				//uploadVideo.execute(title, desc, tags, vInfo.vLocation);
 				//update process status 
 				updateProcessStatus(vInfo.jobId);
-				
+				*/
 				logger.info("Upload complete video " + vInfo.videoId);
 				//Delay time for next upload video
 				try {

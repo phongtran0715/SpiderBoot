@@ -24,8 +24,7 @@ module SpiderAgentApp
       wstring thumbnail;
       wstring vDownloadPath;
       wstring vRenderPath;
-      wstring homeChannelId;
-      wstring monitorChannelId;
+      long mappingId;
       long processStatus;
       long license;
     };
@@ -39,7 +38,8 @@ module SpiderAgentApp
 
     void updateDownloadedVideo(in VideoInfo vInfo);
     void updateRenderedVideo(in long jobId, in long processStatus, in wstring vRenderPath);
-    void updateUploadedVideo (in long videoId, in long processStatus, in wstring videoLocation);
+    void updateUploadedVideo (in long jobId);
+	wstring getMonitorChannelId(in long mappingId);
   };
 };
 
