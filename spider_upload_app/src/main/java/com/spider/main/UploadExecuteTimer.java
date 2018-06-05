@@ -5,9 +5,10 @@ import java.util.Date;
 import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
-import com.google.api.client.util.DateTime;
 import com.google.api.services.samples.youtube.cmdline.data.UploadVideo;
 import com.spider.corba.UploadCorbaClient;
+
+import SpiderAgentApp.AgentSidePackage.ClusterInfo;
 import SpiderUploadApp.SpiderFootSidePackage.UploadInfo;
 import spiderboot.configuration.UploadConfig;
 import spiderboot.data.DataController;
@@ -34,23 +35,47 @@ public class UploadExecuteTimer extends TimerTask{
 
 	@Override
 	public void run() {
-		System.out.println("Timer task started at:" + new Date());
 		completeTask();
-		System.out.println("Timer task finished at:" + new Date());
 	}
 
 	private void completeTask() {
 		if(isComplete){
 			isComplete = false;
+			System.out.println("Timer task started at:" + new Date());
 			if(UploadTimerManager.qUploadJob.isEmpty() == false)
 			{
 				UploadInfo vInfo = UploadTimerManager.qUploadJob.poll();
 				//upload video
 				File uploadFile = new File(vInfo.vLocation);
+				
 				if (!uploadFile.exists()) {
-					logger.error("File " + vInfo.vLocation + " not Exist");
+					logger.error("File " + vInfo.vLocation + " not Exist");	
+					logger.info("Upload complete video " + vInfo.videoId);
+					isComplete = true;
 					return;
 				}
+				ClusterInfo clusterInfo = getClusterInfo(vInfo.mappingId);
+				logger.info("IP = " + clusterInfo.clusterIp);
+				logger.info("User Name = " + clusterInfo.userName);
+				logger.info("Password = " + clusterInfo.password);
+				logger.info("appid config = "+ uploadConfig.appId);
+				logger.info("ip config = "+ uploadConfig.ip);
+				if(clusterInfo.clusterIp.equals(uploadConfig.ip)== false)
+				{
+					//TODO: download video from render cluster
+					SCPDownload scpDownload = new SCPDownload();
+					boolean success = scpDownload.execute(clusterInfo.clusterIp, clusterInfo.userName, clusterInfo.password,
+							vInfo.vLocation, "/tmp/");
+					if(success)
+					{
+						logger.info("Download from render cluster OK");
+					}else {
+						logger.error("ERROR! Download file from render cluster FALSE");
+						isComplete = true;
+						return;
+					}
+				}
+				logger.info("Uploading video : " + vInfo.vLocation);
 				/*
 				logger.info("Beginning get authen file >>>>");
 				String clientFile = getAuthAtr(vInfo.cHomeId,"ClientSecret");
@@ -82,6 +107,7 @@ public class UploadExecuteTimer extends TimerTask{
 				}
 			}
 			isComplete = true;
+			System.out.println("Timer task finished at:" + new Date());
 		}
 		else{
 			//do nothing
@@ -117,5 +143,31 @@ public class UploadExecuteTimer extends TimerTask{
 	{
 		String result = "";
 		return result;
+	}
+	
+	private ClusterInfo getClusterInfo(int mappingId)
+	{
+		ClusterInfo clusterInfo = null;
+		if(isInitCorba == false)
+		{
+			isInitCorba = uploadClient.initCorba(uploadConfig.corbaRef);	
+		}
+		if(isInitCorba)
+		{
+			if(uploadClient.uploadAppImpl != null)
+			{
+				try {
+
+					clusterInfo = uploadClient.uploadAppImpl.getClusterInfo(2, mappingId);
+				}catch (Exception e) {
+					System.out.println(e.toString());
+				}
+			}else {
+				logger.error("Upload client implementation is NULL");
+			}
+		}else {
+			logger.error("Init corba client FALSE");
+		}
+		return clusterInfo;
 	}
 }

@@ -777,8 +777,10 @@ SpiderUploadApp::SpiderFootSide::UploadInfo::operator>>= (cdrStream &_n) const
   _n.marshalWString(vTags,0);
   _n.marshalWString(vThumbnail,0);
   _n.marshalWString(vLocation,0);
-  _n.marshalWString(cHomeId,0);
-  _n.marshalWString(cMonitorId,0);
+  _n.marshalBoolean(enableTitle);
+  _n.marshalBoolean(enableDes);
+  _n.marshalBoolean(enableTags);
+  mappingId >>= _n;
 
 }
 
@@ -792,8 +794,10 @@ SpiderUploadApp::SpiderFootSide::UploadInfo::operator<<= (cdrStream &_n)
   vTags = _n.unmarshalWString(0);
   vThumbnail = _n.unmarshalWString(0);
   vLocation = _n.unmarshalWString(0);
-  cHomeId = _n.unmarshalWString(0);
-  cMonitorId = _n.unmarshalWString(0);
+  enableTitle = _n.unmarshalBoolean();
+  enableDes = _n.unmarshalBoolean();
+  enableTags = _n.unmarshalBoolean();
+  (::CORBA::Long&)mappingId <<= _n;
 
 }
 
@@ -905,7 +909,7 @@ SpiderUploadApp::_objref_SpiderFootSide::_ptrToObjRef(const char* id)
 // Code for SpiderUploadApp::SpiderFootSide::createUploadJob
 
 // Proxy call descriptor class. Mangled signature:
-//  _cboolean_i_clong_i_cSpiderUploadApp_mSpiderFootSide_mUploadInfo
+//  _cboolean_i_cSpiderUploadApp_mSpiderFootSide_mUploadInfo
 class _0RL_cd_61f5032497954561_80000000
   : public omniCallDescriptor
 {
@@ -925,25 +929,22 @@ public:
   
   static const char* const _user_exns[];
 
-  ::CORBA::Long arg_0;
-  SpiderUploadApp::SpiderFootSide::UploadInfo_var arg_1_;
-  const SpiderUploadApp::SpiderFootSide::UploadInfo* arg_1;
+  SpiderUploadApp::SpiderFootSide::UploadInfo_var arg_0_;
+  const SpiderUploadApp::SpiderFootSide::UploadInfo* arg_0;
   ::CORBA::Boolean result;
 };
 
 void _0RL_cd_61f5032497954561_80000000::marshalArguments(cdrStream& _n)
 {
-  arg_0 >>= _n;
-  (const SpiderUploadApp::SpiderFootSide::UploadInfo&) *arg_1 >>= _n;
+  (const SpiderUploadApp::SpiderFootSide::UploadInfo&) *arg_0 >>= _n;
 
 }
 
 void _0RL_cd_61f5032497954561_80000000::unmarshalArguments(cdrStream& _n)
 {
-  (::CORBA::Long&)arg_0 <<= _n;
-  arg_1_ = new SpiderUploadApp::SpiderFootSide::UploadInfo;
-  (SpiderUploadApp::SpiderFootSide::UploadInfo&)arg_1_ <<= _n;
-  arg_1 = &arg_1_.in();
+  arg_0_ = new SpiderUploadApp::SpiderFootSide::UploadInfo;
+  (SpiderUploadApp::SpiderFootSide::UploadInfo&)arg_0_ <<= _n;
+  arg_0 = &arg_0_.in();
 
 }
 
@@ -969,16 +970,15 @@ _0RL_lcfn_61f5032497954561_90000000(omniCallDescriptor* cd, omniServant* svnt)
 {
   _0RL_cd_61f5032497954561_80000000* tcd = (_0RL_cd_61f5032497954561_80000000*)cd;
   SpiderUploadApp::_impl_SpiderFootSide* impl = (SpiderUploadApp::_impl_SpiderFootSide*) svnt->_ptrToInterface(SpiderUploadApp::SpiderFootSide::_PD_repoId);
-  tcd->result = impl->createUploadJob(tcd->arg_0, *tcd->arg_1);
+  tcd->result = impl->createUploadJob(*tcd->arg_0);
 
 
 }
 
-::CORBA::Boolean SpiderUploadApp::_objref_SpiderFootSide::createUploadJob(::CORBA::Long timerId, const ::SpiderUploadApp::SpiderFootSide::UploadInfo& vInfo)
+::CORBA::Boolean SpiderUploadApp::_objref_SpiderFootSide::createUploadJob(const ::SpiderUploadApp::SpiderFootSide::UploadInfo& vInfo)
 {
   _0RL_cd_61f5032497954561_80000000 _call_desc(_0RL_lcfn_61f5032497954561_90000000, "createUploadJob", 16);
-  _call_desc.arg_0 = timerId;
-  _call_desc.arg_1 = &(::SpiderUploadApp::SpiderFootSide::UploadInfo&) vInfo;
+  _call_desc.arg_0 = &(::SpiderUploadApp::SpiderFootSide::UploadInfo&) vInfo;
 
   _invoke(_call_desc);
   return _call_desc.result;
@@ -1048,6 +1048,24 @@ const char*
 SpiderUploadApp::_impl_SpiderFootSide::_mostDerivedRepoId()
 {
   return ::SpiderUploadApp::SpiderFootSide::_PD_repoId;
+}
+
+void
+SpiderAgentApp::AgentSide::ClusterInfo::operator>>= (cdrStream &_n) const
+{
+  _n.marshalWString(clusterIp,0);
+  _n.marshalWString(userName,0);
+  _n.marshalWString(password,0);
+
+}
+
+void
+SpiderAgentApp::AgentSide::ClusterInfo::operator<<= (cdrStream &_n)
+{
+  clusterIp = _n.unmarshalWString(0);
+  userName = _n.unmarshalWString(0);
+  password = _n.unmarshalWString(0);
+
 }
 
 void
@@ -1734,6 +1752,90 @@ _0RL_lcfn_61f5032497954561_91000000(omniCallDescriptor* cd, omniServant* svnt)
 
 }
 
+
+//
+// Code for SpiderAgentApp::AgentSide::getClusterInfo
+
+// Proxy call descriptor class. Mangled signature:
+//  _cSpiderAgentApp_mAgentSide_mClusterInfo_i_clong_i_clong
+class _0RL_cd_61f5032497954561_a1000000
+  : public omniCallDescriptor
+{
+public:
+  inline _0RL_cd_61f5032497954561_a1000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
+    : omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
+  {
+    
+  }
+  
+  void marshalArguments(cdrStream&);
+  void unmarshalArguments(cdrStream&);
+
+  void unmarshalReturnedValues(cdrStream&);
+  void marshalReturnedValues(cdrStream&);
+  
+  
+  static const char* const _user_exns[];
+
+  ::CORBA::Long arg_0;
+  ::CORBA::Long arg_1;
+  SpiderAgentApp::AgentSide::ClusterInfo_var result;
+};
+
+void _0RL_cd_61f5032497954561_a1000000::marshalArguments(cdrStream& _n)
+{
+  arg_0 >>= _n;
+  arg_1 >>= _n;
+
+}
+
+void _0RL_cd_61f5032497954561_a1000000::unmarshalArguments(cdrStream& _n)
+{
+  (::CORBA::Long&)arg_0 <<= _n;
+  (::CORBA::Long&)arg_1 <<= _n;
+
+}
+
+void _0RL_cd_61f5032497954561_a1000000::marshalReturnedValues(cdrStream& _n)
+{
+  (const SpiderAgentApp::AgentSide::ClusterInfo&) result >>= _n;
+
+}
+
+void _0RL_cd_61f5032497954561_a1000000::unmarshalReturnedValues(cdrStream& _n)
+{
+  result = new SpiderAgentApp::AgentSide::ClusterInfo;
+  (SpiderAgentApp::AgentSide::ClusterInfo&)result <<= _n;
+
+}
+
+const char* const _0RL_cd_61f5032497954561_a1000000::_user_exns[] = {
+  0
+};
+
+// Local call call-back function.
+static void
+_0RL_lcfn_61f5032497954561_b1000000(omniCallDescriptor* cd, omniServant* svnt)
+{
+  _0RL_cd_61f5032497954561_a1000000* tcd = (_0RL_cd_61f5032497954561_a1000000*)cd;
+  SpiderAgentApp::_impl_AgentSide* impl = (SpiderAgentApp::_impl_AgentSide*) svnt->_ptrToInterface(SpiderAgentApp::AgentSide::_PD_repoId);
+  tcd->result = impl->getClusterInfo(tcd->arg_0, tcd->arg_1);
+
+
+}
+
+SpiderAgentApp::AgentSide::ClusterInfo* SpiderAgentApp::_objref_AgentSide::getClusterInfo(::CORBA::Long clusterType, ::CORBA::Long mappingId)
+{
+  _0RL_cd_61f5032497954561_a1000000 _call_desc(_0RL_lcfn_61f5032497954561_b1000000, "getClusterInfo", 15);
+  _call_desc.arg_0 = clusterType;
+  _call_desc.arg_1 = mappingId;
+
+  _invoke(_call_desc);
+  return _call_desc.result._retn();
+
+
+}
+
 SpiderAgentApp::_pof_AgentSide::~_pof_AgentSide() {}
 
 
@@ -1830,6 +1932,14 @@ SpiderAgentApp::_impl_AgentSide::_dispatch(omniCallHandle& _handle)
   if (omni::strMatch(op, "getMonitorChannelId")) {
 
     _0RL_cd_61f5032497954561_81000000 _call_desc(_0RL_lcfn_61f5032497954561_91000000, "getMonitorChannelId", 20, 1);
+    
+    _handle.upcall(this,_call_desc);
+    return 1;
+  }
+
+  if (omni::strMatch(op, "getClusterInfo")) {
+
+    _0RL_cd_61f5032497954561_a1000000 _call_desc(_0RL_lcfn_61f5032497954561_b1000000, "getClusterInfo", 15, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;

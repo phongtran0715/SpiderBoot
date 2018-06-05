@@ -23,6 +23,17 @@ struct RenderConifgParam
    bool enableLogo;
 };
 
+struct UploadConfigParam
+{
+   TCHAR* vTitle;
+   TCHAR* vDesc;
+   TCHAR* vTags;
+   TCHAR* vThumb;
+   bool enableTitle;
+   bool enableDesc;
+   bool enableTags;
+};
+
 class LIBCORBA_EXPORTABLE SpiderDownloadClient
 {
 private:
@@ -76,6 +87,8 @@ class AgentSide_i : public POA_SpiderAgentApp::AgentSide
 {
 private:
    RenderConifgParam* getRenderConfig(INT32 mappingId);
+   UploadConfigParam* getUploadConfig(INT32 mappingId);
+   INT32 getMappingId(INT32 jobId);
    INT32 getMaxId(TCHAR * tbName);
 public:
    void onDownloadStartup(const ::CORBA::WChar* appId);
@@ -87,6 +100,8 @@ public:
    void updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const ::CORBA::WChar* vRenderPath);
    void updateUploadedVideo(::CORBA::Long jobId);
    ::CORBA::WChar* getMonitorChannelId(::CORBA::Long mappingId);
+   ::CORBA::Boolean createUploadJob(const ::SpiderUploadApp::SpiderFootSide::UploadInfo& vInfo);
+   ::SpiderAgentApp::AgentSide::ClusterInfo* getClusterInfo(::CORBA::Long clusterType, ::CORBA::Long mappingId);
 };
 
 #endif /* _nms_corba_h_ */

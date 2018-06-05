@@ -90,9 +90,9 @@ void AgentSide_i::onRenderStartup(const ::CORBA::WChar* appId)
 						try
 						{
 							RenderConifgParam* renderConfig =  getRenderConfig(mappingId);
-							if(renderConfig == nullptr)
+							if (renderConfig == nullptr)
 							{
-								DbgPrintf(1, _T("AgentSide_i::[onRenderStartup] : Can not get render config for mappingId = %d"), mappingId);	
+								DbgPrintf(1, _T("AgentSide_i::[onRenderStartup] : Can not get render config for mappingId = %d"), mappingId);
 								return;
 							}
 							::SpiderRenderApp::SpiderFootSide::RenderInfo renderInfo;
@@ -125,35 +125,72 @@ void AgentSide_i::onRenderStartup(const ::CORBA::WChar* appId)
 			DBFreeResult(hResult);
 		}
 	}
-	/*
-	if(renderClient != nullptr)
-	{
-		delete renderClient;
-		renderClient = nullptr;
-	}
-	*/
 	DBConnectionPoolReleaseConnection(hdb);
 }
 
 void AgentSide_i::onUploadStartup(const ::CORBA::WChar* appId)
 {
+	DbgPrintf(6, _T("AgentSide_i::onUploadStartup : uploadId = %s"), appId);
 	DB_RESULT hResult;
 	UINT32 i, dwNumRecords;
 	SpiderUploadClient* uploadClient = new SpiderUploadClient();
+
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
-	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT * FROM video_container WHERE ProcessStatus = ? AND UploadClusterId = ?"));
+	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT Id, VideoId, Title, Tag, Description, Thumbnail, ")
+	                               _T(" VRenderedPath, MappingId FROM video_container WHERE MappingId IN ")
+	                               _T(" (SELECT MappingId FROM channel_mapping WHERE UploadClusterId = ?) AND ProcessStatus = ?"));
 	if (hStmt != NULL)
 	{
-		//DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)VIDEO_RENDERED);
-		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)2);
-		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR*) appId, DB_BIND_DYNAMIC);
+		DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR*) appId, DB_BIND_TRANSIENT);
+		DBBind(hStmt, 2, DB_SQLTYPE_INTEGER, (INT32)2);
 		hResult = DBSelectPrepared(hStmt);
 		if (hResult != NULL)
 		{
 			dwNumRecords = DBGetNumRows(hResult);
+			DbgPrintf(6, _T("AgentSide_i::onUploadStartup : number record = %d"), dwNumRecords);
+
 			for (i = 0; i < dwNumRecords; i++)
 			{
-				//TODO: send information to upload app
+				INT32 id = DBGetFieldInt64(hResult, i, 0);
+				TCHAR* videoId = DBGetField(hResult, i, 1, NULL, 0);
+				TCHAR* vTitle = DBGetField(hResult, i, 2, NULL, 0);
+				TCHAR* vTags = DBGetField(hResult, i, 3, NULL, 0);
+				TCHAR* vDesc = DBGetField(hResult, i, 4, NULL, 0);
+				TCHAR* vThumb = DBGetField(hResult, i, 5, NULL, 0);
+				TCHAR* vLocation = DBGetField(hResult, i, 6, NULL, 0);
+				INT32 mappingId = DBGetFieldInt64(hResult, i, 7);
+
+				if (uploadClient->initSuccess)
+				{
+					if (uploadClient->mUploadRef != NULL)
+					{
+						try
+						{
+							::SpiderUploadApp::SpiderFootSide::UploadInfo vInfo;
+							vInfo.jobId = id;
+							vInfo.videoId = CORBA::wstring_dup(videoId);
+							vInfo.vTitle = CORBA::wstring_dup(vTitle);
+							vInfo.vDesc = CORBA::wstring_dup(vDesc);
+							vInfo.vTags = CORBA::wstring_dup(vTags);
+							vInfo.vThumbnail = CORBA::wstring_dup(vThumb);
+							vInfo.vLocation = CORBA::wstring_dup(vLocation);
+							vInfo.mappingId = mappingId;
+
+							uploadClient->mUploadRef->createUploadJob(vInfo);
+						}
+						catch (CORBA::TRANSIENT&) {
+							DbgPrintf(1, _T("AgentSide_i::[onUploadStartup] : Caught system exception TRANSIENT -- unable to contact the server"));
+						}
+						catch (CORBA::SystemException& ex) {
+							DbgPrintf(1, _T("AgentSide_i::[onUploadStartup] : Caught a CORBA:: %s"), ex._name());
+						}
+						catch (CORBA::Exception& ex)
+						{
+							DbgPrintf(1, _T("AgentSide_i::[onUploadStartup] : Caught a CORBA:: %s"), ex._name());
+						}
+					}
+				} else {
+				}
 			}
 			DBFreeResult(hResult);
 		}
@@ -161,8 +198,15 @@ void AgentSide_i::onUploadStartup(const ::CORBA::WChar* appId)
 	DBConnectionPoolReleaseConnection(hdb);
 }
 
+::CORBA::Boolean AgentSide_i::createUploadJob(const ::SpiderUploadApp::SpiderFootSide::UploadInfo& vInfo)
+{
+	bool result = false;
+	return result;
+}
+
 ::CORBA::LongLong AgentSide_i::getLastSyncTime(::CORBA::Long mappingId)
 {
+	DbgPrintf(6, _T("AgentSide_i::getLastSyncTime : mappingId = %ld"), mappingId);
 	INT32 result = 0;
 	DB_RESULT hResult;
 	UINT32 i, dwNumRecords;
@@ -238,11 +282,11 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::Video
 					{
 
 						RenderConifgParam* renderConfig =  getRenderConfig(vInfo.mappingId);
-						if(renderConfig == nullptr)
+						if (renderConfig == nullptr)
 						{
 							DbgPrintf(1, _T("AgentSide_i::[] : Can not get render config for mapping id = %d"), vInfo.mappingId);
 							return;
-						}else{
+						} else {
 							DbgPrintf(1, _T("AgentSide_i::[] : Get render config ok"));
 						}
 						::SpiderRenderApp::SpiderFootSide::RenderInfo renderInfo;
@@ -273,13 +317,6 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::Video
 			} else
 			{
 			}
-			/*
-			if(renderClient != nullptr)
-			{
-				delete renderClient;
-				renderClient = nullptr;
-			}
-			*/
 		} else
 		{
 			DbgPrintf(1, _T("AgentSide_i::updateDownloadedVideo : insert new video info FALSE"));
@@ -301,7 +338,55 @@ void AgentSide_i::updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long process
 		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)processStatus);
 		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)vRenderPath, DB_BIND_TRANSIENT);
 		DBBind(hStmt, 3, DB_SQLTYPE_INTEGER, (INT32)jobId);
-		DBExecute(hStmt);
+		bool success = DBExecute(hStmt);
+		if (success == true)
+		{
+			//notify to render app
+			SpiderUploadClient* uploadClient = new SpiderUploadClient();
+			if (uploadClient->initSuccess)
+			{
+				if (uploadClient->mUploadRef != NULL)
+				{
+					try
+					{
+						INT32 mappingId = getMappingId(jobId);
+						UploadConfigParam* uploadConfig =  getUploadConfig(mappingId);
+						if (uploadConfig == nullptr)
+						{
+							DbgPrintf(1, _T("AgentSide_i::[] : Can not get render config for mapping id = %d"), mappingId);
+							return;
+						} else {
+							DbgPrintf(1, _T("AgentSide_i::[] : Get upload config ok"));
+						}
+						::SpiderUploadApp::SpiderFootSide::UploadInfo uploadInfo;
+						uploadInfo.jobId = jobId;
+						uploadInfo.videoId = CORBA::wstring_dup(_T(""));
+						uploadInfo.vTitle = CORBA::wstring_dup(uploadConfig->vTitle);
+						uploadInfo.vDesc = CORBA::wstring_dup(uploadConfig->vDesc);
+						uploadInfo.vTags = CORBA::wstring_dup(uploadConfig->vTags);
+						uploadInfo.vThumbnail = CORBA::wstring_dup(uploadConfig->vThumb);
+						uploadInfo.enableTitle = uploadConfig->enableTitle;
+						uploadInfo.enableDes = uploadConfig->enableDesc;
+						uploadInfo.enableTags = uploadConfig->enableTags;
+						uploadInfo.vLocation = CORBA::wstring_dup(vRenderPath);
+
+						uploadClient->mUploadRef->createUploadJob(uploadInfo);
+
+					}
+					catch (CORBA::TRANSIENT&) {
+						DbgPrintf(1, _T("AgentSide_i::[] : Caught system exception TRANSIENT -- unable to contact the server"));
+					}
+					catch (CORBA::SystemException& ex) {
+						DbgPrintf(1, _T("AgentSide_i::[] : Caught a CORBA:: %s"), ex._name());
+					}
+					catch (CORBA::Exception& ex)
+					{
+						DbgPrintf(1, _T("AgentSide_i::[] : Caught a CORBA:: %s"), ex._name());
+					}
+				}
+			} else {
+			}
+		}
 	}
 	DBConnectionPoolReleaseConnection(hdb);
 }
@@ -457,18 +542,55 @@ RenderConifgParam* AgentSide_i::getRenderConfig(INT32 mappingId)
 			renderConfig->enableOutro = DBGetFieldInt64(hResult, 0, 4) == 1;
 			renderConfig->enableLogo = DBGetFieldInt64(hResult, 0, 5) == 1;
 			DBFreeResult(hResult);
-			DbgPrintf(1, _T(" AgentSide_i::[getRenderConfig] renderConfig->vIntro = %s"), renderConfig->vIntro);
-			DbgPrintf(1, _T(" AgentSide_i::[getRenderConfig] Complete"));	
 		}
-		else{
-			DbgPrintf(1, _T(" AgentSide_i::[getRenderConfig] result is NULL"));	
+		else {
+			DbgPrintf(1, _T(" AgentSide_i::[getRenderConfig] result is NULL"));
 		}
 	}
-	else{
+	else {
 		DbgPrintf(1, _T(" AgentSide_i::[getRenderConfig] mappingId = Can not prepare query command"));
 	}
 	DBConnectionPoolReleaseConnection(hdb);
 	return renderConfig;
+}
+
+UploadConfigParam* AgentSide_i::getUploadConfig(INT32 mappingId)
+{
+	DbgPrintf(1, _T(" AgentSide_i::[getUploadConfig] mappingId = %d"), mappingId);
+	UploadConfigParam* uploadConfig = new UploadConfigParam();
+	DB_RESULT hResult;
+	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+	TCHAR query [MAX_DB_STRING];
+	_sntprintf(query, sizeof query, _T("SELECT TitleTemplate, DescTemplate , TagTemplate, EnableTitle, EnableDesc, EnableTag ")
+	           _T(" FROM spider_mapping_config WHERE MappingId = '%d'"), mappingId);
+	DB_STATEMENT hStmt = DBPrepare(hdb, query);
+	if (hStmt != NULL)
+	{
+		hResult = DBSelectPrepared(hStmt);
+		if (hResult != NULL)
+		{
+			uploadConfig->vTitle = DBGetField(hResult, 0, 0, NULL, 0);
+			uploadConfig->vDesc = DBGetField(hResult, 0, 1, NULL, 0);
+			uploadConfig->vTags = DBGetField(hResult, 0, 2, NULL, 0);
+			uploadConfig->vThumb = _T("");
+			uploadConfig->enableTitle = DBGetFieldInt64(hResult, 0, 3) == 1;
+			uploadConfig->enableDesc = DBGetFieldInt64(hResult, 0, 4) == 1;
+			uploadConfig->enableTags = DBGetFieldInt64(hResult, 0, 5) == 1;
+
+			DBFreeResult(hResult);
+			DbgPrintf(1, _T(" AgentSide_i::[getUploadConfig] uploadConfig->vTitle = %s"), uploadConfig->vTitle);
+			DbgPrintf(1, _T(" AgentSide_i::[getUploadConfig] uploadConfig->vDesc = %s"), uploadConfig->vDesc);
+			DbgPrintf(1, _T(" AgentSide_i::[getUploadConfig] uploadConfig->vTags = %s"), uploadConfig->vTags);
+		}
+		else {
+			DbgPrintf(1, _T(" AgentSide_i::[getUploadConfig] result is NULL"));
+		}
+	}
+	else {
+		DbgPrintf(1, _T(" AgentSide_i::[getUploadConfig] mappingId = Can not prepare query command"));
+	}
+	DBConnectionPoolReleaseConnection(hdb);
+	return uploadConfig;
 }
 
 ::CORBA::WChar* AgentSide_i::getMonitorChannelId(::CORBA::Long mappingId)
@@ -487,7 +609,7 @@ RenderConifgParam* AgentSide_i::getRenderConfig(INT32 mappingId)
 		if (hResult != NULL)
 		{
 			dwNumRecords = DBGetNumRows(hResult);
-			if(dwNumRecords > 0)
+			if (dwNumRecords > 0)
 			{
 				result = DBGetField(hResult, 0, 0, NULL, 0);
 
@@ -500,6 +622,77 @@ RenderConifgParam* AgentSide_i::getRenderConfig(INT32 mappingId)
 	return CORBA::wstring_dup(result);
 }
 
+INT32 AgentSide_i::getMappingId(INT32 jobId)
+{
+	DbgPrintf(6, _T(" Function [getMappingId] jobId = %d"), jobId);
+	INT32 result = -1;
+	DB_RESULT hResult;
+	UINT32 i, dwId, dwNumRecords;
+
+	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT MappingId FROM video_container WHERE Id = ?"));
+	if (hStmt != NULL)
+	{
+		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, jobId);
+		hResult = DBSelectPrepared(hStmt);
+		if (hResult != NULL)
+		{
+			dwNumRecords = DBGetNumRows(hResult);
+			if (dwNumRecords > 0)
+			{
+				result = DBGetFieldInt64(hResult, 0, 0);
+
+				DbgPrintf(1, _T(" Function [getMappingId] result = %d"), result);
+			}
+			DBFreeResult(hResult);
+		}
+	}
+	DBConnectionPoolReleaseConnection(hdb);
+	return result;
+}
+
+::SpiderAgentApp::AgentSide::ClusterInfo* AgentSide_i::getClusterInfo(::CORBA::Long clusterType, ::CORBA::Long mappingId)
+{
+	DbgPrintf(6, _T(" Function [getClusterInfo] mappingId = %d"), mappingId);
+	::SpiderAgentApp::AgentSide::ClusterInfo* clusterInfo = new ::SpiderAgentApp::AgentSide::ClusterInfo();
+	DB_RESULT hResult;
+	UINT32 i, dwNumRecords;
+
+	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT ProcessClusterId FROM channel_mapping WHERE Id = ?"));
+	if (hStmt != NULL)
+	{
+		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, mappingId);
+		hResult = DBSelectPrepared(hStmt);
+		if (hResult != NULL)
+		{
+			dwNumRecords = DBGetNumRows(hResult);
+			if (dwNumRecords > 0)
+			{
+				TCHAR* renderClusterId  = DBGetField(hResult, 0, 0, NULL, 0);
+				hStmt = DBPrepare(hdb, _T("SELECT IpAddress FROM render_cluster WHERE ClusterId = ?"));
+				if (hStmt != NULL)
+				{
+					DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, renderClusterId, DB_BIND_TRANSIENT);
+					hResult = DBSelectPrepared(hStmt);
+					if (hResult != NULL) {
+						dwNumRecords = DBGetNumRows(hResult);
+						if (dwNumRecords > 0)
+						{
+							clusterInfo->clusterIp = DBGetField(hResult, 0, 0, NULL, 0);
+							clusterInfo->userName = _T("phongtran0715");
+							clusterInfo->password = _T("123456aA@");
+							DbgPrintf(6, _T(" Function [getClusterInfo] cluster IP = %d"), clusterInfo->clusterIp);
+						}
+					}
+				}
+			}
+			DBFreeResult(hResult);
+		}
+	}
+	DBConnectionPoolReleaseConnection(hdb);
+	return clusterInfo;
+}
 
 AgentCorbaServer::~AgentCorbaServer()
 {

@@ -61,7 +61,7 @@ CORBA::Object_ptr SpiderUploadClient::getObjectReference(CORBA::ORB_ptr orb)
 	CosNaming::Name name;
 	name.length(1);
 
-	name[0].id   = (const char*) "Upload";       // string copied
+	name[0].id   = (const char*) "Spider_Foot_Upload_Server";       // string copied
 	name[0].kind = (const char*) ""; // string copied
 	// Note on kind: The kind field is used to indicate the type
 	// of the object. This is to avoid conventions such as that used

@@ -50,6 +50,7 @@ public class MainUpload {
 					logger.info("Notify startup status to agent");
 					try
 					{
+						logger.info("upload Id = " + uploadConfig.appId);
 						uploadClient.uploadAppImpl.onUploadStartup(uploadConfig.appId);	
 					}catch (Exception e) {
 						logger.error(e.toString());

@@ -411,9 +411,13 @@ _CORBA_MODULE_BEG
 
       ::CORBA::WString_member vLocation;
 
-      ::CORBA::WString_member cHomeId;
+      ::CORBA::Boolean enableTitle;
 
-      ::CORBA::WString_member cMonitorId;
+      ::CORBA::Boolean enableDes;
+
+      ::CORBA::Boolean enableTags;
+
+      ::CORBA::Long mappingId;
 
     
 
@@ -434,7 +438,7 @@ _CORBA_MODULE_BEG
   {
   public:
     // IDL operations
-    ::CORBA::Boolean createUploadJob(::CORBA::Long timerId, const ::SpiderUploadApp::SpiderFootSide::UploadInfo& vInfo);
+    ::CORBA::Boolean createUploadJob(const ::SpiderUploadApp::SpiderFootSide::UploadInfo& vInfo);
 
     // Constructors
     inline _objref_SpiderFootSide()  { _PR_setobj(0); }  // nil
@@ -469,7 +473,7 @@ _CORBA_MODULE_BEG
   public:
     virtual ~_impl_SpiderFootSide();
 
-    virtual ::CORBA::Boolean createUploadJob(::CORBA::Long timerId, const ::SpiderUploadApp::SpiderFootSide::UploadInfo& vInfo) = 0;
+    virtual ::CORBA::Boolean createUploadJob(const ::SpiderUploadApp::SpiderFootSide::UploadInfo& vInfo) = 0;
     
   public:  // Really protected, workaround for xlC
     virtual _CORBA_Boolean _dispatch(omniCallHandle&);
@@ -546,6 +550,26 @@ _CORBA_MODULE_BEG
     static _core_attr const char* _PD_repoId;
 
     // Other IDL defined within this scope.
+    struct ClusterInfo {
+      typedef _CORBA_ConstrType_Variable_Var<ClusterInfo> _var_type;
+
+      
+      ::CORBA::WString_member clusterIp;
+
+      ::CORBA::WString_member userName;
+
+      ::CORBA::WString_member password;
+
+    
+
+      void operator>>= (cdrStream &) const;
+      void operator<<= (cdrStream &);
+    };
+
+    typedef ClusterInfo::_var_type ClusterInfo_var;
+
+    typedef _CORBA_ConstrType_Variable_OUT_arg< ClusterInfo,ClusterInfo_var > ClusterInfo_out;
+
     struct VideoInfo {
       typedef _CORBA_ConstrType_Variable_Var<VideoInfo> _var_type;
 
@@ -598,6 +622,7 @@ _CORBA_MODULE_BEG
     void updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const ::CORBA::WChar* vRenderPath);
     void updateUploadedVideo(::CORBA::Long jobId);
     ::CORBA::WChar* getMonitorChannelId(::CORBA::Long mappingId);
+    AgentSide::ClusterInfo* getClusterInfo(::CORBA::Long clusterType, ::CORBA::Long mappingId);
 
     // Constructors
     inline _objref_AgentSide()  { _PR_setobj(0); }  // nil
@@ -641,6 +666,7 @@ _CORBA_MODULE_BEG
     virtual void updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const ::CORBA::WChar* vRenderPath) = 0;
     virtual void updateUploadedVideo(::CORBA::Long jobId) = 0;
     virtual ::CORBA::WChar* getMonitorChannelId(::CORBA::Long mappingId) = 0;
+    virtual AgentSide::ClusterInfo* getClusterInfo(::CORBA::Long clusterType, ::CORBA::Long mappingId) = 0;
     
   public:  // Really protected, workaround for xlC
     virtual _CORBA_Boolean _dispatch(omniCallHandle&);

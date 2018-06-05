@@ -47,21 +47,27 @@ public class RenderExecuteTimer extends TimerTask{
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-		logger.info("Timer task started at:" + new Date());
 		completeTask();
-		logger.info("Timer task finished at:" + new Date());
 	}
 
 	private void completeTask() {
 		if(isComplete){
 			isComplete = false;
+			logger.info("Timer task started at:" + new Date());
 			if(RenderTimerManager.qRenderJob.isEmpty() == false)
 			{
 				RenderInfo vInfo = RenderTimerManager.qRenderJob.poll();				
 				//TODO: get render information
-				util.createFolderIfNotExist(outputFolder);
+				File uploadFile = new File(vInfo.vLocation);
 
+				if (!uploadFile.exists()) {
+					logger.error("File " + vInfo.vLocation + " not Exist");
+					logger.info("Timer task finished at:" + new Date());
+					isComplete = true;
+					return;
+				}
+				util.createFolderIfNotExist(outputFolder);
+				//check file is existed or not
 				String vOutput = outputFolder + util.prefixOS() + vInfo.videoId + "_" + new Date().getTime() +   ".mp4";
 				//process video
 				String vProcessedInput = processVideo(vInfo.vLocation, outputFolder + util.prefixOS() + "video_tmp1.mp4", vInfo.vLogo, vInfo.enableLogo);
@@ -91,6 +97,7 @@ public class RenderExecuteTimer extends TimerTask{
 				deleteTempFile(outputFolder + util.prefixOS() + "video_tmp1.ts");
 			}
 			isComplete = true;
+			logger.info("Timer task finished at:" + new Date());
 		}
 		else{
 			//do nothing

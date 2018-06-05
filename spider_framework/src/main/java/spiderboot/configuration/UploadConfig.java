@@ -15,6 +15,7 @@ public class UploadConfig {
 	public String appId;
 	public int delayTime;
 	public String corbaRef;
+	public String ip;
 
 	public UploadConfig (String configFile)
 	{
@@ -44,6 +45,7 @@ public class UploadConfig {
 			appId = prop.getProperty(Constant.UPLOAD_APP_ID, "").trim();
 			delayTime = Integer.parseInt(prop.getProperty(Constant.UPLOAD_DELAY_TIME.trim()));
 			corbaRef = prop.getProperty(Constant.UPLOAD_CORBA_REF, "").trim();
+			ip = prop.getProperty(Constant.UPLOAD_CLUSTER_IP, "127.0.0.1").trim();
 			result = true;
 		} catch (Exception e) {
 			result = false;

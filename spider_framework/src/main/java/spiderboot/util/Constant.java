@@ -30,4 +30,5 @@ public class Constant {
     public static final String UPLOAD_APP_ID				= "AppId";
     public static final String UPLOAD_CORBA_REF				= "CorbaRef";
     public static final String UPLOAD_DELAY_TIME			= "UploadDelayTime";
+    public static final String UPLOAD_CLUSTER_IP			= "Ip";
 }

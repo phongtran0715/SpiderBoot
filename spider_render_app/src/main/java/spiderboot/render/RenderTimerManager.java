@@ -28,6 +28,7 @@ public class RenderTimerManager {
 	}
 
 	public void initTimerTask() {
+		//x*1000 -> (x second) 
 		startRenderTimer("RenderApp_01", 5 * 1000);
 	}
 }

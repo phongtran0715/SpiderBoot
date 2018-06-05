@@ -1,30 +1,19 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.itc.edu</groupId>
-	<artifactId>UploadApp</artifactId>
+
+	<groupId>uploadApp</groupId>
+	<artifactId>uploadApp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<project.youtube.version>v3-rev182-1.22.0</project.youtube.version>
-		<project.youtube.analytics.version>v1-rev63-1.22.0</project.youtube.analytics.version>
-		<project.youtube.reporting.version>v1-rev10-1.22.0</project.youtube.reporting.version>
-		<project.http.version>1.20.0</project.http.version>
-		<project.oauth.version>1.20.0</project.oauth.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
-	<name>UlVideo</name>
+
+	<name>uploadApp</name>
 	<url>http://maven.apache.org</url>
 
-	<repositories>
-		<repository>
-			<id>google-api-services</id>
-			<url>http://google-api-client-libraries.appspot.com/mavenrepo</url>
-		</repository>
-	</repositories>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
 	<dependencies>
 		<!-- This dependency is only used for the Topics API sample, which requires 
@@ -60,11 +49,6 @@
 			<version>4.3.12.RELEASE</version>
 		</dependency>
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.6</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.1</version>
@@ -84,108 +68,20 @@
 			<artifactId>framework</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>com.hierynomus</groupId>
+			<artifactId>sshj</artifactId>
+			<version>0.19.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk16</artifactId>
+			<version>1.45</version>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>appassembler-maven-plugin</artifactId>
-				<version>1.3</version>
-				<configuration>
-					<repositoryLayout>flat</repositoryLayout>
-					<configurationDirectory>etc</configurationDirectory>
-					<configurationSourceDirectory>src</configurationSourceDirectory>
-					<copyConfigurationDirectory>true</copyConfigurationDirectory>
-					<includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
-					<target>${project.build.directory}</target>
-					<daemons>
-						<daemon>
-							<id>ulvideo</id>
-							<mainClass>com.itc.edu.ulvideo.main.Main</mainClass>
-							<commandLineArguments>
-								<commandLineArguments>start</commandLineArguments>
-							</commandLineArguments>
-							<platforms>
-								<platform>jsw</platform>
-							</platforms>
-							<generatorConfigurations>
-								<generatorConfiguration>
-									<generator>jsw</generator>
-									<includes>
-										<include>linux-x86-32</include>
-										<include>linux-x86-64</include>
-										<include>windows-x86-32</include>
-									</includes>
-									<configuration>
-										<property>
-											<name>configuration.directory.in.classpath.first</name>
-											<value>etc</value>
-										</property>
-										<property>
-											<name>set.default.REPO_DIR</name>
-											<value>lib</value>
-										</property>
-										<property>
-											<name>wrapper.logfile</name>
-											<value>logs/wrapper.log</value>
-										</property>
-									</configuration>
-								</generatorConfiguration>
-							</generatorConfigurations>
-							<jvmSettings>
-								<initialMemorySize>256M</initialMemorySize>
-								<maxMemorySize>1024M</maxMemorySize>
-								<systemProperties>
-								</systemProperties>
-							</jvmSettings>
-						</daemon>
-					</daemons>
-				</configuration>
-				<executions>
-					<execution>
-						<id>generate-jsw-scripts</id>
-						<phase>package</phase>
-						<goals>
-							<goal>generate-daemons</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- resource plugin -->
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.6</version>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<!-- here the phase you need -->
-						<phase>validate</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.jsw.folder}/etc</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}/etc</directory>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.9.1</version>
-				<configuration>
-					<enableRulesSummary>false</enableRulesSummary>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -197,10 +93,18 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.itc.edu.ulvideo.main.MainUpload</mainClass>
+							<mainClass>com.spider.main.MainUpload</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
