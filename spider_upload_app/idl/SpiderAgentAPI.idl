@@ -27,6 +27,14 @@ module SpiderAgentApp
 {
   interface AgentSide
   {
+    struct AuthenInfo
+    {
+      wstring userName;
+      wstring apiKey;
+      wstring clientSecret;
+      wstring clientId;
+    };
+
     struct ClusterInfo
     {
       wstring clusterIp;
@@ -58,7 +66,7 @@ module SpiderAgentApp
     void updateRenderedVideo(in long jobId, in long processStatus, in wstring vRenderPath);
     void updateUploadedVideo (in long jobId);
     wstring getMonitorChannelId(in long mappingId);
-	ClusterInfo getClusterInfo(in long clusterType, in long mappingId);
+    ClusterInfo getClusterInfo(in long clusterType, in long mappingId);
+    AuthenInfo getAuthenInfo(in long mappingId);
   };
 };
-

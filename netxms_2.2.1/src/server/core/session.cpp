@@ -14320,11 +14320,13 @@ void ClientSession::createHomeChannel(NXCPMessage *request)
       TCHAR* cId = request->getFieldAsString(VID_HOME_CHANNEL_ID);
       TCHAR* cName = request->getFieldAsString(VID_HOME_CHANNEL_NAME);
       TCHAR* googleAcc = request->getFieldAsString(VID_HOME_CHANNEL_GACCOUNT);
+      INT32 accountId = request->getFieldAsInt32(VID_HOME_CHANNEL_ACCOUNT_ID);
 
-      hStmt = DBPrepare(hdb, _T("INSERT INTO home_channel_list (ChannelId, ChannelName, GoogleAccount) VALUES (?,?,?)"));
+      hStmt = DBPrepare(hdb, _T("INSERT INTO home_channel_list (ChannelId, ChannelName, GoogleAccount, AccountId) VALUES (?,?,?,?)"));
       DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)cId, DB_BIND_TRANSIENT);
       DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)cName, DB_BIND_TRANSIENT);
       DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)googleAcc, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 4, DB_SQLTYPE_INTEGER, accountId);
       bool success = DBExecute(hStmt);
       if (success == true)
       {
@@ -14622,12 +14624,15 @@ void ClientSession::modifyHomeChannel(NXCPMessage * request)
       TCHAR* cId = request->getFieldAsString(VID_HOME_CHANNEL_ID);
       TCHAR* cName = request->getFieldAsString(VID_HOME_CHANNEL_NAME);
       TCHAR* googleAcc = request->getFieldAsString(VID_HOME_CHANNEL_GACCOUNT);
+      INT32 accountId = request->getFieldAsInt32(VID_HOME_CHANNEL_ACCOUNT_ID);
 
-      hStmt = DBPrepare(hdb, _T("UPDATE home_channel_list SET ChannelId = ?, ChannelName = ?, GoogleAccount= ? WHERE Id = ?"));
+      hStmt = DBPrepare(hdb, _T("UPDATE home_channel_list SET ChannelId = ?, ChannelName = ?, ")
+         _T(" GoogleAccount= ?, AccountId = ? WHERE Id = ?"));
       DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)cId, DB_BIND_TRANSIENT);
       DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)cName, DB_BIND_TRANSIENT);
       DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)googleAcc, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 4, DB_SQLTYPE_INTEGER, (INT32)id);
+      DBBind(hStmt, 4, DB_SQLTYPE_INTEGER, accountId);
+      DBBind(hStmt, 5, DB_SQLTYPE_INTEGER, (INT32)id);
       bool success = DBExecute(hStmt);
       if (success == true)
       {

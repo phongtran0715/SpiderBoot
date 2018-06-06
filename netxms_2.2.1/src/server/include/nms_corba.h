@@ -102,6 +102,7 @@ public:
    ::CORBA::WChar* getMonitorChannelId(::CORBA::Long mappingId);
    ::CORBA::Boolean createUploadJob(const ::SpiderUploadApp::SpiderFootSide::UploadInfo& vInfo);
    ::SpiderAgentApp::AgentSide::ClusterInfo* getClusterInfo(::CORBA::Long clusterType, ::CORBA::Long mappingId);
+   ::SpiderAgentApp::AgentSide::AuthenInfo* getAuthenInfo(::CORBA::Long mappingId);
 };
 
 #endif /* _nms_corba_h_ */

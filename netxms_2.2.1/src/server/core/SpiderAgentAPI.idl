@@ -29,6 +29,8 @@ module SpiderRenderApp
         };
 
         boolean createRenderJob(in RenderInfo vInfo);
+        boolean deleteRenderJob(in wstring renderClusterId, in long jobId);
+        void deleteRenderdVideo(in wstring renderClusterId, in wstring vLocation);
   };
 };
 
@@ -51,6 +53,7 @@ module SpiderUploadApp
             long mappingId;
         };
         boolean createUploadJob(in UploadInfo vInfo);
+        boolean deleteUploadJob(in wstring uploadClusterId, in long jobId);
   };
 };
 //IDL for C++ server side
@@ -59,6 +62,14 @@ module SpiderAgentApp
 {
   interface AgentSide
   {
+    struct AuthenInfo
+    {
+      wstring userName;
+      wstring apiKey;
+      wstring clientSecret;
+      wstring clientId;
+    };
+
     struct ClusterInfo
     {
       wstring clusterIp;
@@ -91,5 +102,6 @@ module SpiderAgentApp
     void updateUploadedVideo (in long jobId);
     wstring getMonitorChannelId(in long mappingId);
     ClusterInfo getClusterInfo(in long clusterType, in long mappingId);
+    AuthenInfo getAuthenInfo(in long mappingId);
   };
 };

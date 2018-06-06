@@ -1,6 +1,7 @@
 package com.spider.main;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.TimerTask;
 import org.apache.log4j.Logger;
@@ -8,6 +9,7 @@ import org.apache.log4j.Logger;
 import com.google.api.services.samples.youtube.cmdline.data.UploadVideo;
 import com.spider.corba.UploadCorbaClient;
 
+import SpiderAgentApp.AgentSidePackage.AuthenInfo;
 import SpiderAgentApp.AgentSidePackage.ClusterInfo;
 import SpiderUploadApp.SpiderFootSidePackage.UploadInfo;
 import spiderboot.configuration.UploadConfig;
@@ -47,7 +49,7 @@ public class UploadExecuteTimer extends TimerTask{
 				UploadInfo vInfo = UploadTimerManager.qUploadJob.poll();
 				//upload video
 				File uploadFile = new File(vInfo.vLocation);
-				
+
 				if (!uploadFile.exists()) {
 					logger.error("File " + vInfo.vLocation + " not Exist");	
 					logger.info("Upload complete video " + vInfo.videoId);
@@ -60,6 +62,7 @@ public class UploadExecuteTimer extends TimerTask{
 				logger.info("Password = " + clusterInfo.password);
 				logger.info("appid config = "+ uploadConfig.appId);
 				logger.info("ip config = "+ uploadConfig.ip);
+				/*
 				if(clusterInfo.clusterIp.equals(uploadConfig.ip)== false)
 				{
 					//TODO: download video from render cluster
@@ -75,28 +78,53 @@ public class UploadExecuteTimer extends TimerTask{
 						return;
 					}
 				}
+				 */
+
 				logger.info("Uploading video : " + vInfo.vLocation);
-				/*
+
+				AuthenInfo authInfo = getAuthenInfo(vInfo.mappingId);
+				logger.info("Authen infor : user name = " + authInfo.userName);
+				logger.info("Authen infor : api key = " + authInfo.apiKey);
+				logger.info("Authen infor : client secret = " + authInfo.clientSecret);
+				logger.info("Authen infor : client id = " + authInfo.clientId);
+
 				logger.info("Beginning get authen file >>>>");
-				String clientFile = getAuthAtr(vInfo.cHomeId,"ClientSecret");
-				String userName = getHomeAtrr(vInfo.cHomeId,"GoogleAccount");
-				System.out.println("setclientSecretsFile : " + clientFile);
+				//TODO: create client secret file
+				String clientFile = "/tmp/client_secrets.json";
+				//TODO: set authen file name
+				String userName = "";
+				CrunchifyJSONFileWrite jsonCreate = new CrunchifyJSONFileWrite();
+				File jsonFile = new File(clientFile);
+				if(jsonFile.exists() == false)
+				{
+					//Create the file
+					try {
+						if (jsonFile.createNewFile()){
+							logger.error("File created : " + clientFile);
+						}else{
+							logger.error("Can not create file : " + clientFile);
+						}
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				jsonCreate.execute(authInfo.clientSecret, authInfo.clientId, clientFile);
 				UploadVideo.setclientSecretsFile(clientFile);
-				System.out.println("setStoreFile : " + "upload_" + userName);
 				UploadVideo.setStoreFile( "upload_" + userName);
 				logger.info("Complete get authen file <<<<");
-				
+
 				logger.info("Beginning standardize meta data >>>>");
 				String title = standardizeTitle(vInfo.vTitle);
 				String desc = standardizeDesc(vInfo.vDesc);
 				String tags = standardizeTags(vInfo.vTags);
 				logger.info("Complete standardize meta data <<<<");
-				
+
 				logger.info("Beginning upload video " + vInfo.videoId);
-				//uploadVideo.execute(title, desc, tags, vInfo.vLocation);
+				uploadVideo.execute(title, desc, tags, vInfo.vLocation);
 				//update process status 
-				updateProcessStatus(vInfo.jobId);
-				*/
+				//updateUploadedInfo(vInfo.jobId);
+
 				logger.info("Upload complete video " + vInfo.videoId);
 				//Delay time for next upload video
 				try {
@@ -129,22 +157,30 @@ public class UploadExecuteTimer extends TimerTask{
 		String result = originDesc;
 		return result;
 	}
-	private void updateProcessStatus(int id) 
+	private void updateUploadedInfo(int jobId) 
 	{
+		logger.info(">>> Function [updateUploadedInfo] : job Id = " + jobId);
+		if(isInitCorba == false)
+		{
+			isInitCorba = uploadClient.initCorba(uploadConfig.corbaRef);	
+		}
+		if(isInitCorba)
+		{
+			if(uploadClient.uploadAppImpl != null)
+			{
+				try {
+					uploadClient.uploadAppImpl.updateUploadedVideo(jobId);
+				}catch (Exception e) {
+					System.out.println(e.toString());
+				}
+			}else {
+				logger.error("Upload client implementation is NULL");
+			}
+		}else {
+			logger.error("Init corba client FALSE");
+		}
 	}
 
-	private String getHomeAtrr(String cHomeId, String key)
-	{
-		String result = "";
-		return result;
-	}
-
-	private String getAuthAtr(String cHomeId, String key)
-	{
-		String result = "";
-		return result;
-	}
-	
 	private ClusterInfo getClusterInfo(int mappingId)
 	{
 		ClusterInfo clusterInfo = null;
@@ -169,5 +205,31 @@ public class UploadExecuteTimer extends TimerTask{
 			logger.error("Init corba client FALSE");
 		}
 		return clusterInfo;
+	}
+
+	private AuthenInfo getAuthenInfo(int mappingId)
+	{
+		AuthenInfo authInfo = null;
+		if(isInitCorba == false)
+		{
+			isInitCorba = uploadClient.initCorba(uploadConfig.corbaRef);	
+		}
+		if(isInitCorba)
+		{
+			if(uploadClient.uploadAppImpl != null)
+			{
+				try {
+
+					authInfo = uploadClient.uploadAppImpl.getAuthenInfo(mappingId);
+				}catch (Exception e) {
+					System.out.println(e.toString());
+				}
+			}else {
+				logger.error("Upload client implementation is NULL");
+			}
+		}else {
+			logger.error("Init corba client FALSE");
+		}
+		return authInfo;
 	}
 }

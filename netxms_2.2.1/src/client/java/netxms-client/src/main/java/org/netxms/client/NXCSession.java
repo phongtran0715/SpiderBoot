@@ -3960,13 +3960,14 @@ public class NXCSession {
 					SessionNotification.GOOGLE_ACCOUNT_CHANGED, code));
 					}
 
-	public void createHomeCHannel(String cId, String cName, String gAccount) 
+	public void createHomeCHannel(String cId, String cName, String gAccount, int accountd) 
 			throws IOException, NXCException
 			{
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_CREATE_HOME_CHANNEL);
 		msg.setField(SpiderCodes.VID_HOME_CHANNEL_ID, cId);
 		msg.setField(SpiderCodes.VID_HOME_CHANNEL_NAME, cName);
 		msg.setField(SpiderCodes.VID_HOME_CHANNEL_GACCOUNT, gAccount);
+		msg.setFieldInt32(SpiderCodes.VID_HOME_CHANNEL_ACCOUNT_ID, accountd);
 		sendMessage(msg);
 		msg = waitForRCC(msg.getMessageId());
 		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
@@ -3975,13 +3976,15 @@ public class NXCSession {
 					SessionNotification.HOME_CHANNEL_CHANGED, code));
 			}
 
-	public void modifyHomeCHannel(int id, String cId, String cName, String gAccount) 
+	public void modifyHomeCHannel(int id, String cId, String cName, String gAccount, int accountId) 
 			throws IOException, NXCException
 			{
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_MOD_HOME_CHANNEL);
 		msg.setFieldInt32(SpiderCodes.VID_HOME_CHANNEL_RECORD_ID, id);
 		msg.setField(SpiderCodes.VID_HOME_CHANNEL_ID, cId);
 		msg.setField(SpiderCodes.VID_HOME_CHANNEL_NAME, cName);
+		msg.setField(SpiderCodes.VID_HOME_CHANNEL_GACCOUNT, gAccount);
+		msg.setFieldInt32(SpiderCodes.VID_HOME_CHANNEL_ACCOUNT_ID, accountId);
 		sendMessage(msg);
 		msg = waitForRCC(msg.getMessageId());
 		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);

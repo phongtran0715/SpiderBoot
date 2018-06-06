@@ -184,7 +184,7 @@ public class HomeChannelManagerView extends LogViewer {
 				@Override
 				protected void runInternal(IProgressMonitor monitor)
 						throws Exception {
-					session.createHomeCHannel(dlg.getcId(), dlg.getcName(), dlg.getgAccount());
+					session.createHomeCHannel(dlg.getcId(), dlg.getcName(), dlg.getgAccount(), dlg.getAccountId());
 				}
 
 				@Override
@@ -226,7 +226,7 @@ public class HomeChannelManagerView extends LogViewer {
 				@Override
 				protected void runInternal(IProgressMonitor monitor)
 						throws Exception {
-					session.modifyHomeCHannel(dlg.getId(), dlg.getcId(), dlg.getcName(),dlg.getgAccount());
+					session.modifyHomeCHannel(dlg.getId(), dlg.getcId(), dlg.getcName(),dlg.getgAccount(), dlg.getAccountId());
 				}
 
 				@Override

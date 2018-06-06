@@ -39,7 +39,6 @@ import org.netxms.client.NXCException;
 import org.netxms.client.NXCSession;
 import org.netxms.ui.eclipse.shared.ConsoleSharedData;
 import org.spider.client.GoogleAccountObject;
-import org.spider.client.HomeChannelObject;
 
 /**
  * User database object creation dialog
@@ -53,6 +52,7 @@ public class CreateHomeChannelDialog extends Dialog {
 	private String cId;
 	private String cName; 
 	private String gAccount;
+	private int accountId;
 	private NXCSession session;
 	Object[] objGoogleAccount;
 	
@@ -162,6 +162,8 @@ public class CreateHomeChannelDialog extends Dialog {
 		cId = txtChannelId.getText();
 		cName = txtChannelName.getText();
 		gAccount = cbGoogleAccount.getText();
+		accountId = getIdByAccount(gAccount);
+		
 		if(cId == null || cId.isEmpty())
 		{
 			MessageBox dialog =
@@ -181,10 +183,33 @@ public class CreateHomeChannelDialog extends Dialog {
 			dialog.open();
 			return;
 		}
-		
+		if(accountId == -1)
+		{
+			MessageBox dialog =
+					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
+			dialog.setText("Error");
+			dialog.setMessage("Google account does not exist!");
+			dialog.open();
+			return;
+		}
 		super.okPressed();
 	}
-
+	
+	private int getIdByAccount(String googleAccount)
+	{
+		int id = -1;
+		for ( Object it : objGoogleAccount) {
+			if(it instanceof GoogleAccountObject)
+			{
+				if(((GoogleAccountObject)it).getUserName().equals(googleAccount))
+				{
+					id = ((GoogleAccountObject)it).getId();	
+				}
+			}
+		}
+		return id;
+	}
+	
 	public String getcId() {
 		return cId;
 	}
@@ -195,5 +220,10 @@ public class CreateHomeChannelDialog extends Dialog {
 
 	public String getgAccount() {
 		return gAccount;
+	}
+
+	public int getAccountId() {
+		return accountId;
 	}	
+	
 }

@@ -20,8 +20,9 @@ CREATE TABLE `home_channel_list` (
   `ChannelId` varchar(30) NOT NULL,
   `ChannelName` varchar(25) DEFAULT NULL,
   `GoogleAccount` varchar(250) NOT NULL,
+  `AccountID` int(11) DEFAULT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 
 
 -- monitor_channel_list

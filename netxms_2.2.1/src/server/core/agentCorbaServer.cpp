@@ -63,20 +63,22 @@ void AgentSide_i::onDownloadStartup(const ::CORBA::WChar* appId)
 
 void AgentSide_i::onRenderStartup(const ::CORBA::WChar* appId)
 {
-	DbgPrintf(1, _T("AgentSide_i::[onRenderStartup]"));
+	DbgPrintf(6, _T("AgentSide_i::[onRenderStartup]"));
 	DB_RESULT hResult;
 	UINT32 i, dwNumRecords;
 	SpiderRenderClient* renderClient = new SpiderRenderClient();
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
-	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT Id, VideoId, MappingId, VDownloadedPath FROM video_container WHERE ProcessStatus = ? "));
+	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT Id, VideoId, MappingId, VDownloadedPath FROM video_container WHERE MappingId IN ")
+	                               _T(" (SELECT Id FROM channel_mapping WHERE ProcessClusterId = ?) AND ProcessStatus = ?"));
 	if (hStmt != NULL)
 	{
-		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)1);
+		DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR*)appId, NULL, 0);
+		DBBind(hStmt, 2, DB_SQLTYPE_INTEGER, (INT32)1);
 		hResult = DBSelectPrepared(hStmt);
 		if (hResult != NULL)
 		{
 			dwNumRecords = DBGetNumRows(hResult);
-			DbgPrintf(1, _T("AgentSide_i::[onRenderStartup] numRecord = %d"), dwNumRecords);
+			DbgPrintf(6, _T("AgentSide_i::[onRenderStartup] numRecord = %d"), dwNumRecords);
 			for (i = 0; i < dwNumRecords; i++)
 			{
 				INT32 id = DBGetFieldInt64(hResult, i, 0);
@@ -515,9 +517,28 @@ INT32 AgentSide_i::getMaxId(TCHAR * tbName)
 	DBConnectionPoolReleaseConnection(hdb);
 	return result;
 }
+
 void AgentSide_i::updateUploadedVideo(::CORBA::Long jobId)
 {
+	DbgPrintf(6, _T("AgentSide_i::[updateUploadedVideo]jobId = %ld"), jobId);
+	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+	DB_STATEMENT hStmt;
 
+	if (hdb != NULL)
+	{
+		hStmt = DBPrepare(hdb, _T("DELETE FROM video_container WHERE Id = ?"));
+		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)jobId);
+		bool success = DBExecute(hStmt);
+		if (success == true)
+		{
+			DbgPrintf(6, _T("AgentSide_i::[updateUploadedVideo] delete video record successful"));
+			//TODO: delete video on disk
+		}
+		else {
+			DbgPrintf(1, _T("AgentSide_i::[updateUploadedVideo] ERROR! Can not delete vide record for jobId: %ld"), jobId);
+		}
+	}
+	DBConnectionPoolReleaseConnection(hdb);
 }
 
 RenderConifgParam* AgentSide_i::getRenderConfig(INT32 mappingId)
@@ -653,7 +674,7 @@ INT32 AgentSide_i::getMappingId(INT32 jobId)
 
 ::SpiderAgentApp::AgentSide::ClusterInfo* AgentSide_i::getClusterInfo(::CORBA::Long clusterType, ::CORBA::Long mappingId)
 {
-	DbgPrintf(6, _T(" Function [getClusterInfo] mappingId = %d"), mappingId);
+	DbgPrintf(6, _T(" Function [getClusterInfo] mappingId = %ld"), mappingId);
 	::SpiderAgentApp::AgentSide::ClusterInfo* clusterInfo = new ::SpiderAgentApp::AgentSide::ClusterInfo();
 	DB_RESULT hResult;
 	UINT32 i, dwNumRecords;
@@ -692,6 +713,50 @@ INT32 AgentSide_i::getMappingId(INT32 jobId)
 	}
 	DBConnectionPoolReleaseConnection(hdb);
 	return clusterInfo;
+}
+
+::SpiderAgentApp::AgentSide::AuthenInfo* AgentSide_i::getAuthenInfo(::CORBA::Long mappingId)
+{
+	DbgPrintf(6, _T(" Function [getClusterInfo] mappingId = %ld"), mappingId);
+	::SpiderAgentApp::AgentSide::AuthenInfo* authenInfo = new ::SpiderAgentApp::AgentSide::AuthenInfo();
+	DB_RESULT hResult;
+	UINT32 i, dwNumRecords;
+
+	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT HomeChannelId FROM channel_mapping WHERE Id = ?"));
+	if (hStmt != NULL)
+	{
+		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, mappingId);
+		hResult = DBSelectPrepared(hStmt);
+		if (hResult != NULL)
+		{
+			dwNumRecords = DBGetNumRows(hResult);
+			if (dwNumRecords > 0)
+			{
+				TCHAR* cHomeId  = DBGetField(hResult, 0, 0, NULL, 0);
+				hStmt = DBPrepare(hdb, _T("SELECT UserName, Api, ClientSecret, ClientId FROM google_account WHERE Id IN ")
+					_T(" (SELECT AccountId FROM home_channel_list WHERE ChannelId = ?)"));
+				if (hStmt != NULL)
+				{
+					DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, cHomeId, DB_BIND_TRANSIENT);
+					hResult = DBSelectPrepared(hStmt);
+					if (hResult != NULL) {
+						dwNumRecords = DBGetNumRows(hResult);
+						if (dwNumRecords > 0)
+						{
+							authenInfo->userName = CORBA::wstring_dup(DBGetField(hResult, 0, 0, NULL, 0));
+							authenInfo->apiKey = CORBA::wstring_dup(DBGetField(hResult, 0, 1, NULL, 0));
+							authenInfo->clientSecret = CORBA::wstring_dup(DBGetField(hResult, 0, 2, NULL, 0));
+							authenInfo->clientId = CORBA::wstring_dup(DBGetField(hResult, 0, 3, NULL, 0));
+						}
+					}
+				}
+			}
+			DBFreeResult(hResult);
+		}
+	}
+	DBConnectionPoolReleaseConnection(hdb);
+	return authenInfo;
 }
 
 AgentCorbaServer::~AgentCorbaServer()

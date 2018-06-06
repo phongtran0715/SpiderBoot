@@ -26,7 +26,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -55,6 +54,7 @@ public class EditHomeChannelDialog extends Dialog {
 	private String cId;
 	private String cName; 
 	private String gAccount;
+	private int accountId;
 	HomeChannelObject object;
 	Object[] objGoogleAccount;
 	private NXCSession session;
@@ -166,6 +166,7 @@ public class EditHomeChannelDialog extends Dialog {
 		cId = txtChannelId.getText();
 		cName = txtChannelName.getText();
 		gAccount = cbGoogleAccount.getText();
+		accountId = getIdByAccount(gAccount);
 		if(cId == null || cId.isEmpty())
 		{
 			MessageBox dialog =
@@ -184,7 +185,31 @@ public class EditHomeChannelDialog extends Dialog {
 			dialog.open();
 			return;
 		}
+		if(accountId == -1)
+		{
+			MessageBox dialog =
+					new MessageBox(getShell(), SWT.ERROR | SWT.OK);
+			dialog.setText("Error");
+			dialog.setMessage("Google account does not exist!");
+			dialog.open();
+			return;
+		}
 		super.okPressed();
+	}
+	
+	private int getIdByAccount(String googleAccount)
+	{
+		int id = -1;
+		for ( Object it : objGoogleAccount) {
+			if(it instanceof GoogleAccountObject)
+			{
+				if(((GoogleAccountObject)it).getUserName().equals(googleAccount))
+				{
+					id = ((GoogleAccountObject)it).getId();	
+				}
+			}
+		}
+		return id;
 	}
 
 	public int getId() {
@@ -202,4 +227,9 @@ public class EditHomeChannelDialog extends Dialog {
 	public String getgAccount() {
 		return gAccount;
 	}
+
+	public int getAccountId() {
+		return accountId;
+	}
+	
 }

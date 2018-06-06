@@ -51,6 +51,7 @@ public class SpiderCodes {
 	public static final long VID_HOME_CHANNEL_ID			= 1018;
 	public static final long VID_HOME_CHANNEL_NAME			= 1019;
 	public static final long VID_HOME_CHANNEL_GACCOUNT		= 1020;
+	public static final long VID_HOME_CHANNEL_ACCOUNT_ID	= 1021;
 	public static final long VID_HOME_CHANNEL_END			= 1030;
 	//end home channel variable
 

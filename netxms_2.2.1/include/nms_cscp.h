@@ -1262,6 +1262,7 @@ typedef struct
 #define VID_HOME_CHANNEL_ID          ((UINT32)1018)
 #define VID_HOME_CHANNEL_NAME        ((UINT32)1019)
 #define VID_HOME_CHANNEL_GACCOUNT    ((UINT32)1020)
+#define VID_HOME_CHANNEL_ACCOUNT_ID  ((UINT32)1021)
 #define VID_HOME_CHANNEL_END         ((UINT32)1030)
 
 //end home channel variable
