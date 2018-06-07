@@ -472,7 +472,7 @@ INT32 AgentSide_i::getMaxId(TCHAR * tbName)
 
 void AgentSide_i::updateUploadedVideo(::CORBA::Long jobId)
 {
-	DbgPrintf(6, _T("AgentSide_i::[updateUploadedVideo]jobId = %ld"), jobId);
+	DbgPrintf(6, _T("AgentSide_i::[updateUploadedVideo] jobId = %ld"), jobId);
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
 	DB_STATEMENT hStmt;
 

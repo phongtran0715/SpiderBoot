@@ -48,12 +48,12 @@ public class UploadVideo {
 	 * to make YouTube Data API requests.
 	 */
 	private static YouTube youtube;
-	
+
 	/**
 	 * Auth class
 	 */
 	Auth auth = new Auth();
-	
+
 	private static String storeFile = null;
 	private static String clientSecretsFile = null;
 
@@ -66,7 +66,7 @@ public class UploadVideo {
 	public static void setStoreFile(String filePath) {
 		storeFile = filePath;
 	}
-	
+
 	public static void setclientSecretsFile(String filePath) {
 		clientSecretsFile = filePath;
 	}
@@ -77,7 +77,8 @@ public class UploadVideo {
 	 *
 	 * @param args command line args (not used).
 	 */
-	public void execute(String title, String description, String etags, String vLocation) {
+	public void execute(String title, String description, String etags, 
+			String vLocation, String privacyStatus) {
 
 		// This OAuth 2.0 access scope allows an application to upload files
 		// to the authenticated user's YouTube channel, but doesn't allow
@@ -108,7 +109,7 @@ public class UploadVideo {
 			// Set the video to be publicly visible. This is the default
 			// setting. Other supporting settings are "unlisted" and "private."
 			VideoStatus status = new VideoStatus();
-			status.setPrivacyStatus("private");
+			status.setPrivacyStatus(privacyStatus);
 			videoObjectDefiningMetadata.setStatus(status);
 
 			// Most of the video's metadata is set on the VideoSnippet object.

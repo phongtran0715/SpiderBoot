@@ -58,6 +58,7 @@ public class UploadExecuteTimer extends TimerTask{
 					logger.error("File " + vInfo.vRenderPath + " not Exist");	
 					logger.info("Upload complete video " + vInfo.videoId);
 					isComplete = true;
+					updateUploadedInfo(jobData.jobId);
 					return;
 				}
 				ClusterInfo clusterInfo = getClusterInfo(vInfo.mappingId);
@@ -96,7 +97,6 @@ public class UploadExecuteTimer extends TimerTask{
 				//TODO: create client secret file
 				String clientFile = "/tmp/client_secrets.json";
 				//TODO: set authen file name
-				String userName = "";
 				CrunchifyJSONFileWrite jsonCreate = new CrunchifyJSONFileWrite();
 				File jsonFile = new File(clientFile);
 				if(jsonFile.exists() == false)
@@ -114,16 +114,20 @@ public class UploadExecuteTimer extends TimerTask{
 					}
 				}
 				jsonCreate.execute(authInfo.clientSecret, authInfo.clientId, clientFile);
-				UploadVideo.setclientSecretsFile(clientFile);
-				File storeFile = new File(System.getProperty("user.home") + "/" 
-						+ CREDENTIALS_DIRECTORY + "/upload_" + userName);
-				if(storeFile.exists() == false)
-				{
-					logger.error("ERROR : Can not get authen store upload file. File does not exist");
-					isComplete = true;
-					return;
-				}
-				UploadVideo.setStoreFile( "upload_" + userName);
+				uploadVideo.setclientSecretsFile(clientFile);
+				String storeFile = System.getProperty("user.home") + "/" 
+						+ CREDENTIALS_DIRECTORY + "/upload_" + authInfo.userName;
+				System.out.println("Store file = " + storeFile);
+				File file = new File(storeFile);
+//				
+//				if(file.exists() == false)
+//				{
+//					logger.error("ERROR : Can not get authen store upload file. File does not exist");
+//					isComplete = true;
+//					updateUploadedInfo(jobData.jobId);
+//					return;
+//				}
+				uploadVideo.setStoreFile( "upload_" + authInfo.userName);
 				logger.info("Complete get authen file <<<<");
 
 				logger.info("Beginning standardize meta data >>>>");
@@ -133,9 +137,11 @@ public class UploadExecuteTimer extends TimerTask{
 				logger.info("Complete standardize meta data <<<<");
 
 				logger.info("Beginning upload video " + vInfo.videoId);
-				//uploadVideo.execute(title, desc, tags, vInfo.vLocation);
+				logger.info("create authen file for email : " + authInfo.userName);
+				uploadVideo.execute(title, desc, tags, vInfo.vRenderPath, "public");
+				
 				//update process status 
-				//updateUploadedInfo(vInfo.jobId);
+				updateUploadedInfo(jobData.jobId);
 
 				logger.info("Upload complete video " + vInfo.videoId);
 				//Delay time for next upload video
