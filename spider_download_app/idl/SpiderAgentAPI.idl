@@ -1,46 +1,64 @@
-
-//IDL for java server side
-module SpiderDownloadApp
+module SpiderCorba
 {
-  interface SpiderFootSide
+  interface SpiderDefine
   {
-        boolean createMappingChannel(in long timerId, in wstring cHomeId, in wstring cMonitorId, in wstring downloadClusterId, in long timerInterval );
-        boolean modifyMappingChannel(in long timerId, in wstring cHomeId, in wstring cMonitorId, in wstring downloadClusterId, in long timerInterval, in long synStatus);
-        boolean deleteMappingChannel(in long timerId, in wstring downloadClusterId);
-
+     struct VideoInfo {
+          wstring videoId;
+          wstring title;
+          wstring tags;
+          wstring description;
+          wstring thumbnail;
+          wstring vDownloadPath;
+          wstring vRenderPath;
+          long mappingId;
+          long processStatus;
+          long license;
+    };
   };
-};
-//IDL for C++ server side
 
-module SpiderAgentApp
-{
-  interface AgentSide
+  interface DownloadSide : SpiderDefine
   {
-    struct VideoInfo {
-      wstring videoId;
-      wstring title;
-      wstring tags;
-      wstring description;
-      wstring thumbnail;
-      wstring vDownloadPath;
-      wstring vRenderPath;
-      long mappingId;
-      long processStatus;
-      long license;
+        struct DownloadConfig
+        {
+            wstring cHomeId;
+            wstring cMonitorId;
+            wstring downloadClusterId;
+            long timerInterval;
+            long synStatus;
+        };
+
+        boolean createDownloadJob(in long jobId, in DownloadConfig downloadCfg);
+        boolean modifyDownloadJob(in long jobId, in DownloadConfig downloadCfg);
+        boolean deleteDownloadJob(in long jobId, in wstring downloadClusterId);
+  };
+
+  interface AgentSide : SpiderDefine
+  {
+    struct AuthenInfo
+    {
+      wstring userName;
+      wstring apiKey;
+      wstring clientSecret;
+      wstring clientId;
+    };
+
+    struct ClusterInfo
+    {
+      wstring clusterIp;
+      wstring userName;
+      wstring password;
     };
 
     void onDownloadStartup(in wstring appId);
     void onRenderStartup(in wstring appId);
     void onUploadStartup(in wstring appId);
-
     long long getLastSyncTime(in long mappingId);
     void updateLastSyntime(in long mappingId, in long long lastSyncTime);
-
     void updateDownloadedVideo(in VideoInfo vInfo);
     void updateRenderedVideo(in long jobId, in long processStatus, in wstring vRenderPath);
     void updateUploadedVideo (in long jobId);
-	wstring getMonitorChannelId(in long mappingId);
+    wstring getMonitorChannelId(in long mappingId);
+    ClusterInfo getClusterInfo(in long clusterType, in long mappingId);
+    AuthenInfo getAuthenInfo(in long mappingId);
   };
 };
-
-

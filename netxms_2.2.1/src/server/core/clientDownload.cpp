@@ -16,7 +16,7 @@ SpiderDownloadClient::SpiderDownloadClient(): initSuccess(false)
 		CORBA::Object_var obj = getObjectReference(mOrb);
 		if (obj != CORBA::Object::_nil())
 		{
-			mDownloadRef = SpiderDownloadApp::SpiderFootSide::_narrow(obj);
+			mDownloadRef = SpiderCorba::DownloadSide::_narrow(obj);
 			initSuccess = true;
 		}
 	}

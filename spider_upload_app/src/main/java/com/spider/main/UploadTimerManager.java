@@ -4,12 +4,11 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
-import SpiderUploadApp.SpiderFootSidePackage.UploadInfo;
 
 public class UploadTimerManager {
 
 	private static UploadTimerManager instance = null;
-	public static Queue<UploadInfo> qUploadJob = new LinkedList<UploadInfo>();
+	public static Queue<DataDefine.UploadJobData> qUploadJob = new LinkedList<DataDefine.UploadJobData>();
 
 	public UploadTimerManager() {
 	}

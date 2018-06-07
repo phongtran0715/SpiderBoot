@@ -9,9 +9,9 @@ import org.apache.log4j.Logger;
 import com.google.api.services.samples.youtube.cmdline.data.UploadVideo;
 import com.spider.corba.UploadCorbaClient;
 
-import SpiderAgentApp.AgentSidePackage.AuthenInfo;
-import SpiderAgentApp.AgentSidePackage.ClusterInfo;
-import SpiderUploadApp.SpiderFootSidePackage.UploadInfo;
+import SpiderCorba.AgentSidePackage.AuthenInfo;
+import SpiderCorba.AgentSidePackage.ClusterInfo;
+import SpiderCorba.SpiderDefinePackage.VideoInfo;
 import spiderboot.configuration.UploadConfig;
 import spiderboot.data.DataController;
 import spiderboot.util.Utility;
@@ -22,6 +22,7 @@ public class UploadExecuteTimer extends TimerTask{
 	String videoFolderBase;
 	static Utility util = new Utility();
 	private static final Logger logger = Logger.getLogger(UploadExecuteTimer.class);
+	private static final String CREDENTIALS_DIRECTORY = ".oauth-credentials";
 	UploadVideo uploadVideo;
 	UploadConfig uploadConfig;
 	UploadCorbaClient uploadClient;
@@ -43,15 +44,18 @@ public class UploadExecuteTimer extends TimerTask{
 	private void completeTask() {
 		if(isComplete){
 			isComplete = false;
-			System.out.println("Timer task started at:" + new Date());
 			if(UploadTimerManager.qUploadJob.isEmpty() == false)
 			{
-				UploadInfo vInfo = UploadTimerManager.qUploadJob.poll();
+				
+				logger.info("Timer task started at:" + new Date());
+				DataDefine.UploadJobData jobData = UploadTimerManager.qUploadJob.poll();
+				VideoInfo vInfo = jobData.vInfo;
+				SpiderCorba.UploadSidePackage.UploadConfig uploadVideoCfg = jobData.uploadCfg;
 				//upload video
-				File uploadFile = new File(vInfo.vLocation);
+				File uploadFile = new File(vInfo.vRenderPath);
 
 				if (!uploadFile.exists()) {
-					logger.error("File " + vInfo.vLocation + " not Exist");	
+					logger.error("File " + vInfo.vRenderPath + " not Exist");	
 					logger.info("Upload complete video " + vInfo.videoId);
 					isComplete = true;
 					return;
@@ -80,7 +84,7 @@ public class UploadExecuteTimer extends TimerTask{
 				}
 				 */
 
-				logger.info("Uploading video : " + vInfo.vLocation);
+				logger.info("Uploading video : " + vInfo.vRenderPath);
 
 				AuthenInfo authInfo = getAuthenInfo(vInfo.mappingId);
 				logger.info("Authen infor : user name = " + authInfo.userName);
@@ -111,17 +115,25 @@ public class UploadExecuteTimer extends TimerTask{
 				}
 				jsonCreate.execute(authInfo.clientSecret, authInfo.clientId, clientFile);
 				UploadVideo.setclientSecretsFile(clientFile);
+				File storeFile = new File(System.getProperty("user.home") + "/" 
+						+ CREDENTIALS_DIRECTORY + "/upload_" + userName);
+				if(storeFile.exists() == false)
+				{
+					logger.error("ERROR : Can not get authen store upload file. File does not exist");
+					isComplete = true;
+					return;
+				}
 				UploadVideo.setStoreFile( "upload_" + userName);
 				logger.info("Complete get authen file <<<<");
 
 				logger.info("Beginning standardize meta data >>>>");
-				String title = standardizeTitle(vInfo.vTitle);
-				String desc = standardizeDesc(vInfo.vDesc);
-				String tags = standardizeTags(vInfo.vTags);
+				String title = standardizeTitle(vInfo.title, uploadVideoCfg.vTitleTemp, uploadVideoCfg.enableTitle);
+				String desc = standardizeDesc(vInfo.description, uploadVideoCfg.vDescTemp, uploadVideoCfg.enableDes);
+				String tags = standardizeTags(vInfo.tags, uploadVideoCfg.vTagsTemp, uploadVideoCfg.enableTags);
 				logger.info("Complete standardize meta data <<<<");
 
 				logger.info("Beginning upload video " + vInfo.videoId);
-				uploadVideo.execute(title, desc, tags, vInfo.vLocation);
+				//uploadVideo.execute(title, desc, tags, vInfo.vLocation);
 				//update process status 
 				//updateUploadedInfo(vInfo.jobId);
 
@@ -133,30 +145,34 @@ public class UploadExecuteTimer extends TimerTask{
 					logger.error(e.toString());
 					e.printStackTrace();
 				}
+				logger.info("Timer task finished at:" + new Date());
 			}
 			isComplete = true;
-			System.out.println("Timer task finished at:" + new Date());
 		}
 		else{
 			//do nothing
-			System.out.println("Process timer task is still running ...");
+			logger.info("Process timer task is still running ...");
 		}
 	}
-	private String standardizeTitle(String originTitle) {
+	private String standardizeTitle(String originTitle, String titleTemp, boolean enableTitle) {
 		String result = originTitle;
+		logger.info("title temp : " + titleTemp);
 		return result;
 
 	}
 
-	private String standardizeTags(String originTags) {
+	private String standardizeTags(String originTags, String tagTemp, boolean enableTag) {
 		String result = originTags;
+		logger.info("tag temp : " + tagTemp);
 		return result;
 	}
 
-	private String standardizeDesc(String originDesc) {
+	private String standardizeDesc(String originDesc, String desctemp, boolean enableDesc) {
 		String result = originDesc;
+		logger.info("desc temp : " + desctemp);
 		return result;
 	}
+
 	private void updateUploadedInfo(int jobId) 
 	{
 		logger.info(">>> Function [updateUploadedInfo] : job Id = " + jobId);
@@ -183,6 +199,7 @@ public class UploadExecuteTimer extends TimerTask{
 
 	private ClusterInfo getClusterInfo(int mappingId)
 	{
+		logger.info("Function getClusterInfo : mapping ID = " + mappingId + " >>>");
 		ClusterInfo clusterInfo = null;
 		if(isInitCorba == false)
 		{
@@ -209,6 +226,7 @@ public class UploadExecuteTimer extends TimerTask{
 
 	private AuthenInfo getAuthenInfo(int mappingId)
 	{
+		logger.info("Function getAuthenInfo : mapping ID = " + mappingId + " >>>");
 		AuthenInfo authInfo = null;
 		if(isInitCorba == false)
 		{

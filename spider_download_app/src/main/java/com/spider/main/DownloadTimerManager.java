@@ -39,7 +39,7 @@ public class DownloadTimerManager {
 		return isSuccess;
 	}
 
-	public boolean modifyMappingChannel(int timerId, String cHomeId, String cMonitorId, 
+	public boolean modifyDownloadTimer(int timerId, String cHomeId, String cMonitorId, 
 			String downloadClusterId, int timerInterval, int synStatus) 
 	{
 		boolean isSuccess = false;

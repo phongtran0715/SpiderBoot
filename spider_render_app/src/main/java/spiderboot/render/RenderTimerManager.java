@@ -5,11 +5,9 @@ import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import SpiderRenderApp.SpiderFootSidePackage.RenderInfo;
-
 public class RenderTimerManager {
 	
-	public static Queue<RenderInfo> qRenderJob = new LinkedList<RenderInfo>();
+	public static Queue<DataDefine.RenderJobData> qRenderJob = new LinkedList<DataDefine.RenderJobData>();
 	private static RenderTimerManager instance = null;
 	public static RenderTimerManager getInstance() {
 		if (instance == null) {

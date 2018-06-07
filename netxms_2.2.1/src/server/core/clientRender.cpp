@@ -13,7 +13,7 @@ SpiderRenderClient::SpiderRenderClient():initSuccess(false)
 		char* agrv[] = { "-ORBInitRef", "NameService=corbaloc::localhost:2809/NameService" };
 		mOrb = CORBA::ORB_init(agrc, agrv);
 		CORBA::Object_var obj = getObjectReference(mOrb);
-		mRenderRef = SpiderRenderApp::SpiderFootSide::_narrow(obj);
+		mRenderRef = SpiderCorba::RenderSide::_narrow(obj);
 		initSuccess = true;
 	}
 	catch (CORBA::TRANSIENT&) {

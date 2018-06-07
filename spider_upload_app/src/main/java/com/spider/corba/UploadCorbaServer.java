@@ -6,19 +6,29 @@ import org.omg.CORBA.*;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
 
+import com.spider.main.DataDefine;
 import com.spider.main.UploadTimerManager;
 
-import SpiderUploadApp.*;
-import SpiderUploadApp.SpiderFootSidePackage.UploadInfo;
+import SpiderCorba.UploadSide;
+import SpiderCorba.UploadSideHelper;
+import SpiderCorba.UploadSidePOA;
+import SpiderCorba.SpiderDefinePackage.VideoInfo;
+import SpiderCorba.UploadSidePackage.UploadConfig;
 
-class UploadImpl extends SpiderFootSidePOA {
+class UploadImpl extends UploadSidePOA {
 	private static final Logger logger = Logger.getLogger(UploadImpl.class);
 
 	@Override
-	public boolean createUploadJob(UploadInfo vInfo) {
-		logger.info("createUploadJob:: jobId = " + vInfo.jobId);
-		UploadTimerManager.qUploadJob.add(vInfo);
-		return true;
+	public boolean createUploadJob(int jobId, VideoInfo vInfo, UploadConfig uploadCfg) {
+		DataDefine.UploadJobData jobData = new DataDefine().new UploadJobData(jobId, vInfo, uploadCfg);
+		UploadTimerManager.qUploadJob.add(jobData);
+		return false;
+	}
+
+	@Override
+	public boolean deleteUploadJob(int jobId, String uploadClusterId) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
@@ -45,7 +55,7 @@ public class UploadCorbaServer {
 
 			// get object reference from the servant
 			org.omg.CORBA.Object ref = rootpoa.servant_to_reference(downloadImpl);
-			SpiderFootSide href = SpiderFootSideHelper.narrow(ref);
+			UploadSide href = UploadSideHelper.narrow(ref);
 
 			// get the root naming context
 			// NameService invokes the name service

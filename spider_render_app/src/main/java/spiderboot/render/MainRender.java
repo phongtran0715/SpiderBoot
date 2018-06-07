@@ -55,6 +55,7 @@ public class MainRender
 
 		clientThread.start();
 		
+		logger.info("Render app ID : " + renderConfig.appId);
 		//create render timer task (only one timer task)
 		RenderTimerManager.getInstance().initTimerTask();
 	}

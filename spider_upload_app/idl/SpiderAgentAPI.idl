@@ -1,31 +1,37 @@
-
-//IDL for java server side
-module SpiderUploadApp
+module SpiderCorba
 {
-  interface SpiderFootSide
+  interface SpiderDefine
   {
-        struct UploadInfo
+     struct VideoInfo {
+          wstring videoId;
+          wstring title;
+          wstring tags;
+          wstring description;
+          wstring thumbnail;
+          wstring vDownloadPath;
+          wstring vRenderPath;
+          long mappingId;
+          long processStatus;
+          long license;
+    };
+  };
+
+  interface UploadSide : SpiderDefine
+  {
+        struct UploadConfig
         {
-            long jobId;
-            wstring videoId;
-            wstring vTitle;
-            wstring vDesc;
-            wstring vTags;
-            wstring vThumbnail;
-            wstring vLocation;
+            wstring vTitleTemp;
+            wstring vDescTemp;
+            wstring vTagsTemp;
             boolean enableTitle;
             boolean enableDes;
             boolean enableTags;
-            long mappingId;
         };
-        boolean createUploadJob(in UploadInfo vInfo);
+        boolean createUploadJob(in long jobId, in VideoInfo vInfo, in UploadConfig uploadCfg);
+        boolean deleteUploadJob(in long jobId, in wstring uploadClusterId);
   };
-};
-//IDL for C++ server side
 
-module SpiderAgentApp
-{
-  interface AgentSide
+  interface AgentSide : SpiderDefine
   {
     struct AuthenInfo
     {
@@ -42,26 +48,11 @@ module SpiderAgentApp
       wstring password;
     };
 
-    struct VideoInfo {
-      wstring videoId;
-      wstring title;
-      wstring tags;
-      wstring description;
-      wstring thumbnail;
-      wstring vDownloadPath;
-      wstring vRenderPath;
-      long mappingId;
-      long processStatus;
-      long license;
-    };
-
     void onDownloadStartup(in wstring appId);
     void onRenderStartup(in wstring appId);
     void onUploadStartup(in wstring appId);
-
     long long getLastSyncTime(in long mappingId);
     void updateLastSyntime(in long mappingId, in long long lastSyncTime);
-
     void updateDownloadedVideo(in VideoInfo vInfo);
     void updateRenderedVideo(in long jobId, in long processStatus, in wstring vRenderPath);
     void updateUploadedVideo (in long jobId);

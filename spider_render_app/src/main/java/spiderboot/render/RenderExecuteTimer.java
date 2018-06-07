@@ -4,13 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.TimerTask;
-
 import org.apache.log4j.Logger;
-
 import com.spider.corba.RenderCorbaClient;
 
-import SpiderAgentApp.AgentSidePackage.ClusterInfo;
-import SpiderRenderApp.SpiderFootSidePackage.RenderInfo;
+import SpiderCorba.AgentSidePackage.ClusterInfo;
+import SpiderCorba.SpiderDefinePackage.VideoInfo;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
@@ -56,12 +54,14 @@ public class RenderExecuteTimer extends TimerTask{
 			logger.info("Timer task started at:" + new Date());
 			if(RenderTimerManager.qRenderJob.isEmpty() == false)
 			{
-				RenderInfo vInfo = RenderTimerManager.qRenderJob.poll();				
+				DataDefine.RenderJobData jobData = RenderTimerManager.qRenderJob.poll();
+				VideoInfo vInfo = jobData.vInfo;
+				SpiderCorba.RenderSidePackage.RenderConfig renderCfg = jobData.renderCfg;
 				//TODO: get render information
-				File uploadFile = new File(vInfo.vLocation);
+				File uploadFile = new File(vInfo.vDownloadPath);
 
 				if (!uploadFile.exists()) {
-					logger.error("File " + vInfo.vLocation + " not Exist");
+					logger.error("File " + vInfo.vDownloadPath + " not Exist");
 					logger.info("Timer task finished at:" + new Date());
 					isComplete = true;
 					return;
@@ -70,17 +70,18 @@ public class RenderExecuteTimer extends TimerTask{
 				//check file is existed or not
 				String vOutput = outputFolder + util.prefixOS() + vInfo.videoId + "_" + new Date().getTime() +   ".mp4";
 				//process video
-				String vProcessedInput = processVideo(vInfo.vLocation, outputFolder + util.prefixOS() + "video_tmp1.mp4", vInfo.vLogo, vInfo.enableLogo);
+				String vProcessedInput = processVideo(vInfo.vDownloadPath, outputFolder + util.prefixOS() + "video_tmp1.mp4", 
+						renderCfg.vLogoTemp, renderCfg.enableLogo);
 				//convert video
 				String vProcessIntro = "";
 				String vProcessOutro = "";
-				if(vInfo.enableIntro)
+				if(renderCfg.enableIntro)
 				{
-					vProcessIntro = convertVideo(vInfo.vIntro, outputFolder + util.prefixOS() + "intro.ts");	
+					vProcessIntro = convertVideo(renderCfg.vIntroTemp, outputFolder + util.prefixOS() + "intro.ts");	
 				}
-				if(vInfo.enableOutro)
+				if(renderCfg.enableOutro)
 				{
-					vProcessOutro = convertVideo(vInfo.vOutro, outputFolder + util.prefixOS() + "outro.ts");	
+					vProcessOutro = convertVideo(renderCfg.vOutroTemp, outputFolder + util.prefixOS() + "outro.ts");	
 				}
 				convertVideo(vProcessedInput,  outputFolder + util.prefixOS() + "video_tmp1.ts");
 				//concast video 
@@ -89,7 +90,7 @@ public class RenderExecuteTimer extends TimerTask{
 						vProcessOutro, 
 						vOutput);
 				//update rendered video information
-				updateRenderedInfo(vInfo.jobId, 2, vOutput);
+				updateRenderedInfo(jobData.jobId, 2, vOutput);
 				//remove all temp file
 				deleteTempFile(outputFolder + util.prefixOS() + "video_tmp1.mp4");
 				deleteTempFile(outputFolder + util.prefixOS() + "intro.ts");
@@ -201,9 +202,12 @@ public class RenderExecuteTimer extends TimerTask{
 	private void deleteTempFile(String filePath)
 	{
 		File file = new File(filePath);
-		if(file.delete() == false)
+		if(file.exists())
 		{
-			logger.error("Failed to delete the file : " + filePath);
+			if(file.delete() == false)
+			{
+				logger.error("Failed to delete the file : " + filePath);
+			}	
 		}
 	}
 

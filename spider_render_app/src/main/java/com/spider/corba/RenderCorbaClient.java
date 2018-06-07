@@ -1,9 +1,12 @@
 package com.spider.corba;
 
 // Copyright and License 
-import SpiderAgentApp.*;
 
 import org.omg.CosNaming.*;
+
+import SpiderCorba.AgentSide;
+import SpiderCorba.AgentSideHelper;
+
 import org.apache.log4j.Logger;
 import org.omg.CORBA.*;
 

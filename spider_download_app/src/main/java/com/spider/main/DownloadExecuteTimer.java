@@ -7,10 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.TimerTask;
-
 import org.apache.log4j.Logger;
 import org.omg.CORBA.StringHolder;
-
 import com.github.axet.vget.DirectDownload;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.samples.youtube.cmdline.data.Search;
@@ -19,7 +17,7 @@ import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Video;
 import com.spider.corba.DownloadCorbaClient;
 
-import SpiderAgentApp.AgentSidePackage.VideoInfo;
+import SpiderCorba.SpiderDefinePackage.VideoInfo;
 import spiderboot.configuration.DownloadConfig;
 import spiderboot.data.DataController;
 import spiderboot.util.Utility;
@@ -200,7 +198,7 @@ public class DownloadExecuteTimer extends TimerTask {
 			if(downloadClient.downloadAppImpl != null)
 			{
 				try {
-					SpiderAgentApp.AgentSidePackage.VideoInfo vInfo = new VideoInfo(videoWrapper.videoId, videoWrapper.title, 
+					SpiderCorba.SpiderDefinePackage.VideoInfo vInfo = new VideoInfo(videoWrapper.videoId, videoWrapper.title, 
 							videoWrapper.tag, videoWrapper.description, videoWrapper.thumbnail, 
 							videoWrapper.vDownloadPath, videoWrapper.vRenderPath, videoWrapper.mappingId,
 							videoWrapper.processStatus, videoWrapper.license);

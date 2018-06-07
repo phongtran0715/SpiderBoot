@@ -13,33 +13,12 @@
 #define LIBCORBA_EXPORTABLE
 #endif
 
-struct RenderConifgParam
-{
-   TCHAR* vIntro;
-   TCHAR* vOutro;
-   TCHAR* vLogo;
-   bool enableIntro;
-   bool enableOutro;
-   bool enableLogo;
-};
-
-struct UploadConfigParam
-{
-   TCHAR* vTitle;
-   TCHAR* vDesc;
-   TCHAR* vTags;
-   TCHAR* vThumb;
-   bool enableTitle;
-   bool enableDesc;
-   bool enableTags;
-};
-
 class LIBCORBA_EXPORTABLE SpiderDownloadClient
 {
 private:
    CORBA::Object_ptr getObjectReference(CORBA::ORB_ptr orb);
 public:
-   SpiderDownloadApp::SpiderFootSide_var mDownloadRef;
+   SpiderCorba::DownloadSide_var mDownloadRef;
    CORBA::ORB_var mOrb;
    bool initSuccess;
    SpiderDownloadClient();
@@ -51,7 +30,7 @@ class LIBCORBA_EXPORTABLE SpiderRenderClient
 private:
    CORBA::Object_ptr getObjectReference(CORBA::ORB_ptr orb);
 public:
-   SpiderRenderApp::SpiderFootSide_var mRenderRef;
+   SpiderCorba::RenderSide_var mRenderRef;
    CORBA::ORB_var mOrb;
    bool initSuccess;
    SpiderRenderClient();
@@ -63,7 +42,7 @@ class LIBCORBA_EXPORTABLE SpiderUploadClient
 private:
    CORBA::Object_ptr getObjectReference(CORBA::ORB_ptr orb);
 public:
-   SpiderUploadApp::SpiderFootSide_var mUploadRef;
+   SpiderCorba::UploadSide_var mUploadRef;
    CORBA::ORB_var mOrb;
    bool initSuccess;
    SpiderUploadClient();
@@ -83,11 +62,12 @@ public:
 };
 
 
-class AgentSide_i : public POA_SpiderAgentApp::AgentSide
+class AgentSide_i : public POA_SpiderCorba::AgentSide
 {
 private:
-   RenderConifgParam* getRenderConfig(INT32 mappingId);
-   UploadConfigParam* getUploadConfig(INT32 mappingId);
+   ::SpiderCorba::RenderSide::RenderConfig getRenderConfig(INT32 mappingId);
+   ::SpiderCorba::UploadSide::UploadConfig getUploadConfig(INT32 mappingId);
+   ::SpiderCorba::SpiderDefine::VideoInfo getVideoInfo(INT32 mappingId);
    INT32 getMappingId(INT32 jobId);
    INT32 getMaxId(TCHAR * tbName);
 public:
@@ -96,13 +76,12 @@ public:
    void onUploadStartup(const ::CORBA::WChar* appId);
    ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId);
    void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong lastSyncTime);
-   void updateDownloadedVideo(const ::SpiderAgentApp::AgentSide::VideoInfo& vInfo);
+   void updateDownloadedVideo(const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo);
    void updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const ::CORBA::WChar* vRenderPath);
    void updateUploadedVideo(::CORBA::Long jobId);
    ::CORBA::WChar* getMonitorChannelId(::CORBA::Long mappingId);
-   ::CORBA::Boolean createUploadJob(const ::SpiderUploadApp::SpiderFootSide::UploadInfo& vInfo);
-   ::SpiderAgentApp::AgentSide::ClusterInfo* getClusterInfo(::CORBA::Long clusterType, ::CORBA::Long mappingId);
-   ::SpiderAgentApp::AgentSide::AuthenInfo* getAuthenInfo(::CORBA::Long mappingId);
+   ::SpiderCorba::AgentSide::ClusterInfo* getClusterInfo(::CORBA::Long clusterType, ::CORBA::Long mappingId);
+   ::SpiderCorba::AgentSide::AuthenInfo* getAuthenInfo(::CORBA::Long mappingId);
 };
 
 #endif /* _nms_corba_h_ */

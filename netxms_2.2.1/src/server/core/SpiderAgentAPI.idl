@@ -1,66 +1,70 @@
-
-//IDL for java server side
-module SpiderDownloadApp
+module SpiderCorba
 {
-  interface SpiderFootSide
+  interface SpiderDefine
   {
-        boolean createMappingChannel(in long timerId, in wstring cHomeId, in wstring cMonitorId, in wstring downloadClusterId, in long timerInterval );
-        boolean modifyMappingChannel(in long timerId, in wstring cHomeId, in wstring cMonitorId, in wstring downloadClusterId, in long timerInterval, in long synStatus);
-        boolean deleteMappingChannel(in long timerId, in wstring downloadClusterId);
-
+     struct VideoInfo {
+          wstring videoId;
+          wstring title;
+          wstring tags;
+          wstring description;
+          wstring thumbnail;
+          wstring vDownloadPath;
+          wstring vRenderPath;
+          long mappingId;
+          long processStatus;
+          long license;
+    };
   };
-};
 
-module SpiderRenderApp
-{
-  interface SpiderFootSide
+  interface DownloadSide : SpiderDefine
   {
-        struct RenderInfo
+        struct DownloadConfig
         {
-            long jobId;
-            wstring videoId;
-            wstring vIntro;
-            wstring vOutro;
-            wstring vLogo;
+            wstring cHomeId;
+            wstring cMonitorId;
+            wstring downloadClusterId;
+            long timerInterval;
+            long synStatus;
+        };
+
+        boolean createDownloadJob(in long jobId, in DownloadConfig downloadCfg);
+        boolean modifyDownloadJob(in long jobId, in DownloadConfig downloadCfg);
+        boolean deleteDownloadJob(in long jobId, in wstring downloadClusterId);
+  };
+
+  interface RenderSide : SpiderDefine
+  {
+        struct RenderConfig
+        {
+            wstring vIntroTemp;
+            wstring vOutroTemp;
+            wstring vLogoTemp;
             boolean enableIntro;
             boolean enableOutro;
             boolean enableLogo;
-            wstring vLocation;
         };
 
-        boolean createRenderJob(in RenderInfo vInfo);
-        boolean deleteRenderJob(in wstring renderClusterId, in long jobId);
+        boolean createRenderJob(in long jobId, in VideoInfo vInfo, in RenderConfig renderCfg);
+        boolean deleteRenderJob(in long jobId, in wstring renderClusterId);
         void deleteRenderdVideo(in wstring renderClusterId, in wstring vLocation);
   };
-};
 
-module SpiderUploadApp
-{
-  interface SpiderFootSide
+  interface UploadSide : SpiderDefine
   {
-        struct UploadInfo
+        struct UploadConfig
         {
-            long jobId;
-            wstring videoId;
-            wstring vTitle;
-            wstring vDesc;
-            wstring vTags;
-            wstring vThumbnail;
-            wstring vLocation;
+            wstring vTitleTemp;
+            wstring vDescTemp;
+            wstring vTagsTemp;
             boolean enableTitle;
             boolean enableDes;
             boolean enableTags;
-            long mappingId;
         };
-        boolean createUploadJob(in UploadInfo vInfo);
-        boolean deleteUploadJob(in wstring uploadClusterId, in long jobId);
+        boolean createUploadJob(in long jobId, in VideoInfo vInfo, in UploadConfig uploadCfg);
+        boolean deleteUploadJob(in long jobId, in wstring uploadClusterId);
   };
-};
-//IDL for C++ server side
 
-module SpiderAgentApp
-{
-  interface AgentSide
+  interface AgentSide : SpiderDefine
   {
     struct AuthenInfo
     {
@@ -77,26 +81,11 @@ module SpiderAgentApp
       wstring password;
     };
 
-    struct VideoInfo {
-      wstring videoId;
-      wstring title;
-      wstring tags;
-      wstring description;
-      wstring thumbnail;
-      wstring vDownloadPath;
-      wstring vRenderPath;
-      long mappingId;
-      long processStatus;
-      long license;
-    };
-
     void onDownloadStartup(in wstring appId);
     void onRenderStartup(in wstring appId);
     void onUploadStartup(in wstring appId);
-
     long long getLastSyncTime(in long mappingId);
     void updateLastSyntime(in long mappingId, in long long lastSyncTime);
-
     void updateDownloadedVideo(in VideoInfo vInfo);
     void updateRenderedVideo(in long jobId, in long processStatus, in wstring vRenderPath);
     void updateUploadedVideo (in long jobId);

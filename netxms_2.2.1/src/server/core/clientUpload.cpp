@@ -13,7 +13,7 @@ SpiderUploadClient::SpiderUploadClient():initSuccess(false)
 		char* agrv[] = { "-ORBInitRef", "NameService=corbaloc::localhost:2809/NameService" };
 		mOrb = CORBA::ORB_init(agrc, agrv);
 		CORBA::Object_var obj = getObjectReference(mOrb);
-		mUploadRef = SpiderUploadApp::SpiderFootSide::_narrow(obj);
+		mUploadRef = SpiderCorba::UploadSide::_narrow(obj);
 		initSuccess = true;
 	}
 	catch (CORBA::TRANSIENT&) {

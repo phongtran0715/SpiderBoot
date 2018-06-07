@@ -14423,11 +14423,14 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
                {
                   debugPrintf(6, _T("ClientSession::[%s] Init corba for download client successful!"), __FUNCTION__);
                   try {
+                     ::SpiderCorba::DownloadSide::DownloadConfig downloadCfg;
+                     downloadCfg.cHomeId = CORBA::wstring_dup(cHomeId);
+                     downloadCfg.cMonitorId = CORBA::wstring_dup(cMonitorId);
+                     downloadCfg.downloadClusterId = CORBA::wstring_dup(downloadId);
+                     downloadCfg.timerInterval = timeSync;
+                     downloadCfg.synStatus = statusSync;
 
-                     debugPrintf(1, _T("create home channel ID = %s"), cHomeId);
-                     debugPrintf(1, _T("create monitor channel ID = %s"), cMonitorId);
-                     downloadClient->mDownloadRef->createMappingChannel(mappingId, CORBA::wstring_dup(cHomeId),
-                           CORBA::wstring_dup(cMonitorId), CORBA::wstring_dup(downloadId), timeSync);
+                     downloadClient->mDownloadRef->createDownloadJob(mappingId, downloadCfg);
                   }
                   catch (CORBA::TRANSIENT&) {
                      debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
@@ -14627,7 +14630,7 @@ void ClientSession::modifyHomeChannel(NXCPMessage * request)
       INT32 accountId = request->getFieldAsInt32(VID_HOME_CHANNEL_ACCOUNT_ID);
 
       hStmt = DBPrepare(hdb, _T("UPDATE home_channel_list SET ChannelId = ?, ChannelName = ?, ")
-         _T(" GoogleAccount= ?, AccountId = ? WHERE Id = ?"));
+                        _T(" GoogleAccount= ?, AccountId = ? WHERE Id = ?"));
       DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)cId, DB_BIND_TRANSIENT);
       DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)cName, DB_BIND_TRANSIENT);
       DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)googleAcc, DB_BIND_TRANSIENT);
@@ -14734,8 +14737,13 @@ void ClientSession::modifyMappingChannel(NXCPMessage * request)
          {
             debugPrintf(6, _T("ClientSession::[%s] Init corba for download client successful!"), __FUNCTION__);
             try {
-               downloadClient->mDownloadRef->modifyMappingChannel(id, CORBA::wstring_dup(cHomeId),
-                     CORBA::wstring_dup(cMonitorId), CORBA::wstring_dup(downloadId), timeSync, statusSync);
+               ::SpiderCorba::DownloadSide::DownloadConfig downloadCfg;
+               downloadCfg.cHomeId = CORBA::wstring_dup(cHomeId);
+               downloadCfg.cMonitorId = CORBA::wstring_dup(cMonitorId);
+               downloadCfg.downloadClusterId = CORBA::wstring_dup(downloadId);
+               downloadCfg.timerInterval = timeSync;
+               downloadCfg.synStatus = statusSync;
+               downloadClient->mDownloadRef->modifyDownloadJob(id, downloadCfg);
             }
             catch (CORBA::TRANSIENT&) {
                debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
@@ -14895,7 +14903,7 @@ void ClientSession::deleteMappingChannel(NXCPMessage * request)
          {
             debugPrintf(6, _T("ClientSession::[%s] Init corba for download client successful!"), __FUNCTION__);
             try {
-               downloadClient->mDownloadRef->deleteMappingChannel(id, CORBA::wstring_dup(downloadId));
+               downloadClient->mDownloadRef->deleteDownloadJob(id, CORBA::wstring_dup(downloadId));
             }
             catch (CORBA::TRANSIENT&) {
                debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));

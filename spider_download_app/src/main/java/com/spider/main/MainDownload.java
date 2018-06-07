@@ -57,5 +57,7 @@ public class MainDownload {
 		};
 
 		clientThread.start();
+		
+		logger.info("Download app ID: " + downloadConfig.appId);
 	}
 }
