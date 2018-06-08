@@ -2,6 +2,7 @@ package org.spider.ui.eclipse.spidermanager.views;
 
 import java.io.IOException;
 
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.TableItem;
@@ -46,6 +47,7 @@ public class HomeChannelManagerView extends LogViewer {
 	private Action actAddHomeChannel;
 	private Action actEditHomeChannel;
 	private Action actDeleteHomeChannel;
+	private Action actViewHomeChanne;
 	private SessionListener sessionListener;
 
 	public static final int COLUMN_ID 				= 0;
@@ -61,7 +63,7 @@ public class HomeChannelManagerView extends LogViewer {
 
 	public HomeChannelManagerView() {
 	}
-	
+
 	@Override
 	public void createPartControl(Composite parent) {
 		// TODO Auto-generated method stub
@@ -127,6 +129,8 @@ public class HomeChannelManagerView extends LogViewer {
 		manager.add(actAddHomeChannel);
 		manager.add(actEditHomeChannel);
 		manager.add(actDeleteHomeChannel);
+		manager.add(new Separator());
+		manager.add(actViewHomeChanne);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -172,6 +176,14 @@ public class HomeChannelManagerView extends LogViewer {
 			}
 		};
 		actDeleteHomeChannel.setToolTipText("Delete home channel");
+
+		actViewHomeChanne = new Action("View home channel", 
+				Activator.getImageDescriptor("icons/eye_16x16.png")) {
+			public void run() {
+				viewHomeChannel();
+			}
+		};
+		actViewHomeChanne.setToolTipText("View home channel");
 	}
 
 
@@ -262,8 +274,6 @@ public class HomeChannelManagerView extends LogViewer {
 				protected void runInternal(IProgressMonitor monitor)
 						throws Exception {
 					for (Object object : selection.toList()) {
-						System.out.println("delete home channel");
-						System.out.println(((org.netxms.client.TableRow)object).get(COLUMN_ID).getValue());
 						int id = Integer.parseInt(((org.netxms.client.TableRow)object).get(COLUMN_ID).getValue());
 						String channelId = ((org.netxms.client.TableRow)object).get(COLUMN_CHANNEL_ID).getValue();
 						session.deleteHomeChannel(id, channelId);
@@ -277,5 +287,22 @@ public class HomeChannelManagerView extends LogViewer {
 				}
 			}.start();
 		}
+	}
+
+	private void viewHomeChannel()
+	{
+		final TableItem[] selection = viewer.getTable().getSelection();
+		if(selection.length <= 0)
+		{
+			MessageBox dialog =
+					new MessageBox(getViewSite().getShell(), SWT.ICON_WARNING | SWT.OK);
+			dialog.setText("Warning");
+			dialog.setMessage("You must select at least one item to delete!");
+			dialog.open();
+			return;
+		}
+		String channelId = selection[0].getText(COLUMN_CHANNEL_ID);
+		System.out.println("Channel Id = " + channelId);
+		Program.launch("https://www.youtube.com/channel/" + channelId);
 	}
 }

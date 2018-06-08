@@ -747,6 +747,7 @@ INT32 AgentSide_i::getMappingId(INT32 jobId)
 				vInfo.vRenderPath = CORBA::wstring_dup(DBGetField(hResult, 0, 6, NULL, 0));
 				vInfo.processStatus = DBGetFieldInt64(hResult, 0, 7);
 				vInfo.license = DBGetFieldInt64(hResult, 0, 8);
+				vInfo.mappingId = mappingId;
 			}
 			DBFreeResult(hResult);
 		}

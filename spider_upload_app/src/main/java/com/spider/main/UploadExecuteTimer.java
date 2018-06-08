@@ -46,16 +46,21 @@ public class UploadExecuteTimer extends TimerTask{
 			isComplete = false;
 			if(UploadTimerManager.qUploadJob.isEmpty() == false)
 			{
-				
-				logger.info("Timer task started at:" + new Date());
 				DataDefine.UploadJobData jobData = UploadTimerManager.qUploadJob.poll();
 				VideoInfo vInfo = jobData.vInfo;
 				SpiderCorba.UploadSidePackage.UploadConfig uploadVideoCfg = jobData.uploadCfg;
+				logger.info("Starting new job (job id = " + jobData.jobId + ") at : " + new Date());
 				//upload video
+				logger.info("=================== Upload video infor ===================");
+				logger.info(" + Video ID :" + vInfo.videoId);
+				logger.info(" + Title :" + vInfo.title);
+				logger.info(" + Video location :" + vInfo.vRenderPath);
+				logger.info(" + Mapping ID :" + vInfo.mappingId);
+				logger.info("==========================================================");
 				File uploadFile = new File(vInfo.vRenderPath);
 
 				if (!uploadFile.exists()) {
-					logger.error("File " + vInfo.vRenderPath + " not Exist");	
+					logger.error("FALSE! File to upload : <" + vInfo.vRenderPath + "> not Exist");	
 					logger.info("Upload complete video " + vInfo.videoId);
 					isComplete = true;
 					updateUploadedInfo(jobData.jobId);
@@ -138,7 +143,7 @@ public class UploadExecuteTimer extends TimerTask{
 
 				logger.info("Beginning upload video " + vInfo.videoId);
 				logger.info("create authen file for email : " + authInfo.userName);
-				uploadVideo.execute(title, desc, tags, vInfo.vRenderPath, "public");
+				//uploadVideo.execute(title, desc, tags, vInfo.vRenderPath, "public");
 				
 				//update process status 
 				updateUploadedInfo(jobData.jobId);
@@ -191,7 +196,7 @@ public class UploadExecuteTimer extends TimerTask{
 			if(uploadClient.uploadAppImpl != null)
 			{
 				try {
-					uploadClient.uploadAppImpl.updateUploadedVideo(jobId);
+					//uploadClient.uploadAppImpl.updateUploadedVideo(jobId);
 				}catch (Exception e) {
 					System.out.println(e.toString());
 				}

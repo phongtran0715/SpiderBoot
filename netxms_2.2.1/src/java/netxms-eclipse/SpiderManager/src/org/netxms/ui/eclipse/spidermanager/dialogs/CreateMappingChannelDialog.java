@@ -301,7 +301,7 @@ public class CreateMappingChannelDialog extends Dialog {
 				txtLogo.setText("/home/phongtran0715/Downloads/Video/test/render_resource/logo.png");
 				cbIntro.setSelection(true);
 				cbOutro.setSelection(true);
-				cbLogo.setSelection(true);
+				cbLogo.setSelection(false);
 			}
 		});
 		btnDefault.setBounds(113, 283, 95, 29);

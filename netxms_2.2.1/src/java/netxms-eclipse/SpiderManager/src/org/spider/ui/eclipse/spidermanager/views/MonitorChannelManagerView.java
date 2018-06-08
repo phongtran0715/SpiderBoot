@@ -2,6 +2,7 @@ package org.spider.ui.eclipse.spidermanager.views;
 
 import java.io.IOException;
 
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.TableItem;
@@ -46,6 +47,7 @@ public class MonitorChannelManagerView extends LogViewer {
 	private Action actAddMonitorChannel;
 	private Action actEditMonitorChannel;
 	private Action actDeleteMonitorChannel;
+	private Action actViewChannel;
 	private SessionListener sessionListener;
 
 	public static final int COLUMN_ID 				= 0;
@@ -120,6 +122,8 @@ public class MonitorChannelManagerView extends LogViewer {
 		manager.add(actAddMonitorChannel);
 		manager.add(actEditMonitorChannel);
 		manager.add(actDeleteMonitorChannel);
+		manager.add(new Separator());
+		manager.add(actViewChannel);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -165,6 +169,14 @@ public class MonitorChannelManagerView extends LogViewer {
 			}
 		};
 		actDeleteMonitorChannel.setToolTipText("Delete monitor channel");
+		
+		actViewChannel = new Action("View monitor channel", 
+				Activator.getImageDescriptor("icons/eye_16x16.png")) {
+			public void run() {
+				viewMonitorChannel();
+			}
+		};
+		actDeleteMonitorChannel.setToolTipText("View monitor channel");
 	}
 
 	private void addMonitorChannel()
@@ -253,5 +265,22 @@ public class MonitorChannelManagerView extends LogViewer {
 				}
 			}.start();
 		}
+	}
+	
+	private void viewMonitorChannel()
+	{
+		final TableItem[] selection = viewer.getTable().getSelection();
+		if(selection.length <= 0)
+		{
+			MessageBox dialog =
+					new MessageBox(getViewSite().getShell(), SWT.ICON_WARNING | SWT.OK);
+			dialog.setText("Warning");
+			dialog.setMessage("You must select at least one item to delete!");
+			dialog.open();
+			return;
+		}
+		String channelId = selection[0].getText(COLUMN_CHANNEL_ID);
+		System.out.println("Channel Id = " + channelId);
+		Program.launch("https://www.youtube.com/channel/" + channelId);
 	}
 }

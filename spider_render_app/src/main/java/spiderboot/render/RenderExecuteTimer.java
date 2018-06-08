@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.log4j.Logger;
 import com.spider.corba.RenderCorbaClient;
 
@@ -11,8 +13,13 @@ import SpiderCorba.AgentSidePackage.ClusterInfo;
 import SpiderCorba.SpiderDefinePackage.VideoInfo;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
+import net.bramp.ffmpeg.FFmpegUtils;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
+import net.bramp.ffmpeg.job.FFmpegJob;
+import net.bramp.ffmpeg.probe.FFmpegProbeResult;
+import net.bramp.ffmpeg.progress.Progress;
+import net.bramp.ffmpeg.progress.ProgressListener;
 import spiderboot.configuration.RenderConfig;
 import spiderboot.data.DataController;
 import spiderboot.util.Utility;
@@ -45,18 +52,31 @@ public class RenderExecuteTimer extends TimerTask{
 
 	@Override
 	public void run() {
-		completeTask();
+		try {
+			completeTask();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			logger.error(e.toString());
+		}
 	}
 
-	private void completeTask() {
+	private void completeTask() throws IOException {
 		if(isComplete){
 			isComplete = false;
-			logger.info("Timer task started at:" + new Date());
+			
 			if(RenderTimerManager.qRenderJob.isEmpty() == false)
 			{
 				DataDefine.RenderJobData jobData = RenderTimerManager.qRenderJob.poll();
 				VideoInfo vInfo = jobData.vInfo;
 				SpiderCorba.RenderSidePackage.RenderConfig renderCfg = jobData.renderCfg;
+				logger.info("Render job ( id = )"  + jobData.jobId + " started at:" + new Date());
+				logger.info("=================== Render video infor ===================");
+				logger.info(" + Video ID :" + vInfo.videoId);
+				logger.info(" + Title :" + vInfo.title);
+				logger.info(" + Video location :" + vInfo.vDownloadPath);
+				logger.info(" + Mapping ID :" + vInfo.mappingId);
+				logger.info("==========================================================");
 				//TODO: get render information
 				File uploadFile = new File(vInfo.vDownloadPath);
 
@@ -70,35 +90,24 @@ public class RenderExecuteTimer extends TimerTask{
 				//check file is existed or not
 				String vOutput = outputFolder + util.prefixOS() + vInfo.videoId + "_" + new Date().getTime() +   ".mp4";
 				//process video
-				String vProcessedInput = processVideo(vInfo.vDownloadPath, outputFolder + util.prefixOS() + "video_tmp1.mp4", 
-						renderCfg.vLogoTemp, renderCfg.enableLogo);
+				String vProcessedInput = processVideo(renderCfg, vInfo.vDownloadPath);
 				//convert video
-				String vProcessIntro = "";
-				String vProcessOutro = "";
-				if(renderCfg.enableIntro)
-				{
-					vProcessIntro = convertVideo(renderCfg.vIntroTemp, outputFolder + util.prefixOS() + "intro.ts");	
-				}
-				if(renderCfg.enableOutro)
-				{
-					vProcessOutro = convertVideo(renderCfg.vOutroTemp, outputFolder + util.prefixOS() + "outro.ts");	
-				}
-				convertVideo(vProcessedInput,  outputFolder + util.prefixOS() + "video_tmp1.ts");
+				String tmpVIntro = convertVideo(renderCfg.vIntroTemp);	
+				String tmpVOutro = convertVideo(renderCfg.vOutroTemp);	
+				String tmpVProcess =  convertVideo(vProcessedInput);
 				//concast video 
-				concastVideo(vProcessIntro,
-						outputFolder + util.prefixOS() + "video_tmp1.ts",
-						vProcessOutro, 
-						vOutput);
+				concastVideo(tmpVIntro, tmpVProcess, tmpVOutro, 
+						renderCfg.enableIntro, renderCfg.enableOutro, vOutput);
 				//update rendered video information
-				updateRenderedInfo(jobData.jobId, 2, vOutput);
+				//updateRenderedInfo(jobData.jobId, 2, vOutput);
 				//remove all temp file
-				deleteTempFile(outputFolder + util.prefixOS() + "video_tmp1.mp4");
-				deleteTempFile(outputFolder + util.prefixOS() + "intro.ts");
-				deleteTempFile(outputFolder + util.prefixOS() + "outro.ts");
-				deleteTempFile(outputFolder + util.prefixOS() + "video_tmp1.ts");
+				deleteTempFile(vProcessedInput);
+				deleteTempFile(tmpVProcess);
+				deleteTempFile(tmpVIntro);
+				deleteTempFile(tmpVOutro);
+				logger.info("Timer task finished at:" + new Date());
 			}
 			isComplete = true;
-			logger.info("Timer task finished at:" + new Date());
 		}
 		else{
 			//do nothing
@@ -106,41 +115,59 @@ public class RenderExecuteTimer extends TimerTask{
 		}
 	}
 
-	private String processVideo(String inputVideo, String outVideo, String logo, boolean enableLogo)
+	private String processVideo(SpiderCorba.RenderSidePackage.RenderConfig renderCfg, String inputVideo) throws IOException 
 	{
 		logger.info("Beginning processVideo : " + inputVideo);
-		String result = null;
-		if (enableLogo)
+		String tmpOutput = "/tmp/" + new Date().getTime() + ".mp4";
+		FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
+		final FFmpegProbeResult in = ffprobe.probe(inputVideo);
+
+		FFmpegBuilder builder;
+		builder = new FFmpegBuilder();
+		builder = builder.setInput(inputVideo);
+		if(renderCfg.enableLogo)
 		{
-			FFmpegBuilder builder;
-			builder = new FFmpegBuilder();
-			builder = builder.setInput(inputVideo);	
-			builder = builder.addInput(logo);
+			builder = builder.addInput(renderCfg.vLogoTemp);
 			builder = builder.setComplexFilter("overlay=main_w-overlay_w-10:10");
-			builder = builder.overrideOutputFiles(true);
-			builder.addOutput(outVideo).done();
-
-			FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
-
-			// Run a one-pass encode
-			executor.createJob(builder).run();
-			result = outVideo;
-		}else {
-			result = inputVideo;
 		}
+		builder = builder.addExtraArgs("-r", "30");
+		builder = builder.overrideOutputFiles(true);
+		builder.addOutput(tmpOutput).done();
 
-		logger.info("Finish processVideo : " + inputVideo);
-		return result;
+		FFmpegJob job = executor.createJob(builder, new ProgressListener() {
+
+			// Using the FFmpegProbeResult determine the duration of the input
+			final double duration_ns = in.getFormat().duration * TimeUnit.SECONDS.toNanos(1);
+
+			@Override
+			public void progress(Progress progress) {
+				double percentage = progress.out_time_ns / duration_ns;
+
+				// Print out interesting information about the progress
+				System.out.println(String.format(
+						"[%.0f%%] status:%s frame:%d time:%s ms fps:%.0f speed:%.2fx",
+						percentage * 100,
+						progress.status,
+						progress.frame,
+						FFmpegUtils.toTimecode(progress.out_time_ns, TimeUnit.NANOSECONDS),
+						progress.fps.doubleValue(),
+						progress.speed
+						));
+			}
+		});
+		job.run();
+		logger.info("Finish processVideo : ");
+		return tmpOutput;
 	}
 
-	private String convertVideo(String inputVideo, String outVideo)
+	private String convertVideo(String inputVideo)
 	{
 		logger.info("Beginning convertVideo video : " + inputVideo);
-		String result = null;
+		String tmpOutput = "/tmp/" + new Date().getTime() + ".mp4";
 		FFmpegBuilder builder = new FFmpegBuilder()
 				.setInput(inputVideo)
 				.overrideOutputFiles(true)
-				.addOutput(outVideo)
+				.addOutput(tmpOutput)
 				.addExtraArgs("-c", "copy")
 				.addExtraArgs("-bsf:v", "h264_mp4toannexb")
 				.addExtraArgs("-f", "mpegts")
@@ -150,19 +177,31 @@ public class RenderExecuteTimer extends TimerTask{
 
 		// Run a one-pass encode
 		executor.createJob(builder).run();
-		result = outVideo;
+
 		logger.info("Finish convertVideo : " + inputVideo);
-		return result;
+		return tmpOutput;
 	}
 
-	private String concastVideo(String vIntro, String vMain, String vOutro, String vOutput)
+	private String concastVideo(String vIntro, String vMain, String vOutro, 
+			boolean enableIntro, boolean enableOutro, String outputFile)
 	{
 		logger.info("Beginning concastVideo >>> ");
-		String result = null;
+		logger.info("input video " + vMain);
+		String concast = "concat:";
+		if(enableIntro)
+		{
+			concast += vIntro + "|";
+		}
+		concast += vMain;
+		if(enableOutro)
+		{
+			concast += "|" + vOutro;
+		}
+		logger.info("concast string :" + concast);
 		FFmpegBuilder builder = new FFmpegBuilder()
-				.setInput("concat:" + vIntro + "|" + vMain + "|" +  vOutro + "")
+				.setInput(concast)
 				.overrideOutputFiles(true)
-				.addOutput(vOutput)
+				.addOutput(outputFile)
 				.addExtraArgs("-c", "copy")
 				.addExtraArgs("-bsf:a", "aac_adtstoasc")
 				.done();
@@ -170,9 +209,8 @@ public class RenderExecuteTimer extends TimerTask{
 
 		// Run a one-pass encode
 		executor.createJob(builder).run();
-		result = vOutput;
-		logger.info("Finish concastVideo <<< Output video : " + vOutput);
-		return result;
+		logger.info("Finish concastVideo <<< Output video : " + outputFile);
+		return outputFile;
 	}
 
 	private void updateRenderedInfo(int jobId, int processStatus, String videoRendered)

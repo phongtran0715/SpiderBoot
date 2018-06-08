@@ -49,6 +49,8 @@ public class MappingChannelManagerView extends LogViewer {
 	private Action actAddMapping;
 	private Action actEditMapping;
 	private Action actDeleteMapping;
+	private Action actViewHomeChannel;
+	private Action actViewMonitorChannel;
 	private SessionListener sessionListener;
 
 	public static final int COLUMN_ID 					= 0;
@@ -60,6 +62,9 @@ public class MappingChannelManagerView extends LogViewer {
 	public static final int COLUMN_DOWNLOAD_ID		 	= 6;
 	public static final int COLUMN_RENDER_ID		 	= 7;
 	public static final int COLUMN_UPLOAD_ID		 	= 8;
+	
+	public static final int HOME_CHANNLE_TYPE 			= 0;
+	public static final int MONITOR_CHANNLE_TYPE 		= 1;
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -127,6 +132,9 @@ public class MappingChannelManagerView extends LogViewer {
 		manager.add(actAddMapping);
 		manager.add(actEditMapping);
 		manager.add(actDeleteMapping);
+		manager.add(new Separator());
+		manager.add(actViewHomeChannel);
+		manager.add(actViewMonitorChannel);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -166,6 +174,22 @@ public class MappingChannelManagerView extends LogViewer {
 			}
 		};
 		actDeleteMapping.setToolTipText("Delete mapping channel");
+		
+		actViewHomeChannel = new Action("View home channel", 
+				Activator.getImageDescriptor("icons/eye_16x16.png")) {
+			public void run() {
+				viewChannel(HOME_CHANNLE_TYPE);
+			}
+		};
+		actViewHomeChannel.setToolTipText("View home channel");
+		
+		actViewMonitorChannel = new Action("View monitor channel", 
+				Activator.getImageDescriptor("icons/eye_16x16.png")) {
+			public void run() {
+				viewChannel(MONITOR_CHANNLE_TYPE);
+			}
+		};
+		actViewMonitorChannel.setToolTipText("View monitor channel");
 	}
 
 	private void addMappingChannel()
@@ -271,5 +295,27 @@ public class MappingChannelManagerView extends LogViewer {
 				}
 			}.start();
 		}
+	}
+	
+	private void viewChannel(int channelType)
+	{
+		final TableItem[] selection = viewer.getTable().getSelection();
+		if(selection.length <= 0)
+		{
+			MessageBox dialog =
+					new MessageBox(getViewSite().getShell(), SWT.ICON_WARNING | SWT.OK);
+			dialog.setText("Warning");
+			dialog.setMessage("You must select at least one item to delete!");
+			dialog.open();
+			return;
+		}
+		String channelId;
+		if(channelType == HOME_CHANNLE_TYPE)
+		{
+			channelId = selection[0].getText(COLUMN_HOME_CHANNEL_ID);	
+		}else{
+			channelId = selection[0].getText(COLUMN_MONITOR_CHANNEL_ID);
+		}
+		Program.launch("https://www.youtube.com/channel/" + channelId);
 	}
 }
