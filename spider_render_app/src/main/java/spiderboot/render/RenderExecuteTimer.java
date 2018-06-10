@@ -121,6 +121,7 @@ public class RenderExecuteTimer extends TimerTask{
 		String tmpOutput = "/tmp/" + new Date().getTime() + ".mp4";
 		FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
 		final FFmpegProbeResult in = ffprobe.probe(inputVideo);
+		Double duration = in.getFormat().duration - 20;
 
 		FFmpegBuilder builder;
 		builder = new FFmpegBuilder();
@@ -137,6 +138,8 @@ public class RenderExecuteTimer extends TimerTask{
 			}
 		}
 		builder = builder.addExtraArgs("-r", "30");
+		builder = builder.addExtraArgs("-ss", "10");
+		builder = builder.addExtraArgs("-t", Double.toString(duration));
 		builder = builder.overrideOutputFiles(true);
 		builder.addOutput(tmpOutput).done();
 
