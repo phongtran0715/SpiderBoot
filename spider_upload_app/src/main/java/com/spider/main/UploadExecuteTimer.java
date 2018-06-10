@@ -2,7 +2,14 @@ package com.spider.main;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
@@ -72,13 +79,16 @@ public class UploadExecuteTimer extends TimerTask{
 				logger.info("Password = " + clusterInfo.password);
 				logger.info("appid config = "+ uploadConfig.appId);
 				logger.info("ip config = "+ uploadConfig.ip);
-				/*
+
+				String tranferFile = "";
 				if(clusterInfo.clusterIp.equals(uploadConfig.ip)== false)
 				{
 					//TODO: download video from render cluster
 					SCPDownload scpDownload = new SCPDownload();
+					logger.info("====================================================");
+					logger.info("Begining coopy file : " + vInfo.vRenderPath);
 					boolean success = scpDownload.execute(clusterInfo.clusterIp, clusterInfo.userName, clusterInfo.password,
-							vInfo.vLocation, "/tmp/");
+							vInfo.vRenderPath, "/tmp/");
 					if(success)
 					{
 						logger.info("Download from render cluster OK");
@@ -87,10 +97,16 @@ public class UploadExecuteTimer extends TimerTask{
 						isComplete = true;
 						return;
 					}
+					logger.info("====================================================");
+					Path p = Paths.get(vInfo.vRenderPath);
+					String fileName = p.getFileName().toString();
+					tranferFile = "/tmp/" + fileName;
+				}else {
+					tranferFile =  vInfo.vRenderPath;
 				}
-				 */
 
-				logger.info("Uploading video : " + vInfo.vRenderPath);
+
+				logger.info("Uploading video : " + tranferFile);
 
 				AuthenInfo authInfo = getAuthenInfo(vInfo.mappingId);
 				logger.info("Authen infor : user name = " + authInfo.userName);
@@ -124,14 +140,16 @@ public class UploadExecuteTimer extends TimerTask{
 						+ CREDENTIALS_DIRECTORY + "/upload_" + authInfo.userName;
 				System.out.println("Store file = " + storeFile);
 				File file = new File(storeFile);
-//				
-//				if(file.exists() == false)
-//				{
-//					logger.error("ERROR : Can not get authen store upload file. File does not exist");
-//					isComplete = true;
-//					updateUploadedInfo(jobData.jobId);
-//					return;
-//				}
+				/*
+				if(file.exists() == false)
+				{
+					logger.error("ERROR : Can not get authen store upload file. File does not exist");
+					isComplete = true;
+					updateUploadedInfo(jobData.jobId);
+					return;
+				}
+				 */
+
 				uploadVideo.setStoreFile( "upload_" + authInfo.userName);
 				logger.info("Complete get authen file <<<<");
 
@@ -143,20 +161,13 @@ public class UploadExecuteTimer extends TimerTask{
 
 				logger.info("Beginning upload video " + vInfo.videoId);
 				logger.info("create authen file for email : " + authInfo.userName);
-				//uploadVideo.execute(title, desc, tags, vInfo.vRenderPath, "public");
-				
-				//update process status 
-				updateUploadedInfo(jobData.jobId);
+				//uploadVideo.execute(title, desc, tags, tranferFile, "public");
 
-				logger.info("Upload complete video " + vInfo.videoId);
-				//Delay time for next upload video
-				try {
-					Thread.sleep(uploadConfig.delayTime * 1000);
-				} catch (InterruptedException e) {
-					logger.error(e.toString());
-					e.printStackTrace();
-				}
-				logger.info("Timer task finished at:" + new Date());
+				//update process status 
+				//updateUploadedInfo(jobData.jobId);
+				//deleteTempFile(tranferFile);
+				logger.info("Upload complete video " + vInfo.videoId);	
+
 			}
 			isComplete = true;
 		}
@@ -173,14 +184,59 @@ public class UploadExecuteTimer extends TimerTask{
 	}
 
 	private String standardizeTags(String originTags, String tagTemp, boolean enableTag) {
-		String result = originTags;
-		logger.info("tag temp : " + tagTemp);
+		String result = "";
+		List<String> listTags = new ArrayList<>();
+		List<String> originListTags = Arrays.asList(originTags.split(System.getProperty("line.separator")));
+		listTags.addAll(originListTags);
+		if(enableTag)
+		{
+			List<String> customTag = Arrays.asList(tagTemp.split(";"));
+			listTags.addAll(customTag);
+		}
+		Collections.shuffle(listTags);
+		//
+		if (listTags != null) {
+			Iterator<String> iteratorTags = listTags.iterator();
+			while (iteratorTags.hasNext()) {
+				result += iteratorTags.next() + System.getProperty("line.separator");
+			}
+		}
+		logger.info("standardizeTags : " + result);
 		return result;
 	}
 
 	private String standardizeDesc(String originDesc, String desctemp, boolean enableDesc) {
-		String result = originDesc;
-		logger.info("desc temp : " + desctemp);
+		logger.info("originDesc : " + originDesc);
+		String result = "";
+		List<String> listOriginDesc = Arrays.asList(originDesc.split(System.getProperty("line.separator")));
+		List<String> listFilter = new ArrayList<String>();
+		for (String item : listOriginDesc) {
+			if(checkIgnoreKeyword(item))
+			{
+				listFilter.add(item);
+			}
+		}
+		if (listFilter != null) {
+			Iterator<String> iteratorTags = listFilter.iterator();
+			while (iteratorTags.hasNext()) {
+				result += iteratorTags.next() + System.getProperty("line.separator");
+			}
+		}
+		logger.info("standardizeTags : " + result);
+		return result;
+	}
+	
+	private boolean checkIgnoreKeyword(String inputLine)
+	{
+		boolean result = true;
+		for (String keyword : new DataDefine().IGNORE_KEYWORD) {
+			if(inputLine.contains(keyword))
+			{
+				result = false;
+				logger.info("invalid line : " + inputLine);
+				break;
+			}
+		}
 		return result;
 	}
 
@@ -196,7 +252,7 @@ public class UploadExecuteTimer extends TimerTask{
 			if(uploadClient.uploadAppImpl != null)
 			{
 				try {
-					//uploadClient.uploadAppImpl.updateUploadedVideo(jobId);
+					uploadClient.uploadAppImpl.updateUploadedVideo(jobId);
 				}catch (Exception e) {
 					System.out.println(e.toString());
 				}
@@ -260,5 +316,18 @@ public class UploadExecuteTimer extends TimerTask{
 			logger.error("Init corba client FALSE");
 		}
 		return authInfo;
+	}
+
+
+	private void deleteTempFile(String filePath)
+	{
+		File file = new File(filePath);
+		if(file.exists())
+		{
+			if(file.delete() == false)
+			{
+				logger.error("Failed to delete the file : " + filePath);
+			}	
+		}
 	}
 }

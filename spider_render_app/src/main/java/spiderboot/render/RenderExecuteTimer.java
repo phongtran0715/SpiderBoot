@@ -99,7 +99,7 @@ public class RenderExecuteTimer extends TimerTask{
 				concastVideo(tmpVIntro, tmpVProcess, tmpVOutro, 
 						renderCfg.enableIntro, renderCfg.enableOutro, vOutput);
 				//update rendered video information
-				//updateRenderedInfo(jobData.jobId, 2, vOutput);
+				updateRenderedInfo(jobData.jobId, 2, vOutput);
 				//remove all temp file
 				deleteTempFile(vProcessedInput);
 				deleteTempFile(tmpVProcess);
@@ -127,8 +127,14 @@ public class RenderExecuteTimer extends TimerTask{
 		builder = builder.setInput(inputVideo);
 		if(renderCfg.enableLogo)
 		{
-			builder = builder.addInput(renderCfg.vLogoTemp);
-			builder = builder.setComplexFilter("overlay=main_w-overlay_w-10:10");
+			File file = new File(renderCfg.vLogoTemp);
+			if(file.exists() == true)
+			{
+				builder = builder.addInput(renderCfg.vLogoTemp);
+				builder = builder.setComplexFilter("overlay=main_w-overlay_w-10:10");
+			}else {
+			logger.error("Logo template file does not exist");	
+			}
 		}
 		builder = builder.addExtraArgs("-r", "30");
 		builder = builder.overrideOutputFiles(true);
@@ -163,6 +169,12 @@ public class RenderExecuteTimer extends TimerTask{
 	private String convertVideo(String inputVideo)
 	{
 		logger.info("Beginning convertVideo video : " + inputVideo);
+		File file = new File(inputVideo);
+		if(file.exists() == false)
+		{
+			logger.error("Input file does not exist!");
+			return null;
+		}
 		String tmpOutput = "/tmp/" + new Date().getTime() + ".mp4";
 		FFmpegBuilder builder = new FFmpegBuilder()
 				.setInput(inputVideo)
@@ -188,12 +200,12 @@ public class RenderExecuteTimer extends TimerTask{
 		logger.info("Beginning concastVideo >>> ");
 		logger.info("input video " + vMain);
 		String concast = "concat:";
-		if(enableIntro)
+		if(enableIntro && (vIntro != null))
 		{
 			concast += vIntro + "|";
 		}
 		concast += vMain;
-		if(enableOutro)
+		if(enableOutro && (vOutro != null))
 		{
 			concast += "|" + vOutro;
 		}
@@ -239,39 +251,18 @@ public class RenderExecuteTimer extends TimerTask{
 
 	private void deleteTempFile(String filePath)
 	{
-		File file = new File(filePath);
-		if(file.exists())
-		{
-			if(file.delete() == false)
+		try {
+			File file = new File(filePath);
+			if(file.exists())
 			{
-				logger.error("Failed to delete the file : " + filePath);
+				if(file.delete() == false)
+				{
+					logger.error("Failed to delete the file : " + filePath);
+				}	
 			}	
+		}catch (Exception e) {
+			logger.error(e.toString());
 		}
-	}
-
-	private ClusterInfo getClusterInfo(int jobId)
-	{
-		ClusterInfo clusterInfo = null;
-		if(isInitCorba == false)
-		{
-			isInitCorba = renderClient.initCorba(renderConfig.corbaRef);	
-		}
-		if(isInitCorba)
-		{
-			if(renderClient.renderAppImpl != null)
-			{
-				try {
-
-					//clusterInfo = renderClient.renderAppImpl.getClusterInfor(jobId);
-				}catch (Exception e) {
-					System.out.println(e.toString());
-				}
-			}else {
-				logger.error("Render client implementation is NULL");
-			}
-		}else {
-			logger.error("Init corba client FALSE");
-		}
-		return clusterInfo;
+		
 	}
 }
