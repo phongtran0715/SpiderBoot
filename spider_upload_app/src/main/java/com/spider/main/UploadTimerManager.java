@@ -29,7 +29,7 @@ public class UploadTimerManager {
 		return isSuccess;
 	}
 	public void initTimerTask() {
-		//delay 600 second
-		startUploadTimer("UploadApp_01", 600 * 1000);
+		//delay 5 second
+		startUploadTimer("UploadApp_01", 5 * 1000);
 	}
 }

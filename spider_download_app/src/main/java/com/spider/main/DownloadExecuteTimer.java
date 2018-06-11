@@ -180,7 +180,14 @@ public class DownloadExecuteTimer extends TimerTask {
 			}
 		}
 		int processStatus = 1;
-		int license = 0;
+		int license;
+		if (singleVideo.getContentDetails().getLicensedContent() == true)
+		{
+			license = 1;
+		}else {
+			license = 0;
+		}
+		logger.info("Function getVideoInfor:: video id = " + videoId + " license content = " + license);
 		VideoWraper vWraper = new VideoWraper(videoId, title, tags, desc, thumb, 
 				vDownloadPath, vRenderPath, timerId, processStatus, license);
 		return vWraper;

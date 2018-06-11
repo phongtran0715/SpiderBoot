@@ -77,8 +77,9 @@ public class UploadVideo {
 	 *
 	 * @param args command line args (not used).
 	 */
-	public void execute(String title, String description, String etags, 
+	public static boolean execute(String title, String description, String etags, 
 			String vLocation, String privacyStatus) {
+		boolean isSuccess = false;
 
 		// This OAuth 2.0 access scope allows an application to upload files
 		// to the authenticated user's YouTube channel, but doesn't allow
@@ -91,12 +92,13 @@ public class UploadVideo {
 			if(storeFile == null)
 			{
 				System.out.println("Can not found store file to get upload auth!");
-				return;
+				return isSuccess;
 			}
 			else
 			{
-				credential = Auth.authorize(scopes, storeFile); 
+				System.out.println("Function UploadVideo::execute :" + clientSecretsFile );
 				Auth.setClientSecrect(clientSecretsFile);
+				credential = Auth.authorize(scopes, storeFile); 
 			}
 
 			// This object is used to make YouTube Data API requests.
@@ -191,12 +193,13 @@ public class UploadVideo {
 			Video returnedVideo = videoInsert.execute();
 
 			// Print data about the newly inserted video from the API response.
-			System.out.println("\n================== Returned Video ==================\n");
+			System.out.println("\n================== Uploaded Video ==================\n");
 			System.out.println("  - Id: " + returnedVideo.getId());
 			System.out.println("  - Title: " + returnedVideo.getSnippet().getTitle());
 			System.out.println("  - Tags: " + returnedVideo.getSnippet().getTags());
 			System.out.println("  - Privacy Status: " + returnedVideo.getStatus().getPrivacyStatus());
 			System.out.println("  - Video Count: " + returnedVideo.getStatistics().getViewCount());
+			isSuccess = true;
 
 		} catch (GoogleJsonResponseException e) {
 			System.err.println("GoogleJsonResponseException code: " + e.getDetails().getCode() + " : "
@@ -209,5 +212,6 @@ public class UploadVideo {
 			System.err.println("Throwable: " + t.getMessage());
 			t.printStackTrace();
 		}
+		return isSuccess;
 	}
 }

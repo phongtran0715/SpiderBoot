@@ -116,7 +116,7 @@ public class Search {
 			// To increase efficiency, only retrieve the fields that the
 			// application uses.
 			search.setFields("items(etag,id/kind,id/videoId,snippet/title,snippet/description,"
-					+ "snippet/thumbnails/default/url)");
+					+ "snippet/thumbnails/default/url, contentDetails/licensedContent)");
 			search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
 
 			// Call the API and print results.

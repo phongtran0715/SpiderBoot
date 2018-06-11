@@ -20,6 +20,7 @@ class UploadImpl extends UploadSidePOA {
 
 	@Override
 	public boolean createUploadJob(int jobId, VideoInfo vInfo, UploadConfig uploadCfg) {
+		logger.info("createUploadJob:: jobId = " + jobId);
 		DataDefine.UploadJobData jobData = new DataDefine().new UploadJobData(jobId, vInfo, uploadCfg);
 		UploadTimerManager.qUploadJob.add(jobData);
 		return false;
