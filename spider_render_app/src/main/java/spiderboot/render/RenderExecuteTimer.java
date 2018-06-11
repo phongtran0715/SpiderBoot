@@ -64,7 +64,7 @@ public class RenderExecuteTimer extends TimerTask{
 	private void completeTask() throws IOException {
 		if(isComplete){
 			isComplete = false;
-			
+
 			if(RenderTimerManager.qRenderJob.isEmpty() == false)
 			{
 				DataDefine.RenderJobData jobData = RenderTimerManager.qRenderJob.poll();
@@ -121,27 +121,29 @@ public class RenderExecuteTimer extends TimerTask{
 		String tmpOutput = "/tmp/" + new Date().getTime() + ".mp4";
 		FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
 		final FFmpegProbeResult in = ffprobe.probe(inputVideo);
-		Double duration = in.getFormat().duration - 20;
-
-		FFmpegBuilder builder;
-		builder = new FFmpegBuilder();
-		builder = builder.setInput(inputVideo);
-		if(renderCfg.enableLogo)
-		{
-			File file = new File(renderCfg.vLogoTemp);
-			if(file.exists() == true)
-			{
-				builder = builder.addInput(renderCfg.vLogoTemp);
-				builder = builder.setComplexFilter("overlay=main_w-overlay_w-10:10");
-			}else {
-			logger.error("Logo template file does not exist");	
-			}
-		}
-		builder = builder.addExtraArgs("-r", "30");
-		builder = builder.addExtraArgs("-ss", "10");
-		builder = builder.addExtraArgs("-t", Double.toString(duration));
-		builder = builder.overrideOutputFiles(true);
-		builder.addOutput(tmpOutput).done();
+		Double duration = in.getFormat().duration - 30;
+		FFmpegBuilder builder =
+				new FFmpegBuilder()
+				.addExtraArgs("-ss", "15")
+				.addExtraArgs("-t", Double.toString(duration))
+				.setInput(inputVideo)
+				.addOutput(tmpOutput)
+				.setFormat("mp4")
+				.addExtraArgs("-bufsize", "4000k")
+				.addExtraArgs("-maxrate", "1000k")
+				.setAudioCodec("copy")
+				.setAudioSampleRate(FFmpeg.AUDIO_SAMPLE_44100)
+				.setAudioBitRate(1_000_000)
+				.addExtraArgs("-profile:v", "baseline")
+				.setVideoCodec("libx264")
+				.setVideoPixelFormat("yuv420p")
+				.setVideoResolution(1280, 720)
+				.setVideoBitRate(2_000_000)
+				.setVideoFrameRate(30)
+				.addExtraArgs("-deinterlace")
+				.addExtraArgs("-preset", "medium")
+				.addExtraArgs("-g", "30")
+				.done();
 
 		FFmpegJob job = executor.createJob(builder, new ProgressListener() {
 
@@ -266,6 +268,6 @@ public class RenderExecuteTimer extends TimerTask{
 		}catch (Exception e) {
 			logger.error(e.toString());
 		}
-		
+
 	}
 }
