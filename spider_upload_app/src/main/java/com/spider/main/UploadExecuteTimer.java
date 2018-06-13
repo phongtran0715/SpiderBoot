@@ -53,12 +53,15 @@ public class UploadExecuteTimer extends TimerTask{
 			{
 				DataDefine.UploadJobData jobData = UploadTimerManager.qUploadJob.poll();
 				VideoInfo vInfo = jobData.vInfo;
+				
 				if(vInfo.license == 1)
 				{
 					logger.error("Video license = true. This video will be ignore");
+					updateUploadedInfo(jobData.jobId);
 					isComplete = true;
 					return;
 				}
+				
 				SpiderCorba.UploadSidePackage.UploadConfig uploadVideoCfg = jobData.uploadCfg;
 				logger.info("Starting new job (job id = " + jobData.jobId + ") at : " + new Date());
 				//upload video
@@ -135,7 +138,7 @@ public class UploadExecuteTimer extends TimerTask{
 						}
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						logger.error(e);
 					}
 				}
 				jsonCreate.execute(authInfo.clientSecret, authInfo.clientId, clientFile);
@@ -144,6 +147,7 @@ public class UploadExecuteTimer extends TimerTask{
 						+ CREDENTIALS_DIRECTORY + "/upload_" + authInfo.userName;
 				System.out.println("Store file = " + storeFile);
 				File file = new File(storeFile);
+				
 				if(file.exists() == false)
 				{
 					logger.error("ERROR : Can not get authen store upload file. File does not exist");
@@ -151,6 +155,7 @@ public class UploadExecuteTimer extends TimerTask{
 					//updateUploadedInfo(jobData.jobId);
 					return;
 				}
+				
 
 				UploadVideo.setStoreFile( "upload_" + authInfo.userName);
 				logger.info("Complete get authen file <<<<");
@@ -163,6 +168,7 @@ public class UploadExecuteTimer extends TimerTask{
 
 				logger.info("Beginning upload video " + vInfo.videoId);
 				logger.info("create authen file for email : " + authInfo.userName);
+				
 				boolean isSuccess = UploadVideo.execute(title, desc, tags, tranferFile, "public");
 				if(isSuccess)
 				{
@@ -180,6 +186,7 @@ public class UploadExecuteTimer extends TimerTask{
 				}else {
 					logger.error("FALSE : Can not upload video id = " + vInfo.videoId);
 				}
+				
 			}
 			isComplete = true;
 		}
@@ -189,20 +196,39 @@ public class UploadExecuteTimer extends TimerTask{
 		}
 	}
 	private String standardizeTitle(String originTitle, String titleTemp, boolean enableTitle) {
-		String result = originTitle;
-		logger.info("title temp : " + titleTemp);
+		logger.info("Function standardizeTitle <<<<< ");
+		logger.info("origin title : " + originTitle);
+		logger.info("title template : " + titleTemp);
+		String result = "";
+		if(enableTitle)
+		{
+			String [] data = titleTemp.split("---", 2);
+			if(data.length >= 2)
+			{
+				result += data[0];
+				result += originTitle;
+				result += data[1];	
+			}else {
+				logger.error("Description template format incorrect");
+			}
+			
+		}else {
+			logger.info("enable title template = false");
+			result = originTitle;
+		}
+		logger.info("standardizeTitle result = " + result);
 		return result;
-
 	}
 
 	private String standardizeTags(String originTags, String tagTemp, boolean enableTag) {
+		logger.info("Function standardizeTags <<<< ");
 		String result = "";
 		List<String> listTags = new ArrayList<>();
 		List<String> originListTags = Arrays.asList(originTags.split(System.getProperty("line.separator")));
 		listTags.addAll(originListTags);
 		if(enableTag)
 		{
-			List<String> customTag = Arrays.asList(tagTemp.split(";"));
+			List<String> customTag = Arrays.asList(tagTemp.split(System.getProperty("line.separator")));
 			listTags.addAll(customTag);
 		}
 		Collections.shuffle(listTags);
@@ -213,12 +239,12 @@ public class UploadExecuteTimer extends TimerTask{
 				result += iteratorTags.next() + System.getProperty("line.separator");
 			}
 		}
-		logger.info("standardizeTags : " + result);
+		logger.info("standardizeTags result = " + result);
 		return result;
 	}
 
 	private String standardizeDesc(String originDesc, String desctemp, boolean enableDesc) {
-		logger.info("originDesc : " + originDesc);
+		logger.info("Function standardizeDesc : <<<< ");
 		String result = "";
 		List<String> listOriginDesc = Arrays.asList(originDesc.split(System.getProperty("line.separator")));
 		List<String> listFilter = new ArrayList<String>();
@@ -234,7 +260,18 @@ public class UploadExecuteTimer extends TimerTask{
 				result += iteratorTags.next() + System.getProperty("line.separator");
 			}
 		}
-		logger.info("standardizeTags : " + result);
+		if(enableDesc)
+		{
+			String [] data = desctemp.split("---", 2);
+			if(data.length >= 2)
+			{
+				result = data[0] + result;
+				result = result + data[1];	
+			}else {
+				logger.error("Description template format incorrect");
+			}
+		}
+		logger.info("standardizeDesc result = " + result);
 		return result;
 	}
 	
@@ -245,7 +282,7 @@ public class UploadExecuteTimer extends TimerTask{
 			if(inputLine.contains(keyword))
 			{
 				result = false;
-				logger.info("invalid line : " + inputLine);
+				//logger.info("invalid line : " + inputLine);
 				break;
 			}
 		}

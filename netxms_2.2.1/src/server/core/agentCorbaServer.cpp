@@ -643,7 +643,7 @@ INT32 AgentSide_i::getMappingId(INT32 jobId)
 	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT ProcessClusterId FROM channel_mapping WHERE Id = ?"));
 	if (hStmt != NULL)
 	{
-		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, mappingId);
+		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)mappingId);
 		hResult = DBSelectPrepared(hStmt);
 		if (hResult != NULL)
 		{
@@ -686,7 +686,7 @@ INT32 AgentSide_i::getMappingId(INT32 jobId)
 	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT HomeChannelId FROM channel_mapping WHERE Id = ?"));
 	if (hStmt != NULL)
 	{
-		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, mappingId);
+		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)mappingId);
 		hResult = DBSelectPrepared(hStmt);
 		if (hResult != NULL)
 		{

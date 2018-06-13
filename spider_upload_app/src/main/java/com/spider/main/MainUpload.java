@@ -53,7 +53,7 @@ public class MainUpload {
 						logger.info("upload Id = " + uploadConfig.appId);
 						uploadClient.uploadAppImpl.onUploadStartup(uploadConfig.appId);	
 					}catch (Exception e) {
-						logger.error(e.toString());
+						logger.error(e);
 					}
 				}
 			}

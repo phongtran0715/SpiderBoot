@@ -50,7 +50,7 @@ public class MainDownload {
 					{
 						downloadClient.downloadAppImpl.onDownloadStartup(downloadConfig.appId);	
 					}catch (Exception e) {
-						System.err.println(e.toString());
+						logger.error(e);
 					}
 				}
 			}
