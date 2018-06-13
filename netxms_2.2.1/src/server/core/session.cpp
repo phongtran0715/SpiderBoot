@@ -14216,9 +14216,11 @@ void ClientSession::getMappingChannels(NXCPMessage *request)
    DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
    DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT MappingId, VideoIntro, VideoOutro, Logo,  ")
                                   _T(" TitleTemplate, DescTemplate, TagTemplate, EnableIntro, EnableOutro, EnableLogo, EnableTitle, ")
-                                  _T(" EnableDesc, EnableTag FROM spider_mapping_config"));
+                                  _T(" EnableDesc, EnableTag FROM spider_mapping_config WHERE MappingId = ?"));
    if (hStmt != NULL)
    {
+      INT32 mappingId = request->getFieldAsInt32(VID_MAPPING_CHANNEL_RECORD_ID);
+      DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, mappingId);
       hResult = DBSelectPrepared(hStmt);
       if (hResult != NULL)
       {
@@ -14281,8 +14283,6 @@ void ClientSession::createGoogleAccount(NXCPMessage *request)
       TCHAR* clientId = request->getFieldAsString(VID_GOOGLE_CLIENT_ID);
       UINT32 accountType = request->getFieldAsUInt32(VID_GOOGLE_ACCOUNT_TYPE);
       TCHAR* appName = request->getFieldAsString(VID_GOOGLE_APP_NAME);
-
-      debugPrintf(6, _T("ClientSession::[createGoogleAccount] ==== appName = %s"), appName);
 
       hStmt = DBPrepare(hdb, _T("INSERT INTO google_account (UserName,Api,ClientSecret,ClientId, AccountType,AppName) VALUES (?,?,?,?,?,?)"));
       DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)userName, DB_BIND_TRANSIENT);
@@ -14374,7 +14374,7 @@ void ClientSession::createMonitorChannel(NXCPMessage *request)
 
 void ClientSession::createMappingChannel(NXCPMessage *request)
 {
-   debugPrintf(1, _T("ClientSession::[%s]"), __FUNCTION__);
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
    NXCPMessage msg;
    DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
    DB_STATEMENT hStmt;
@@ -14465,7 +14465,7 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
 
 void ClientSession::createSpiderMappingConfig(UINT32 mappingId, NXCPMessage *request)
 {
-   debugPrintf(1, _T("ClientSession::[%s]"), __FUNCTION__);
+   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
    NXCPMessage msg;
    DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
    DB_STATEMENT hStmt;
@@ -14715,15 +14715,6 @@ void ClientSession::modifyMappingChannel(NXCPMessage * request)
       DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)renderId, DB_BIND_TRANSIENT);
       DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)uploadId, DB_BIND_TRANSIENT);
       DBBind(hStmt, 8, DB_SQLTYPE_INTEGER, (INT32)id);
-
-      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] id = %d"), id);
-      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] cHomeId = %s"), cHomeId);
-      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] cMonitorId = %s"), cMonitorId);
-      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] timeSync = %d"), timeSync);
-      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] statusSync = %d"), statusSync);
-      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] statusSync = %s"), downloadId);
-      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] statusSync = %s"), renderId);
-      debugPrintf(6, _T("ClientSession::[modifyMappingChannel] statusSync = %s"), uploadId);
 
       bool success = DBExecute(hStmt);
       if (success == true)

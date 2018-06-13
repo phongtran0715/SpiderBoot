@@ -3845,6 +3845,7 @@ public class NXCSession {
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_GET_MAPPING_CHANNEL);
 		final long rqId = msg.getMessageId();
 		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_RECORD_ID, mappingId);
+		System.out.println("mapping id = " + mappingId);
 		sendMessage(msg);
 
 		msg = waitForRCC(rqId);
