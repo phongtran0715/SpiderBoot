@@ -67,8 +67,8 @@ class AgentSide_i : public POA_SpiderCorba::AgentSide
 private:
    ::SpiderCorba::RenderSide::RenderConfig getRenderConfig(INT32 mappingId);
    ::SpiderCorba::UploadSide::UploadConfig getUploadConfig(INT32 mappingId);
-   ::SpiderCorba::SpiderDefine::VideoInfo getVideoInfo(INT32 mappingId);
-   INT32 getMappingId(INT32 jobId);
+   ::SpiderCorba::SpiderDefine::VideoInfo getVideoInfo(TCHAR* videoId, INT32 mappingId);
+   TCHAR* getVideoContainerField(INT32 jobId, TCHAR* fieldName);
    INT32 getMaxId(TCHAR * tbName);
 public:
    void onDownloadStartup(const ::CORBA::WChar* appId);

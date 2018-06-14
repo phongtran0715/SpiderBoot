@@ -98,18 +98,20 @@ void AgentSide_i::onRenderStartup(const ::CORBA::WChar* appId)
 						try
 						{
 							::SpiderCorba::RenderSide::RenderConfig renderCfg = getRenderConfig(mappingId);
-							::SpiderCorba::SpiderDefine::VideoInfo vInfo = getVideoInfo(mappingId);
+							::SpiderCorba::SpiderDefine::VideoInfo vInfo = getVideoInfo(videoId, mappingId);
+							DbgPrintf(1, _T("AgentSide_i::[onRenderStartup]  video id = %s "), vInfo.videoId);
+							DbgPrintf(1, _T("AgentSide_i::[onRenderStartup]  mapping id = %d "), vInfo.mappingId);
 							renderClient->mRenderRef->createRenderJob(id, vInfo, renderCfg);
 						}
 						catch (CORBA::TRANSIENT&) {
-							DbgPrintf(1, _T("AgentSide_i::[] : Caught system exception TRANSIENT -- unable to contact the server"));
+							DbgPrintf(1, _T("AgentSide_i::[onRenderStartup] : Caught system exception TRANSIENT -- unable to contact the server"));
 						}
 						catch (CORBA::SystemException& ex) {
-							DbgPrintf(1, _T("AgentSide_i::[] : Caught a CORBA:: %s"), ex._name());
+							DbgPrintf(1, _T("AgentSide_i::[onRenderStartup] : Caught a CORBA:: %s"), ex._name());
 						}
 						catch (CORBA::Exception& ex)
 						{
-							DbgPrintf(1, _T("AgentSide_i::[] : Caught a CORBA:: %s"), ex._name());
+							DbgPrintf(1, _T("AgentSide_i::[onRenderStartup] : Caught a CORBA:: %s"), ex._name());
 						}
 					}
 				} else {
@@ -322,9 +324,12 @@ void AgentSide_i::updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long process
 				{
 					try
 					{
-						INT32 mappingId = getMappingId(jobId);
+						TCHAR* videoId = getVideoContainerField(jobId, _T("VideoId"));
+						TCHAR* strMappingId = getVideoContainerField(jobId, _T("MappingId"));
+						TCHAR* ptr;
+						INT32 mappingId = (INT32)_tcstol(strMappingId, &ptr, 10);
 						::SpiderCorba::UploadSide::UploadConfig uploadCfg = getUploadConfig(mappingId);
-						::SpiderCorba::SpiderDefine::VideoInfo vInfo = getVideoInfo(mappingId);
+						::SpiderCorba::SpiderDefine::VideoInfo vInfo = getVideoInfo(videoId, mappingId);
 						uploadClient->mUploadRef->createUploadJob(jobId, vInfo, uploadCfg);
 					}
 					catch (CORBA::TRANSIENT&) {
@@ -603,27 +608,27 @@ void AgentSide_i::updateUploadedVideo(::CORBA::Long jobId)
 	return CORBA::wstring_dup(result);
 }
 
-INT32 AgentSide_i::getMappingId(INT32 jobId)
+TCHAR* AgentSide_i::getVideoContainerField(INT32 jobId, TCHAR* fieldName)
 {
-	DbgPrintf(6, _T(" Function [getMappingId] jobId = %d"), jobId);
-	INT32 result = -1;
+	DbgPrintf(6, _T(" Function [getVideoContainerField] jobId = %d, fieldName = %s"), jobId, fieldName);
+	TCHAR* result;
 	DB_RESULT hResult;
 	UINT32 i, dwId, dwNumRecords;
 
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
-	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT MappingId FROM video_container WHERE Id = ?"));
+	TCHAR query [MAX_DB_STRING];
+	_sntprintf(query, sizeof query, _T("SELECT %s FROM video_container WHERE Id = %d"), fieldName, jobId);
+	DB_STATEMENT hStmt = DBPrepare(hdb, query);
 	if (hStmt != NULL)
 	{
-		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, jobId);
 		hResult = DBSelectPrepared(hStmt);
 		if (hResult != NULL)
 		{
 			dwNumRecords = DBGetNumRows(hResult);
 			if (dwNumRecords > 0)
 			{
-				result = DBGetFieldInt64(hResult, 0, 0);
-
-				DbgPrintf(1, _T(" Function [getMappingId] result = %d"), result);
+				result = DBGetField(hResult, 0, 0, NULL, 0);
+				DbgPrintf(1, _T(" Function [getVideoContainerField] result = %s"), result);
 			}
 			DBFreeResult(hResult);
 		}
@@ -719,35 +724,43 @@ INT32 AgentSide_i::getMappingId(INT32 jobId)
 	return authenInfo;
 }
 
-::SpiderCorba::SpiderDefine::VideoInfo AgentSide_i::getVideoInfo(INT32 mappingId)
+::SpiderCorba::SpiderDefine::VideoInfo AgentSide_i::getVideoInfo(TCHAR* videoId, INT32 mappingId)
 {
-	DbgPrintf(6, _T(" Function [getVideoInfo] mappingId = %ld"), mappingId);
+	DbgPrintf(6, _T(" Function [getVideoInfo] videoId = %s and mapping id = %d"), videoId, mappingId);
 	::SpiderCorba::SpiderDefine::VideoInfo vInfo;
 	DB_RESULT hResult;
-	UINT32 i, dwNumRecords;
+	UINT32 dwNumRecords;
 
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
-	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT VideoId, Title, Tag, Description, Thumbnail, VDownloadedPath, ")
-	                               _T(" VRenderedPath, ProcessStatus, License FROM video_container WHERE MappingId = ?"));
+	TCHAR query [MAX_DB_STRING];
+	_sntprintf(query, sizeof query, _T("SELECT Title, Tag, Description, Thumbnail, VDownloadedPath, VRenderedPath, ")
+	           _T(" ProcessStatus, License FROM video_container WHERE VideoId = '%s' AND MappingId = %d"), videoId, mappingId);
+	DB_STATEMENT hStmt = DBPrepare(hdb, query);
+	DbgPrintf(6, _T(" Function [getVideoInfo] SQL query= %s"), query);
+	
 	if (hStmt != NULL)
 	{
-		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, mappingId);
+		DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, videoId, NULL, 0);
+		DBBind(hStmt, 2, DB_SQLTYPE_INTEGER, mappingId);
 		hResult = DBSelectPrepared(hStmt);
 		if (hResult != NULL)
 		{
 			dwNumRecords = DBGetNumRows(hResult);
+			DbgPrintf(6, _T(" Function [getVideoInfo] number record = %d"), dwNumRecords);
 			if (dwNumRecords > 0)
 			{
-				vInfo.videoId = CORBA::wstring_dup(DBGetField(hResult, 0, 0, NULL, 0));
-				vInfo.title = CORBA::wstring_dup(DBGetField(hResult, 0, 1, NULL, 0));
-				vInfo.tags = CORBA::wstring_dup(DBGetField(hResult, 0, 2, NULL, 0));
-				vInfo.description = CORBA::wstring_dup(DBGetField(hResult, 0, 3, NULL, 0));
-				vInfo.thumbnail = CORBA::wstring_dup(DBGetField(hResult, 0, 4, NULL, 0));
-				vInfo.vDownloadPath = CORBA::wstring_dup(DBGetField(hResult, 0, 5, NULL, 0));
-				vInfo.vRenderPath = CORBA::wstring_dup(DBGetField(hResult, 0, 6, NULL, 0));
-				vInfo.processStatus = DBGetFieldInt64(hResult, 0, 7);
-				vInfo.license = DBGetFieldInt64(hResult, 0, 8);
+				vInfo.videoId = CORBA::wstring_dup(videoId);
+				vInfo.title = CORBA::wstring_dup(DBGetField(hResult, 0, 0, NULL, 0));
+				vInfo.tags = CORBA::wstring_dup(DBGetField(hResult, 0, 1, NULL, 0));
+				vInfo.description = CORBA::wstring_dup(DBGetField(hResult, 0, 2, NULL, 0));
+				vInfo.thumbnail = CORBA::wstring_dup(DBGetField(hResult, 0, 3, NULL, 0));
+				vInfo.vDownloadPath = CORBA::wstring_dup(DBGetField(hResult, 0, 4, NULL, 0));
+				vInfo.vRenderPath = CORBA::wstring_dup(DBGetField(hResult, 0, 5, NULL, 0));
+				vInfo.processStatus = DBGetFieldInt64(hResult, 0, 6);
+				vInfo.license = DBGetFieldInt64(hResult, 0, 7);
 				vInfo.mappingId = mappingId;
+			} else {
+				DbgPrintf(1, _T(" Function [getVideoInfo] Not found data in database"));
 			}
 			DBFreeResult(hResult);
 		}
