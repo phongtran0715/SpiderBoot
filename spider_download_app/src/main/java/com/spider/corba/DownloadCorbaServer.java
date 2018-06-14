@@ -37,7 +37,7 @@ class DownloadImpl extends DownloadSidePOA {
 	@Override
 	public boolean modifyDownloadJob(int jobId, DownloadConfig downloadCfg) {
 		// TODO Auto-generated method stub
-		logger.error("DownloadImpl::modifyMappingChannel : >>>");
+		logger.info("DownloadImpl::modifyMappingChannel : >>>");
 		//check timer id
 		DownloadTimerManager.getInstance().modifyDownloadTimer(jobId, downloadCfg.cHomeId, downloadCfg.cMonitorId,
 				downloadCfg.downloadClusterId, downloadCfg.timerInterval, downloadCfg.synStatus);	

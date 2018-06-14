@@ -56,7 +56,7 @@ public class UploadExecuteTimer extends TimerTask{
 				
 				if(vInfo.license == 1)
 				{
-					logger.error("Video license = true. This video will be ignore");
+					logger.error("Video (id =  " + vInfo.videoId + ") license = true. This video will be ignore");
 					updateUploadedInfo(jobData.jobId);
 					isComplete = true;
 					return;
@@ -156,7 +156,6 @@ public class UploadExecuteTimer extends TimerTask{
 					return;
 				}
 				
-
 				UploadVideo.setStoreFile( "upload_" + authInfo.userName);
 				logger.info("Complete get authen file <<<<");
 
@@ -168,7 +167,7 @@ public class UploadExecuteTimer extends TimerTask{
 
 				logger.info("Beginning upload video " + vInfo.videoId);
 				logger.info("create authen file for email : " + authInfo.userName);
-				
+				/*
 				boolean isSuccess = UploadVideo.execute(title, desc, tags, tranferFile, "public");
 				if(isSuccess)
 				{
@@ -186,6 +185,7 @@ public class UploadExecuteTimer extends TimerTask{
 				}else {
 					logger.error("FALSE : Can not upload video id = " + vInfo.videoId);
 				}
+				*/
 				
 			}
 			isComplete = true;

@@ -10,8 +10,8 @@ using namespace std;
 SpiderDownloadClient::SpiderDownloadClient(): initSuccess(false)
 {
 	try {
-		int agrc = 2;
-		char* agrv[] = { "-ORBInitRef", "NameService=corbaloc::localhost:2809/NameService" };
+		int agrc = 1;
+		char* agrv[] = { ""};
 		mOrb = CORBA::ORB_init(agrc, agrv);
 		CORBA::Object_var obj = getObjectReference(mOrb);
 		if (obj != CORBA::Object::_nil())

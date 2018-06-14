@@ -88,7 +88,7 @@ public class RenderExecuteTimer extends TimerTask{
 				}
 				util.createFolderIfNotExist(outputFolder);
 				//check file is existed or not
-				String vOutput = outputFolder + util.prefixOS() + vInfo.videoId + "_" + new Date().getTime() +   ".mp4";
+				String vOutput = outputFolder + util.prefixOS() + "video_" +vInfo.videoId + "_" + new Date().getTime() +   ".mp4";
 				//process video
 				String vProcessedInput = processVideo(renderCfg, vInfo.vDownloadPath);
 				//convert video
