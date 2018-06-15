@@ -25,6 +25,7 @@ SpiderCorba::SpiderDefine::VideoInfo::operator>>= (cdrStream &_n) const
   _n.marshalWString(vDownloadPath,0);
   _n.marshalWString(vRenderPath,0);
   mappingId >>= _n;
+  mappingType >>= _n;
   processStatus >>= _n;
   license >>= _n;
 
@@ -41,6 +42,7 @@ SpiderCorba::SpiderDefine::VideoInfo::operator<<= (cdrStream &_n)
   vDownloadPath = _n.unmarshalWString(0);
   vRenderPath = _n.unmarshalWString(0);
   (::CORBA::Long&)mappingId <<= _n;
+  (::CORBA::Long&)mappingType <<= _n;
   (::CORBA::Long&)processStatus <<= _n;
   (::CORBA::Long&)license <<= _n;
 
@@ -1198,10 +1200,10 @@ SpiderCorba::_objref_UploadSide::_ptrToObjRef(const char* id)
 
 
 //
-// Code for SpiderCorba::UploadSide::createUploadJob
+// Code for SpiderCorba::UploadSide::createUploadTimer
 
 // Proxy call descriptor class. Mangled signature:
-//  _cboolean_i_clong_i_cSpiderCorba_mSpiderDefine_mVideoInfo_i_cSpiderCorba_mUploadSide_mUploadConfig
+//  _cboolean_i_cwstring_i_cwstring
 class _0RL_cd_bcb7b54210ff8436_a0000000
   : public omniCallDescriptor
 {
@@ -1221,31 +1223,26 @@ public:
   
   static const char* const _user_exns[];
 
-  ::CORBA::Long arg_0;
-  SpiderCorba::SpiderDefine::VideoInfo_var arg_1_;
-  const SpiderCorba::SpiderDefine::VideoInfo* arg_1;
-  SpiderCorba::UploadSide::UploadConfig_var arg_2_;
-  const SpiderCorba::UploadSide::UploadConfig* arg_2;
+  ::CORBA::WString_var arg_0_;
+  const ::CORBA::WChar* arg_0;
+  ::CORBA::WString_var arg_1_;
+  const ::CORBA::WChar* arg_1;
   ::CORBA::Boolean result;
 };
 
 void _0RL_cd_bcb7b54210ff8436_a0000000::marshalArguments(cdrStream& _n)
 {
-  arg_0 >>= _n;
-  (const SpiderCorba::SpiderDefine::VideoInfo&) *arg_1 >>= _n;
-  (const SpiderCorba::UploadSide::UploadConfig&) *arg_2 >>= _n;
+  _n.marshalWString(arg_0,0);
+  _n.marshalWString(arg_1,0);
 
 }
 
 void _0RL_cd_bcb7b54210ff8436_a0000000::unmarshalArguments(cdrStream& _n)
 {
-  (::CORBA::Long&)arg_0 <<= _n;
-  arg_1_ = new SpiderCorba::SpiderDefine::VideoInfo;
-  (SpiderCorba::SpiderDefine::VideoInfo&)arg_1_ <<= _n;
-  arg_1 = &arg_1_.in();
-  arg_2_ = new SpiderCorba::UploadSide::UploadConfig;
-  (SpiderCorba::UploadSide::UploadConfig&)arg_2_ <<= _n;
-  arg_2 = &arg_2_.in();
+  arg_0_ = _n.unmarshalWString(0);
+  arg_0 = arg_0_.in();
+  arg_1_ = _n.unmarshalWString(0);
+  arg_1 = arg_1_.in();
 
 }
 
@@ -1271,6 +1268,223 @@ _0RL_lcfn_bcb7b54210ff8436_b0000000(omniCallDescriptor* cd, omniServant* svnt)
 {
   _0RL_cd_bcb7b54210ff8436_a0000000* tcd = (_0RL_cd_bcb7b54210ff8436_a0000000*)cd;
   SpiderCorba::_impl_UploadSide* impl = (SpiderCorba::_impl_UploadSide*) svnt->_ptrToInterface(SpiderCorba::UploadSide::_PD_repoId);
+  tcd->result = impl->createUploadTimer(tcd->arg_0, tcd->arg_1);
+
+
+}
+
+::CORBA::Boolean SpiderCorba::_objref_UploadSide::createUploadTimer(const ::CORBA::WChar* timerId, const ::CORBA::WChar* uploadClusterId)
+{
+  _0RL_cd_bcb7b54210ff8436_a0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_b0000000, "createUploadTimer", 18);
+  _call_desc.arg_0 = timerId;
+  _call_desc.arg_1 = uploadClusterId;
+
+  _invoke(_call_desc);
+  return _call_desc.result;
+
+
+}
+
+
+//
+// Code for SpiderCorba::UploadSide::modifyUploadTimer
+
+// Proxy call descriptor class. Mangled signature:
+//  _cboolean_i_cwstring_i_cwstring_i_clong_i_cSpiderCorba_mUploadSide_mUploadConfig
+class _0RL_cd_bcb7b54210ff8436_c0000000
+  : public omniCallDescriptor
+{
+public:
+  inline _0RL_cd_bcb7b54210ff8436_c0000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
+    : omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
+  {
+    
+  }
+  
+  void marshalArguments(cdrStream&);
+  void unmarshalArguments(cdrStream&);
+
+  void unmarshalReturnedValues(cdrStream&);
+  void marshalReturnedValues(cdrStream&);
+  
+  
+  static const char* const _user_exns[];
+
+  ::CORBA::WString_var arg_0_;
+  const ::CORBA::WChar* arg_0;
+  ::CORBA::WString_var arg_1_;
+  const ::CORBA::WChar* arg_1;
+  ::CORBA::Long arg_2;
+  SpiderCorba::UploadSide::UploadConfig_var arg_3_;
+  const SpiderCorba::UploadSide::UploadConfig* arg_3;
+  ::CORBA::Boolean result;
+};
+
+void _0RL_cd_bcb7b54210ff8436_c0000000::marshalArguments(cdrStream& _n)
+{
+  _n.marshalWString(arg_0,0);
+  _n.marshalWString(arg_1,0);
+  arg_2 >>= _n;
+  (const SpiderCorba::UploadSide::UploadConfig&) *arg_3 >>= _n;
+
+}
+
+void _0RL_cd_bcb7b54210ff8436_c0000000::unmarshalArguments(cdrStream& _n)
+{
+  arg_0_ = _n.unmarshalWString(0);
+  arg_0 = arg_0_.in();
+  arg_1_ = _n.unmarshalWString(0);
+  arg_1 = arg_1_.in();
+  (::CORBA::Long&)arg_2 <<= _n;
+  arg_3_ = new SpiderCorba::UploadSide::UploadConfig;
+  (SpiderCorba::UploadSide::UploadConfig&)arg_3_ <<= _n;
+  arg_3 = &arg_3_.in();
+
+}
+
+void _0RL_cd_bcb7b54210ff8436_c0000000::marshalReturnedValues(cdrStream& _n)
+{
+  _n.marshalBoolean(result);
+
+}
+
+void _0RL_cd_bcb7b54210ff8436_c0000000::unmarshalReturnedValues(cdrStream& _n)
+{
+  result = _n.unmarshalBoolean();
+
+}
+
+const char* const _0RL_cd_bcb7b54210ff8436_c0000000::_user_exns[] = {
+  0
+};
+
+// Local call call-back function.
+static void
+_0RL_lcfn_bcb7b54210ff8436_d0000000(omniCallDescriptor* cd, omniServant* svnt)
+{
+  _0RL_cd_bcb7b54210ff8436_c0000000* tcd = (_0RL_cd_bcb7b54210ff8436_c0000000*)cd;
+  SpiderCorba::_impl_UploadSide* impl = (SpiderCorba::_impl_UploadSide*) svnt->_ptrToInterface(SpiderCorba::UploadSide::_PD_repoId);
+  tcd->result = impl->modifyUploadTimer(tcd->arg_0, tcd->arg_1, tcd->arg_2, *tcd->arg_3);
+
+
+}
+
+::CORBA::Boolean SpiderCorba::_objref_UploadSide::modifyUploadTimer(const ::CORBA::WChar* timerId, const ::CORBA::WChar* uploadClusterId, ::CORBA::Long synStatus, const ::SpiderCorba::UploadSide::UploadConfig& uploadCfg)
+{
+  _0RL_cd_bcb7b54210ff8436_c0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_d0000000, "modifyUploadTimer", 18);
+  _call_desc.arg_0 = timerId;
+  _call_desc.arg_1 = uploadClusterId;
+  _call_desc.arg_2 = synStatus;
+  _call_desc.arg_3 = &(::SpiderCorba::UploadSide::UploadConfig&) uploadCfg;
+
+  _invoke(_call_desc);
+  return _call_desc.result;
+
+
+}
+
+
+//
+// Code for SpiderCorba::UploadSide::deleteUploadTimer
+
+// Local call call-back function.
+static void
+_0RL_lcfn_bcb7b54210ff8436_e0000000(omniCallDescriptor* cd, omniServant* svnt)
+{
+  _0RL_cd_bcb7b54210ff8436_a0000000* tcd = (_0RL_cd_bcb7b54210ff8436_a0000000*)cd;
+  SpiderCorba::_impl_UploadSide* impl = (SpiderCorba::_impl_UploadSide*) svnt->_ptrToInterface(SpiderCorba::UploadSide::_PD_repoId);
+  tcd->result = impl->deleteUploadTimer(tcd->arg_0, tcd->arg_1);
+
+
+}
+
+::CORBA::Boolean SpiderCorba::_objref_UploadSide::deleteUploadTimer(const ::CORBA::WChar* timerId, const ::CORBA::WChar* uploadClusterId)
+{
+  _0RL_cd_bcb7b54210ff8436_a0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_e0000000, "deleteUploadTimer", 18);
+  _call_desc.arg_0 = timerId;
+  _call_desc.arg_1 = uploadClusterId;
+
+  _invoke(_call_desc);
+  return _call_desc.result;
+
+
+}
+
+
+//
+// Code for SpiderCorba::UploadSide::createUploadJob
+
+// Proxy call descriptor class. Mangled signature:
+//  _cboolean_i_clong_i_cSpiderCorba_mSpiderDefine_mVideoInfo_i_cSpiderCorba_mUploadSide_mUploadConfig
+class _0RL_cd_bcb7b54210ff8436_f0000000
+  : public omniCallDescriptor
+{
+public:
+  inline _0RL_cd_bcb7b54210ff8436_f0000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
+    : omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
+  {
+    
+  }
+  
+  void marshalArguments(cdrStream&);
+  void unmarshalArguments(cdrStream&);
+
+  void unmarshalReturnedValues(cdrStream&);
+  void marshalReturnedValues(cdrStream&);
+  
+  
+  static const char* const _user_exns[];
+
+  ::CORBA::Long arg_0;
+  SpiderCorba::SpiderDefine::VideoInfo_var arg_1_;
+  const SpiderCorba::SpiderDefine::VideoInfo* arg_1;
+  SpiderCorba::UploadSide::UploadConfig_var arg_2_;
+  const SpiderCorba::UploadSide::UploadConfig* arg_2;
+  ::CORBA::Boolean result;
+};
+
+void _0RL_cd_bcb7b54210ff8436_f0000000::marshalArguments(cdrStream& _n)
+{
+  arg_0 >>= _n;
+  (const SpiderCorba::SpiderDefine::VideoInfo&) *arg_1 >>= _n;
+  (const SpiderCorba::UploadSide::UploadConfig&) *arg_2 >>= _n;
+
+}
+
+void _0RL_cd_bcb7b54210ff8436_f0000000::unmarshalArguments(cdrStream& _n)
+{
+  (::CORBA::Long&)arg_0 <<= _n;
+  arg_1_ = new SpiderCorba::SpiderDefine::VideoInfo;
+  (SpiderCorba::SpiderDefine::VideoInfo&)arg_1_ <<= _n;
+  arg_1 = &arg_1_.in();
+  arg_2_ = new SpiderCorba::UploadSide::UploadConfig;
+  (SpiderCorba::UploadSide::UploadConfig&)arg_2_ <<= _n;
+  arg_2 = &arg_2_.in();
+
+}
+
+void _0RL_cd_bcb7b54210ff8436_f0000000::marshalReturnedValues(cdrStream& _n)
+{
+  _n.marshalBoolean(result);
+
+}
+
+void _0RL_cd_bcb7b54210ff8436_f0000000::unmarshalReturnedValues(cdrStream& _n)
+{
+  result = _n.unmarshalBoolean();
+
+}
+
+const char* const _0RL_cd_bcb7b54210ff8436_f0000000::_user_exns[] = {
+  0
+};
+
+// Local call call-back function.
+static void
+_0RL_lcfn_bcb7b54210ff8436_01000000(omniCallDescriptor* cd, omniServant* svnt)
+{
+  _0RL_cd_bcb7b54210ff8436_f0000000* tcd = (_0RL_cd_bcb7b54210ff8436_f0000000*)cd;
+  SpiderCorba::_impl_UploadSide* impl = (SpiderCorba::_impl_UploadSide*) svnt->_ptrToInterface(SpiderCorba::UploadSide::_PD_repoId);
   tcd->result = impl->createUploadJob(tcd->arg_0, *tcd->arg_1, *tcd->arg_2);
 
 
@@ -1278,7 +1492,7 @@ _0RL_lcfn_bcb7b54210ff8436_b0000000(omniCallDescriptor* cd, omniServant* svnt)
 
 ::CORBA::Boolean SpiderCorba::_objref_UploadSide::createUploadJob(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo, const ::SpiderCorba::UploadSide::UploadConfig& uploadCfg)
 {
-  _0RL_cd_bcb7b54210ff8436_a0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_b0000000, "createUploadJob", 16);
+  _0RL_cd_bcb7b54210ff8436_f0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_01000000, "createUploadJob", 16);
   _call_desc.arg_0 = jobId;
   _call_desc.arg_1 = &(::SpiderCorba::SpiderDefine::VideoInfo&) vInfo;
   _call_desc.arg_2 = &(::SpiderCorba::UploadSide::UploadConfig&) uploadCfg;
@@ -1295,7 +1509,7 @@ _0RL_lcfn_bcb7b54210ff8436_b0000000(omniCallDescriptor* cd, omniServant* svnt)
 
 // Local call call-back function.
 static void
-_0RL_lcfn_bcb7b54210ff8436_c0000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bcb7b54210ff8436_11000000(omniCallDescriptor* cd, omniServant* svnt)
 {
   _0RL_cd_bcb7b54210ff8436_30000000* tcd = (_0RL_cd_bcb7b54210ff8436_30000000*)cd;
   SpiderCorba::_impl_UploadSide* impl = (SpiderCorba::_impl_UploadSide*) svnt->_ptrToInterface(SpiderCorba::UploadSide::_PD_repoId);
@@ -1306,7 +1520,7 @@ _0RL_lcfn_bcb7b54210ff8436_c0000000(omniCallDescriptor* cd, omniServant* svnt)
 
 ::CORBA::Boolean SpiderCorba::_objref_UploadSide::deleteUploadJob(::CORBA::Long jobId, const ::CORBA::WChar* uploadClusterId)
 {
-  _0RL_cd_bcb7b54210ff8436_30000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_c0000000, "deleteUploadJob", 16);
+  _0RL_cd_bcb7b54210ff8436_30000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_11000000, "deleteUploadJob", 16);
   _call_desc.arg_0 = jobId;
   _call_desc.arg_1 = uploadClusterId;
 
@@ -1348,9 +1562,33 @@ SpiderCorba::_impl_UploadSide::_dispatch(omniCallHandle& _handle)
 {
   const char* op = _handle.operation_name();
 
+  if (omni::strMatch(op, "createUploadTimer")) {
+
+    _0RL_cd_bcb7b54210ff8436_a0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_b0000000, "createUploadTimer", 18, 1);
+    
+    _handle.upcall(this,_call_desc);
+    return 1;
+  }
+
+  if (omni::strMatch(op, "modifyUploadTimer")) {
+
+    _0RL_cd_bcb7b54210ff8436_c0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_d0000000, "modifyUploadTimer", 18, 1);
+    
+    _handle.upcall(this,_call_desc);
+    return 1;
+  }
+
+  if (omni::strMatch(op, "deleteUploadTimer")) {
+
+    _0RL_cd_bcb7b54210ff8436_a0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_e0000000, "deleteUploadTimer", 18, 1);
+    
+    _handle.upcall(this,_call_desc);
+    return 1;
+  }
+
   if (omni::strMatch(op, "createUploadJob")) {
 
-    _0RL_cd_bcb7b54210ff8436_a0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_b0000000, "createUploadJob", 16, 1);
+    _0RL_cd_bcb7b54210ff8436_f0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_01000000, "createUploadJob", 16, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;
@@ -1358,7 +1596,7 @@ SpiderCorba::_impl_UploadSide::_dispatch(omniCallHandle& _handle)
 
   if (omni::strMatch(op, "deleteUploadJob")) {
 
-    _0RL_cd_bcb7b54210ff8436_30000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_c0000000, "deleteUploadJob", 16, 1);
+    _0RL_cd_bcb7b54210ff8436_30000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_11000000, "deleteUploadJob", 16, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;
@@ -1563,11 +1801,11 @@ SpiderCorba::_objref_AgentSide::_ptrToObjRef(const char* id)
 
 // Proxy call descriptor class. Mangled signature:
 //  void_i_cwstring
-class _0RL_cd_bcb7b54210ff8436_d0000000
+class _0RL_cd_bcb7b54210ff8436_21000000
   : public omniCallDescriptor
 {
 public:
-  inline _0RL_cd_bcb7b54210ff8436_d0000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
+  inline _0RL_cd_bcb7b54210ff8436_21000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
     : omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
   {
     
@@ -1584,28 +1822,28 @@ public:
   const ::CORBA::WChar* arg_0;
 };
 
-void _0RL_cd_bcb7b54210ff8436_d0000000::marshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_21000000::marshalArguments(cdrStream& _n)
 {
   _n.marshalWString(arg_0,0);
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_d0000000::unmarshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_21000000::unmarshalArguments(cdrStream& _n)
 {
   arg_0_ = _n.unmarshalWString(0);
   arg_0 = arg_0_.in();
 
 }
 
-const char* const _0RL_cd_bcb7b54210ff8436_d0000000::_user_exns[] = {
+const char* const _0RL_cd_bcb7b54210ff8436_21000000::_user_exns[] = {
   0
 };
 
 // Local call call-back function.
 static void
-_0RL_lcfn_bcb7b54210ff8436_e0000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bcb7b54210ff8436_31000000(omniCallDescriptor* cd, omniServant* svnt)
 {
-  _0RL_cd_bcb7b54210ff8436_d0000000* tcd = (_0RL_cd_bcb7b54210ff8436_d0000000*)cd;
+  _0RL_cd_bcb7b54210ff8436_21000000* tcd = (_0RL_cd_bcb7b54210ff8436_21000000*)cd;
   SpiderCorba::_impl_AgentSide* impl = (SpiderCorba::_impl_AgentSide*) svnt->_ptrToInterface(SpiderCorba::AgentSide::_PD_repoId);
   impl->onDownloadStartup(tcd->arg_0);
 
@@ -1614,7 +1852,7 @@ _0RL_lcfn_bcb7b54210ff8436_e0000000(omniCallDescriptor* cd, omniServant* svnt)
 
 void SpiderCorba::_objref_AgentSide::onDownloadStartup(const ::CORBA::WChar* appId)
 {
-  _0RL_cd_bcb7b54210ff8436_d0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_e0000000, "onDownloadStartup", 18);
+  _0RL_cd_bcb7b54210ff8436_21000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_31000000, "onDownloadStartup", 18);
   _call_desc.arg_0 = appId;
 
   _invoke(_call_desc);
@@ -1629,9 +1867,9 @@ void SpiderCorba::_objref_AgentSide::onDownloadStartup(const ::CORBA::WChar* app
 
 // Local call call-back function.
 static void
-_0RL_lcfn_bcb7b54210ff8436_f0000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bcb7b54210ff8436_41000000(omniCallDescriptor* cd, omniServant* svnt)
 {
-  _0RL_cd_bcb7b54210ff8436_d0000000* tcd = (_0RL_cd_bcb7b54210ff8436_d0000000*)cd;
+  _0RL_cd_bcb7b54210ff8436_21000000* tcd = (_0RL_cd_bcb7b54210ff8436_21000000*)cd;
   SpiderCorba::_impl_AgentSide* impl = (SpiderCorba::_impl_AgentSide*) svnt->_ptrToInterface(SpiderCorba::AgentSide::_PD_repoId);
   impl->onRenderStartup(tcd->arg_0);
 
@@ -1640,7 +1878,7 @@ _0RL_lcfn_bcb7b54210ff8436_f0000000(omniCallDescriptor* cd, omniServant* svnt)
 
 void SpiderCorba::_objref_AgentSide::onRenderStartup(const ::CORBA::WChar* appId)
 {
-  _0RL_cd_bcb7b54210ff8436_d0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_f0000000, "onRenderStartup", 16);
+  _0RL_cd_bcb7b54210ff8436_21000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_41000000, "onRenderStartup", 16);
   _call_desc.arg_0 = appId;
 
   _invoke(_call_desc);
@@ -1655,9 +1893,9 @@ void SpiderCorba::_objref_AgentSide::onRenderStartup(const ::CORBA::WChar* appId
 
 // Local call call-back function.
 static void
-_0RL_lcfn_bcb7b54210ff8436_01000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bcb7b54210ff8436_51000000(omniCallDescriptor* cd, omniServant* svnt)
 {
-  _0RL_cd_bcb7b54210ff8436_d0000000* tcd = (_0RL_cd_bcb7b54210ff8436_d0000000*)cd;
+  _0RL_cd_bcb7b54210ff8436_21000000* tcd = (_0RL_cd_bcb7b54210ff8436_21000000*)cd;
   SpiderCorba::_impl_AgentSide* impl = (SpiderCorba::_impl_AgentSide*) svnt->_ptrToInterface(SpiderCorba::AgentSide::_PD_repoId);
   impl->onUploadStartup(tcd->arg_0);
 
@@ -1666,7 +1904,7 @@ _0RL_lcfn_bcb7b54210ff8436_01000000(omniCallDescriptor* cd, omniServant* svnt)
 
 void SpiderCorba::_objref_AgentSide::onUploadStartup(const ::CORBA::WChar* appId)
 {
-  _0RL_cd_bcb7b54210ff8436_d0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_01000000, "onUploadStartup", 16);
+  _0RL_cd_bcb7b54210ff8436_21000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_51000000, "onUploadStartup", 16);
   _call_desc.arg_0 = appId;
 
   _invoke(_call_desc);
@@ -1681,11 +1919,11 @@ void SpiderCorba::_objref_AgentSide::onUploadStartup(const ::CORBA::WChar* appId
 
 // Proxy call descriptor class. Mangled signature:
 //  _clonglong_i_clong
-class _0RL_cd_bcb7b54210ff8436_11000000
+class _0RL_cd_bcb7b54210ff8436_61000000
   : public omniCallDescriptor
 {
 public:
-  inline _0RL_cd_bcb7b54210ff8436_11000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
+  inline _0RL_cd_bcb7b54210ff8436_61000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
     : omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
   {
     
@@ -1704,39 +1942,39 @@ public:
   ::CORBA::LongLong result;
 };
 
-void _0RL_cd_bcb7b54210ff8436_11000000::marshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_61000000::marshalArguments(cdrStream& _n)
 {
   arg_0 >>= _n;
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_11000000::unmarshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_61000000::unmarshalArguments(cdrStream& _n)
 {
   (::CORBA::Long&)arg_0 <<= _n;
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_11000000::marshalReturnedValues(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_61000000::marshalReturnedValues(cdrStream& _n)
 {
   result >>= _n;
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_11000000::unmarshalReturnedValues(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_61000000::unmarshalReturnedValues(cdrStream& _n)
 {
   (::CORBA::LongLong&)result <<= _n;
 
 }
 
-const char* const _0RL_cd_bcb7b54210ff8436_11000000::_user_exns[] = {
+const char* const _0RL_cd_bcb7b54210ff8436_61000000::_user_exns[] = {
   0
 };
 
 // Local call call-back function.
 static void
-_0RL_lcfn_bcb7b54210ff8436_21000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bcb7b54210ff8436_71000000(omniCallDescriptor* cd, omniServant* svnt)
 {
-  _0RL_cd_bcb7b54210ff8436_11000000* tcd = (_0RL_cd_bcb7b54210ff8436_11000000*)cd;
+  _0RL_cd_bcb7b54210ff8436_61000000* tcd = (_0RL_cd_bcb7b54210ff8436_61000000*)cd;
   SpiderCorba::_impl_AgentSide* impl = (SpiderCorba::_impl_AgentSide*) svnt->_ptrToInterface(SpiderCorba::AgentSide::_PD_repoId);
   tcd->result = impl->getLastSyncTime(tcd->arg_0);
 
@@ -1745,7 +1983,7 @@ _0RL_lcfn_bcb7b54210ff8436_21000000(omniCallDescriptor* cd, omniServant* svnt)
 
 ::CORBA::LongLong SpiderCorba::_objref_AgentSide::getLastSyncTime(::CORBA::Long mappingId)
 {
-  _0RL_cd_bcb7b54210ff8436_11000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_21000000, "getLastSyncTime", 16);
+  _0RL_cd_bcb7b54210ff8436_61000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_71000000, "getLastSyncTime", 16);
   _call_desc.arg_0 = mappingId;
 
   _invoke(_call_desc);
@@ -1760,11 +1998,11 @@ _0RL_lcfn_bcb7b54210ff8436_21000000(omniCallDescriptor* cd, omniServant* svnt)
 
 // Proxy call descriptor class. Mangled signature:
 //  void_i_clong_i_clonglong
-class _0RL_cd_bcb7b54210ff8436_31000000
+class _0RL_cd_bcb7b54210ff8436_81000000
   : public omniCallDescriptor
 {
 public:
-  inline _0RL_cd_bcb7b54210ff8436_31000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
+  inline _0RL_cd_bcb7b54210ff8436_81000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
     : omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
   {
     
@@ -1781,29 +2019,29 @@ public:
   ::CORBA::LongLong arg_1;
 };
 
-void _0RL_cd_bcb7b54210ff8436_31000000::marshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_81000000::marshalArguments(cdrStream& _n)
 {
   arg_0 >>= _n;
   arg_1 >>= _n;
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_31000000::unmarshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_81000000::unmarshalArguments(cdrStream& _n)
 {
   (::CORBA::Long&)arg_0 <<= _n;
   (::CORBA::LongLong&)arg_1 <<= _n;
 
 }
 
-const char* const _0RL_cd_bcb7b54210ff8436_31000000::_user_exns[] = {
+const char* const _0RL_cd_bcb7b54210ff8436_81000000::_user_exns[] = {
   0
 };
 
 // Local call call-back function.
 static void
-_0RL_lcfn_bcb7b54210ff8436_41000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bcb7b54210ff8436_91000000(omniCallDescriptor* cd, omniServant* svnt)
 {
-  _0RL_cd_bcb7b54210ff8436_31000000* tcd = (_0RL_cd_bcb7b54210ff8436_31000000*)cd;
+  _0RL_cd_bcb7b54210ff8436_81000000* tcd = (_0RL_cd_bcb7b54210ff8436_81000000*)cd;
   SpiderCorba::_impl_AgentSide* impl = (SpiderCorba::_impl_AgentSide*) svnt->_ptrToInterface(SpiderCorba::AgentSide::_PD_repoId);
   impl->updateLastSyntime(tcd->arg_0, tcd->arg_1);
 
@@ -1812,7 +2050,7 @@ _0RL_lcfn_bcb7b54210ff8436_41000000(omniCallDescriptor* cd, omniServant* svnt)
 
 void SpiderCorba::_objref_AgentSide::updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong lastSyncTime)
 {
-  _0RL_cd_bcb7b54210ff8436_31000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_41000000, "updateLastSyntime", 18);
+  _0RL_cd_bcb7b54210ff8436_81000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_91000000, "updateLastSyntime", 18);
   _call_desc.arg_0 = mappingId;
   _call_desc.arg_1 = lastSyncTime;
 
@@ -1828,11 +2066,11 @@ void SpiderCorba::_objref_AgentSide::updateLastSyntime(::CORBA::Long mappingId, 
 
 // Proxy call descriptor class. Mangled signature:
 //  void_i_cSpiderCorba_mSpiderDefine_mVideoInfo
-class _0RL_cd_bcb7b54210ff8436_51000000
+class _0RL_cd_bcb7b54210ff8436_a1000000
   : public omniCallDescriptor
 {
 public:
-  inline _0RL_cd_bcb7b54210ff8436_51000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
+  inline _0RL_cd_bcb7b54210ff8436_a1000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
     : omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
   {
     
@@ -1849,13 +2087,13 @@ public:
   const SpiderCorba::SpiderDefine::VideoInfo* arg_0;
 };
 
-void _0RL_cd_bcb7b54210ff8436_51000000::marshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_a1000000::marshalArguments(cdrStream& _n)
 {
   (const SpiderCorba::SpiderDefine::VideoInfo&) *arg_0 >>= _n;
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_51000000::unmarshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_a1000000::unmarshalArguments(cdrStream& _n)
 {
   arg_0_ = new SpiderCorba::SpiderDefine::VideoInfo;
   (SpiderCorba::SpiderDefine::VideoInfo&)arg_0_ <<= _n;
@@ -1863,15 +2101,15 @@ void _0RL_cd_bcb7b54210ff8436_51000000::unmarshalArguments(cdrStream& _n)
 
 }
 
-const char* const _0RL_cd_bcb7b54210ff8436_51000000::_user_exns[] = {
+const char* const _0RL_cd_bcb7b54210ff8436_a1000000::_user_exns[] = {
   0
 };
 
 // Local call call-back function.
 static void
-_0RL_lcfn_bcb7b54210ff8436_61000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bcb7b54210ff8436_b1000000(omniCallDescriptor* cd, omniServant* svnt)
 {
-  _0RL_cd_bcb7b54210ff8436_51000000* tcd = (_0RL_cd_bcb7b54210ff8436_51000000*)cd;
+  _0RL_cd_bcb7b54210ff8436_a1000000* tcd = (_0RL_cd_bcb7b54210ff8436_a1000000*)cd;
   SpiderCorba::_impl_AgentSide* impl = (SpiderCorba::_impl_AgentSide*) svnt->_ptrToInterface(SpiderCorba::AgentSide::_PD_repoId);
   impl->updateDownloadedVideo(*tcd->arg_0);
 
@@ -1880,7 +2118,7 @@ _0RL_lcfn_bcb7b54210ff8436_61000000(omniCallDescriptor* cd, omniServant* svnt)
 
 void SpiderCorba::_objref_AgentSide::updateDownloadedVideo(const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo)
 {
-  _0RL_cd_bcb7b54210ff8436_51000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_61000000, "updateDownloadedVideo", 22);
+  _0RL_cd_bcb7b54210ff8436_a1000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_b1000000, "updateDownloadedVideo", 22);
   _call_desc.arg_0 = &(::SpiderCorba::SpiderDefine::VideoInfo&) vInfo;
 
   _invoke(_call_desc);
@@ -1895,11 +2133,11 @@ void SpiderCorba::_objref_AgentSide::updateDownloadedVideo(const ::SpiderCorba::
 
 // Proxy call descriptor class. Mangled signature:
 //  void_i_clong_i_clong_i_cwstring
-class _0RL_cd_bcb7b54210ff8436_71000000
+class _0RL_cd_bcb7b54210ff8436_c1000000
   : public omniCallDescriptor
 {
 public:
-  inline _0RL_cd_bcb7b54210ff8436_71000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
+  inline _0RL_cd_bcb7b54210ff8436_c1000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
     : omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
   {
     
@@ -1918,7 +2156,7 @@ public:
   const ::CORBA::WChar* arg_2;
 };
 
-void _0RL_cd_bcb7b54210ff8436_71000000::marshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_c1000000::marshalArguments(cdrStream& _n)
 {
   arg_0 >>= _n;
   arg_1 >>= _n;
@@ -1926,7 +2164,7 @@ void _0RL_cd_bcb7b54210ff8436_71000000::marshalArguments(cdrStream& _n)
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_71000000::unmarshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_c1000000::unmarshalArguments(cdrStream& _n)
 {
   (::CORBA::Long&)arg_0 <<= _n;
   (::CORBA::Long&)arg_1 <<= _n;
@@ -1935,15 +2173,15 @@ void _0RL_cd_bcb7b54210ff8436_71000000::unmarshalArguments(cdrStream& _n)
 
 }
 
-const char* const _0RL_cd_bcb7b54210ff8436_71000000::_user_exns[] = {
+const char* const _0RL_cd_bcb7b54210ff8436_c1000000::_user_exns[] = {
   0
 };
 
 // Local call call-back function.
 static void
-_0RL_lcfn_bcb7b54210ff8436_81000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bcb7b54210ff8436_d1000000(omniCallDescriptor* cd, omniServant* svnt)
 {
-  _0RL_cd_bcb7b54210ff8436_71000000* tcd = (_0RL_cd_bcb7b54210ff8436_71000000*)cd;
+  _0RL_cd_bcb7b54210ff8436_c1000000* tcd = (_0RL_cd_bcb7b54210ff8436_c1000000*)cd;
   SpiderCorba::_impl_AgentSide* impl = (SpiderCorba::_impl_AgentSide*) svnt->_ptrToInterface(SpiderCorba::AgentSide::_PD_repoId);
   impl->updateRenderedVideo(tcd->arg_0, tcd->arg_1, tcd->arg_2);
 
@@ -1952,7 +2190,7 @@ _0RL_lcfn_bcb7b54210ff8436_81000000(omniCallDescriptor* cd, omniServant* svnt)
 
 void SpiderCorba::_objref_AgentSide::updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const ::CORBA::WChar* vRenderPath)
 {
-  _0RL_cd_bcb7b54210ff8436_71000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_81000000, "updateRenderedVideo", 20);
+  _0RL_cd_bcb7b54210ff8436_c1000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_d1000000, "updateRenderedVideo", 20);
   _call_desc.arg_0 = jobId;
   _call_desc.arg_1 = processStatus;
   _call_desc.arg_2 = vRenderPath;
@@ -1969,11 +2207,11 @@ void SpiderCorba::_objref_AgentSide::updateRenderedVideo(::CORBA::Long jobId, ::
 
 // Proxy call descriptor class. Mangled signature:
 //  void_i_clong
-class _0RL_cd_bcb7b54210ff8436_91000000
+class _0RL_cd_bcb7b54210ff8436_e1000000
   : public omniCallDescriptor
 {
 public:
-  inline _0RL_cd_bcb7b54210ff8436_91000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
+  inline _0RL_cd_bcb7b54210ff8436_e1000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
     : omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
   {
     
@@ -1989,27 +2227,27 @@ public:
   ::CORBA::Long arg_0;
 };
 
-void _0RL_cd_bcb7b54210ff8436_91000000::marshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_e1000000::marshalArguments(cdrStream& _n)
 {
   arg_0 >>= _n;
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_91000000::unmarshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_e1000000::unmarshalArguments(cdrStream& _n)
 {
   (::CORBA::Long&)arg_0 <<= _n;
 
 }
 
-const char* const _0RL_cd_bcb7b54210ff8436_91000000::_user_exns[] = {
+const char* const _0RL_cd_bcb7b54210ff8436_e1000000::_user_exns[] = {
   0
 };
 
 // Local call call-back function.
 static void
-_0RL_lcfn_bcb7b54210ff8436_a1000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bcb7b54210ff8436_f1000000(omniCallDescriptor* cd, omniServant* svnt)
 {
-  _0RL_cd_bcb7b54210ff8436_91000000* tcd = (_0RL_cd_bcb7b54210ff8436_91000000*)cd;
+  _0RL_cd_bcb7b54210ff8436_e1000000* tcd = (_0RL_cd_bcb7b54210ff8436_e1000000*)cd;
   SpiderCorba::_impl_AgentSide* impl = (SpiderCorba::_impl_AgentSide*) svnt->_ptrToInterface(SpiderCorba::AgentSide::_PD_repoId);
   impl->updateUploadedVideo(tcd->arg_0);
 
@@ -2018,7 +2256,7 @@ _0RL_lcfn_bcb7b54210ff8436_a1000000(omniCallDescriptor* cd, omniServant* svnt)
 
 void SpiderCorba::_objref_AgentSide::updateUploadedVideo(::CORBA::Long jobId)
 {
-  _0RL_cd_bcb7b54210ff8436_91000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_a1000000, "updateUploadedVideo", 20);
+  _0RL_cd_bcb7b54210ff8436_e1000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_f1000000, "updateUploadedVideo", 20);
   _call_desc.arg_0 = jobId;
 
   _invoke(_call_desc);
@@ -2033,11 +2271,11 @@ void SpiderCorba::_objref_AgentSide::updateUploadedVideo(::CORBA::Long jobId)
 
 // Proxy call descriptor class. Mangled signature:
 //  _cwstring_i_clong
-class _0RL_cd_bcb7b54210ff8436_b1000000
+class _0RL_cd_bcb7b54210ff8436_02000000
   : public omniCallDescriptor
 {
 public:
-  inline _0RL_cd_bcb7b54210ff8436_b1000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
+  inline _0RL_cd_bcb7b54210ff8436_02000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
     : omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
   {
     
@@ -2056,39 +2294,39 @@ public:
   ::CORBA::WString_var result;
 };
 
-void _0RL_cd_bcb7b54210ff8436_b1000000::marshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_02000000::marshalArguments(cdrStream& _n)
 {
   arg_0 >>= _n;
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_b1000000::unmarshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_02000000::unmarshalArguments(cdrStream& _n)
 {
   (::CORBA::Long&)arg_0 <<= _n;
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_b1000000::marshalReturnedValues(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_02000000::marshalReturnedValues(cdrStream& _n)
 {
   _n.marshalWString(result,0);
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_b1000000::unmarshalReturnedValues(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_02000000::unmarshalReturnedValues(cdrStream& _n)
 {
   result = _n.unmarshalWString(0);
 
 }
 
-const char* const _0RL_cd_bcb7b54210ff8436_b1000000::_user_exns[] = {
+const char* const _0RL_cd_bcb7b54210ff8436_02000000::_user_exns[] = {
   0
 };
 
 // Local call call-back function.
 static void
-_0RL_lcfn_bcb7b54210ff8436_c1000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bcb7b54210ff8436_12000000(omniCallDescriptor* cd, omniServant* svnt)
 {
-  _0RL_cd_bcb7b54210ff8436_b1000000* tcd = (_0RL_cd_bcb7b54210ff8436_b1000000*)cd;
+  _0RL_cd_bcb7b54210ff8436_02000000* tcd = (_0RL_cd_bcb7b54210ff8436_02000000*)cd;
   SpiderCorba::_impl_AgentSide* impl = (SpiderCorba::_impl_AgentSide*) svnt->_ptrToInterface(SpiderCorba::AgentSide::_PD_repoId);
   tcd->result = impl->getMonitorChannelId(tcd->arg_0);
 
@@ -2097,7 +2335,7 @@ _0RL_lcfn_bcb7b54210ff8436_c1000000(omniCallDescriptor* cd, omniServant* svnt)
 
 ::CORBA::WChar* SpiderCorba::_objref_AgentSide::getMonitorChannelId(::CORBA::Long mappingId)
 {
-  _0RL_cd_bcb7b54210ff8436_b1000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_c1000000, "getMonitorChannelId", 20);
+  _0RL_cd_bcb7b54210ff8436_02000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_12000000, "getMonitorChannelId", 20);
   _call_desc.arg_0 = mappingId;
 
   _invoke(_call_desc);
@@ -2112,11 +2350,11 @@ _0RL_lcfn_bcb7b54210ff8436_c1000000(omniCallDescriptor* cd, omniServant* svnt)
 
 // Proxy call descriptor class. Mangled signature:
 //  _cSpiderCorba_mAgentSide_mClusterInfo_i_clong_i_clong
-class _0RL_cd_bcb7b54210ff8436_d1000000
+class _0RL_cd_bcb7b54210ff8436_22000000
   : public omniCallDescriptor
 {
 public:
-  inline _0RL_cd_bcb7b54210ff8436_d1000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
+  inline _0RL_cd_bcb7b54210ff8436_22000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
     : omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
   {
     
@@ -2136,42 +2374,42 @@ public:
   SpiderCorba::AgentSide::ClusterInfo_var result;
 };
 
-void _0RL_cd_bcb7b54210ff8436_d1000000::marshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_22000000::marshalArguments(cdrStream& _n)
 {
   arg_0 >>= _n;
   arg_1 >>= _n;
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_d1000000::unmarshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_22000000::unmarshalArguments(cdrStream& _n)
 {
   (::CORBA::Long&)arg_0 <<= _n;
   (::CORBA::Long&)arg_1 <<= _n;
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_d1000000::marshalReturnedValues(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_22000000::marshalReturnedValues(cdrStream& _n)
 {
   (const SpiderCorba::AgentSide::ClusterInfo&) result >>= _n;
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_d1000000::unmarshalReturnedValues(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_22000000::unmarshalReturnedValues(cdrStream& _n)
 {
   result = new SpiderCorba::AgentSide::ClusterInfo;
   (SpiderCorba::AgentSide::ClusterInfo&)result <<= _n;
 
 }
 
-const char* const _0RL_cd_bcb7b54210ff8436_d1000000::_user_exns[] = {
+const char* const _0RL_cd_bcb7b54210ff8436_22000000::_user_exns[] = {
   0
 };
 
 // Local call call-back function.
 static void
-_0RL_lcfn_bcb7b54210ff8436_e1000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bcb7b54210ff8436_32000000(omniCallDescriptor* cd, omniServant* svnt)
 {
-  _0RL_cd_bcb7b54210ff8436_d1000000* tcd = (_0RL_cd_bcb7b54210ff8436_d1000000*)cd;
+  _0RL_cd_bcb7b54210ff8436_22000000* tcd = (_0RL_cd_bcb7b54210ff8436_22000000*)cd;
   SpiderCorba::_impl_AgentSide* impl = (SpiderCorba::_impl_AgentSide*) svnt->_ptrToInterface(SpiderCorba::AgentSide::_PD_repoId);
   tcd->result = impl->getClusterInfo(tcd->arg_0, tcd->arg_1);
 
@@ -2180,7 +2418,7 @@ _0RL_lcfn_bcb7b54210ff8436_e1000000(omniCallDescriptor* cd, omniServant* svnt)
 
 SpiderCorba::AgentSide::ClusterInfo* SpiderCorba::_objref_AgentSide::getClusterInfo(::CORBA::Long clusterType, ::CORBA::Long mappingId)
 {
-  _0RL_cd_bcb7b54210ff8436_d1000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_e1000000, "getClusterInfo", 15);
+  _0RL_cd_bcb7b54210ff8436_22000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_32000000, "getClusterInfo", 15);
   _call_desc.arg_0 = clusterType;
   _call_desc.arg_1 = mappingId;
 
@@ -2196,11 +2434,11 @@ SpiderCorba::AgentSide::ClusterInfo* SpiderCorba::_objref_AgentSide::getClusterI
 
 // Proxy call descriptor class. Mangled signature:
 //  _cSpiderCorba_mAgentSide_mAuthenInfo_i_clong
-class _0RL_cd_bcb7b54210ff8436_f1000000
+class _0RL_cd_bcb7b54210ff8436_42000000
   : public omniCallDescriptor
 {
 public:
-  inline _0RL_cd_bcb7b54210ff8436_f1000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
+  inline _0RL_cd_bcb7b54210ff8436_42000000(LocalCallFn lcfn, const char* op_, size_t oplen, _CORBA_Boolean upcall=0)
     : omniCallDescriptor(lcfn, op_, oplen, 0, _user_exns, 0, upcall)
   {
     
@@ -2219,40 +2457,40 @@ public:
   SpiderCorba::AgentSide::AuthenInfo_var result;
 };
 
-void _0RL_cd_bcb7b54210ff8436_f1000000::marshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_42000000::marshalArguments(cdrStream& _n)
 {
   arg_0 >>= _n;
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_f1000000::unmarshalArguments(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_42000000::unmarshalArguments(cdrStream& _n)
 {
   (::CORBA::Long&)arg_0 <<= _n;
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_f1000000::marshalReturnedValues(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_42000000::marshalReturnedValues(cdrStream& _n)
 {
   (const SpiderCorba::AgentSide::AuthenInfo&) result >>= _n;
 
 }
 
-void _0RL_cd_bcb7b54210ff8436_f1000000::unmarshalReturnedValues(cdrStream& _n)
+void _0RL_cd_bcb7b54210ff8436_42000000::unmarshalReturnedValues(cdrStream& _n)
 {
   result = new SpiderCorba::AgentSide::AuthenInfo;
   (SpiderCorba::AgentSide::AuthenInfo&)result <<= _n;
 
 }
 
-const char* const _0RL_cd_bcb7b54210ff8436_f1000000::_user_exns[] = {
+const char* const _0RL_cd_bcb7b54210ff8436_42000000::_user_exns[] = {
   0
 };
 
 // Local call call-back function.
 static void
-_0RL_lcfn_bcb7b54210ff8436_02000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bcb7b54210ff8436_52000000(omniCallDescriptor* cd, omniServant* svnt)
 {
-  _0RL_cd_bcb7b54210ff8436_f1000000* tcd = (_0RL_cd_bcb7b54210ff8436_f1000000*)cd;
+  _0RL_cd_bcb7b54210ff8436_42000000* tcd = (_0RL_cd_bcb7b54210ff8436_42000000*)cd;
   SpiderCorba::_impl_AgentSide* impl = (SpiderCorba::_impl_AgentSide*) svnt->_ptrToInterface(SpiderCorba::AgentSide::_PD_repoId);
   tcd->result = impl->getAuthenInfo(tcd->arg_0);
 
@@ -2261,7 +2499,7 @@ _0RL_lcfn_bcb7b54210ff8436_02000000(omniCallDescriptor* cd, omniServant* svnt)
 
 SpiderCorba::AgentSide::AuthenInfo* SpiderCorba::_objref_AgentSide::getAuthenInfo(::CORBA::Long mappingId)
 {
-  _0RL_cd_bcb7b54210ff8436_f1000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_02000000, "getAuthenInfo", 14);
+  _0RL_cd_bcb7b54210ff8436_42000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_52000000, "getAuthenInfo", 14);
   _call_desc.arg_0 = mappingId;
 
   _invoke(_call_desc);
@@ -2304,7 +2542,7 @@ SpiderCorba::_impl_AgentSide::_dispatch(omniCallHandle& _handle)
 
   if (omni::strMatch(op, "onDownloadStartup")) {
 
-    _0RL_cd_bcb7b54210ff8436_d0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_e0000000, "onDownloadStartup", 18, 1);
+    _0RL_cd_bcb7b54210ff8436_21000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_31000000, "onDownloadStartup", 18, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;
@@ -2312,7 +2550,7 @@ SpiderCorba::_impl_AgentSide::_dispatch(omniCallHandle& _handle)
 
   if (omni::strMatch(op, "onRenderStartup")) {
 
-    _0RL_cd_bcb7b54210ff8436_d0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_f0000000, "onRenderStartup", 16, 1);
+    _0RL_cd_bcb7b54210ff8436_21000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_41000000, "onRenderStartup", 16, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;
@@ -2320,7 +2558,7 @@ SpiderCorba::_impl_AgentSide::_dispatch(omniCallHandle& _handle)
 
   if (omni::strMatch(op, "onUploadStartup")) {
 
-    _0RL_cd_bcb7b54210ff8436_d0000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_01000000, "onUploadStartup", 16, 1);
+    _0RL_cd_bcb7b54210ff8436_21000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_51000000, "onUploadStartup", 16, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;
@@ -2328,7 +2566,7 @@ SpiderCorba::_impl_AgentSide::_dispatch(omniCallHandle& _handle)
 
   if (omni::strMatch(op, "getLastSyncTime")) {
 
-    _0RL_cd_bcb7b54210ff8436_11000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_21000000, "getLastSyncTime", 16, 1);
+    _0RL_cd_bcb7b54210ff8436_61000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_71000000, "getLastSyncTime", 16, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;
@@ -2336,7 +2574,7 @@ SpiderCorba::_impl_AgentSide::_dispatch(omniCallHandle& _handle)
 
   if (omni::strMatch(op, "updateLastSyntime")) {
 
-    _0RL_cd_bcb7b54210ff8436_31000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_41000000, "updateLastSyntime", 18, 1);
+    _0RL_cd_bcb7b54210ff8436_81000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_91000000, "updateLastSyntime", 18, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;
@@ -2344,7 +2582,7 @@ SpiderCorba::_impl_AgentSide::_dispatch(omniCallHandle& _handle)
 
   if (omni::strMatch(op, "updateDownloadedVideo")) {
 
-    _0RL_cd_bcb7b54210ff8436_51000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_61000000, "updateDownloadedVideo", 22, 1);
+    _0RL_cd_bcb7b54210ff8436_a1000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_b1000000, "updateDownloadedVideo", 22, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;
@@ -2352,7 +2590,7 @@ SpiderCorba::_impl_AgentSide::_dispatch(omniCallHandle& _handle)
 
   if (omni::strMatch(op, "updateRenderedVideo")) {
 
-    _0RL_cd_bcb7b54210ff8436_71000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_81000000, "updateRenderedVideo", 20, 1);
+    _0RL_cd_bcb7b54210ff8436_c1000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_d1000000, "updateRenderedVideo", 20, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;
@@ -2360,7 +2598,7 @@ SpiderCorba::_impl_AgentSide::_dispatch(omniCallHandle& _handle)
 
   if (omni::strMatch(op, "updateUploadedVideo")) {
 
-    _0RL_cd_bcb7b54210ff8436_91000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_a1000000, "updateUploadedVideo", 20, 1);
+    _0RL_cd_bcb7b54210ff8436_e1000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_f1000000, "updateUploadedVideo", 20, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;
@@ -2368,7 +2606,7 @@ SpiderCorba::_impl_AgentSide::_dispatch(omniCallHandle& _handle)
 
   if (omni::strMatch(op, "getMonitorChannelId")) {
 
-    _0RL_cd_bcb7b54210ff8436_b1000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_c1000000, "getMonitorChannelId", 20, 1);
+    _0RL_cd_bcb7b54210ff8436_02000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_12000000, "getMonitorChannelId", 20, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;
@@ -2376,7 +2614,7 @@ SpiderCorba::_impl_AgentSide::_dispatch(omniCallHandle& _handle)
 
   if (omni::strMatch(op, "getClusterInfo")) {
 
-    _0RL_cd_bcb7b54210ff8436_d1000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_e1000000, "getClusterInfo", 15, 1);
+    _0RL_cd_bcb7b54210ff8436_22000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_32000000, "getClusterInfo", 15, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;
@@ -2384,7 +2622,7 @@ SpiderCorba::_impl_AgentSide::_dispatch(omniCallHandle& _handle)
 
   if (omni::strMatch(op, "getAuthenInfo")) {
 
-    _0RL_cd_bcb7b54210ff8436_f1000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_02000000, "getAuthenInfo", 14, 1);
+    _0RL_cd_bcb7b54210ff8436_42000000 _call_desc(_0RL_lcfn_bcb7b54210ff8436_52000000, "getAuthenInfo", 14, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;

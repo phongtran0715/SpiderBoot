@@ -14374,7 +14374,8 @@ void ClientSession::createMonitorChannel(NXCPMessage *request)
 
 void ClientSession::createMappingChannel(NXCPMessage *request)
 {
-   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   debugPrintf(6, _T("ClientSession1::[createMappingChannel]"));
+
    NXCPMessage msg;
    DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
    DB_STATEMENT hStmt;
@@ -14418,10 +14419,10 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
             if (statusSync == 1) //enable timer
             {
                //notify to download app
+               debugPrintf(6, _T("ClientSession1::[createMappingChannel] beginning notify to download app"));
                SpiderDownloadClient* downloadClient = new SpiderDownloadClient();
                if (downloadClient->initSuccess)
                {
-                  debugPrintf(6, _T("ClientSession::[%s] Init corba for download client successful!"), __FUNCTION__);
                   try {
                      ::SpiderCorba::DownloadSide::DownloadConfig downloadCfg;
                      downloadCfg.cHomeId = CORBA::wstring_dup(cHomeId);
@@ -14442,7 +14443,31 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
                      debugPrintf(1, _T("Caught a CORBA:: %s"), ex._name());
                   }
                } else {
-                  debugPrintf(1, _T("ClientSession::[%s] Init corba for download client FALSE"), __FUNCTION__);
+                  debugPrintf(1, _T("ClientSession::[createMappingChannel] Init corba for download client FALSE"));
+               }
+
+               //notify upload app
+               debugPrintf(6, _T("ClientSession1::[createMappingChannel] beginning notify to upload app"));
+               SpiderUploadClient* uploadClient = new SpiderUploadClient();
+               if (uploadClient->initSuccess)
+               {
+                  try
+                  {
+                     TCHAR bufTimerId[128];
+                     _sntprintf(bufTimerId, 128, _T("%d_%d"), TYPE_MAPPING_CHANNEL, mappingId);
+                     uploadClient->mUploadRef->createUploadTimer(CORBA::wstring_dup(bufTimerId), CORBA::wstring_dup(uploadId));
+                  }
+                  catch (CORBA::TRANSIENT&) {
+                     debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
+                  }
+                  catch (CORBA::SystemException& ex) {
+                     debugPrintf(1, _T("Caught a CORBA:: %s"), ex._name());
+                  }
+                  catch (CORBA::Exception& ex) {
+                     debugPrintf(1, _T("Caught a CORBA:: %s"), ex._name());
+                  }
+               } else {
+                  debugPrintf(1, _T("ClientSession::[%s] Init corba for upload client FALSE"), __FUNCTION__);
                }
             }
          }
@@ -14465,7 +14490,7 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
 
 void ClientSession::createSpiderMappingConfig(UINT32 mappingId, NXCPMessage *request)
 {
-   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   debugPrintf(6, _T("ClientSession::[createSpiderMappingConfig] >>>>"));
    NXCPMessage msg;
    DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
    DB_STATEMENT hStmt;
@@ -14512,6 +14537,7 @@ void ClientSession::createSpiderMappingConfig(UINT32 mappingId, NXCPMessage *req
       }
    }
    DBConnectionPoolReleaseConnection(hdb);
+   debugPrintf(6, _T("ClientSession::[createSpiderMappingConfig] <<<<<"));
 }
 
 void ClientSession::modifySpiderMappingConfig(UINT32 mappingId, NXCPMessage * request)
@@ -14685,7 +14711,7 @@ void ClientSession::modifyMonitorChannel(NXCPMessage * request)
 
 void ClientSession::modifyMappingChannel(NXCPMessage * request)
 {
-   debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
+   debugPrintf(6, _T("ClientSession::[modifyMappingChannel]"));
    NXCPMessage msg;
    DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
    DB_STATEMENT hStmt;
@@ -14723,10 +14749,10 @@ void ClientSession::modifyMappingChannel(NXCPMessage * request)
          //modify spider mapping config
          modifySpiderMappingConfig(id, request);
          //notify information to download app
+         debugPrintf(6, _T("ClientSession1::[modifyMappingChannel] beginning notify to download app"));
          SpiderDownloadClient* downloadClient = new SpiderDownloadClient();
          if (downloadClient->initSuccess)
          {
-            debugPrintf(6, _T("ClientSession::[%s] Init corba for download client successful!"), __FUNCTION__);
             try {
                ::SpiderCorba::DownloadSide::DownloadConfig downloadCfg;
                downloadCfg.cHomeId = CORBA::wstring_dup(cHomeId);
@@ -14747,6 +14773,30 @@ void ClientSession::modifyMappingChannel(NXCPMessage * request)
             }
          } else {
             debugPrintf(1, _T("ClientSession::[%s] Init corba for download client FALSE"), __FUNCTION__);
+         }
+         //notify upload app
+         debugPrintf(6, _T("ClientSession1::[modifyMappingChannel] beginning notify to upload app"));
+         SpiderUploadClient* uploadClient = new SpiderUploadClient();
+         if (uploadClient->initSuccess)
+         {
+            try
+            {
+               TCHAR bufTimerId[128];
+               _sntprintf(bufTimerId, 128, _T("%d_%d"), TYPE_MAPPING_CHANNEL, id);
+               ::SpiderCorba::UploadSide::UploadConfig uploadCfg;
+               uploadClient->mUploadRef->modifyUploadTimer(CORBA::wstring_dup(bufTimerId), CORBA::wstring_dup(uploadId), statusSync, uploadCfg);
+            }
+            catch (CORBA::TRANSIENT&) {
+               debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
+            }
+            catch (CORBA::SystemException& ex) {
+               debugPrintf(1, _T("Caught a CORBA:: %s"), ex._name());
+            }
+            catch (CORBA::Exception& ex) {
+               debugPrintf(1, _T("Caught a CORBA:: %s"), ex._name());
+            }
+         } else {
+            debugPrintf(1, _T("ClientSession::[%s] Init corba for upload client FALSE"), __FUNCTION__);
          }
       }
       else
@@ -14879,6 +14929,7 @@ void ClientSession::deleteMappingChannel(NXCPMessage * request)
    {
       INT32 id = request->getFieldAsInt32(VID_MAPPING_CHANNEL_RECORD_ID);
       TCHAR* downloadId = request->getFieldAsString(VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID);
+      TCHAR* uploadId = request->getFieldAsString(VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID);
       debugPrintf(6, _T("ClientSession::[%s] id = %d"), __FUNCTION__, id);
       hStmt = DBPrepare(hdb, _T("DELETE FROM channel_mapping WHERE Id = ?"));
       DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)id);
@@ -14889,6 +14940,7 @@ void ClientSession::deleteMappingChannel(NXCPMessage * request)
          deleteSpiderMappingConfig(id);
          deleteVideoContainer(id);
          //notify information to download app
+         debugPrintf(6, _T("Beginning notify to download app"));
          SpiderDownloadClient* downloadClient = new SpiderDownloadClient();
          if (downloadClient->initSuccess)
          {
@@ -14907,6 +14959,29 @@ void ClientSession::deleteMappingChannel(NXCPMessage * request)
             }
          } else {
             debugPrintf(1, _T("ClientSession::[%s] Init corba for download client FALSE"), __FUNCTION__);
+         }
+         //notify information to upload app
+         debugPrintf(6, _T("Beginning notify to upload app"));
+         SpiderUploadClient* uploadClient = new SpiderUploadClient();
+         if (uploadClient->initSuccess)
+         {
+            debugPrintf(6, _T("ClientSession::[%s] Init corba for upload client successful!"), __FUNCTION__);
+            try {
+               TCHAR bufTimerId[128];
+               _sntprintf(bufTimerId, 128, _T("%d_%d"), TYPE_MAPPING_CHANNEL, id);
+               uploadClient->mUploadRef->deleteUploadTimer(CORBA::wstring_dup(bufTimerId), CORBA::wstring_dup(uploadId));
+            }
+            catch (CORBA::TRANSIENT&) {
+               debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
+            }
+            catch (CORBA::SystemException& ex) {
+               debugPrintf(1, _T("Caught a CORBA:: %s"), ex._name());
+            }
+            catch (CORBA::Exception& ex) {
+               debugPrintf(1, _T("Caught a CORBA:: %s"), ex._name());
+            }
+         } else {
+            debugPrintf(1, _T("ClientSession::[%s] Init corba for upload client FALSE"), __FUNCTION__);
          }
       }
       else
@@ -14969,7 +15044,7 @@ AgentConnection * ClientSession::getAgentConnectionByObjectName(TCHAR * objectNa
 
 bool ClientSession::checkMappingIsExisted(TCHAR * cHomeId, TCHAR * cMonitorId)
 {
-   debugPrintf(6, _T("ClientSession::[%s]"), __func__);
+   debugPrintf(6, _T("ClientSession::[checkMappingIsExisted] home ID = 5s - monitor id = %s"), cHomeId, cMonitorId);
    bool isExisted = false;
    DB_RESULT hResult;
    UINT32 dwNumRecords;

@@ -11,6 +11,7 @@ module SpiderCorba
           wstring vDownloadPath;
           wstring vRenderPath;
           long mappingId;
+          long mappingType;
           long processStatus;
           long license;
     };

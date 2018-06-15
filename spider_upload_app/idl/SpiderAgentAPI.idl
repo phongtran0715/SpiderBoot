@@ -27,6 +27,9 @@ module SpiderCorba
             boolean enableDes;
             boolean enableTags;
         };
+		boolean createUploadTimer(in wstring timerId, in wstring uploadClusterId);
+		boolean modifyUploadTimer(in wstring timerId, in wstring uploadClusterId, in long synStatus, in UploadConfig uploadCfg);
+		boolean deleteUploadTimer(in wstring timerId, in wstring uploadClusterId);
         boolean createUploadJob(in long jobId, in VideoInfo vInfo, in UploadConfig uploadCfg);
         boolean deleteUploadJob(in long jobId, in wstring uploadClusterId);
   };

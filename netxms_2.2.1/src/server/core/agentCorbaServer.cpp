@@ -10,12 +10,28 @@ using namespace std;
 void AgentSide_i::onDownloadStartup(const ::CORBA::WChar* downloadAppId)
 {
 	DbgPrintf(1, _T("AgentSide_i::[onDownloadStartup] Download cluster id : %s"), downloadAppId);
+	createDownloadTimerByMapping(downloadAppId, TYPE_MAPPING_CHANNEL);
+}
+
+void AgentSide_i::createDownloadTimerByMapping(const ::CORBA::WChar* downloadAppId, INT32 mappingType)
+{
+	DbgPrintf(6, _T("AgentSide_i::createDownloadTimerByMapping : downloadAppId = %s , mapping type = %d"), downloadAppId, mappingType);
+	TCHAR* mappingTable = getMappingTableNameByType(mappingType);
+	if (mappingTable == nullptr)
+	{
+		DbgPrintf(1, _T("AgentSide_i::[createDownloadTimerByMapping] Can not get mapping table by mapping type = %d"), mappingType);
+		return;
+	}
 	DB_RESULT hResult;
 	UINT32 i, dwNumRecords;
 	SpiderDownloadClient* downloadClient = new SpiderDownloadClient();
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
-	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT Id, HomeChannelId, MonitorChannelId, TimeIntervalSync, StatusSync ")
-	                               _T(" FROM channel_mapping WHERE StatusSync = ? AND DownloadClusterId = ?"));
+	TCHAR query [MAX_DB_STRING];
+	_sntprintf(query, sizeof query, _T("SELECT Id, HomeChannelId, MonitorChannelId, TimeIntervalSync, StatusSync ")
+	           _T(" FROM %s WHERE StatusSync = 1 AND DownloadClusterId = %s"), mappingTable, (const TCHAR*)downloadAppId);
+	DbgPrintf(6, _T("AgentSide_i::[createUploadTimerByMapping] SQL query = %s"), query);
+	//TODO: check another filed for another mapping type
+	DB_STATEMENT hStmt = DBPrepare(hdb, query);
 	if (hStmt != NULL)
 	{
 		DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)1);
@@ -27,7 +43,7 @@ void AgentSide_i::onDownloadStartup(const ::CORBA::WChar* downloadAppId)
 			DbgPrintf(1, _T("AgentSide_i::[DownloadStartup] numRecord = %d"), dwNumRecords);
 			for (i = 0; i < dwNumRecords; i++)
 			{
-				INT32 id = DBGetFieldInt64(hResult, i, 0);
+				INT32 jobId = DBGetFieldInt64(hResult, i, 0);
 				TCHAR* cHomeId = DBGetField(hResult, i, 1, NULL, 0);
 				TCHAR* cMonitorId = DBGetField(hResult, i, 2, NULL, 0);
 				INT64 timeSync = DBGetFieldInt64(hResult, i, 3);
@@ -45,7 +61,7 @@ void AgentSide_i::onDownloadStartup(const ::CORBA::WChar* downloadAppId)
 							downloadCfg.timerInterval = timeSync;
 							downloadCfg.synStatus = statusSync;
 
-							downloadClient->mDownloadRef->createDownloadJob(id, downloadCfg);
+							downloadClient->mDownloadRef->createDownloadJob(jobId, downloadCfg);
 						}
 						catch (CORBA::TRANSIENT&) {
 							DbgPrintf(1, _T("AgentSide_i::[] : Caught system exception TRANSIENT -- unable to contact the server"));
@@ -65,6 +81,7 @@ void AgentSide_i::onDownloadStartup(const ::CORBA::WChar* downloadAppId)
 		}
 	}
 	DBConnectionPoolReleaseConnection(hdb);
+
 }
 
 void AgentSide_i::onRenderStartup(const ::CORBA::WChar* appId)
@@ -123,21 +140,99 @@ void AgentSide_i::onRenderStartup(const ::CORBA::WChar* appId)
 	DBConnectionPoolReleaseConnection(hdb);
 }
 
-void AgentSide_i::onUploadStartup(const ::CORBA::WChar* appId)
+void AgentSide_i::onUploadStartup(const ::CORBA::WChar* uploadClusterId)
 {
-	DbgPrintf(6, _T("AgentSide_i::onUploadStartup : uploadId = %s"), appId);
+	DbgPrintf(6, _T("AgentSide_i::onUploadStartup : uploadId = %s"), uploadClusterId);
+	//create upload timer
+	createUploadTimerByMapping(uploadClusterId, TYPE_MAPPING_CHANNEL);
+	//create upload job
+	createUploadJobByMapping(uploadClusterId, TYPE_MAPPING_CHANNEL);
+}
+
+void AgentSide_i::createUploadTimerByMapping(const ::CORBA::WChar* uploadClusterId, INT32 mappingType)
+{
+	DbgPrintf(6, _T("AgentSide_i::createUploadTimerByMapping : uploadClusterId = %s , mapping type = %d"), uploadClusterId, mappingType);
+	TCHAR* mappingTable = getMappingTableNameByType(mappingType);
+	if (mappingTable == nullptr)
+	{
+		DbgPrintf(1, _T("AgentSide_i::[createUploadTimerByMapping] Can not get mapping table by mapping type = %d"), mappingType);
+		return;
+	}
 	DB_RESULT hResult;
 	UINT32 i, dwNumRecords;
 	SpiderUploadClient* uploadClient = new SpiderUploadClient();
-
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
-	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT Id, VideoId, Title, Tag, Description, Thumbnail, ")
-	                               _T(" VRenderedPath, MappingId, License FROM video_container WHERE MappingId IN ")
-	                               _T(" (SELECT Id FROM channel_mapping WHERE UploadClusterId = ?) AND ProcessStatus = ?"));
+	TCHAR query [MAX_DB_STRING];
+	_sntprintf(query, sizeof query, _T("SELECT DISTINCT Id FROM %s WHERE StatusSync = 1 AND UploadClusterId = '%s'"), mappingTable, uploadClusterId);
+	DbgPrintf(6, _T("AgentSide_i::[createUploadTimerByMapping] SQL query = %s"), query);
+	DB_STATEMENT hStmt = DBPrepare(hdb, query);
 	if (hStmt != NULL)
 	{
-		DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR*) appId, DB_BIND_TRANSIENT);
-		DBBind(hStmt, 2, DB_SQLTYPE_INTEGER, (INT32)2);
+		hResult = DBSelectPrepared(hStmt);
+		if (hResult != NULL)
+		{
+			dwNumRecords = DBGetNumRows(hResult);
+			DbgPrintf(6, _T("AgentSide_i::[createUploadTimerByMapping] dwNumRecords = %d"), dwNumRecords);
+			for (i = 0; i < dwNumRecords; i++)
+			{
+				INT32 mappingId = DBGetFieldInt64(hResult, i, 0);
+
+				if (uploadClient->initSuccess)
+				{
+					if (uploadClient->mUploadRef != NULL)
+					{
+						try
+						{
+							DbgPrintf(6, _T("AgentSide_i::[createUploadTimerByMapping] beginning create buff timer id "));
+							TCHAR bufTimerId[128];
+							_sntprintf(bufTimerId, 128, _T("%d_%d"), mappingType, mappingId);
+							DbgPrintf(6, _T("AgentSide_i::[createUploadTimerByMapping] : upload timer id = %s"), bufTimerId);
+							uploadClient->mUploadRef->createUploadTimer(CORBA::wstring_dup(bufTimerId), CORBA::wstring_dup(uploadClusterId));
+						}
+						catch (CORBA::TRANSIENT&) {
+							DbgPrintf(1, _T("AgentSide_i::[createUploadTimerByMapping] : Caught system exception TRANSIENT -- unable to contact the server"));
+						}
+						catch (CORBA::SystemException& ex) {
+							DbgPrintf(1, _T("AgentSide_i::[createUploadTimerByMapping] : Caught a CORBA:: %s"), ex._name());
+						}
+						catch (CORBA::Exception& ex)
+						{
+							DbgPrintf(1, _T("AgentSide_i::[createUploadTimerByMapping] : Caught a CORBA:: %s"), ex._name());
+						}
+					}
+				} else {
+					DbgPrintf(1, _T("AgentSide_i::[createUploadTimerByMapping] : Can not create corba connection"));
+				}
+			}
+			DBFreeResult(hResult);
+		}
+	}
+	DBConnectionPoolReleaseConnection(hdb);
+}
+
+void AgentSide_i::createUploadJobByMapping(const ::CORBA::WChar* uploadClusterId, INT32 mappingType)
+{
+	DbgPrintf(6, _T("AgentSide_i::[createUploadJobByMapping] CSQL query : uploadClusterId = %s , mappingType = %d"), uploadClusterId, mappingType);
+	TCHAR* mappingTable = getMappingTableNameByType(mappingType);
+	if (mappingTable == nullptr)
+	{
+		DbgPrintf(1, _T("AgentSide_i::[createUploadJobByMapping] Can not get mapping table by mapping type = %d"), mappingType);
+		return;
+	}
+	DB_RESULT hResult;
+	UINT32 i, dwNumRecords;
+	SpiderUploadClient* uploadClient = new SpiderUploadClient();
+	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
+	TCHAR query [MAX_DB_STRING];
+	//TODO: set id for another mapping type (palylist / keyword, ...)
+	_sntprintf(query, sizeof query,  _T("SELECT Id, VideoId, Title, Tag, Description, Thumbnail, ")
+	           _T(" VRenderedPath, MappingId, License FROM video_container WHERE MappingId IN ")
+	           _T(" (SELECT Id FROM %s WHERE UploadClusterId = '%s') AND ProcessStatus = %d"), mappingTable, (const TCHAR*)uploadClusterId, 2);
+	DbgPrintf(6, _T("AgentSide_i::[createUploadJobByMapping] SQL query : %s"), query);
+
+	DB_STATEMENT hStmt = DBPrepare(hdb, query);
+	if (hStmt != NULL)
+	{
 		hResult = DBSelectPrepared(hStmt);
 		if (hResult != NULL)
 		{
@@ -198,6 +293,29 @@ void AgentSide_i::onUploadStartup(const ::CORBA::WChar* appId)
 	DBConnectionPoolReleaseConnection(hdb);
 }
 
+TCHAR* AgentSide_i::getMappingTableNameByType(INT32 mappingType)
+{
+	DbgPrintf(6, _T("AgentSide_i::[getMappingTableNameByType] : mappingType = %d"), mappingType);
+	TCHAR* result = nullptr;
+	switch (mappingType)
+	{
+	case TYPE_MAPPING_CHANNEL:
+		result = _T("channel_mapping");
+		break;
+	case TYPE_MAPPING_PLAYLIST:
+		break;
+	case TYPE_MAPPING_KEYWORD:
+		break;
+	case TYPE_MAPPING_CUSTOM_VIDEO_LINK:
+		break;
+	case TYPE_MAPPING_CUSTOM_VIDEO_LOCATION:
+		break;
+	default:
+		break;
+	}
+	return result;
+}
+
 ::CORBA::LongLong AgentSide_i::getLastSyncTime(::CORBA::Long mappingId)
 {
 	DbgPrintf(6, _T("AgentSide_i::getLastSyncTime : mappingId = %ld"), mappingId);
@@ -250,7 +368,7 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderCorba::SpiderDefine::Video
 	{
 		hStmt = DBPrepare(hdb, _T("INSERT INTO video_container (VideoId, Title, Tag, ")
 		                  _T(" Description, Thumbnail, VDownloadedPath,")
-		                  _T("MappingId, ProcessStatus, License) VALUES (?,?,?,?,?,?,?,?,?)"));
+		                  _T("MappingId, ProcessStatus, License, MappingType) VALUES (?,?,?,?,?,?,?,?,?,?)"));
 
 		DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.videoId), DB_BIND_TRANSIENT);
 		DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)CORBA::wstring_dup(vInfo.title), DB_BIND_TRANSIENT);
@@ -261,7 +379,7 @@ void AgentSide_i::updateDownloadedVideo(const ::SpiderCorba::SpiderDefine::Video
 		DBBind(hStmt, 7, DB_SQLTYPE_INTEGER, (INT32)vInfo.mappingId);
 		DBBind(hStmt, 8, DB_SQLTYPE_INTEGER, (INT32)vInfo.processStatus);
 		DBBind(hStmt, 9, DB_SQLTYPE_INTEGER, (INT32)vInfo.license);
-
+		DBBind(hStmt, 10, DB_SQLTYPE_INTEGER, (INT32)vInfo.mappingType);
 
 		bool success = DBExecute(hStmt);
 		if (success == true)
@@ -584,7 +702,7 @@ void AgentSide_i::updateUploadedVideo(::CORBA::Long jobId)
 	DbgPrintf(6, _T(" Function [getMonitorChannelId] mappingId = %d"), mappingId);
 	TCHAR* result = _T("");
 	DB_RESULT hResult;
-	UINT32 i, dwId, dwNumRecords;
+	UINT32 dwNumRecords;
 
 	DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
 	DB_STATEMENT hStmt = DBPrepare(hdb, _T("SELECT MonitorChannelId FROM channel_mapping WHERE Id = ?"));
@@ -737,7 +855,7 @@ TCHAR* AgentSide_i::getVideoContainerField(INT32 jobId, TCHAR* fieldName)
 	           _T(" ProcessStatus, License FROM video_container WHERE VideoId = '%s' AND MappingId = %d"), videoId, mappingId);
 	DB_STATEMENT hStmt = DBPrepare(hdb, query);
 	DbgPrintf(6, _T(" Function [getVideoInfo] SQL query= %s"), query);
-	
+
 	if (hStmt != NULL)
 	{
 		DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, videoId, NULL, 0);

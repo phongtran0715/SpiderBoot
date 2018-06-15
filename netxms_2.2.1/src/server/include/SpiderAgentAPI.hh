@@ -135,6 +135,8 @@ _CORBA_MODULE_BEG
 
       ::CORBA::Long mappingId;
 
+      ::CORBA::Long mappingType;
+
       ::CORBA::Long processStatus;
 
       ::CORBA::Long license;
@@ -584,6 +586,9 @@ _CORBA_MODULE_BEG
   {
   public:
     // IDL operations
+    ::CORBA::Boolean createUploadTimer(const ::CORBA::WChar* timerId, const ::CORBA::WChar* uploadClusterId);
+    ::CORBA::Boolean modifyUploadTimer(const ::CORBA::WChar* timerId, const ::CORBA::WChar* uploadClusterId, ::CORBA::Long synStatus, const ::SpiderCorba::UploadSide::UploadConfig& uploadCfg);
+    ::CORBA::Boolean deleteUploadTimer(const ::CORBA::WChar* timerId, const ::CORBA::WChar* uploadClusterId);
     ::CORBA::Boolean createUploadJob(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo, const ::SpiderCorba::UploadSide::UploadConfig& uploadCfg);
     ::CORBA::Boolean deleteUploadJob(::CORBA::Long jobId, const ::CORBA::WChar* uploadClusterId);
 
@@ -620,6 +625,9 @@ _CORBA_MODULE_BEG
   public:
     virtual ~_impl_UploadSide();
 
+    virtual ::CORBA::Boolean createUploadTimer(const ::CORBA::WChar* timerId, const ::CORBA::WChar* uploadClusterId) = 0;
+    virtual ::CORBA::Boolean modifyUploadTimer(const ::CORBA::WChar* timerId, const ::CORBA::WChar* uploadClusterId, ::CORBA::Long synStatus, const ::SpiderCorba::UploadSide::UploadConfig& uploadCfg) = 0;
+    virtual ::CORBA::Boolean deleteUploadTimer(const ::CORBA::WChar* timerId, const ::CORBA::WChar* uploadClusterId) = 0;
     virtual ::CORBA::Boolean createUploadJob(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo, const ::SpiderCorba::UploadSide::UploadConfig& uploadCfg) = 0;
     virtual ::CORBA::Boolean deleteUploadJob(::CORBA::Long jobId, const ::CORBA::WChar* uploadClusterId) = 0;
     

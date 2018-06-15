@@ -17,7 +17,10 @@ SpiderDownloadClient::SpiderDownloadClient(): initSuccess(false)
 		if (obj != CORBA::Object::_nil())
 		{
 			mDownloadRef = SpiderCorba::DownloadSide::_narrow(obj);
-			initSuccess = true;
+			if (mDownloadRef != CORBA::Object::_nil())
+			{
+				initSuccess = true;
+			}
 		}
 	}
 	catch (CORBA::TRANSIENT&) {

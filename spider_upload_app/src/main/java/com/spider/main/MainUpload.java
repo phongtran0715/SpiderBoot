@@ -62,7 +62,5 @@ public class MainUpload {
 		clientThread.start();
 		
 		logger.info("Upload app ID : " + uploadConfig.appId);
-		
-		UploadTimerManager.getInstance().initTimerTask();
 	}
 }

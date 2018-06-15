@@ -20,7 +20,7 @@ public class DownloadTimerManager {
 		return instance;
 	}
 
-	public boolean createDownloadTimer(int timerId, String cHomeId, String cMonitorId, int timerInterval) {
+	public boolean createDownloadTimer(int timerId, String cHomeId, String cMonitorId,  int timerInterval) {
 		boolean isSuccess = false;
 		//check timer is existed
 		if(timerMap.get(timerId)!= null)

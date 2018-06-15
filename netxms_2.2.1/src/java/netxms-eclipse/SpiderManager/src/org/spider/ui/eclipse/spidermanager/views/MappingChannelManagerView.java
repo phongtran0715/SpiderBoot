@@ -284,7 +284,9 @@ public class MappingChannelManagerView extends LogViewer {
 					for (Object object : selection.toList()) {
 						int id = Integer.parseInt(((org.netxms.client.TableRow)object).get(COLUMN_ID).getValue());
 						String downloadCluster = ((org.netxms.client.TableRow)object).get(COLUMN_DOWNLOAD_ID).getValue();
-						session.deleteMappingChannel(id, downloadCluster);
+						String uploadCluster = ((org.netxms.client.TableRow)object).get(COLUMN_UPLOAD_ID).getValue();
+						
+						session.deleteMappingChannel(id, downloadCluster, uploadCluster);
 						refreshData();
 					}
 				}

@@ -72,8 +72,12 @@ private:
    INT32 getMaxId(TCHAR * tbName);
 public:
    void onDownloadStartup(const ::CORBA::WChar* appId);
+   void createDownloadTimerByMapping(const ::CORBA::WChar* downloadAppId, INT32 mappingType);
    void onRenderStartup(const ::CORBA::WChar* appId);
    void onUploadStartup(const ::CORBA::WChar* appId);
+   void createUploadTimerByMapping(const ::CORBA::WChar* uploadClusterId, INT32 mappingType);
+   void createUploadJobByMapping(const ::CORBA::WChar* uploadClusterId, INT32 mappingType);
+   TCHAR* getMappingTableNameByType(INT32 mappingType);
    ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId);
    void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong lastSyncTime);
    void updateDownloadedVideo(const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo);

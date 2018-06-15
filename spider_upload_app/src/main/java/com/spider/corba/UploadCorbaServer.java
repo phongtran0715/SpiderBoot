@@ -21,8 +21,8 @@ class UploadImpl extends UploadSidePOA {
 	@Override
 	public boolean createUploadJob(int jobId, VideoInfo vInfo, UploadConfig uploadCfg) {
 		logger.info("createUploadJob:: jobId = " + jobId);
-		DataDefine.UploadJobData jobData = new DataDefine().new UploadJobData(jobId, vInfo, uploadCfg);
-		UploadTimerManager.qUploadJob.add(jobData);
+		//DataDefine.UploadJobData jobData = new DataDefine().new UploadJobData(jobId, vInfo, uploadCfg);
+		//UploadTimerManager.qUploadJob.add(jobData);
 		return false;
 	}
 
@@ -32,6 +32,29 @@ class UploadImpl extends UploadSidePOA {
 		return false;
 	}
 
+	@Override
+	public boolean createUploadTimer(String timerId, String uploadClusterId) {
+		// TODO Auto-generated method stub
+		logger.info("Create new upload timer id = " + timerId + "upload cluster id = " + uploadClusterId);
+		UploadTimerManager.getInstance().createUploadTimer(timerId, uploadClusterId);
+		return true;
+	}
+
+	@Override
+	public boolean modifyUploadTimer(String timerId, String uploadClusterId, int synStatus, UploadConfig uploadCfg) {
+		// TODO Auto-generated method stub
+		logger.info("Modify upload timer id = " + timerId + "upload cluster id = " + uploadClusterId);
+		UploadTimerManager.getInstance().modifyUploadTimer(timerId, uploadClusterId, synStatus, uploadCfg);
+		return false;
+	}
+	
+	@Override
+	public boolean deleteUploadTimer(String timerId, String uploadClusterId) {
+		// TODO Auto-generated method stub
+		logger.info("Delete upload timer id = " + timerId + "upload cluster id = " + uploadClusterId);
+		UploadTimerManager.getInstance().deleteUploadTimer(timerId, uploadClusterId);
+		return false;
+	}
 }
 
 public class UploadCorbaServer {

@@ -10,11 +10,14 @@ SpiderUploadClient::SpiderUploadClient(): initSuccess(false)
 {
 	try {
 		int agrc = 1;
-		char* agrv[] = { ""};
+		char* agrv[] = {""};
 		mOrb = CORBA::ORB_init(agrc, agrv);
 		CORBA::Object_var obj = getObjectReference(mOrb);
 		mUploadRef = SpiderCorba::UploadSide::_narrow(obj);
-		initSuccess = true;
+		if (mUploadRef != CORBA::Object::_nil())
+		{
+			initSuccess = true;
+		}
 	}
 	catch (CORBA::TRANSIENT&) {
 		cerr << "Caught system exception TRANSIENT -- unable to contact the "

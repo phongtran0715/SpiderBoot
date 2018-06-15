@@ -4174,7 +4174,7 @@ public class NXCSession {
 		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID, mappingConifg.downloadClusterId);
 		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_RENDER_CLUSTER_ID, mappingConifg.renderClusterId);
 		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID, mappingConifg.uploadClusterId);
-		
+
 		//render config
 		msg.setField(SpiderCodes.VID_VIDEO_INTRO, renderConfig.vIntro);
 		msg.setField(SpiderCodes.VID_VIDEO_OUTRO, renderConfig.vOutro);
@@ -4182,7 +4182,7 @@ public class NXCSession {
 		msg.setFieldInt32(SpiderCodes.VID_ENABLE_VIDEO_INTRO,renderConfig.enableIntro ? 1 : 0);
 		msg.setFieldInt32(SpiderCodes.VID_ENABLE_VIDEO_OUTRO, renderConfig.enableOutro ? 1 : 0);
 		msg.setFieldInt32(SpiderCodes.VID_ENABLE_VIDEO_LOGO, renderConfig.enableLogo ? 1 : 0);
-		
+
 		//Upload config
 		msg.setField(SpiderCodes.VID_VIDEO_TITLE_TEMPLATE, uploadConfig.titleTemp);
 		msg.setField(SpiderCodes.VID_VIDEO_DESC_TEMPLATE, uploadConfig.descTemp);
@@ -4190,7 +4190,7 @@ public class NXCSession {
 		msg.setFieldInt32(SpiderCodes.VID_ENABLE_TITLE_TEMPLATE,uploadConfig.enableTitle ? 1 : 0);
 		msg.setFieldInt32(SpiderCodes.VID_ENABLE_DESC_TEMPLATE,uploadConfig.enableDesc ? 1 : 0);
 		msg.setFieldInt32(SpiderCodes.VID_ENABLE_TAGS_TEMPLATE,uploadConfig.enableTag ? 1 : 0);
-		
+
 		sendMessage(msg);
 		msg = waitForRCC(msg.getMessageId());
 		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
@@ -4284,11 +4284,13 @@ public class NXCSession {
 					SessionNotification.MONITOR_CHANNEL_CHANGED, code));
 	}
 
-	public void deleteMappingChannel(int id, String downloadClusterId) throws IOException, NXCException
-	{
+	public void deleteMappingChannel(int id, String downloadClusterId, String uploadClusterId) 
+			throws IOException, NXCException
+			{
 		NXCPMessage msg = newMessage(SpiderCodes.CMD_DEL_MAPPING_CHANNEL);
 		msg.setFieldInt32(SpiderCodes.VID_MAPPING_CHANNEL_RECORD_ID, id);
 		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_DOWNLOAD_CLUSTER_ID, downloadClusterId);
+		msg.setField(SpiderCodes.VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID, uploadClusterId);
 		sendMessage(msg);
 		msg = waitForRCC(msg.getMessageId());
 		final int code = msg.getFieldAsInt32(NXCPCodes.VID_RCC);
@@ -4298,7 +4300,7 @@ public class NXCSession {
 		if (code == 0) //RCC_SUCCESS
 			sendNotification(new SessionNotification(
 					SessionNotification.MAPPING_CHANNEL_CHANGED, code));
-	}
+			}
 
 	/**
 	 * Create user or group on server

@@ -14,7 +14,10 @@ SpiderRenderClient::SpiderRenderClient(): initSuccess(false)
 		mOrb = CORBA::ORB_init(agrc, agrv);
 		CORBA::Object_var obj = getObjectReference(mOrb);
 		mRenderRef = SpiderCorba::RenderSide::_narrow(obj);
-		initSuccess = true;
+		if (mRenderRef != CORBA::Object::_nil())
+		{
+			initSuccess = true;
+		}
 	}
 	catch (CORBA::TRANSIENT&) {
 		cerr << "Caught system exception TRANSIENT -- unable to contact the "

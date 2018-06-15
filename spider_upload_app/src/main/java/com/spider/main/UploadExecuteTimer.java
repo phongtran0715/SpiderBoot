@@ -33,12 +33,14 @@ public class UploadExecuteTimer extends TimerTask{
 	UploadConfig uploadConfig;
 	UploadCorbaClient uploadClient;
 	boolean isInitCorba = false;
+	String timerId;
 
 	public UploadExecuteTimer(String timerId) {
 		logger.info("Function UploadExecuteTimer >>>");
 		uploadConfig = DataController.getInstance().uploadConfig;
 		uploadClient = new UploadCorbaClient();
 		isInitCorba = uploadClient.initCorba(uploadConfig.corbaRef);
+		this.timerId = timerId;
 	}
 
 	@Override
@@ -47,6 +49,8 @@ public class UploadExecuteTimer extends TimerTask{
 	}
 
 	private void completeTask() {
+		logger.info("Upload timer id : " + this.timerId  + " " + new Date());
+		/*
 		if(isComplete){
 			isComplete = false;
 			if(UploadTimerManager.qUploadJob.isEmpty() == false)
@@ -167,7 +171,7 @@ public class UploadExecuteTimer extends TimerTask{
 
 				logger.info("Beginning upload video " + vInfo.videoId);
 				logger.info("create authen file for email : " + authInfo.userName);
-				/*
+				
 				boolean isSuccess = UploadVideo.execute(title, desc, tags, tranferFile, "public");
 				if(isSuccess)
 				{
@@ -185,7 +189,6 @@ public class UploadExecuteTimer extends TimerTask{
 				}else {
 					logger.error("FALSE : Can not upload video id = " + vInfo.videoId);
 				}
-				*/
 				
 			}
 			isComplete = true;
@@ -194,6 +197,7 @@ public class UploadExecuteTimer extends TimerTask{
 			//do nothing
 			logger.info("Process timer task is still running ...");
 		}
+		*/
 	}
 	private String standardizeTitle(String originTitle, String titleTemp, boolean enableTitle) {
 		logger.info("Function standardizeTitle <<<<< ");
