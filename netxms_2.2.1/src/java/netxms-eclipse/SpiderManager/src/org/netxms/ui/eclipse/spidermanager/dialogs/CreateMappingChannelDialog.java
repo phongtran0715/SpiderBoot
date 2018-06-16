@@ -47,7 +47,8 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.wb.swt.ResourceManager;
+
+import spider.org.eclipse.wb.swt.ResourceManager;
 
 public class CreateMappingChannelDialog extends Dialog {
 	private Text txtTimeSync;

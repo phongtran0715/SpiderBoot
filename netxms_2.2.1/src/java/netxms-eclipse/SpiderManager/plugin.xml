@@ -1,6 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Google Account"
+            id="org.spider.ui.eclipse.google_account_manager">
+      </category>
+      <view
+      		allowMultiple="true"
+            name="Google Account"
+            icon="icons/gmail_16x16.png"
+            category="org.spider.ui.eclipse.google_account_manager"
+            class="org.spider.ui.eclipse.spidermanager.views.GoogleAccountManagerView"
+            id="org.spider.ui.eclipse.spidermanager.views.GoogleAccountManager">
+      </view>
+      <category
+            id="org.spider.ui.eclipse.channel_manager"
+            name="Channel Manager">
+      </category>
+      <view
+            allowMultiple="true"
+            category="org.spider.ui.eclipse.channel_manager"
+            class="org.spider.ui.eclipse.spidermanager.views.HomeChannelManagerView"
+            icon="icons/playlist_16x16.png"
+            id="org.spider.ui.eclipse.spidermanager.views.HomeChannelManager"
+            name="Home Channle"
+            restorable="true">
+      </view>
+      <view
+      		allowMultiple="true"
+            category="org.spider.ui.eclipse.channel_manager"
+            class="org.spider.ui.eclipse.spidermanager.views.MonitorChannelManagerView"
+            icon="icons/eye_16x16.png"
+            id="org.spider.ui.eclipse.spidermanager.views.MonitorChannelManager"
+            name="Monitor Channel"
+            restorable="true">
+      </view>
+      <view
+     		allowMultiple="true"
+            category="org.spider.ui.eclipse.channel_manager"
+            class="org.spider.ui.eclipse.spidermanager.views.MappingChannelManagerView"
+            icon="icons/settings_16x16.png"
+            id="org.spider.ui.eclipse.spidermanager.views.MappingChannelManager"
+            name="Mapping Channel"
+            restorable="true">
+      </view>
+      <view
+            class="org.spider.ui.eclipse.spidermanager.views.DownloadClusterManagerView"
+            icon="icons/download.png"
+            id="org.spider.ui.eclipse.spidermanager.views.DownloadClusterManager"
+            name="Download Cluster"
+            restorable="true">
+      </view>
+      <view
+            class="org.spider.ui.eclipse.spidermanager.views.RenderClusterManagerView"
+            icon="icons/render.png"
+            id="org.spider.ui.eclipse.spidermanager.views.RenderClusterManager"
+            name="Render Cluster"
+            restorable="true">
+      </view>
+      <view
+            class="org.spider.ui.eclipse.spidermanager.views.UploadClusterManagerView"
+            icon="icons/upload.png"
+            id="org.spider.ui.eclipse.spidermanager.views.UploadClusterManager"
+            name="Upload Cluster"
+            restorable="true">
+      </view>
+   </extension>
 
    <extension
          point="org.eclipse.ui.commands">
@@ -107,73 +174,6 @@
                toolbarPath="spiderManager/clusterGroup">
          </action>
       </actionSet>
-   </extension>
-   <extension
-         point="org.eclipse.ui.views">
-      <category
-            name="Google Account"
-            id="org.spider.ui.eclipse.google_account_manager">
-      </category>
-      <view
-      		allowMultiple="true"
-            name="Google Account"
-            icon="icons/gmail_16x16.png"
-            category="org.spider.ui.eclipse.google_account_manager"
-            class="org.spider.ui.eclipse.spidermanager.views.GoogleAccountManagerView"
-            id="org.spider.ui.eclipse.spidermanager.views.GoogleAccountManager">
-      </view>
-      <category
-            id="org.spider.ui.eclipse.channel_manager"
-            name="Channel Manager">
-      </category>
-      <view
-            allowMultiple="true"
-            category="org.spider.ui.eclipse.channel_manager"
-            class="org.spider.ui.eclipse.spidermanager.views.HomeChannelManagerView"
-            icon="icons/playlist_16x16.png"
-            id="org.spider.ui.eclipse.spidermanager.views.HomeChannelManager"
-            name="Home Channle"
-            restorable="true">
-      </view>
-      <view
-      		allowMultiple="true"
-            category="org.spider.ui.eclipse.channel_manager"
-            class="org.spider.ui.eclipse.spidermanager.views.MonitorChannelManagerView"
-            icon="icons/eye_16x16.png"
-            id="org.spider.ui.eclipse.spidermanager.views.MonitorChannelManager"
-            name="Monitor Channel"
-            restorable="true">
-      </view>
-      <view
-     		allowMultiple="true"
-            category="org.spider.ui.eclipse.channel_manager"
-            class="org.spider.ui.eclipse.spidermanager.views.MappingChannelManagerView"
-            icon="icons/settings_16x16.png"
-            id="org.spider.ui.eclipse.spidermanager.views.MappingChannelManager"
-            name="Mapping Channel"
-            restorable="true">
-      </view>
-      <view
-            class="org.spider.ui.eclipse.spidermanager.views.DownloadClusterManagerView"
-            icon="icons/download.png"
-            id="org.spider.ui.eclipse.spidermanager.views.DownloadClusterManager"
-            name="Download Cluster"
-            restorable="true">
-      </view>
-      <view
-            class="org.spider.ui.eclipse.spidermanager.views.RenderClusterManagerView"
-            icon="icons/render.png"
-            id="org.spider.ui.eclipse.spidermanager.views.RenderClusterManager"
-            name="Render Cluster"
-            restorable="true">
-      </view>
-      <view
-            class="org.spider.ui.eclipse.spidermanager.views.UploadClusterManagerView"
-            icon="icons/upload.png"
-            id="org.spider.ui.eclipse.spidermanager.views.UploadClusterManager"
-            name="Upload Cluster"
-            restorable="true">
-      </view>
    </extension>
    <extension
          point="org.eclipse.help.contexts">
