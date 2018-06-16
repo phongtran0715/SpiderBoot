@@ -2,7 +2,8 @@ module SpiderCorba
 {
   interface SpiderDefine
   {
-     struct VideoInfo {
+     struct VideoInfo
+     {
           wstring videoId;
           wstring title;
           wstring tags;
@@ -15,86 +16,93 @@ module SpiderCorba
           long processStatus;
           long license;
     };
-  };
 
-  interface DownloadSide : SpiderDefine
-  {
-        struct DownloadConfig
-        {
+    struct DownloadConfig
+    {
             wstring cHomeId;
             wstring cMonitorId;
             wstring downloadClusterId;
             long timerInterval;
             long synStatus;
-        };
+    };
 
-        boolean createDownloadJob(in long jobId, in DownloadConfig downloadCfg);
-        boolean modifyDownloadJob(in long jobId, in DownloadConfig downloadCfg);
-        boolean deleteDownloadJob(in long jobId, in wstring downloadClusterId);
-  };
-
-  interface RenderSide : SpiderDefine
-  {
-        struct RenderConfig
-        {
+    struct RenderConfig
+    {
             wstring vIntroTemp;
             wstring vOutroTemp;
             wstring vLogoTemp;
             boolean enableIntro;
             boolean enableOutro;
             boolean enableLogo;
-        };
+    };
 
-        boolean createRenderJob(in long jobId, in VideoInfo vInfo, in RenderConfig renderCfg);
-        boolean deleteRenderJob(in long jobId, in wstring renderClusterId);
-        void deleteRenderdVideo(in wstring renderClusterId, in wstring vLocation);
-  };
-
-  interface UploadSide : SpiderDefine
-  {
-        struct UploadConfig
-        {
+    struct UploadConfig
+    {
             wstring vTitleTemp;
             wstring vDescTemp;
             wstring vTagsTemp;
             boolean enableTitle;
             boolean enableDes;
             boolean enableTags;
-        };
-        boolean createUploadTimer(in wstring timerId, in wstring uploadClusterId);
-        boolean modifyUploadTimer(in wstring timerId, in wstring uploadClusterId, in long synStatus, in UploadConfig uploadCfg);
-        boolean deleteUploadTimer(in wstring timerId, in wstring uploadClusterId);
-        boolean createUploadJob(in long jobId, in VideoInfo vInfo, in UploadConfig uploadCfg);
-        boolean deleteUploadJob(in long jobId, in wstring uploadClusterId);
-  };
+    };
 
-  interface AgentSide : SpiderDefine
-  {
     struct AuthenInfo
     {
-      wstring userName;
-      wstring apiKey;
-      wstring clientSecret;
-      wstring clientId;
+            wstring userName;
+            wstring apiKey;
+            wstring clientSecret;
+            wstring clientId;
     };
 
     struct ClusterInfo
     {
-      wstring clusterIp;
-      wstring userName;
-      wstring password;
+            wstring clusterIp;
+            wstring userName;
+            wstring password;
     };
+  };
 
-    void onDownloadStartup(in wstring appId);
-    void onRenderStartup(in wstring appId);
-    void onUploadStartup(in wstring appId);
-    long long getLastSyncTime(in long mappingId);
-    void updateLastSyntime(in long mappingId, in long long lastSyncTime);
-    void updateDownloadedVideo(in VideoInfo vInfo);
-    void updateRenderedVideo(in long jobId, in long processStatus, in wstring vRenderPath);
-    void updateUploadedVideo (in long jobId);
-    wstring getMonitorChannelId(in long mappingId);
-    ClusterInfo getClusterInfo(in long clusterType, in long mappingId);
-    AuthenInfo getAuthenInfo(in long mappingId);
+  interface DownloadSide : SpiderDefine
+  {
+        boolean createDownloadTimer(in long timerId, in long timerType, in DownloadConfig downloadCfg);
+        boolean modifyDownloadTimer(in long timerId, in long timerType, in DownloadConfig downloadCfg);
+        boolean deleteDowloadTimer(in long timerId, in long timerType);
+        boolean deleteDownloadedVideo(in long jobId);
+  };
+
+  interface RenderSide : SpiderDefine
+  {
+        boolean createRenderJob(in long jobId, in VideoInfo vInfo);
+        boolean deleteRenderJob(in long jobId, in wstring renderClusterId);
+        void deleteRenderdVideo(in wstring vLocation);
+  };
+
+  interface UploadSide : SpiderDefine
+  {
+        boolean createUploadTimer(in long timerId, in long timerType);
+        boolean deleteUploadTimer(in long timerId, in long timerType);
+        boolean createUploadJob(in long jobId, in VideoInfo vInfo);
+  };
+
+  interface AgentSide : SpiderDefine
+  {
+      //Download app function
+      void onDownloadStartup(in wstring downloadClusterId);
+      long long getLastSyncTime(in long mappingId, in long mappingType);
+      void updateLastSyntime(in long mappingId, in long mappingType, in long long lastSyncTime);
+      void updateDownloadedVideo(in VideoInfo vInfo);
+
+      //Render app function
+      void onRenderStartup(in wstring renderClusterId);
+      RenderConfig getRenderConfig(in long mappingId, in long mappingType);
+      void updateRenderedVideo(in long jobId, in VideoInfo vInfo);
+
+      //Upload app function
+      void onUploadStartup(in wstring uploadClusterId);
+      UploadConfig getUploadConfig(in long mappingId, in long mappingType);
+      void updateUploadedVideo (in long jobId);
+
+      //Other function
+      AuthenInfo getAuthenInfo(in long mappingId, in long mappingType);
   };
 };

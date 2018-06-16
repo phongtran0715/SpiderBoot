@@ -35,8 +35,7 @@ public class RenderCorbaClient {
 			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
 
 			// lookup name
-			String name = "AgentSide";
-			org.omg.CORBA.Object obj = ncRef.resolve_str(name);
+			org.omg.CORBA.Object obj = ncRef.resolve_str(COMPONENT_NAME);
 			renderAppImpl = AgentSideHelper.narrow(obj);
 			isSuccess = true;
 

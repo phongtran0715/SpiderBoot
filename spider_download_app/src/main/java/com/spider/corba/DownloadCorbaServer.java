@@ -55,8 +55,6 @@ class DownloadImpl extends DownloadSidePOA {
 
 
 public class DownloadCorbaServer {
-
-	public final String COMPONENT_NAME = "Spider_Foot_Download_Server";
 	private static final Logger logger = Logger.getLogger(DownloadCorbaServer.class);
 
 	public boolean initCorba(String refStr) {
@@ -87,7 +85,9 @@ public class DownloadCorbaServer {
 			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
 
 			// bind the Object Reference in Naming
-			NameComponent path[] = ncRef.to_name( COMPONENT_NAME );
+			String contextName =  DataController.getInstance().downloadConfig.appId;
+			logger.info("Carba context name = " + contextName);
+			NameComponent path[] = ncRef.to_name(contextName);
 			ncRef.rebind(path, href);
 
 			logger.info("Download server ready and waiting ...");

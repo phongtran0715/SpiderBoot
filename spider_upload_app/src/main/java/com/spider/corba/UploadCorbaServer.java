@@ -14,6 +14,7 @@ import SpiderCorba.UploadSideHelper;
 import SpiderCorba.UploadSidePOA;
 import SpiderCorba.SpiderDefinePackage.VideoInfo;
 import SpiderCorba.UploadSidePackage.UploadConfig;
+import spiderboot.data.DataController;
 
 class UploadImpl extends UploadSidePOA {
 	private static final Logger logger = Logger.getLogger(UploadImpl.class);
@@ -58,8 +59,6 @@ class UploadImpl extends UploadSidePOA {
 }
 
 public class UploadCorbaServer {
-
-	public final String COMPONENT_NAME = "Spider_Foot_Upload_Server";
 	private static final Logger logger = Logger.getLogger(UploadCorbaServer.class);
 
 	public boolean initCorba(String refStr) {
@@ -90,7 +89,9 @@ public class UploadCorbaServer {
 			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
 
 			// bind the Object Reference in Naming
-			NameComponent path[] = ncRef.to_name( COMPONENT_NAME );
+			String contextName = DataController.getInstance().renderConfig.appId;
+			logger.info("Corba context name = " + contextName);
+			NameComponent path[] = ncRef.to_name(contextName);
 			ncRef.rebind(path, href);
 
 			logger.info("Upload server ready and waiting ...");

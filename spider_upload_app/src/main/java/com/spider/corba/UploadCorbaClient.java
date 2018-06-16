@@ -31,8 +31,7 @@ public class UploadCorbaClient {
 			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
 
 			// lookup name
-			String name = "AgentSide";
-			org.omg.CORBA.Object obj = ncRef.resolve_str(name);
+			org.omg.CORBA.Object obj = ncRef.resolve_str(COMPONENT_NAME);
 			uploadAppImpl = AgentSideHelper.narrow(obj);
 
 			logger.info("Obtained a handle on server object: " + uploadAppImpl);

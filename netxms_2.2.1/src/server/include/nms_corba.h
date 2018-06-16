@@ -16,36 +16,36 @@
 class LIBCORBA_EXPORTABLE SpiderDownloadClient
 {
 private:
-   CORBA::Object_ptr getObjectReference(CORBA::ORB_ptr orb);
+   CORBA::Object_ptr getObjectReference(CORBA::ORB_ptr orb, const TCHAR* contextName);
 public:
    SpiderCorba::DownloadSide_var mDownloadRef;
    CORBA::ORB_var mOrb;
    bool initSuccess;
-   SpiderDownloadClient();
+   SpiderDownloadClient(const TCHAR* contextName);
    ~SpiderDownloadClient();
 };
 
 class LIBCORBA_EXPORTABLE SpiderRenderClient
 {
 private:
-   CORBA::Object_ptr getObjectReference(CORBA::ORB_ptr orb);
+   CORBA::Object_ptr getObjectReference(CORBA::ORB_ptr orb, const TCHAR* contextName);
 public:
    SpiderCorba::RenderSide_var mRenderRef;
    CORBA::ORB_var mOrb;
    bool initSuccess;
-   SpiderRenderClient();
+   SpiderRenderClient(const TCHAR* contextName);
    ~SpiderRenderClient();
 };
 
 class LIBCORBA_EXPORTABLE SpiderUploadClient
 {
 private:
-   CORBA::Object_ptr getObjectReference(CORBA::ORB_ptr orb);
+   CORBA::Object_ptr getObjectReference(CORBA::ORB_ptr orb, const TCHAR* contextName);
 public:
    SpiderCorba::UploadSide_var mUploadRef;
    CORBA::ORB_var mOrb;
    bool initSuccess;
-   SpiderUploadClient();
+   SpiderUploadClient(const TCHAR* contextName);
    ~SpiderUploadClient();
 };
 
@@ -65,27 +65,26 @@ public:
 class AgentSide_i : public POA_SpiderCorba::AgentSide
 {
 private:
-   ::SpiderCorba::RenderSide::RenderConfig getRenderConfig(INT32 mappingId);
-   ::SpiderCorba::UploadSide::UploadConfig getUploadConfig(INT32 mappingId);
-   ::SpiderCorba::SpiderDefine::VideoInfo getVideoInfo(TCHAR* videoId, INT32 mappingId);
-   TCHAR* getVideoContainerField(INT32 jobId, TCHAR* fieldName);
+   //::SpiderCorba::SpiderDefine::VideoInfo getVideoInfo(TCHAR* videoId, INT32 mappingId);
+   //TCHAR* getVideoContainerField(INT32 jobId, TCHAR* fieldName);
    INT32 getMaxId(TCHAR * tbName);
-public:
-   void onDownloadStartup(const ::CORBA::WChar* appId);
-   void createDownloadTimerByMapping(const ::CORBA::WChar* downloadAppId, INT32 mappingType);
-   void onRenderStartup(const ::CORBA::WChar* appId);
-   void onUploadStartup(const ::CORBA::WChar* appId);
+   TCHAR* getClusterId(INT32 mappingId, INT32 mappingType, INT32 clusterType);
+   void createDownloadTimerByMapping(const ::CORBA::WChar* downloadClusterId, INT32 mappingType);
+   TCHAR* getMappingTableNameByType(INT32 mappingType);
    void createUploadTimerByMapping(const ::CORBA::WChar* uploadClusterId, INT32 mappingType);
    void createUploadJobByMapping(const ::CORBA::WChar* uploadClusterId, INT32 mappingType);
-   TCHAR* getMappingTableNameByType(INT32 mappingType);
-   ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId);
-   void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong lastSyncTime);
+public:
+   void onDownloadStartup(const ::CORBA::WChar* downloadClusterId);
+   ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId, ::CORBA::Long mappingType);
+   void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::Long mappingType, ::CORBA::LongLong lastSyncTime);
    void updateDownloadedVideo(const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo);
-   void updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const ::CORBA::WChar* vRenderPath);
+   void onRenderStartup(const ::CORBA::WChar* renderClusterId);
+   ::SpiderCorba::SpiderDefine::RenderConfig* getRenderConfig(::CORBA::Long mappingId, ::CORBA::Long mappingType);
+   void updateRenderedVideo(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo);
+   void onUploadStartup(const ::CORBA::WChar* uploadClusterId);
+   ::SpiderCorba::SpiderDefine::UploadConfig* getUploadConfig(::CORBA::Long mappingId, ::CORBA::Long mappingType);
    void updateUploadedVideo(::CORBA::Long jobId);
-   ::CORBA::WChar* getMonitorChannelId(::CORBA::Long mappingId);
-   ::SpiderCorba::AgentSide::ClusterInfo* getClusterInfo(::CORBA::Long clusterType, ::CORBA::Long mappingId);
-   ::SpiderCorba::AgentSide::AuthenInfo* getAuthenInfo(::CORBA::Long mappingId);
+   ::SpiderCorba::SpiderDefine::AuthenInfo* getAuthenInfo(::CORBA::Long mappingId, ::CORBA::Long mappingType);
 };
 
 #endif /* _nms_corba_h_ */

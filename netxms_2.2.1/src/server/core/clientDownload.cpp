@@ -7,13 +7,13 @@ using namespace std;
 #endif
 
 
-SpiderDownloadClient::SpiderDownloadClient(): initSuccess(false)
+SpiderDownloadClient::SpiderDownloadClient(const TCHAR* contextName): initSuccess(false)
 {
 	try {
 		int agrc = 1;
 		char* agrv[] = { ""};
 		mOrb = CORBA::ORB_init(agrc, agrv);
-		CORBA::Object_var obj = getObjectReference(mOrb);
+		CORBA::Object_var obj = getObjectReference(mOrb, contextName);
 		if (obj != CORBA::Object::_nil())
 		{
 			mDownloadRef = SpiderCorba::DownloadSide::_narrow(obj);
@@ -35,7 +35,7 @@ SpiderDownloadClient::SpiderDownloadClient(): initSuccess(false)
 	}
 }
 
-CORBA::Object_ptr SpiderDownloadClient::getObjectReference(CORBA::ORB_ptr orb)
+CORBA::Object_ptr SpiderDownloadClient::getObjectReference(CORBA::ORB_ptr orb, const TCHAR* contextName)
 {
 	CosNaming::NamingContext_var rootContext;
 
@@ -68,7 +68,10 @@ CORBA::Object_ptr SpiderDownloadClient::getObjectReference(CORBA::ORB_ptr orb)
 	CosNaming::Name name;
 	name.length(1);
 
-	name[0].id   = (const char*) "Spider_Foot_Download_Server";       // string copied
+	char buffer[128];
+	std::wcstombs(buffer, contextName, 128);
+	cerr << "------------> context name = " << buffer << endl;
+	name[0].id   = (const char*) buffer;       // string copied
 	name[0].kind = (const char*) ""; // string copied
 	// Note on kind: The kind field is used to indicate the type
 	// of the object. This is to avoid conventions such as that used

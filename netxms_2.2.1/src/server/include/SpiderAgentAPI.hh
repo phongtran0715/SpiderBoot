@@ -151,6 +151,124 @@ _CORBA_MODULE_BEG
 
     typedef _CORBA_ConstrType_Variable_OUT_arg< VideoInfo,VideoInfo_var > VideoInfo_out;
 
+    struct DownloadConfig {
+      typedef _CORBA_ConstrType_Variable_Var<DownloadConfig> _var_type;
+
+      
+      ::CORBA::WString_member cHomeId;
+
+      ::CORBA::WString_member cMonitorId;
+
+      ::CORBA::WString_member downloadClusterId;
+
+      ::CORBA::Long timerInterval;
+
+      ::CORBA::Long synStatus;
+
+    
+
+      void operator>>= (cdrStream &) const;
+      void operator<<= (cdrStream &);
+    };
+
+    typedef DownloadConfig::_var_type DownloadConfig_var;
+
+    typedef _CORBA_ConstrType_Variable_OUT_arg< DownloadConfig,DownloadConfig_var > DownloadConfig_out;
+
+    struct RenderConfig {
+      typedef _CORBA_ConstrType_Variable_Var<RenderConfig> _var_type;
+
+      
+      ::CORBA::WString_member vIntroTemp;
+
+      ::CORBA::WString_member vOutroTemp;
+
+      ::CORBA::WString_member vLogoTemp;
+
+      ::CORBA::Boolean enableIntro;
+
+      ::CORBA::Boolean enableOutro;
+
+      ::CORBA::Boolean enableLogo;
+
+    
+
+      void operator>>= (cdrStream &) const;
+      void operator<<= (cdrStream &);
+    };
+
+    typedef RenderConfig::_var_type RenderConfig_var;
+
+    typedef _CORBA_ConstrType_Variable_OUT_arg< RenderConfig,RenderConfig_var > RenderConfig_out;
+
+    struct UploadConfig {
+      typedef _CORBA_ConstrType_Variable_Var<UploadConfig> _var_type;
+
+      
+      ::CORBA::WString_member vTitleTemp;
+
+      ::CORBA::WString_member vDescTemp;
+
+      ::CORBA::WString_member vTagsTemp;
+
+      ::CORBA::Boolean enableTitle;
+
+      ::CORBA::Boolean enableDes;
+
+      ::CORBA::Boolean enableTags;
+
+    
+
+      void operator>>= (cdrStream &) const;
+      void operator<<= (cdrStream &);
+    };
+
+    typedef UploadConfig::_var_type UploadConfig_var;
+
+    typedef _CORBA_ConstrType_Variable_OUT_arg< UploadConfig,UploadConfig_var > UploadConfig_out;
+
+    struct AuthenInfo {
+      typedef _CORBA_ConstrType_Variable_Var<AuthenInfo> _var_type;
+
+      
+      ::CORBA::WString_member userName;
+
+      ::CORBA::WString_member apiKey;
+
+      ::CORBA::WString_member clientSecret;
+
+      ::CORBA::WString_member clientId;
+
+    
+
+      void operator>>= (cdrStream &) const;
+      void operator<<= (cdrStream &);
+    };
+
+    typedef AuthenInfo::_var_type AuthenInfo_var;
+
+    typedef _CORBA_ConstrType_Variable_OUT_arg< AuthenInfo,AuthenInfo_var > AuthenInfo_out;
+
+    struct ClusterInfo {
+      typedef _CORBA_ConstrType_Variable_Var<ClusterInfo> _var_type;
+
+      
+      ::CORBA::WString_member clusterIp;
+
+      ::CORBA::WString_member userName;
+
+      ::CORBA::WString_member password;
+
+    
+
+      void operator>>= (cdrStream &) const;
+      void operator<<= (cdrStream &);
+    };
+
+    typedef ClusterInfo::_var_type ClusterInfo_var;
+
+    typedef _CORBA_ConstrType_Variable_OUT_arg< ClusterInfo,ClusterInfo_var > ClusterInfo_out;
+
   
   };
 
@@ -266,31 +384,7 @@ _CORBA_MODULE_BEG
     static _core_attr const char* _PD_repoId;
 
     // Other IDL defined within this scope.
-    struct DownloadConfig {
-      typedef _CORBA_ConstrType_Variable_Var<DownloadConfig> _var_type;
-
-      
-      ::CORBA::WString_member cHomeId;
-
-      ::CORBA::WString_member cMonitorId;
-
-      ::CORBA::WString_member downloadClusterId;
-
-      ::CORBA::Long timerInterval;
-
-      ::CORBA::Long synStatus;
-
     
-
-      void operator>>= (cdrStream &) const;
-      void operator<<= (cdrStream &);
-    };
-
-    typedef DownloadConfig::_var_type DownloadConfig_var;
-
-    typedef _CORBA_ConstrType_Variable_OUT_arg< DownloadConfig,DownloadConfig_var > DownloadConfig_out;
-
-  
   };
 
   class _objref_DownloadSide :
@@ -298,9 +392,10 @@ _CORBA_MODULE_BEG
   {
   public:
     // IDL operations
-    ::CORBA::Boolean createDownloadJob(::CORBA::Long jobId, const ::SpiderCorba::DownloadSide::DownloadConfig& downloadCfg);
-    ::CORBA::Boolean modifyDownloadJob(::CORBA::Long jobId, const ::SpiderCorba::DownloadSide::DownloadConfig& downloadCfg);
-    ::CORBA::Boolean deleteDownloadJob(::CORBA::Long jobId, const ::CORBA::WChar* downloadClusterId);
+    ::CORBA::Boolean createDownloadTimer(::CORBA::Long timerId, ::CORBA::Long timerType, const ::SpiderCorba::SpiderDefine::DownloadConfig& downloadCfg);
+    ::CORBA::Boolean modifyDownloadTimer(::CORBA::Long timerId, ::CORBA::Long timerType, const ::SpiderCorba::SpiderDefine::DownloadConfig& downloadCfg);
+    ::CORBA::Boolean deleteDowloadTimer(::CORBA::Long timerId, ::CORBA::Long timerType);
+    ::CORBA::Boolean deleteDownloadedVideo(::CORBA::Long jobId);
 
     // Constructors
     inline _objref_DownloadSide()  { _PR_setobj(0); }  // nil
@@ -335,9 +430,10 @@ _CORBA_MODULE_BEG
   public:
     virtual ~_impl_DownloadSide();
 
-    virtual ::CORBA::Boolean createDownloadJob(::CORBA::Long jobId, const ::SpiderCorba::DownloadSide::DownloadConfig& downloadCfg) = 0;
-    virtual ::CORBA::Boolean modifyDownloadJob(::CORBA::Long jobId, const ::SpiderCorba::DownloadSide::DownloadConfig& downloadCfg) = 0;
-    virtual ::CORBA::Boolean deleteDownloadJob(::CORBA::Long jobId, const ::CORBA::WChar* downloadClusterId) = 0;
+    virtual ::CORBA::Boolean createDownloadTimer(::CORBA::Long timerId, ::CORBA::Long timerType, const ::SpiderCorba::SpiderDefine::DownloadConfig& downloadCfg) = 0;
+    virtual ::CORBA::Boolean modifyDownloadTimer(::CORBA::Long timerId, ::CORBA::Long timerType, const ::SpiderCorba::SpiderDefine::DownloadConfig& downloadCfg) = 0;
+    virtual ::CORBA::Boolean deleteDowloadTimer(::CORBA::Long timerId, ::CORBA::Long timerType) = 0;
+    virtual ::CORBA::Boolean deleteDownloadedVideo(::CORBA::Long jobId) = 0;
     
   public:  // Really protected, workaround for xlC
     virtual _CORBA_Boolean _dispatch(omniCallHandle&);
@@ -408,33 +504,7 @@ _CORBA_MODULE_BEG
     static _core_attr const char* _PD_repoId;
 
     // Other IDL defined within this scope.
-    struct RenderConfig {
-      typedef _CORBA_ConstrType_Variable_Var<RenderConfig> _var_type;
-
-      
-      ::CORBA::WString_member vIntroTemp;
-
-      ::CORBA::WString_member vOutroTemp;
-
-      ::CORBA::WString_member vLogoTemp;
-
-      ::CORBA::Boolean enableIntro;
-
-      ::CORBA::Boolean enableOutro;
-
-      ::CORBA::Boolean enableLogo;
-
     
-
-      void operator>>= (cdrStream &) const;
-      void operator<<= (cdrStream &);
-    };
-
-    typedef RenderConfig::_var_type RenderConfig_var;
-
-    typedef _CORBA_ConstrType_Variable_OUT_arg< RenderConfig,RenderConfig_var > RenderConfig_out;
-
-  
   };
 
   class _objref_RenderSide :
@@ -442,9 +512,9 @@ _CORBA_MODULE_BEG
   {
   public:
     // IDL operations
-    ::CORBA::Boolean createRenderJob(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo, const ::SpiderCorba::RenderSide::RenderConfig& renderCfg);
+    ::CORBA::Boolean createRenderJob(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo);
     ::CORBA::Boolean deleteRenderJob(::CORBA::Long jobId, const ::CORBA::WChar* renderClusterId);
-    void deleteRenderdVideo(const ::CORBA::WChar* renderClusterId, const ::CORBA::WChar* vLocation);
+    void deleteRenderdVideo(const ::CORBA::WChar* vLocation);
 
     // Constructors
     inline _objref_RenderSide()  { _PR_setobj(0); }  // nil
@@ -479,9 +549,9 @@ _CORBA_MODULE_BEG
   public:
     virtual ~_impl_RenderSide();
 
-    virtual ::CORBA::Boolean createRenderJob(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo, const ::SpiderCorba::RenderSide::RenderConfig& renderCfg) = 0;
+    virtual ::CORBA::Boolean createRenderJob(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo) = 0;
     virtual ::CORBA::Boolean deleteRenderJob(::CORBA::Long jobId, const ::CORBA::WChar* renderClusterId) = 0;
-    virtual void deleteRenderdVideo(const ::CORBA::WChar* renderClusterId, const ::CORBA::WChar* vLocation) = 0;
+    virtual void deleteRenderdVideo(const ::CORBA::WChar* vLocation) = 0;
     
   public:  // Really protected, workaround for xlC
     virtual _CORBA_Boolean _dispatch(omniCallHandle&);
@@ -552,33 +622,7 @@ _CORBA_MODULE_BEG
     static _core_attr const char* _PD_repoId;
 
     // Other IDL defined within this scope.
-    struct UploadConfig {
-      typedef _CORBA_ConstrType_Variable_Var<UploadConfig> _var_type;
-
-      
-      ::CORBA::WString_member vTitleTemp;
-
-      ::CORBA::WString_member vDescTemp;
-
-      ::CORBA::WString_member vTagsTemp;
-
-      ::CORBA::Boolean enableTitle;
-
-      ::CORBA::Boolean enableDes;
-
-      ::CORBA::Boolean enableTags;
-
     
-
-      void operator>>= (cdrStream &) const;
-      void operator<<= (cdrStream &);
-    };
-
-    typedef UploadConfig::_var_type UploadConfig_var;
-
-    typedef _CORBA_ConstrType_Variable_OUT_arg< UploadConfig,UploadConfig_var > UploadConfig_out;
-
-  
   };
 
   class _objref_UploadSide :
@@ -586,11 +630,9 @@ _CORBA_MODULE_BEG
   {
   public:
     // IDL operations
-    ::CORBA::Boolean createUploadTimer(const ::CORBA::WChar* timerId, const ::CORBA::WChar* uploadClusterId);
-    ::CORBA::Boolean modifyUploadTimer(const ::CORBA::WChar* timerId, const ::CORBA::WChar* uploadClusterId, ::CORBA::Long synStatus, const ::SpiderCorba::UploadSide::UploadConfig& uploadCfg);
-    ::CORBA::Boolean deleteUploadTimer(const ::CORBA::WChar* timerId, const ::CORBA::WChar* uploadClusterId);
-    ::CORBA::Boolean createUploadJob(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo, const ::SpiderCorba::UploadSide::UploadConfig& uploadCfg);
-    ::CORBA::Boolean deleteUploadJob(::CORBA::Long jobId, const ::CORBA::WChar* uploadClusterId);
+    ::CORBA::Boolean createUploadTimer(::CORBA::Long timerId, ::CORBA::Long timerType);
+    ::CORBA::Boolean deleteUploadTimer(::CORBA::Long timerId, ::CORBA::Long timerType);
+    ::CORBA::Boolean createUploadJob(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo);
 
     // Constructors
     inline _objref_UploadSide()  { _PR_setobj(0); }  // nil
@@ -625,11 +667,9 @@ _CORBA_MODULE_BEG
   public:
     virtual ~_impl_UploadSide();
 
-    virtual ::CORBA::Boolean createUploadTimer(const ::CORBA::WChar* timerId, const ::CORBA::WChar* uploadClusterId) = 0;
-    virtual ::CORBA::Boolean modifyUploadTimer(const ::CORBA::WChar* timerId, const ::CORBA::WChar* uploadClusterId, ::CORBA::Long synStatus, const ::SpiderCorba::UploadSide::UploadConfig& uploadCfg) = 0;
-    virtual ::CORBA::Boolean deleteUploadTimer(const ::CORBA::WChar* timerId, const ::CORBA::WChar* uploadClusterId) = 0;
-    virtual ::CORBA::Boolean createUploadJob(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo, const ::SpiderCorba::UploadSide::UploadConfig& uploadCfg) = 0;
-    virtual ::CORBA::Boolean deleteUploadJob(::CORBA::Long jobId, const ::CORBA::WChar* uploadClusterId) = 0;
+    virtual ::CORBA::Boolean createUploadTimer(::CORBA::Long timerId, ::CORBA::Long timerType) = 0;
+    virtual ::CORBA::Boolean deleteUploadTimer(::CORBA::Long timerId, ::CORBA::Long timerType) = 0;
+    virtual ::CORBA::Boolean createUploadJob(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo) = 0;
     
   public:  // Really protected, workaround for xlC
     virtual _CORBA_Boolean _dispatch(omniCallHandle&);
@@ -700,49 +740,7 @@ _CORBA_MODULE_BEG
     static _core_attr const char* _PD_repoId;
 
     // Other IDL defined within this scope.
-    struct AuthenInfo {
-      typedef _CORBA_ConstrType_Variable_Var<AuthenInfo> _var_type;
-
-      
-      ::CORBA::WString_member userName;
-
-      ::CORBA::WString_member apiKey;
-
-      ::CORBA::WString_member clientSecret;
-
-      ::CORBA::WString_member clientId;
-
     
-
-      void operator>>= (cdrStream &) const;
-      void operator<<= (cdrStream &);
-    };
-
-    typedef AuthenInfo::_var_type AuthenInfo_var;
-
-    typedef _CORBA_ConstrType_Variable_OUT_arg< AuthenInfo,AuthenInfo_var > AuthenInfo_out;
-
-    struct ClusterInfo {
-      typedef _CORBA_ConstrType_Variable_Var<ClusterInfo> _var_type;
-
-      
-      ::CORBA::WString_member clusterIp;
-
-      ::CORBA::WString_member userName;
-
-      ::CORBA::WString_member password;
-
-    
-
-      void operator>>= (cdrStream &) const;
-      void operator<<= (cdrStream &);
-    };
-
-    typedef ClusterInfo::_var_type ClusterInfo_var;
-
-    typedef _CORBA_ConstrType_Variable_OUT_arg< ClusterInfo,ClusterInfo_var > ClusterInfo_out;
-
-  
   };
 
   class _objref_AgentSide :
@@ -750,17 +748,17 @@ _CORBA_MODULE_BEG
   {
   public:
     // IDL operations
-    void onDownloadStartup(const ::CORBA::WChar* appId);
-    void onRenderStartup(const ::CORBA::WChar* appId);
-    void onUploadStartup(const ::CORBA::WChar* appId);
-    ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId);
-    void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong lastSyncTime);
+    void onDownloadStartup(const ::CORBA::WChar* downloadClusterId);
+    ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId, ::CORBA::Long mappingType);
+    void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::Long mappingType, ::CORBA::LongLong lastSyncTime);
     void updateDownloadedVideo(const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo);
-    void updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const ::CORBA::WChar* vRenderPath);
+    void onRenderStartup(const ::CORBA::WChar* renderClusterId);
+    SpiderDefine::RenderConfig* getRenderConfig(::CORBA::Long mappingId, ::CORBA::Long mappingType);
+    void updateRenderedVideo(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo);
+    void onUploadStartup(const ::CORBA::WChar* uploadClusterId);
+    SpiderDefine::UploadConfig* getUploadConfig(::CORBA::Long mappingId, ::CORBA::Long mappingType);
     void updateUploadedVideo(::CORBA::Long jobId);
-    ::CORBA::WChar* getMonitorChannelId(::CORBA::Long mappingId);
-    AgentSide::ClusterInfo* getClusterInfo(::CORBA::Long clusterType, ::CORBA::Long mappingId);
-    AgentSide::AuthenInfo* getAuthenInfo(::CORBA::Long mappingId);
+    SpiderDefine::AuthenInfo* getAuthenInfo(::CORBA::Long mappingId, ::CORBA::Long mappingType);
 
     // Constructors
     inline _objref_AgentSide()  { _PR_setobj(0); }  // nil
@@ -795,17 +793,17 @@ _CORBA_MODULE_BEG
   public:
     virtual ~_impl_AgentSide();
 
-    virtual void onDownloadStartup(const ::CORBA::WChar* appId) = 0;
-    virtual void onRenderStartup(const ::CORBA::WChar* appId) = 0;
-    virtual void onUploadStartup(const ::CORBA::WChar* appId) = 0;
-    virtual ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId) = 0;
-    virtual void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::LongLong lastSyncTime) = 0;
+    virtual void onDownloadStartup(const ::CORBA::WChar* downloadClusterId) = 0;
+    virtual ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId, ::CORBA::Long mappingType) = 0;
+    virtual void updateLastSyntime(::CORBA::Long mappingId, ::CORBA::Long mappingType, ::CORBA::LongLong lastSyncTime) = 0;
     virtual void updateDownloadedVideo(const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo) = 0;
-    virtual void updateRenderedVideo(::CORBA::Long jobId, ::CORBA::Long processStatus, const ::CORBA::WChar* vRenderPath) = 0;
+    virtual void onRenderStartup(const ::CORBA::WChar* renderClusterId) = 0;
+    virtual SpiderDefine::RenderConfig* getRenderConfig(::CORBA::Long mappingId, ::CORBA::Long mappingType) = 0;
+    virtual void updateRenderedVideo(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo) = 0;
+    virtual void onUploadStartup(const ::CORBA::WChar* uploadClusterId) = 0;
+    virtual SpiderDefine::UploadConfig* getUploadConfig(::CORBA::Long mappingId, ::CORBA::Long mappingType) = 0;
     virtual void updateUploadedVideo(::CORBA::Long jobId) = 0;
-    virtual ::CORBA::WChar* getMonitorChannelId(::CORBA::Long mappingId) = 0;
-    virtual AgentSide::ClusterInfo* getClusterInfo(::CORBA::Long clusterType, ::CORBA::Long mappingId) = 0;
-    virtual AgentSide::AuthenInfo* getAuthenInfo(::CORBA::Long mappingId) = 0;
+    virtual SpiderDefine::AuthenInfo* getAuthenInfo(::CORBA::Long mappingId, ::CORBA::Long mappingType) = 0;
     
   public:  // Really protected, workaround for xlC
     virtual _CORBA_Boolean _dispatch(omniCallHandle&);
