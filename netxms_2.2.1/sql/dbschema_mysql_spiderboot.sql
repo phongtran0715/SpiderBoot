@@ -63,10 +63,12 @@ CREATE TABLE `video_container` (
   `VDownloadedPath` varchar(250) CHARACTER SET utf8 DEFAULT NULL,
   `VRenderedPath` varchar(250) CHARACTER SET utf8 DEFAULT NULL,
   `MappingId` int(11) DEFAULT NULL,
+  `MappingType` int(11) DEFAULT NULL,
   `ProcessStatus` int(11) DEFAULT '0',
   `License` tinyint(1) DEFAULT NULL COMMENT 'Video license or not',
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 
 
 -- download_cluster
@@ -109,12 +111,13 @@ DROP TABLE IF EXISTS `spider_mapping_config`;
 CREATE TABLE `spider_mapping_config` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `MappingId` int(11) NOT NULL,
+  `MappingType` int(11) DEFAULT NULL,
   `VideoIntro` varchar(150) CHARACTER SET utf8 DEFAULT NULL,
   `VideoOutro` varchar(150) CHARACTER SET utf8 DEFAULT NULL,
   `Logo` varchar(150) CHARACTER SET utf8 DEFAULT NULL,
-  `TitleTemplate` varchar(250) CHARACTER SET utf8 DEFAULT NULL,
-  `DescTemplate` varchar(250) CHARACTER SET utf8 DEFAULT NULL,
-  `TagTemplate` varchar(250) CHARACTER SET utf8 DEFAULT NULL,
+  `TitleTemplate` varchar(500) CHARACTER SET utf8 DEFAULT NULL,
+  `DescTemplate` varchar(2000) CHARACTER SET utf8 DEFAULT NULL,
+  `TagTemplate` varchar(500) CHARACTER SET utf8 DEFAULT NULL,
   `LogoPosition` varchar(45) COLLATE utf8_unicode_ci DEFAULT NULL,
   `EnableIntro` int(11) DEFAULT NULL,
   `EnableOutro` int(11) DEFAULT NULL,
@@ -123,5 +126,6 @@ CREATE TABLE `spider_mapping_config` (
   `EnableDesc` int(11) DEFAULT NULL,
   `EnableTag` int(11) DEFAULT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=83 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 
