@@ -2,7 +2,8 @@ module SpiderCorba
 {
   interface SpiderDefine
   {
-     struct VideoInfo {
+     struct VideoInfo
+     {
           wstring videoId;
           wstring title;
           wstring tags;
@@ -11,56 +12,51 @@ module SpiderCorba
           wstring vDownloadPath;
           wstring vRenderPath;
           long mappingId;
+          long mappingType;
           long processStatus;
           long license;
     };
-  };
 
-  interface UploadSide : SpiderDefine
-  {
-        struct UploadConfig
-        {
+    struct UploadConfig
+    {
             wstring vTitleTemp;
             wstring vDescTemp;
             wstring vTagsTemp;
             boolean enableTitle;
             boolean enableDes;
             boolean enableTags;
-        };
-		boolean createUploadTimer(in wstring timerId, in wstring uploadClusterId);
-		boolean modifyUploadTimer(in wstring timerId, in wstring uploadClusterId, in long synStatus, in UploadConfig uploadCfg);
-		boolean deleteUploadTimer(in wstring timerId, in wstring uploadClusterId);
-        boolean createUploadJob(in long jobId, in VideoInfo vInfo, in UploadConfig uploadCfg);
-        boolean deleteUploadJob(in long jobId, in wstring uploadClusterId);
+    };
+    struct AuthenInfo
+    {
+            wstring userName;
+            wstring apiKey;
+            wstring clientSecret;
+            wstring clientId;
+    };
+	struct ClusterInfo
+    {
+            wstring clusterIp;
+            wstring userName;
+            wstring password;
+    };
+  };
+
+  interface UploadSide : SpiderDefine
+  {
+        boolean createUploadTimer(in long timerId, in long timerType);
+        boolean deleteUploadTimer(in long timerId, in long timerType);
+        boolean createUploadJob(in long jobId, in VideoInfo vInfo);
   };
 
   interface AgentSide : SpiderDefine
   {
-    struct AuthenInfo
-    {
-      wstring userName;
-      wstring apiKey;
-      wstring clientSecret;
-      wstring clientId;
-    };
+      //Upload app function
+      void onUploadStartup(in wstring uploadClusterId);
+      UploadConfig getUploadConfig(in long mappingId, in long mappingType);
+      void updateUploadedVideo (in long jobId);
 
-    struct ClusterInfo
-    {
-      wstring clusterIp;
-      wstring userName;
-      wstring password;
-    };
-
-    void onDownloadStartup(in wstring appId);
-    void onRenderStartup(in wstring appId);
-    void onUploadStartup(in wstring appId);
-    long long getLastSyncTime(in long mappingId);
-    void updateLastSyntime(in long mappingId, in long long lastSyncTime);
-    void updateDownloadedVideo(in VideoInfo vInfo);
-    void updateRenderedVideo(in long jobId, in long processStatus, in wstring vRenderPath);
-    void updateUploadedVideo (in long jobId);
-    wstring getMonitorChannelId(in long mappingId);
-    ClusterInfo getClusterInfo(in long clusterType, in long mappingId);
-    AuthenInfo getAuthenInfo(in long mappingId);
+      //Other function
+      AuthenInfo getAuthenInfo(in long mappingId, in long mappingType);
+	  ClusterInfo getClusterInfo (in long mappingId, in long mappingType, in long clusterType);
   };
 };

@@ -65,14 +65,15 @@ public:
 class AgentSide_i : public POA_SpiderCorba::AgentSide
 {
 private:
-   //::SpiderCorba::SpiderDefine::VideoInfo getVideoInfo(TCHAR* videoId, INT32 mappingId);
-   //TCHAR* getVideoContainerField(INT32 jobId, TCHAR* fieldName);
    INT32 getMaxId(TCHAR * tbName);
    TCHAR* getClusterId(INT32 mappingId, INT32 mappingType, INT32 clusterType);
-   void createDownloadTimerByMapping(const ::CORBA::WChar* downloadClusterId, INT32 mappingType);
    TCHAR* getMappingTableNameByType(INT32 mappingType);
+   TCHAR* getClusterTableNameByType(INT32 clusterType);
+   void createDownloadTimerByMapping(const ::CORBA::WChar* downloadClusterId, INT32 mappingType);
+   void createRenderJobByMapping(const ::CORBA::WChar* renderClusterId, INT32 mappingType);
    void createUploadTimerByMapping(const ::CORBA::WChar* uploadClusterId, INT32 mappingType);
    void createUploadJobByMapping(const ::CORBA::WChar* uploadClusterId, INT32 mappingType);
+
 public:
    void onDownloadStartup(const ::CORBA::WChar* downloadClusterId);
    ::CORBA::LongLong getLastSyncTime(::CORBA::Long mappingId, ::CORBA::Long mappingType);
@@ -85,6 +86,7 @@ public:
    ::SpiderCorba::SpiderDefine::UploadConfig* getUploadConfig(::CORBA::Long mappingId, ::CORBA::Long mappingType);
    void updateUploadedVideo(::CORBA::Long jobId);
    ::SpiderCorba::SpiderDefine::AuthenInfo* getAuthenInfo(::CORBA::Long mappingId, ::CORBA::Long mappingType);
+   ::SpiderCorba::SpiderDefine::ClusterInfo* getClusterInfo(::CORBA::Long mappingId, ::CORBA::Long mappingType, ::CORBA::Long clusterType);
 };
 
 #endif /* _nms_corba_h_ */

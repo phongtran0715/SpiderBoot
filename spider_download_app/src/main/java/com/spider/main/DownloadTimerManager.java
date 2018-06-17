@@ -4,12 +4,10 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import spiderboot.data.DataController;
-
 public class DownloadTimerManager {
 
 	private static DownloadTimerManager instance = null;
-	public static HashMap<Integer, Timer> timerMap = new HashMap<Integer, Timer>();
+	public static HashMap<String, Timer> timerMap = new HashMap<String, Timer>();
 	public DownloadTimerManager() {
 	}
 
@@ -20,77 +18,66 @@ public class DownloadTimerManager {
 		return instance;
 	}
 
-	public boolean createDownloadTimer(int timerId, String cHomeId, String cMonitorId,  int timerInterval) {
+	public boolean createDownloadTimer(int timerId, int timeType, 
+			SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg) {
 		boolean isSuccess = false;
 		//check timer is existed
-		if(timerMap.get(timerId)!= null)
+		String timerIdent = Integer.toString(timerId) + "_" + Integer.toString(timeType);
+		if(timerMap.get(timerIdent)!= null)
 		{
-			timerMap.get(timerId).cancel();
-			timerMap.get(timerId).purge();
-			timerMap.remove(timerId);
+			timerMap.get(timerIdent).cancel();
+			timerMap.get(timerIdent).purge();
+			timerMap.remove(timerIdent);
 		}
-		TimerTask timerTask = new DownloadExecuteTimer(timerId);
+		TimerTask timerTask = new DownloadExecuteTimer(timerId, timeType, downloadCfg);
 		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(timerTask, 0, timerInterval * 1000);
+		timer.scheduleAtFixedRate(timerTask, 0, downloadCfg.timerInterval * 1000);
 		if (timer != null) {
-			timerMap.put(timerId, timer);
+			timerMap.put(timerIdent, timer);
 		}
 		isSuccess = true;
 		return isSuccess;
 	}
 
-	public boolean modifyDownloadTimer(int timerId, String cHomeId, String cMonitorId, 
-			String downloadClusterId, int timerInterval, int synStatus) 
+	public boolean modifyDownloadTimer(int timerId, int timerType,
+			SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg) 
 	{
 		boolean isSuccess = false;
+		String timerIdent = Integer.toString(timerId) + "_" + Integer.toString(timerType);
 		//check timer  id is existed
-		boolean isIdExisted = timerMap.get(timerId) != null;
-		boolean isAppIdExisted = downloadClusterId.equals(DataController.getInstance().downloadConfig.appId);
+		boolean isIdExisted = timerMap.get(timerIdent) != null;
 
-		if(isIdExisted == true && isAppIdExisted == true)
+		if(isIdExisted == true )
 		{
 			//reset this timer
-			timerMap.get(timerId).cancel();
-			timerMap.get(timerId).purge();
-			timerMap.remove(timerId);
-			if(synStatus == 1)
+			timerMap.get(timerIdent).cancel();
+			timerMap.get(timerIdent).purge();
+			timerMap.remove(timerIdent);
+			if(downloadCfg.synStatus == 1)
 			{
-				createDownloadTimer(timerId, cHomeId, cMonitorId, timerInterval);	
-			}else {
-
+				createDownloadTimer(timerId, timerType, downloadCfg);	
 			}
-		}else if(isIdExisted == true && isAppIdExisted == false)
+		}else
 		{
-			//remove this timer
-			timerMap.get(timerId).cancel();
-			timerMap.get(timerId).purge();
-			timerMap.remove(timerId);
-		}else if(isIdExisted == false && isAppIdExisted == true)
-		{
-			if(synStatus == 1)
+			if(downloadCfg.synStatus == 1)
 			{
-				//create new timer
-				createDownloadTimer(timerId, cHomeId, cMonitorId, timerInterval);
-			}else {
-				//nothing to do
+				createDownloadTimer(timerId, timerType, downloadCfg);
 			}
-		}else {
-			//nothing to do
 		}
 		return isSuccess;
 	}
 
-	public boolean deleteDownloadTimer(int timerId, String downloadClusterId) 
+	public boolean deleteDownloadTimer(int timerId, int timerType) 
 	{
 		boolean isSuccess = false;
-		boolean isIdExisted = timerMap.get(timerId) != null;
-		boolean isAppIdExisted = downloadClusterId.equals(DataController.getInstance().downloadConfig.appId);
-		if(isIdExisted == true && isAppIdExisted == true)
+		String timerIdent = Integer.toString(timerId) + "_" + Integer.toString(timerType);
+		boolean isIdExisted = timerMap.get(timerIdent) != null;
+		if(isIdExisted == true)
 		{
-			Timer timer = timerMap.get(timerId);
+			Timer timer = timerMap.get(timerIdent);
 			timer.cancel();
 			timer.purge();
-			timerMap.remove(timerId);
+			timerMap.remove(timerIdent);
 		}
 		isSuccess = true;		
 		return isSuccess;

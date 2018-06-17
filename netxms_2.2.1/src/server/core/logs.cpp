@@ -139,7 +139,7 @@ static NXCORE_LOG s_logs[] =
 			{ _T("StatusSync"), _T("Status"), LC_INTEGER },
 			{ _T("LastSyncTime"), _T("LastSyncTime"), LC_INTEGER },
 			{ _T("DownloadClusterId"), _T("DownloadClusterId"), LC_TEXT },
-			{ _T("ProcessClusterId"), _T("ProcessClusterId"), LC_TEXT },
+			{ _T("RenderClusterId"), _T("RenderClusterId"), LC_TEXT },
 			{ _T("UploadClusterId"), _T("UploadClusterId"), LC_TEXT },
 			{ NULL, NULL, 0 }
 		}

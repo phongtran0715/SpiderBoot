@@ -8,48 +8,41 @@ import org.omg.CORBA.*;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
 import com.spider.main.*;
-
 import SpiderCorba.DownloadSide;
 import SpiderCorba.DownloadSideHelper;
 import SpiderCorba.DownloadSidePOA;
-import SpiderCorba.DownloadSidePackage.DownloadConfig;
 
 
 class DownloadImpl extends DownloadSidePOA {
 	private static final Logger logger = Logger.getLogger(DownloadImpl.class);
 
 	@Override
-	public boolean createDownloadJob(int jobId, DownloadConfig downloadCfg) {
-		// TODO Auto-generated method stub
-		logger.info("DownloadImpl::createMappingChannel: >>> ");
-		logger.info("timer id = " + jobId);
-		logger.info("monitor id = " + downloadCfg.cMonitorId);
-		logger.info("time interval id = " + downloadCfg.timerInterval);
-
-		if(downloadCfg.downloadClusterId.equals(DataController.getInstance().downloadConfig.appId))
-		{
-			DownloadTimerManager.getInstance().createDownloadTimer(jobId, downloadCfg.cHomeId, 
-					downloadCfg.cMonitorId, downloadCfg.timerInterval);	
-		}
+	public boolean createDownloadTimer(int timerId, int timerType,
+			SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg) {
+		logger.info("Create new download timer id = " + timerId + " timer type = " + timerType);
+		DownloadTimerManager.getInstance().createDownloadTimer(timerId, timerType, downloadCfg);	
 		return true;
 	}
 
 	@Override
-	public boolean modifyDownloadJob(int jobId, DownloadConfig downloadCfg) {
-		// TODO Auto-generated method stub
-		logger.info("DownloadImpl::modifyMappingChannel : >>>");
-		//check timer id
-		DownloadTimerManager.getInstance().modifyDownloadTimer(jobId, downloadCfg.cHomeId, downloadCfg.cMonitorId,
-				downloadCfg.downloadClusterId, downloadCfg.timerInterval, downloadCfg.synStatus);	
+	public boolean modifyDownloadTimer(int timerId, int timerType,
+			SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg) {
+		logger.info("Modify download timer id = " + timerId + " timer type = " + timerType);		
+		DownloadTimerManager.getInstance().modifyDownloadTimer(timerId, timerType, downloadCfg);
 		return true;
 	}
 
 	@Override
-	public boolean deleteDownloadJob(int jobId, String downloadClusterId) {
-		// TODO Auto-generated method stub
-		logger.info("DownloadImpl::deleteMappingChannel : >>>");
-		DownloadTimerManager.getInstance().deleteDownloadTimer(jobId, downloadClusterId);	
-		return false;
+	public boolean deleteDowloadTimer(int timerId, int timerType) {
+		logger.info("Delete download timer id = " + timerId + " timer type = " + timerType);
+		DownloadTimerManager.getInstance().deleteDownloadTimer(timerId, timerType);
+		return true;
+	}
+
+	@Override
+	public boolean deleteDownloadedVideo(int jobId) {
+		logger.info("Delete video by jobId = " + jobId);
+		return true;
 	}
 }
 

@@ -73,7 +73,7 @@ module SpiderCorba
   interface RenderSide : SpiderDefine
   {
         boolean createRenderJob(in long jobId, in VideoInfo vInfo);
-        boolean deleteRenderJob(in long jobId, in wstring renderClusterId);
+        boolean deleteRenderJob(in long jobId);
         void deleteRenderdVideo(in wstring vLocation);
   };
 
@@ -104,5 +104,6 @@ module SpiderCorba
 
       //Other function
       AuthenInfo getAuthenInfo(in long mappingId, in long mappingType);
+      ClusterInfo getClusterInfo (in long mappingId, in long mappingType, in long clusterType);
   };
 };

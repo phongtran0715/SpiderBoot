@@ -513,7 +513,7 @@ _CORBA_MODULE_BEG
   public:
     // IDL operations
     ::CORBA::Boolean createRenderJob(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo);
-    ::CORBA::Boolean deleteRenderJob(::CORBA::Long jobId, const ::CORBA::WChar* renderClusterId);
+    ::CORBA::Boolean deleteRenderJob(::CORBA::Long jobId);
     void deleteRenderdVideo(const ::CORBA::WChar* vLocation);
 
     // Constructors
@@ -550,7 +550,7 @@ _CORBA_MODULE_BEG
     virtual ~_impl_RenderSide();
 
     virtual ::CORBA::Boolean createRenderJob(::CORBA::Long jobId, const ::SpiderCorba::SpiderDefine::VideoInfo& vInfo) = 0;
-    virtual ::CORBA::Boolean deleteRenderJob(::CORBA::Long jobId, const ::CORBA::WChar* renderClusterId) = 0;
+    virtual ::CORBA::Boolean deleteRenderJob(::CORBA::Long jobId) = 0;
     virtual void deleteRenderdVideo(const ::CORBA::WChar* vLocation) = 0;
     
   public:  // Really protected, workaround for xlC
@@ -759,6 +759,7 @@ _CORBA_MODULE_BEG
     SpiderDefine::UploadConfig* getUploadConfig(::CORBA::Long mappingId, ::CORBA::Long mappingType);
     void updateUploadedVideo(::CORBA::Long jobId);
     SpiderDefine::AuthenInfo* getAuthenInfo(::CORBA::Long mappingId, ::CORBA::Long mappingType);
+    SpiderDefine::ClusterInfo* getClusterInfo(::CORBA::Long mappingId, ::CORBA::Long mappingType, ::CORBA::Long clusterType);
 
     // Constructors
     inline _objref_AgentSide()  { _PR_setobj(0); }  // nil
@@ -804,6 +805,7 @@ _CORBA_MODULE_BEG
     virtual SpiderDefine::UploadConfig* getUploadConfig(::CORBA::Long mappingId, ::CORBA::Long mappingType) = 0;
     virtual void updateUploadedVideo(::CORBA::Long jobId) = 0;
     virtual SpiderDefine::AuthenInfo* getAuthenInfo(::CORBA::Long mappingId, ::CORBA::Long mappingType) = 0;
+    virtual SpiderDefine::ClusterInfo* getClusterInfo(::CORBA::Long mappingId, ::CORBA::Long mappingType, ::CORBA::Long clusterType) = 0;
     
   public:  // Really protected, workaround for xlC
     virtual _CORBA_Boolean _dispatch(omniCallHandle&);

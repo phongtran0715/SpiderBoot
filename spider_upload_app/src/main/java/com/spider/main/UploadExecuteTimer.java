@@ -16,8 +16,8 @@ import org.apache.log4j.Logger;
 import com.google.api.services.samples.youtube.cmdline.data.UploadVideo;
 import com.spider.corba.UploadCorbaClient;
 
-import SpiderCorba.AgentSidePackage.AuthenInfo;
-import SpiderCorba.AgentSidePackage.ClusterInfo;
+import SpiderCorba.SpiderDefinePackage.AuthenInfo;
+import SpiderCorba.SpiderDefinePackage.ClusterInfo;
 import SpiderCorba.SpiderDefinePackage.VideoInfo;
 import spiderboot.configuration.UploadConfig;
 import spiderboot.data.DataController;
@@ -25,6 +25,8 @@ import spiderboot.util.Utility;
 
 public class UploadExecuteTimer extends TimerTask{
 
+	int timerId;
+	int timerType;
 	boolean isComplete = true;
 	String videoFolderBase;
 	static Utility util = new Utility();
@@ -33,14 +35,14 @@ public class UploadExecuteTimer extends TimerTask{
 	UploadConfig uploadConfig;
 	UploadCorbaClient uploadClient;
 	boolean isInitCorba = false;
-	String timerId;
-
-	public UploadExecuteTimer(String timerId) {
+	
+	public UploadExecuteTimer(int timerId, int timerType) {
 		logger.info("Function UploadExecuteTimer >>>");
+		this.timerId = timerId;
+		this.timerType = timerType;
 		uploadConfig = DataController.getInstance().uploadConfig;
 		uploadClient = new UploadCorbaClient();
 		isInitCorba = uploadClient.initCorba(uploadConfig.corbaRef);
-		this.timerId = timerId;
 	}
 
 	@Override
@@ -49,24 +51,26 @@ public class UploadExecuteTimer extends TimerTask{
 	}
 
 	private void completeTask() {
-		logger.info("Upload timer id : " + this.timerId  + " " + new Date());
-		/*
+		logger.info("Upload timer id : " + this.timerId  + " timer type : " + timerType + " at : " + new Date());
 		if(isComplete){
 			isComplete = false;
 			if(UploadTimerManager.qUploadJob.isEmpty() == false)
 			{
 				DataDefine.UploadJobData jobData = UploadTimerManager.qUploadJob.poll();
 				VideoInfo vInfo = jobData.vInfo;
-				
+				logger.info("Begining upload for job : " + jobData.jobId);
+				logger.info("");
 				if(vInfo.license == 1)
 				{
 					logger.error("Video (id =  " + vInfo.videoId + ") license = true. This video will be ignore");
-					updateUploadedInfo(jobData.jobId);
+					//updateUploadedInfo(jobData.jobId);
 					isComplete = true;
 					return;
 				}
 				
-				SpiderCorba.UploadSidePackage.UploadConfig uploadVideoCfg = jobData.uploadCfg;
+				//TODO: get upload config
+				SpiderCorba.SpiderDefinePackage.UploadConfig uploadVideoCfg = getUploadCfg(timerId, timerType);
+				
 				logger.info("Starting new job (job id = " + jobData.jobId + ") at : " + new Date());
 				//upload video
 				logger.info("=================== Upload video infor ===================");
@@ -84,7 +88,8 @@ public class UploadExecuteTimer extends TimerTask{
 					//updateUploadedInfo(jobData.jobId);
 					return;
 				}
-				ClusterInfo clusterInfo = getClusterInfo(vInfo.mappingId);
+				ClusterInfo clusterInfo = getClusterInfo(vInfo.mappingId, vInfo.mappingType, 
+						DataController.getInstance().TYPE_CLUSTER_RENDER);
 				logger.info("IP = " + clusterInfo.clusterIp);
 				logger.info("User Name = " + clusterInfo.userName);
 				logger.info("Password = " + clusterInfo.password);
@@ -119,7 +124,7 @@ public class UploadExecuteTimer extends TimerTask{
 
 				logger.info("Uploading video : " + tranferFile);
 
-				AuthenInfo authInfo = getAuthenInfo(vInfo.mappingId);
+				AuthenInfo authInfo = getAuthenInfo(vInfo.mappingId, vInfo.mappingId);
 				logger.info("Authen infor : user name = " + authInfo.userName);
 				logger.info("Authen infor : api key = " + authInfo.apiKey);
 				logger.info("Authen infor : client secret = " + authInfo.clientSecret);
@@ -127,7 +132,8 @@ public class UploadExecuteTimer extends TimerTask{
 
 				logger.info("Beginning get authen file >>>>");
 				//TODO: create client secret file
-				String clientFile = "/tmp/client_secrets.json";
+				String timerIdent = Integer.toString(timerId) + "_" + Integer.toString(timerType);
+				String clientFile = "/tmp/ " + timerIdent + "_client_secrets.json";
 				//TODO: set authen file name
 				CrunchifyJSONFileWrite jsonCreate = new CrunchifyJSONFileWrite();
 				File jsonFile = new File(clientFile);
@@ -151,14 +157,15 @@ public class UploadExecuteTimer extends TimerTask{
 						+ CREDENTIALS_DIRECTORY + "/upload_" + authInfo.userName;
 				System.out.println("Store file = " + storeFile);
 				File file = new File(storeFile);
-				
+				/*
 				if(file.exists() == false)
 				{
-					logger.error("ERROR : Can not get authen store upload file. File does not exist");
+					logger.error("ERROR : Can not get authen store upload");
 					isComplete = true;
 					//updateUploadedInfo(jobData.jobId);
 					return;
 				}
+				*/
 				
 				UploadVideo.setStoreFile( "upload_" + authInfo.userName);
 				logger.info("Complete get authen file <<<<");
@@ -171,7 +178,7 @@ public class UploadExecuteTimer extends TimerTask{
 
 				logger.info("Beginning upload video " + vInfo.videoId);
 				logger.info("create authen file for email : " + authInfo.userName);
-				
+				/*
 				boolean isSuccess = UploadVideo.execute(title, desc, tags, tranferFile, "public");
 				if(isSuccess)
 				{
@@ -189,7 +196,7 @@ public class UploadExecuteTimer extends TimerTask{
 				}else {
 					logger.error("FALSE : Can not upload video id = " + vInfo.videoId);
 				}
-				
+				*/
 			}
 			isComplete = true;
 		}
@@ -197,7 +204,6 @@ public class UploadExecuteTimer extends TimerTask{
 			//do nothing
 			logger.info("Process timer task is still running ...");
 		}
-		*/
 	}
 	private String standardizeTitle(String originTitle, String titleTemp, boolean enableTitle) {
 		logger.info("Function standardizeTitle <<<<< ");
@@ -317,10 +323,11 @@ public class UploadExecuteTimer extends TimerTask{
 		}
 	}
 
-	private ClusterInfo getClusterInfo(int mappingId)
+	private ClusterInfo getClusterInfo (int mappingId, int mappingType, int clusterType)
 	{
-		logger.info("Function getClusterInfo : mapping ID = " + mappingId + " >>>");
-		ClusterInfo clusterInfo = null;
+		logger.info("Function getClusterInfo : mapping ID = " + mappingId 
+				+ " mapping type = " + mappingType);
+		ClusterInfo clusterInfor = null;
 		if(isInitCorba == false)
 		{
 			isInitCorba = uploadClient.initCorba(uploadConfig.corbaRef);	
@@ -331,7 +338,7 @@ public class UploadExecuteTimer extends TimerTask{
 			{
 				try {
 
-					clusterInfo = uploadClient.uploadAppImpl.getClusterInfo(2, mappingId);
+					clusterInfor = uploadClient.uploadAppImpl.getClusterInfo(mappingId, mappingType, clusterType);
 				}catch (Exception e) {
 					System.out.println(e.toString());
 				}
@@ -341,12 +348,39 @@ public class UploadExecuteTimer extends TimerTask{
 		}else {
 			logger.error("Init corba client FALSE");
 		}
-		return clusterInfo;
+		return clusterInfor;
 	}
-
-	private AuthenInfo getAuthenInfo(int mappingId)
+	
+	private SpiderCorba.SpiderDefinePackage.UploadConfig getUploadCfg (int mappingId, int mappingType)
 	{
-		logger.info("Function getAuthenInfo : mapping ID = " + mappingId + " >>>");
+		SpiderCorba.SpiderDefinePackage.UploadConfig uploadCfg = new SpiderCorba.SpiderDefinePackage.UploadConfig();
+		if(isInitCorba == false)
+		{
+			isInitCorba = uploadClient.initCorba(uploadConfig.corbaRef);	
+		}
+		if(isInitCorba)
+		{
+			if(uploadClient.uploadAppImpl != null)
+			{
+				try {
+
+					uploadCfg = uploadClient.uploadAppImpl.getUploadConfig(mappingId, mappingType);
+				}catch (Exception e) {
+					System.out.println(e.toString());
+				}
+			}else {
+				logger.error("Upload client implementation is NULL");
+			}
+		}else {
+			logger.error("Init corba client FALSE");
+		}
+		return uploadCfg;
+	}
+	
+	private AuthenInfo getAuthenInfo(int mappingId, int mappingType)
+	{
+		logger.info("Function getAuthenInfo : mapping ID = " + mappingId 
+				+ " mapping type = " + mappingType);
 		AuthenInfo authInfo = null;
 		if(isInitCorba == false)
 		{
@@ -358,7 +392,7 @@ public class UploadExecuteTimer extends TimerTask{
 			{
 				try {
 
-					authInfo = uploadClient.uploadAppImpl.getAuthenInfo(mappingId);
+					authInfo = uploadClient.uploadAppImpl.getAuthenInfo(mappingId, mappingType);
 				}catch (Exception e) {
 					System.out.println(e.toString());
 				}

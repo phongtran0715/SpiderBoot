@@ -1,6 +1,5 @@
 package spiderboot.render;
 
-import SpiderCorba.RenderSidePackage.RenderConfig;
 import SpiderCorba.SpiderDefinePackage.VideoInfo;
 
 public class DataDefine {
@@ -8,12 +7,10 @@ public class DataDefine {
 	{
 		public int jobId;
 		public VideoInfo vInfo;
-		public RenderConfig renderCfg;
-		public RenderJobData(int jobId, VideoInfo vInfo, RenderConfig renderCfg) {
+		public RenderJobData(int jobId, VideoInfo vInfo) {
 			super();
 			this.jobId = jobId;
 			this.vInfo = vInfo;
-			this.renderCfg = renderCfg;
 		}
 	}
 }

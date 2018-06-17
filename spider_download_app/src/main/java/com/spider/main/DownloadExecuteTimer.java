@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.TimerTask;
 import org.apache.log4j.Logger;
-import org.omg.CORBA.StringHolder;
 import com.github.axet.vget.DirectDownload;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.samples.youtube.cmdline.data.Search;
@@ -26,6 +25,8 @@ import java.util.List;
 
 public class DownloadExecuteTimer extends TimerTask {
 	int timerId;
+	int timerType;
+	SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg;
 	static Utility util;;
 	String videoFolderBase;
 	DateFormat dateFormat;
@@ -35,8 +36,11 @@ public class DownloadExecuteTimer extends TimerTask {
 	boolean isComplete = true;
 	private static final Logger logger = Logger.getLogger(DownloadExecuteTimer.class);
 
-	public DownloadExecuteTimer(int timerId) {
+	public DownloadExecuteTimer(int timerId, int timerType, 
+			SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg) {
 		this.timerId = timerId;
+		this.timerType = timerType;
+		this.downloadCfg = downloadCfg;
 		util = new Utility();
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		downloadConfig = DataController.getInstance().downloadConfig;
@@ -60,9 +64,8 @@ public class DownloadExecuteTimer extends TimerTask {
 				return;
 			}
 			DateTime ytbTime = new DateTime(lastSyncTime);
-			String cMonitorId = getMonitorChannelId(timerId);
-			logger.info("cmonitor  = " + cMonitorId);
-			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(cMonitorId, ytbTime, downloadConfig.maxResult);
+			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(downloadCfg.cMonitorId, 
+					ytbTime, downloadConfig.maxResult);
 			Iterator<SearchResult> iteratorSearchResults = result.iterator();
 			if (!iteratorSearchResults.hasNext()) {
 				isComplete = true;
@@ -82,7 +85,8 @@ public class DownloadExecuteTimer extends TimerTask {
 						if (theDir.exists()) {
 							String ext = dowloadHandle.download(vId, videoLocation);
 							// Get video info
-							List<Video> videoList = Search.getInstance().getVideoInfo(vId, DataController.getInstance().downloadConfig.apiKey);
+							List<Video> videoList = Search.getInstance().getVideoInfo(vId, 
+									DataController.getInstance().downloadConfig.apiKey);
 							Iterator<Video> iteratorSRS = videoList.iterator();
 							if (videoList != null) {
 								if(iteratorSRS.hasNext()) {
@@ -121,7 +125,7 @@ public class DownloadExecuteTimer extends TimerTask {
 			if(downloadClient.downloadAppImpl != null)
 			{
 				try {
-					long lastTime = downloadClient.downloadAppImpl.getLastSyncTime(timerId);
+					long lastTime = downloadClient.downloadAppImpl.getLastSyncTime(timerId, timerType);
 					Date date = new Date(lastTime * 1000);
 					result = date;
 				}catch (Exception e) {
@@ -151,7 +155,7 @@ public class DownloadExecuteTimer extends TimerTask {
 			{
 				try {
 					Timestamp ts = new Timestamp(new Date().getTime());
-					downloadClient.downloadAppImpl.updateLastSyntime(this.timerId, ts.getTime() / 1000);
+					downloadClient.downloadAppImpl.updateLastSyntime(timerId, timerType, ts.getTime() / 1000);
 				}catch (Exception e) {
 					logger.error(e.toString());
 				}
@@ -189,7 +193,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		}
 		logger.info("Function getVideoInfor:: video id = " + videoId + " license content = " + license);
 		VideoWraper vWraper = new VideoWraper(videoId, title, tags, desc, thumb, 
-				vDownloadPath, vRenderPath, timerId, processStatus, license);
+				vDownloadPath, vRenderPath, timerId, timerType, processStatus, license);
 		return vWraper;
 	}
 
@@ -208,7 +212,7 @@ public class DownloadExecuteTimer extends TimerTask {
 					SpiderCorba.SpiderDefinePackage.VideoInfo vInfo = new VideoInfo(videoWrapper.videoId, videoWrapper.title, 
 							videoWrapper.tag, videoWrapper.description, videoWrapper.thumbnail, 
 							videoWrapper.vDownloadPath, videoWrapper.vRenderPath, videoWrapper.mappingId,
-							videoWrapper.processStatus, videoWrapper.license);
+							videoWrapper.mappingType, videoWrapper.processStatus, videoWrapper.license);
 
 					downloadClient.downloadAppImpl.updateDownloadedVideo(vInfo);
 				}catch (Exception e) {
@@ -222,6 +226,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		}
 	}
 
+	/*
 	private String getMonitorChannelId(int mappingId)
 	{
 		String result = null;
@@ -248,4 +253,5 @@ public class DownloadExecuteTimer extends TimerTask {
 		}
 		return result;
 	}
+	 */
 }

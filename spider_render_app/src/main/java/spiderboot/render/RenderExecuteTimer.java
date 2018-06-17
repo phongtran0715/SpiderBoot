@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import com.spider.corba.RenderCorbaClient;
 
-import SpiderCorba.AgentSidePackage.ClusterInfo;
 import SpiderCorba.SpiderDefinePackage.VideoInfo;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
@@ -69,7 +68,7 @@ public class RenderExecuteTimer extends TimerTask{
 			{
 				DataDefine.RenderJobData jobData = RenderTimerManager.qRenderJob.poll();
 				VideoInfo vInfo = jobData.vInfo;
-				SpiderCorba.RenderSidePackage.RenderConfig renderCfg = jobData.renderCfg;
+			
 				logger.info("Render job ( id = )"  + jobData.jobId + " started at:" + new Date());
 				logger.info("=================== Render video infor ===================");
 				logger.info(" + Video ID :" + vInfo.videoId);
@@ -78,6 +77,16 @@ public class RenderExecuteTimer extends TimerTask{
 				logger.info(" + Mapping ID :" + vInfo.mappingId);
 				logger.info("==========================================================");
 				//TODO: get render information
+				
+				SpiderCorba.SpiderDefinePackage.RenderConfig renderCfg = getRenderConfig(vInfo.mappingId, vInfo.mappingType);
+				if(renderCfg != null)
+				{
+					logger.info("video intro = " + renderCfg.vIntroTemp);
+					logger.info("video outro = " + renderCfg.vOutroTemp);
+				}else {
+					logger.error("can not get render config");
+					return;
+				}
 				File uploadFile = new File(vInfo.vDownloadPath);
 
 				if (!uploadFile.exists()) {
@@ -99,12 +108,15 @@ public class RenderExecuteTimer extends TimerTask{
 				concastVideo(tmpVIntro, tmpVProcess, tmpVOutro, 
 						renderCfg.enableIntro, renderCfg.enableOutro, vOutput);
 				//update rendered video information
-				updateRenderedInfo(jobData.jobId, 2, vOutput);
+				vInfo.vRenderPath = vOutput;
+				vInfo.processStatus = 2;
+				updateRenderedInfo(jobData.jobId, vInfo);
 				//remove all temp file
 				deleteTempFile(vProcessedInput);
 				deleteTempFile(tmpVProcess);
 				deleteTempFile(tmpVIntro);
 				deleteTempFile(tmpVOutro);
+				
 				logger.info("Timer task finished at:" + new Date());
 			}
 			isComplete = true;
@@ -115,7 +127,32 @@ public class RenderExecuteTimer extends TimerTask{
 		}
 	}
 
-	private String processVideo(SpiderCorba.RenderSidePackage.RenderConfig renderCfg, String inputVideo) throws IOException 
+	private SpiderCorba.SpiderDefinePackage.RenderConfig getRenderConfig(int mappingId, int mappingType)
+	{
+		SpiderCorba.SpiderDefinePackage.RenderConfig renderCfg = null;
+		logger.info(">>> Function [getRenderConfig] :");
+		if(isInitCorba == false)
+		{
+			isInitCorba = renderClient.initCorba(renderConfig.corbaRef);	
+		}
+		if(isInitCorba)
+		{
+			if(renderClient.renderAppImpl != null)
+			{
+				try {
+					renderCfg = renderClient.renderAppImpl.getRenderConfig(mappingId, mappingType);
+				}catch (Exception e) {
+					System.out.println(e.toString());
+				}
+			}else {
+				logger.error("Render client implementation is NULL");
+			}
+		}else {
+			logger.error("Init corba client FALSE");
+		}
+		return renderCfg;
+	}
+	private String processVideo(SpiderCorba.SpiderDefinePackage.RenderConfig renderCfg, String inputVideo) throws IOException 
 	{
 		logger.info("Beginning processVideo : " + inputVideo);
 		String tmpOutput = "/tmp/" + new Date().getTime() + ".mp4";
@@ -230,7 +267,7 @@ public class RenderExecuteTimer extends TimerTask{
 		return outputFile;
 	}
 
-	private void updateRenderedInfo(int jobId, int processStatus, String videoRendered)
+	private void updateRenderedInfo(int jobId, VideoInfo vInfo)
 	{
 		logger.info(">>> Function [updateRenderedInfo] : job Id = " + jobId);
 		if(isInitCorba == false)
@@ -242,7 +279,7 @@ public class RenderExecuteTimer extends TimerTask{
 			if(renderClient.renderAppImpl != null)
 			{
 				try {
-					renderClient.renderAppImpl.updateRenderedVideo(jobId, processStatus, videoRendered);
+					renderClient.renderAppImpl.updateRenderedVideo(jobId, vInfo);
 				}catch (Exception e) {
 					System.out.println(e.toString());
 				}

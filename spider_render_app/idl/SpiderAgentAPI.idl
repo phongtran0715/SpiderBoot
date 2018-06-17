@@ -2,7 +2,8 @@ module SpiderCorba
 {
   interface SpiderDefine
   {
-     struct VideoInfo {
+     struct VideoInfo
+     {
           wstring videoId;
           wstring title;
           wstring tags;
@@ -15,52 +16,32 @@ module SpiderCorba
           long processStatus;
           long license;
     };
-  };
 
-  interface RenderSide : SpiderDefine
-  {
-        struct RenderConfig
-        {
+    struct RenderConfig
+    {
             wstring vIntroTemp;
             wstring vOutroTemp;
             wstring vLogoTemp;
             boolean enableIntro;
             boolean enableOutro;
             boolean enableLogo;
-        };
-
-        boolean createRenderJob(in long jobId, in VideoInfo vInfo, in RenderConfig renderCfg);
-        boolean deleteRenderJob(in long jobId, in wstring renderClusterId);
-        void deleteRenderdVideo(in wstring renderClusterId, in wstring vLocation);
+    };
   };
+
+  interface RenderSide : SpiderDefine
+  {
+        boolean createRenderJob(in long jobId, in VideoInfo vInfo);
+        boolean deleteRenderJob(in long jobId);
+        void deleteRenderdVideo(in wstring vLocation);
+  };
+
 
   interface AgentSide : SpiderDefine
   {
-    struct AuthenInfo
-    {
-      wstring userName;
-      wstring apiKey;
-      wstring clientSecret;
-      wstring clientId;
-    };
+      //Render app function
+      void onRenderStartup(in wstring renderClusterId);
+      RenderConfig getRenderConfig(in long mappingId, in long mappingType);
+      void updateRenderedVideo(in long jobId, in VideoInfo vInfo);
 
-    struct ClusterInfo
-    {
-      wstring clusterIp;
-      wstring userName;
-      wstring password;
-    };
-
-    void onDownloadStartup(in wstring appId);
-    void onRenderStartup(in wstring appId);
-    void onUploadStartup(in wstring appId);
-    long long getLastSyncTime(in long mappingId);
-    void updateLastSyntime(in long mappingId, in long long lastSyncTime);
-    void updateDownloadedVideo(in VideoInfo vInfo);
-    void updateRenderedVideo(in long jobId, in long processStatus, in wstring vRenderPath);
-    void updateUploadedVideo (in long jobId);
-    wstring getMonitorChannelId(in long mappingId);
-    ClusterInfo getClusterInfo(in long clusterType, in long mappingId);
-    AuthenInfo getAuthenInfo(in long mappingId);
   };
 };

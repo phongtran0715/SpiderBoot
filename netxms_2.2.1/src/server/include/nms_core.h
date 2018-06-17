@@ -785,10 +785,10 @@ private:
    void createCluster(NXCPMessage *request);
    void modifyCluster(NXCPMessage *request);
    void deleteCluster(NXCPMessage *request);
-   void createSpiderMappingConfig(UINT32 mappingId, NXCPMessage *request);
-   void modifySpiderMappingConfig(UINT32 mappingId, NXCPMessage *request);
-   void deleteSpiderMappingConfig(UINT32 mappingId);
-   void deleteVideoContainer(UINT32 mappingId);
+   void createSpiderMappingConfig(UINT32 mappingId, INT32 mappingType, NXCPMessage *request);
+   void modifySpiderMappingConfig(UINT32 mappingId, INT32 mappingType, NXCPMessage *request);
+   void deleteSpiderMappingConfig(UINT32 mappingId, INT32 mappingType);
+   void deleteVideoContainer(UINT32 mappingId, INT32 mappingType);
    TCHAR* getChannelNameById(TCHAR* channelId, TCHAR* tbName);
    bool checkDeleteCondition(TCHAR* checkId, TCHAR* tbCheck, TCHAR* fieldCheck);
    INT32 getLastestInsertId(TCHAR* tbName);

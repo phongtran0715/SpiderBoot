@@ -5,55 +5,34 @@ import org.apache.log4j.Logger;
 import org.omg.CORBA.*;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
-
-import com.spider.main.DataDefine;
 import com.spider.main.UploadTimerManager;
-
 import SpiderCorba.UploadSide;
 import SpiderCorba.UploadSideHelper;
 import SpiderCorba.UploadSidePOA;
 import SpiderCorba.SpiderDefinePackage.VideoInfo;
-import SpiderCorba.UploadSidePackage.UploadConfig;
 import spiderboot.data.DataController;
 
 class UploadImpl extends UploadSidePOA {
 	private static final Logger logger = Logger.getLogger(UploadImpl.class);
 
 	@Override
-	public boolean createUploadJob(int jobId, VideoInfo vInfo, UploadConfig uploadCfg) {
-		logger.info("createUploadJob:: jobId = " + jobId);
-		//DataDefine.UploadJobData jobData = new DataDefine().new UploadJobData(jobId, vInfo, uploadCfg);
-		//UploadTimerManager.qUploadJob.add(jobData);
+	public boolean createUploadTimer(int timerId, int timerType) {
+		logger.info("Create new upload timer id = " + timerId + " timer type = " + timerType);
+		UploadTimerManager.getInstance().createUploadTimer(timerId, timerType);
 		return false;
 	}
 
 	@Override
-	public boolean deleteUploadJob(int jobId, String uploadClusterId) {
-		// TODO Auto-generated method stub
+	public boolean deleteUploadTimer(int timerId, int timerType) {
+		logger.info("Delete upload timer id = " + timerId + " timer type = " + timerType);
+		UploadTimerManager.getInstance().deleteUploadTimer(timerId, timerType);
 		return false;
 	}
 
 	@Override
-	public boolean createUploadTimer(String timerId, String uploadClusterId) {
-		// TODO Auto-generated method stub
-		logger.info("Create new upload timer id = " + timerId + "upload cluster id = " + uploadClusterId);
-		UploadTimerManager.getInstance().createUploadTimer(timerId, uploadClusterId);
-		return true;
-	}
-
-	@Override
-	public boolean modifyUploadTimer(String timerId, String uploadClusterId, int synStatus, UploadConfig uploadCfg) {
-		// TODO Auto-generated method stub
-		logger.info("Modify upload timer id = " + timerId + "upload cluster id = " + uploadClusterId);
-		UploadTimerManager.getInstance().modifyUploadTimer(timerId, uploadClusterId, synStatus, uploadCfg);
-		return false;
-	}
-	
-	@Override
-	public boolean deleteUploadTimer(String timerId, String uploadClusterId) {
-		// TODO Auto-generated method stub
-		logger.info("Delete upload timer id = " + timerId + "upload cluster id = " + uploadClusterId);
-		UploadTimerManager.getInstance().deleteUploadTimer(timerId, uploadClusterId);
+	public boolean createUploadJob(int jobId, VideoInfo vInfo) {
+		logger.info("Create upload jod id = " + jobId);
+		UploadTimerManager.getInstance().createUploadJob(jobId, vInfo);
 		return false;
 	}
 }
@@ -72,12 +51,12 @@ public class UploadCorbaServer {
 			// get reference to rootpoa & activate the POAManager
 			POA rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
 			rootpoa.the_POAManager().activate();
-
+			
 			// create servant and register it with the ORB
-			UploadImpl downloadImpl = new UploadImpl(); 
+			UploadImpl uploadImpl = new UploadImpl(); 
 
 			// get object reference from the servant
-			org.omg.CORBA.Object ref = rootpoa.servant_to_reference(downloadImpl);
+			org.omg.CORBA.Object ref = rootpoa.servant_to_reference(uploadImpl);
 			UploadSide href = UploadSideHelper.narrow(ref);
 
 			// get the root naming context
@@ -87,9 +66,9 @@ public class UploadCorbaServer {
 			// Use NamingContextExt which is part of the Interoperable
 			// Naming Service (INS) specification.
 			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
-
 			// bind the Object Reference in Naming
-			String contextName = DataController.getInstance().renderConfig.appId;
+			String contextName = DataController.getInstance().uploadConfig.appId;
+			logger.info("6");
 			logger.info("Corba context name = " + contextName);
 			NameComponent path[] = ncRef.to_name(contextName);
 			ncRef.rebind(path, href);

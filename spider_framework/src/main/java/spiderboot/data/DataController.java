@@ -8,7 +8,9 @@ public class DataController {
 
 	// static variable single_instance of type Singleton
 	private static DataController single_instance = null;
-
+	public final int TYPE_CLUSTER_DOWNLOAD = 1;
+	public final int TYPE_CLUSTER_RENDER = 2;
+	public final int TYPE_CLUSTER_UPLOAD = 3;
 	public DownloadConfig downloadConfig;
 	public RenderConfig renderConfig;
 	public UploadConfig uploadConfig;

@@ -1,7 +1,6 @@
 package com.spider.corba;
 
 import org.omg.CosNaming.*;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.omg.CORBA.*;
 import org.omg.PortableServer.*;
@@ -10,7 +9,6 @@ import org.omg.PortableServer.POA;
 import SpiderCorba.RenderSide;
 import SpiderCorba.RenderSideHelper;
 import SpiderCorba.RenderSidePOA;
-import SpiderCorba.RenderSidePackage.RenderConfig;
 import SpiderCorba.SpiderDefinePackage.VideoInfo;
 import spiderboot.data.DataController;
 import spiderboot.render.DataDefine;
@@ -20,22 +18,22 @@ import spiderboot.render.RenderTimerManager;
 class RenderImpl extends RenderSidePOA {
 	private static final Logger logger = Logger.getLogger(RenderImpl.class);
 	@Override
-	public boolean createRenderJob(int jobId, VideoInfo vInfo, RenderConfig renderCfg) {
-		// TODO Auto-generated method stub
+	public boolean createRenderJob(int jobId, VideoInfo vInfo) {
 		logger.info("createRenderJob:: jobId = " + jobId);
-		DataDefine.RenderJobData jobData = new DataDefine().new RenderJobData(jobId, vInfo, renderCfg);
+		DataDefine.RenderJobData jobData = new DataDefine().new RenderJobData(jobId, vInfo);
 		RenderTimerManager.qRenderJob.add(jobData);
 		return true;
 	}
 	@Override
-	public boolean deleteRenderJob(int jobId, String renderClusterId) {
+	public boolean deleteRenderJob(int jobId) {
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
 	@Override
-	public void deleteRenderdVideo(String renderClusterId, String vLocation) {
+	public void deleteRenderdVideo(String vLocation) {
 		// TODO Auto-generated method stub
-
+		
 	}
 }
 

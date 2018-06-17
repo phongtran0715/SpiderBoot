@@ -6,8 +6,7 @@ import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import SpiderCorba.UploadSidePackage.UploadConfig;
-import spiderboot.data.DataController;
+import SpiderCorba.SpiderDefinePackage.VideoInfo;
 
 public class UploadTimerManager {
 
@@ -25,73 +24,44 @@ public class UploadTimerManager {
 		return instance;
 	}
 
-	public boolean createUploadTimer(String timerId, String uploadClusterId) {
+	public boolean createUploadTimer(int timerId, int timerType) {
 		boolean isSuccess = false;
 		//check timer is existed
-		//if timer existed -> nothing to do
-		if(timerMap.get(timerId)== null)
+		String timerIndent = Integer.toString(timerId) + "_" + Integer.toString(timerType);
+		if(timerMap.get(timerIndent)== null)
 		{
-			TimerTask timerTask = new UploadExecuteTimer((timerId));
+			TimerTask timerTask = new UploadExecuteTimer(timerId, timerType);
 			Timer timer = new Timer();
 			timer.scheduleAtFixedRate(timerTask, 0, 10 * 1000);
 			if (timer != null) {
-				timerMap.put(timerId, timer);
+				timerMap.put(timerIndent, timer);
 			}	
 		}
 		isSuccess = true;
 		return isSuccess;
 	}
 	
-	public boolean modifyUploadTimer(String timerId, String uploadClusterId, int synStatus, UploadConfig uploadCfg)
+	public boolean deleteUploadTimer(int timerId, int timerType) 
 	{
 		boolean isSuccess = false;
-		//check timer  id is existed
-		boolean isIdExisted = timerMap.get(timerId) != null;
-		boolean isAppIdExisted = uploadClusterId.equals(DataController.getInstance().uploadConfig.appId);
-		if(isIdExisted == true && isAppIdExisted == true)
+		String timerIndent = Integer.toString(timerId) + "_" + Integer.toString(timerType);
+		boolean isIdExisted = timerMap.get(timerIndent) != null;
+		if(isIdExisted == true)
 		{
-			//reset this timer
-			timerMap.get(timerId).cancel();
-			timerMap.get(timerId).purge();
-			timerMap.remove(timerId);
-			if(synStatus == 1)
-			{
-				createUploadTimer(timerId, uploadClusterId);
-			}else {
-
-			}
-		}else if(isIdExisted == true && isAppIdExisted == false)
-		{
-			//remove this timer
-			timerMap.get(timerId).cancel();
-			timerMap.get(timerId).purge();
-			timerMap.remove(timerId);
-		}else if(isIdExisted == false && isAppIdExisted == true)
-		{
-			if(synStatus == 1)
-			{
-				//create new timer
-				createUploadTimer(timerId, uploadClusterId);
-			}else {
-				//nothing to do
-			}
-		}else {
-			//nothing to do
-		}
-		return isSuccess;
-	}
-	public boolean deleteUploadTimer(String timerId, String uploadClusterId) 
-	{
-		boolean isSuccess = false;
-		boolean isIdExisted = timerMap.get(timerId) != null;
-		boolean isAppIdExisted = uploadClusterId.equals(DataController.getInstance().uploadConfig.appId);
-		if(isIdExisted == true && isAppIdExisted == true)
-		{
-			Timer timer = timerMap.get(timerId);
+			Timer timer = timerMap.get(timerIndent);
 			timer.cancel();
 			timer.purge();
-			timerMap.remove(timerId);
+			timerMap.remove(timerIndent);
 		}
+		isSuccess = true;		
+		return isSuccess;
+	}
+	
+	public boolean createUploadJob(int jobId, VideoInfo vInfo)
+	{
+		boolean isSuccess = false;
+		DataDefine.UploadJobData uploadJobData = new DataDefine().new UploadJobData(jobId, vInfo);
+		qUploadJob.add(uploadJobData);
 		isSuccess = true;		
 		return isSuccess;
 	}

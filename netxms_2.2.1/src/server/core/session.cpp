@@ -14400,7 +14400,7 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
       if (isExisted == false)
       {
          hStmt = DBPrepare(hdb, _T("INSERT INTO channel_mapping (HomeChannelId, MonitorChannelId, TimeIntervalSync, ")
-                           _T(" StatusSync, LastSyncTime, DownloadClusterId, ProcessClusterId, UploadClusterId) VALUES (?,?,?,?,?,?,?,?)"));
+                           _T(" StatusSync, LastSyncTime, DownloadClusterId, RenderClusterId, UploadClusterId) VALUES (?,?,?,?,?,?,?,?)"));
          DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)cHomeId, DB_BIND_TRANSIENT);
          DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)cMonitorId, DB_BIND_TRANSIENT);
          DBBind(hStmt, 3, DB_SQLTYPE_INTEGER, (INT32)timeSync);
@@ -14415,7 +14415,7 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
             msg.setField(VID_RCC, RCC_SUCCESS);
             INT32 mappingId = getMaxId(_T("channel_mapping"));
             //Insert to spider mapping config
-            createSpiderMappingConfig(mappingId, request);
+            createSpiderMappingConfig(mappingId, TYPE_MAPPING_CHANNEL, request);
             if (statusSync == 1) //enable timer
             {
                //notify to download app
@@ -14424,7 +14424,14 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
                if (downloadClient->initSuccess)
                {
                   try {
-                     //downloadClient->mDownloadRef->createDownloadTimer(mappingId, downloadCfg);
+                     ::SpiderCorba::SpiderDefine::DownloadConfig downloadCfg;
+                     downloadCfg.cHomeId = ::CORBA::wstring_dup(cHomeId);
+                     downloadCfg.cMonitorId = ::CORBA::wstring_dup(cMonitorId);
+                     downloadCfg.downloadClusterId = ::CORBA::wstring_dup(downloadId);
+                     downloadCfg.timerInterval = timeSync;
+                     downloadCfg.synStatus = statusSync;
+
+                     downloadClient->mDownloadRef->createDownloadTimer(mappingId, TYPE_MAPPING_CHANNEL, downloadCfg);
                   }
                   catch (CORBA::TRANSIENT&) {
                      debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
@@ -14446,7 +14453,7 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
                {
                   try
                   {
-                     //uploadClient->mUploadRef->createUploadTimer(ma);
+                     uploadClient->mUploadRef->createUploadTimer(mappingId, TYPE_MAPPING_CHANNEL);
                   }
                   catch (CORBA::TRANSIENT&) {
                      debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
@@ -14479,7 +14486,7 @@ void ClientSession::createMappingChannel(NXCPMessage *request)
    sendMessage(&msg);
 }
 
-void ClientSession::createSpiderMappingConfig(UINT32 mappingId, NXCPMessage *request)
+void ClientSession::createSpiderMappingConfig(UINT32 mappingId, INT32 mappingType, NXCPMessage *request)
 {
    debugPrintf(6, _T("ClientSession::[createSpiderMappingConfig] >>>>"));
    NXCPMessage msg;
@@ -14504,23 +14511,24 @@ void ClientSession::createSpiderMappingConfig(UINT32 mappingId, NXCPMessage *req
       INT32 enableDesc = request->getFieldAsInt32(VID_ENABLE_DESC_TEMPLATE);
       INT32 enableTags = request->getFieldAsInt32(VID_ENABLE_TAGS_TEMPLATE);
 
-      hStmt = DBPrepare(hdb, _T("INSERT INTO spider_mapping_config (MappingId, VideoIntro, VideoOutro, ")
+      hStmt = DBPrepare(hdb, _T("INSERT INTO spider_mapping_config (MappingId, MappingType, VideoIntro, VideoOutro, ")
                         _T(" Logo, TitleTemplate, DescTemplate, TagTemplate, ")
                         _T(" EnableIntro, EnableOutro, EnableLogo, EnableTitle, EnableDesc, EnableTag)")
-                        _T(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"));
+                        _T(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"));
       DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, mappingId);
-      DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)vIntro, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)vOutro, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)vLogo, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)titleTemp, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)descTemp, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)tagsTemp, DB_BIND_TRANSIENT);
-      DBBind(hStmt, 8, DB_SQLTYPE_INTEGER, enableIntro);
-      DBBind(hStmt, 9, DB_SQLTYPE_INTEGER, enableOutro);
-      DBBind(hStmt, 10, DB_SQLTYPE_INTEGER, enableLogo);
-      DBBind(hStmt, 11, DB_SQLTYPE_INTEGER, enableTitle);
-      DBBind(hStmt, 12, DB_SQLTYPE_INTEGER, enableDesc);
-      DBBind(hStmt, 13, DB_SQLTYPE_INTEGER, enableLogo);
+      DBBind(hStmt, 2, DB_SQLTYPE_INTEGER, mappingType);
+      DBBind(hStmt, 3, DB_SQLTYPE_VARCHAR, (const TCHAR *)vIntro, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 4, DB_SQLTYPE_VARCHAR, (const TCHAR *)vOutro, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 5, DB_SQLTYPE_VARCHAR, (const TCHAR *)vLogo, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 6, DB_SQLTYPE_VARCHAR, (const TCHAR *)titleTemp, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 7, DB_SQLTYPE_VARCHAR, (const TCHAR *)descTemp, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 8, DB_SQLTYPE_VARCHAR, (const TCHAR *)tagsTemp, DB_BIND_TRANSIENT);
+      DBBind(hStmt, 9, DB_SQLTYPE_INTEGER, enableIntro);
+      DBBind(hStmt, 10, DB_SQLTYPE_INTEGER, enableOutro);
+      DBBind(hStmt, 11, DB_SQLTYPE_INTEGER, enableLogo);
+      DBBind(hStmt, 12, DB_SQLTYPE_INTEGER, enableTitle);
+      DBBind(hStmt, 13, DB_SQLTYPE_INTEGER, enableDesc);
+      DBBind(hStmt, 14, DB_SQLTYPE_INTEGER, enableLogo);
       bool success = DBExecute(hStmt);
       if (success == true)
       {
@@ -14531,7 +14539,7 @@ void ClientSession::createSpiderMappingConfig(UINT32 mappingId, NXCPMessage *req
    debugPrintf(6, _T("ClientSession::[createSpiderMappingConfig] <<<<<"));
 }
 
-void ClientSession::modifySpiderMappingConfig(UINT32 mappingId, NXCPMessage * request)
+void ClientSession::modifySpiderMappingConfig(UINT32 mappingId, INT32 mappingType, NXCPMessage * request)
 {
    debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
    DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
@@ -14557,7 +14565,8 @@ void ClientSession::modifySpiderMappingConfig(UINT32 mappingId, NXCPMessage * re
 
       hStmt = DBPrepare(hdb, _T("UPDATE spider_mapping_config SET VideoIntro = ?, VideoOutro = ?, Logo = ?, ")
                         _T(" TitleTemplate = ?, DescTemplate = ?, TagTemplate = ?, EnableIntro = ?, ")
-                        _T(" EnableOutro = ?, EnableLogo = ?, EnableTitle = ?, EnableDesc = ?, EnableTag = ? WHERE MappingId = ?"));
+                        _T(" EnableOutro = ?, EnableLogo = ?, EnableTitle = ?, EnableDesc = ?, EnableTag = ? ")
+                        _T(" WHERE MappingId = ? AND MappingType = ?"));
 
       DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)vIntro, DB_BIND_TRANSIENT);
       DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)vOutro, DB_BIND_TRANSIENT);
@@ -14572,6 +14581,7 @@ void ClientSession::modifySpiderMappingConfig(UINT32 mappingId, NXCPMessage * re
       DBBind(hStmt, 11, DB_SQLTYPE_INTEGER, enableDesc);
       DBBind(hStmt, 12, DB_SQLTYPE_INTEGER, enableTags);
       DBBind(hStmt, 13, DB_SQLTYPE_INTEGER, mappingId);
+      DBBind(hStmt, 14, DB_SQLTYPE_INTEGER, mappingType);
 
       bool success = DBExecute(hStmt);
       if (success == false)
@@ -14723,7 +14733,7 @@ void ClientSession::modifyMappingChannel(NXCPMessage * request)
       TCHAR* uploadId = request->getFieldAsString(VID_MAPPING_CHANNEL_UPLOAD_CLUSTER_ID);
 
       hStmt = DBPrepare(hdb, _T("UPDATE channel_mapping SET HomeChannelId = ?, MonitorChannelId = ?, TimeIntervalSync = ?, ")
-                        _T(" StatusSync = ?, DownloadClusterId = ?, ProcessClusterId = ?, UploadClusterId = ? WHERE Id = ?"));
+                        _T(" StatusSync = ?, DownloadClusterId = ?, RenderClusterId = ?, UploadClusterId = ? WHERE Id = ?"));
       DBBind(hStmt, 1, DB_SQLTYPE_VARCHAR, (const TCHAR *)cHomeId, DB_BIND_TRANSIENT);
       DBBind(hStmt, 2, DB_SQLTYPE_VARCHAR, (const TCHAR *)cMonitorId, DB_BIND_TRANSIENT);
       DBBind(hStmt, 3, DB_SQLTYPE_INTEGER, (INT32)timeSync);
@@ -14738,7 +14748,7 @@ void ClientSession::modifyMappingChannel(NXCPMessage * request)
       {
          msg.setField(VID_RCC, RCC_SUCCESS);
          //modify spider mapping config
-         modifySpiderMappingConfig(id, request);
+         modifySpiderMappingConfig(id, TYPE_MAPPING_CHANNEL, request);
          //notify information to download app
          debugPrintf(6, _T("ClientSession1::[modifyMappingChannel] beginning notify to download app"));
          SpiderDownloadClient* downloadClient = new SpiderDownloadClient((const TCHAR*)downloadId);
@@ -14751,7 +14761,7 @@ void ClientSession::modifyMappingChannel(NXCPMessage * request)
                downloadCfg.downloadClusterId = CORBA::wstring_dup(downloadId);
                downloadCfg.timerInterval = timeSync;
                downloadCfg.synStatus = statusSync;
-               //downloadClient->mDownloadRef->modifyDownloadTimer(id, downloadCfg);
+               downloadClient->mDownloadRef->modifyDownloadTimer(id, TYPE_MAPPING_CHANNEL, downloadCfg);
             }
             catch (CORBA::TRANSIENT&) {
                debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
@@ -14904,8 +14914,8 @@ void ClientSession::deleteMappingChannel(NXCPMessage * request)
       if (success == true)
       {
          msg.setField(VID_RCC, RCC_SUCCESS);
-         deleteSpiderMappingConfig(id);
-         deleteVideoContainer(id);
+         deleteSpiderMappingConfig(id, TYPE_MAPPING_CHANNEL);
+         deleteVideoContainer(id, TYPE_MAPPING_CHANNEL);
          //notify information to download app
          debugPrintf(6, _T("Beginning notify to download app"));
          SpiderDownloadClient* downloadClient = new SpiderDownloadClient((const TCHAR*)downloadId);
@@ -14913,7 +14923,7 @@ void ClientSession::deleteMappingChannel(NXCPMessage * request)
          {
             debugPrintf(6, _T("ClientSession::[%s] Init corba for download client successful!"), __FUNCTION__);
             try {
-               //downloadClient->mDownloadRef->deleteDowloadTimer(id, CORBA::wstring_dup(downloadId));
+               downloadClient->mDownloadRef->deleteDowloadTimer(id, TYPE_MAPPING_CHANNEL);
             }
             catch (CORBA::TRANSIENT&) {
                debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
@@ -14934,7 +14944,7 @@ void ClientSession::deleteMappingChannel(NXCPMessage * request)
          {
             debugPrintf(6, _T("ClientSession::[%s] Init corba for upload client successful!"), __FUNCTION__);
             try {
-               //uploadClient->mUploadRef->deleteUploadTimer(CORBA::wstring_dup(bufTimerId), CORBA::wstring_dup(uploadId));
+               uploadClient->mUploadRef->deleteUploadTimer(id, TYPE_MAPPING_CHANNEL);
             }
             catch (CORBA::TRANSIENT&) {
                debugPrintf(1, _T("Caught system exception TRANSIENT -- unable to contact the server"));
@@ -15235,7 +15245,7 @@ void ClientSession::deleteCluster(NXCPMessage * request)
    sendMessage(&msg);
 }
 
-void ClientSession::deleteSpiderMappingConfig(UINT32 mappingId)
+void ClientSession::deleteSpiderMappingConfig(UINT32 mappingId, INT32 mappingType)
 {
    debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
    DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
@@ -15243,19 +15253,21 @@ void ClientSession::deleteSpiderMappingConfig(UINT32 mappingId)
 
    if (hdb != NULL)
    {
-      hStmt = DBPrepare(hdb, _T("DELETE FROM spider_mapping_config WHERE MappingId = ?"));
+      hStmt = DBPrepare(hdb, _T("DELETE FROM spider_mapping_config WHERE MappingId = ? AND MappingType = ?"));
       DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)mappingId);
+      DBBind(hStmt, 2, DB_SQLTYPE_INTEGER, (INT32)mappingType);
       bool success = DBExecute(hStmt);
       if (success == false)
       {
-         debugPrintf(6, _T("ClientSession::[%s] Execute delete query false"), __FUNCTION__);
+         debugPrintf(1, _T("ClientSession::[%s] Execute delete query false"), __FUNCTION__);
       }
    }
    else {
-      debugPrintf(6, _T("ClientSession::[%s] can not create database connection"), __FUNCTION__);
+      debugPrintf(1, _T("ClientSession::[%s] can not create database connection"), __FUNCTION__);
    }
 }
-void ClientSession::deleteVideoContainer(UINT32 mappingId)
+
+void ClientSession::deleteVideoContainer(UINT32 mappingId, INT32 mappingType)
 {
    debugPrintf(6, _T("ClientSession::[%s]"), __FUNCTION__);
    DB_HANDLE hdb = DBConnectionPoolAcquireConnection();
@@ -15263,8 +15275,9 @@ void ClientSession::deleteVideoContainer(UINT32 mappingId)
 
    if (hdb != NULL)
    {
-      hStmt = DBPrepare(hdb, _T("DELETE FROM video_container WHERE MappingId = ?"));
+      hStmt = DBPrepare(hdb, _T("DELETE FROM video_container WHERE MappingId = ? AND MappingType = ?"));
       DBBind(hStmt, 1, DB_SQLTYPE_INTEGER, (INT32)mappingId);
+      DBBind(hStmt, 2, DB_SQLTYPE_INTEGER, (INT32)mappingType);
       bool success = DBExecute(hStmt);
       if (success == false)
       {
