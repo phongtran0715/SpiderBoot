@@ -1,3 +1,0 @@
-SUBDIRS = odbc sqlite
-
-include ..\..\..\Makefile.inc.w32

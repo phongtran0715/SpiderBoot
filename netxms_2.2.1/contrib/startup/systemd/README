@@ -1,4 +1,0 @@
-* Copy nxagentd.service to /etc/systemd/system/
-* "systemctl --system daemon-reload"
-* "systemctl enable nxagentd"
-* "systemctl start nxagentd"
