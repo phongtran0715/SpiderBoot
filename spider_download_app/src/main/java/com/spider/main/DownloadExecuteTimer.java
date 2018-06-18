@@ -225,33 +225,4 @@ public class DownloadExecuteTimer extends TimerTask {
 			logger.error("Init corba client FALSE");
 		}
 	}
-
-	/*
-	private String getMonitorChannelId(int mappingId)
-	{
-		String result = null;
-		logger.info("Function getCMonitorIdByMapping:: >>>>");
-		if(isInitCorba == false)
-		{
-			isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);	
-		}
-		if(isInitCorba)
-		{
-			if(downloadClient.downloadAppImpl != null)
-			{
-				try {
-					result = downloadClient.downloadAppImpl.getMonitorChannelId(mappingId);
-					System.out.println("result = " +  result);
-				}catch (Exception e) {
-					logger.error(e.toString());
-				}
-			}else {
-				logger.error("Download client implementation is NULL");
-			}
-		}else {
-			logger.error("Init corba client FALSE");
-		}
-		return result;
-	}
-	 */
 }

@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
@@ -25,8 +26,7 @@ import spiderboot.util.Utility;
 
 public class UploadExecuteTimer extends TimerTask{
 
-	int timerId;
-	int timerType;
+	String cHomeId;
 	boolean isComplete = true;
 	String videoFolderBase;
 	static Utility util = new Utility();
@@ -36,10 +36,9 @@ public class UploadExecuteTimer extends TimerTask{
 	UploadCorbaClient uploadClient;
 	boolean isInitCorba = false;
 	
-	public UploadExecuteTimer(int timerId, int timerType) {
+	public UploadExecuteTimer(String cHomeId) {
 		logger.info("Function UploadExecuteTimer >>>");
-		this.timerId = timerId;
-		this.timerType = timerType;
+		this.cHomeId = cHomeId;
 		uploadConfig = DataController.getInstance().uploadConfig;
 		uploadClient = new UploadCorbaClient();
 		isInitCorba = uploadClient.initCorba(uploadConfig.corbaRef);
@@ -51,25 +50,25 @@ public class UploadExecuteTimer extends TimerTask{
 	}
 
 	private void completeTask() {
-		logger.info("Upload timer id : " + this.timerId  + " timer type : " + timerType + " at : " + new Date());
+		logger.info("Upload timer channel : " + cHomeId + " at : " + new Date());
 		if(isComplete){
 			isComplete = false;
-			if(UploadTimerManager.qUploadJob.isEmpty() == false)
+			Queue<DataDefine.UploadJobData> uploadQueue = UploadTimerManager.queueMap.get(cHomeId); 
+			if( uploadQueue != null && uploadQueue.isEmpty() == false)
 			{
-				DataDefine.UploadJobData jobData = UploadTimerManager.qUploadJob.poll();
+				DataDefine.UploadJobData jobData = uploadQueue.poll();
 				VideoInfo vInfo = jobData.vInfo;
 				logger.info("Begining upload for job : " + jobData.jobId);
 				logger.info("");
 				if(vInfo.license == 1)
 				{
 					logger.error("Video (id =  " + vInfo.videoId + ") license = true. This video will be ignore");
-					//updateUploadedInfo(jobData.jobId);
+					updateUploadedInfo(jobData.jobId);
 					isComplete = true;
 					return;
 				}
 				
-				//TODO: get upload config
-				SpiderCorba.SpiderDefinePackage.UploadConfig uploadVideoCfg = getUploadCfg(timerId, timerType);
+				SpiderCorba.SpiderDefinePackage.UploadConfig uploadVideoCfg = getUploadCfg(vInfo.mappingId, vInfo.mappingType);
 				
 				logger.info("Starting new job (job id = " + jobData.jobId + ") at : " + new Date());
 				//upload video
@@ -85,7 +84,7 @@ public class UploadExecuteTimer extends TimerTask{
 					logger.error("FALSE! File to upload : <" + vInfo.vRenderPath + "> not Exist");	
 					logger.info("Upload complete video " + vInfo.videoId);
 					isComplete = true;
-					//updateUploadedInfo(jobData.jobId);
+					updateUploadedInfo(jobData.jobId);
 					return;
 				}
 				ClusterInfo clusterInfo = getClusterInfo(vInfo.mappingId, vInfo.mappingType, 
@@ -131,10 +130,7 @@ public class UploadExecuteTimer extends TimerTask{
 				logger.info("Authen infor : client id = " + authInfo.clientId);
 
 				logger.info("Beginning get authen file >>>>");
-				//TODO: create client secret file
-				String timerIdent = Integer.toString(timerId) + "_" + Integer.toString(timerType);
-				String clientFile = "/tmp/ " + timerIdent + "_client_secrets.json";
-				//TODO: set authen file name
+				String clientFile = "/tmp/ " + cHomeId + "_client_secrets.json";
 				CrunchifyJSONFileWrite jsonCreate = new CrunchifyJSONFileWrite();
 				File jsonFile = new File(clientFile);
 				if(jsonFile.exists() == false)
@@ -147,7 +143,6 @@ public class UploadExecuteTimer extends TimerTask{
 							logger.error("Can not create file : " + clientFile);
 						}
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						logger.error(e);
 					}
 				}
@@ -157,15 +152,14 @@ public class UploadExecuteTimer extends TimerTask{
 						+ CREDENTIALS_DIRECTORY + "/upload_" + authInfo.userName;
 				System.out.println("Store file = " + storeFile);
 				File file = new File(storeFile);
-				/*
+				
 				if(file.exists() == false)
 				{
 					logger.error("ERROR : Can not get authen store upload");
 					isComplete = true;
-					//updateUploadedInfo(jobData.jobId);
+					updateUploadedInfo(jobData.jobId);
 					return;
 				}
-				*/
 				
 				UploadVideo.setStoreFile( "upload_" + authInfo.userName);
 				logger.info("Complete get authen file <<<<");
@@ -178,25 +172,24 @@ public class UploadExecuteTimer extends TimerTask{
 
 				logger.info("Beginning upload video " + vInfo.videoId);
 				logger.info("create authen file for email : " + authInfo.userName);
-				/*
+				
 				boolean isSuccess = UploadVideo.execute(title, desc, tags, tranferFile, "public");
 				if(isSuccess)
 				{
 					//update process status 
 					updateUploadedInfo(jobData.jobId);
 					deleteTempFile(tranferFile);
+					deleteTempFile(clientFile);
 					logger.info("Upload complete video " + vInfo.videoId);
 					//Sleep for next upload
 					try {
 						Thread.sleep(uploadConfig.delayTime *1000);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}else {
 					logger.error("FALSE : Can not upload video id = " + vInfo.videoId);
 				}
-				*/
 			}
 			isComplete = true;
 		}

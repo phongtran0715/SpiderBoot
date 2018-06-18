@@ -34,7 +34,7 @@ public class DownloadCorbaClient {
 			org.omg.CORBA.Object obj = ncRef.resolve_str(COMPONENT_NAME);
 			downloadAppImpl = AgentSideHelper.narrow(obj);
 
-			logger.info("Obtained a handle on server object: " + downloadAppImpl);
+			//logger.info("Obtained a handle on server object: " + downloadAppImpl);
 			isSuccess = true;
 
 		} catch (Exception e) {

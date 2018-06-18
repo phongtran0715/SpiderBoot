@@ -34,7 +34,7 @@ public class UploadCorbaClient {
 			org.omg.CORBA.Object obj = ncRef.resolve_str(COMPONENT_NAME);
 			uploadAppImpl = AgentSideHelper.narrow(obj);
 
-			logger.info("Obtained a handle on server object: " + uploadAppImpl);
+			//logger.info("Obtained a handle on server object: " + uploadAppImpl);
 			isSuccess = true;
 
 		} catch (Exception e) {

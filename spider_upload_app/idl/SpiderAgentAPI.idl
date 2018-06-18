@@ -43,9 +43,10 @@ module SpiderCorba
 
   interface UploadSide : SpiderDefine
   {
-        boolean createUploadTimer(in long timerId, in long timerType);
-        boolean deleteUploadTimer(in long timerId, in long timerType);
-        boolean createUploadJob(in long jobId, in VideoInfo vInfo);
+        boolean createUploadTimer(in wstring cHomeId);
+        boolean deleteUploadTimer(in wstring cHomeId);
+        boolean createUploadJob(in long jobId, in VideoInfo vInfo, in wstring cHomeId);
+		boolean deleteUploadJob(in long jobId, in wstring cHomeId);
   };
 
   interface AgentSide : SpiderDefine
