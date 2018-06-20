@@ -7,7 +7,7 @@ import java.util.TimerTask;
 public class DownloadTimerManager {
 
 	private static DownloadTimerManager instance = null;
-	public static HashMap<String, Timer> timerMap = new HashMap<String, Timer>();
+	public static HashMap<Integer, Timer> timerMap = new HashMap<Integer, Timer>();
 	public DownloadTimerManager() {
 	}
 
@@ -18,66 +18,63 @@ public class DownloadTimerManager {
 		return instance;
 	}
 
-	public boolean createDownloadTimer(int timerId, int timeType, 
+	public boolean createDownloadTimer(int timerId, 
 			SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg) {
 		boolean isSuccess = false;
 		//check timer is existed
-		String timerIdent = Integer.toString(timerId) + "_" + Integer.toString(timeType);
-		if(timerMap.get(timerIdent)!= null)
+		if(timerMap.get(timerId)!= null)
 		{
-			timerMap.get(timerIdent).cancel();
-			timerMap.get(timerIdent).purge();
-			timerMap.remove(timerIdent);
+			timerMap.get(timerId).cancel();
+			timerMap.get(timerId).purge();
+			timerMap.remove(timerId);
 		}
-		TimerTask timerTask = new DownloadExecuteTimer(timerId, timeType, downloadCfg);
+		TimerTask timerTask = new DownloadExecuteTimer(timerId, downloadCfg);
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(timerTask, 0, downloadCfg.timerInterval * 1000);
 		if (timer != null) {
-			timerMap.put(timerIdent, timer);
+			timerMap.put(timerId, timer);
 		}
 		isSuccess = true;
 		return isSuccess;
 	}
 
-	public boolean modifyDownloadTimer(int timerId, int timerType,
+	public boolean modifyDownloadTimer(int timerId,
 			SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg) 
 	{
 		boolean isSuccess = false;
-		String timerIdent = Integer.toString(timerId) + "_" + Integer.toString(timerType);
 		//check timer  id is existed
-		boolean isIdExisted = timerMap.get(timerIdent) != null;
+		boolean isIdExisted = timerMap.get(timerId) != null;
 
 		if(isIdExisted == true )
 		{
 			//reset this timer
-			timerMap.get(timerIdent).cancel();
-			timerMap.get(timerIdent).purge();
-			timerMap.remove(timerIdent);
+			timerMap.get(timerId).cancel();
+			timerMap.get(timerId).purge();
+			timerMap.remove(timerId);
 			if(downloadCfg.synStatus == 1)
 			{
-				createDownloadTimer(timerId, timerType, downloadCfg);	
+				createDownloadTimer(timerId, downloadCfg);	
 			}
 		}else
 		{
 			if(downloadCfg.synStatus == 1)
 			{
-				createDownloadTimer(timerId, timerType, downloadCfg);
+				createDownloadTimer(timerId, downloadCfg);
 			}
 		}
 		return isSuccess;
 	}
 
-	public boolean deleteDownloadTimer(int timerId, int timerType) 
+	public boolean deleteDownloadTimer(int timerId) 
 	{
 		boolean isSuccess = false;
-		String timerIdent = Integer.toString(timerId) + "_" + Integer.toString(timerType);
-		boolean isIdExisted = timerMap.get(timerIdent) != null;
+		boolean isIdExisted = timerMap.get(timerId) != null;
 		if(isIdExisted == true)
 		{
-			Timer timer = timerMap.get(timerIdent);
+			Timer timer = timerMap.get(timerId);
 			timer.cancel();
 			timer.purge();
-			timerMap.remove(timerIdent);
+			timerMap.remove(timerId);
 		}
 		isSuccess = true;		
 		return isSuccess;

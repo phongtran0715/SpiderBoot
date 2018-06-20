@@ -25,7 +25,6 @@ import java.util.List;
 
 public class DownloadExecuteTimer extends TimerTask {
 	int timerId;
-	int timerType;
 	SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg;
 	static Utility util;;
 	String videoFolderBase;
@@ -36,10 +35,9 @@ public class DownloadExecuteTimer extends TimerTask {
 	boolean isComplete = true;
 	private static final Logger logger = Logger.getLogger(DownloadExecuteTimer.class);
 
-	public DownloadExecuteTimer(int timerId, int timerType, 
+	public DownloadExecuteTimer(int timerId, 
 			SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg) {
 		this.timerId = timerId;
-		this.timerType = timerType;
 		this.downloadCfg = downloadCfg;
 		util = new Utility();
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -64,7 +62,7 @@ public class DownloadExecuteTimer extends TimerTask {
 				return;
 			}
 			DateTime ytbTime = new DateTime(lastSyncTime);
-			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(downloadCfg.cMonitorId, 
+			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(downloadCfg.monitorContent, 
 					ytbTime, downloadConfig.maxResult);
 			Iterator<SearchResult> iteratorSearchResults = result.iterator();
 			if (!iteratorSearchResults.hasNext()) {
@@ -125,7 +123,7 @@ public class DownloadExecuteTimer extends TimerTask {
 			if(downloadClient.downloadAppImpl != null)
 			{
 				try {
-					long lastTime = downloadClient.downloadAppImpl.getLastSyncTime(timerId, timerType);
+					long lastTime = downloadClient.downloadAppImpl.getLastSyncTime(timerId);
 					Date date = new Date(lastTime * 1000);
 					result = date;
 				}catch (Exception e) {
@@ -155,7 +153,7 @@ public class DownloadExecuteTimer extends TimerTask {
 			{
 				try {
 					Timestamp ts = new Timestamp(new Date().getTime());
-					downloadClient.downloadAppImpl.updateLastSyntime(timerId, timerType, ts.getTime() / 1000);
+					downloadClient.downloadAppImpl.updateLastSyntime(timerId, ts.getTime() / 1000);
 				}catch (Exception e) {
 					logger.error(e.toString());
 				}
@@ -193,7 +191,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		}
 		logger.info("Function getVideoInfor:: video id = " + videoId + " license content = " + license);
 		VideoWraper vWraper = new VideoWraper(videoId, title, tags, desc, thumb, 
-				vDownloadPath, vRenderPath, timerId, timerType, processStatus, license);
+				vDownloadPath, vRenderPath, timerId, processStatus, license);
 		return vWraper;
 	}
 
@@ -212,7 +210,7 @@ public class DownloadExecuteTimer extends TimerTask {
 					SpiderCorba.SpiderDefinePackage.VideoInfo vInfo = new VideoInfo(videoWrapper.videoId, videoWrapper.title, 
 							videoWrapper.tag, videoWrapper.description, videoWrapper.thumbnail, 
 							videoWrapper.vDownloadPath, videoWrapper.vRenderPath, videoWrapper.mappingId,
-							videoWrapper.mappingType, videoWrapper.processStatus, videoWrapper.license);
+							videoWrapper.processStatus, videoWrapper.license);
 
 					downloadClient.downloadAppImpl.updateDownloadedVideo(vInfo);
 				}catch (Exception e) {

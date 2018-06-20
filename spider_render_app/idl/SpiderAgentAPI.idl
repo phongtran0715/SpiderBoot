@@ -2,7 +2,7 @@ module SpiderCorba
 {
   interface SpiderDefine
   {
-     struct VideoInfo
+	struct VideoInfo
      {
           wstring videoId;
           wstring title;
@@ -12,7 +12,6 @@ module SpiderCorba
           wstring vDownloadPath;
           wstring vRenderPath;
           long mappingId;
-          long mappingType;
           long processStatus;
           long license;
     };
@@ -40,8 +39,7 @@ module SpiderCorba
   {
       //Render app function
       void onRenderStartup(in wstring renderClusterId);
-      RenderConfig getRenderConfig(in long mappingId, in long mappingType);
+      RenderConfig getRenderConfig(in long mappingId);
       void updateRenderedVideo(in long jobId, in VideoInfo vInfo);
-
   };
 };

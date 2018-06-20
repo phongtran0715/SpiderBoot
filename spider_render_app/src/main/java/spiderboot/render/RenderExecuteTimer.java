@@ -78,7 +78,7 @@ public class RenderExecuteTimer extends TimerTask{
 				logger.info("==========================================================");
 				//TODO: get render information
 				
-				SpiderCorba.SpiderDefinePackage.RenderConfig renderCfg = getRenderConfig(vInfo.mappingId, vInfo.mappingType);
+				SpiderCorba.SpiderDefinePackage.RenderConfig renderCfg = getRenderConfig(vInfo.mappingId);
 				if(renderCfg != null)
 				{
 					logger.info("video intro = " + renderCfg.vIntroTemp);
@@ -127,7 +127,7 @@ public class RenderExecuteTimer extends TimerTask{
 		}
 	}
 
-	private SpiderCorba.SpiderDefinePackage.RenderConfig getRenderConfig(int mappingId, int mappingType)
+	private SpiderCorba.SpiderDefinePackage.RenderConfig getRenderConfig(int mappingId)
 	{
 		SpiderCorba.SpiderDefinePackage.RenderConfig renderCfg = null;
 		logger.info(">>> Function [getRenderConfig] :");
@@ -140,7 +140,7 @@ public class RenderExecuteTimer extends TimerTask{
 			if(renderClient.renderAppImpl != null)
 			{
 				try {
-					renderCfg = renderClient.renderAppImpl.getRenderConfig(mappingId, mappingType);
+					renderCfg = renderClient.renderAppImpl.getRenderConfig(mappingId);
 				}catch (Exception e) {
 					System.out.println(e.toString());
 				}

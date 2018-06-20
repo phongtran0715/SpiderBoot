@@ -17,25 +17,25 @@ class DownloadImpl extends DownloadSidePOA {
 	private static final Logger logger = Logger.getLogger(DownloadImpl.class);
 
 	@Override
-	public boolean createDownloadTimer(int timerId, int timerType,
+	public boolean createDownloadTimer(int timerId,
 			SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg) {
-		logger.info("Create new download timer id = " + timerId + " timer type = " + timerType);
-		DownloadTimerManager.getInstance().createDownloadTimer(timerId, timerType, downloadCfg);	
+		logger.info("Create new download timer id = " + timerId );
+		DownloadTimerManager.getInstance().createDownloadTimer(timerId, downloadCfg);	
 		return true;
 	}
 
 	@Override
-	public boolean modifyDownloadTimer(int timerId, int timerType,
+	public boolean modifyDownloadTimer(int timerId,
 			SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg) {
-		logger.info("Modify download timer id = " + timerId + " timer type = " + timerType);		
-		DownloadTimerManager.getInstance().modifyDownloadTimer(timerId, timerType, downloadCfg);
+		logger.info("Modify download timer id = " + timerId );		
+		DownloadTimerManager.getInstance().modifyDownloadTimer(timerId, downloadCfg);
 		return true;
 	}
 
 	@Override
-	public boolean deleteDowloadTimer(int timerId, int timerType) {
-		logger.info("Delete download timer id = " + timerId + " timer type = " + timerType);
-		DownloadTimerManager.getInstance().deleteDownloadTimer(timerId, timerType);
+	public boolean deleteDowloadTimer(int timerId) {
+		logger.info("Delete download timer id = " + timerId );
+		DownloadTimerManager.getInstance().deleteDownloadTimer(timerId);
 		return true;
 	}
 

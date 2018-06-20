@@ -12,7 +12,6 @@ module SpiderCorba
           wstring vDownloadPath;
           wstring vRenderPath;
           long mappingId;
-          long mappingType;
           long processStatus;
           long license;
     };
@@ -20,8 +19,9 @@ module SpiderCorba
     struct DownloadConfig
     {
             wstring cHomeId;
-            wstring cMonitorId;
+            wstring monitorContent;
             wstring downloadClusterId;
+            long mappingType;
             long timerInterval;
             long synStatus;
     };
@@ -29,9 +29,9 @@ module SpiderCorba
 
   interface DownloadSide : SpiderDefine
   {
-        boolean createDownloadTimer(in long timerId, in long timerType, in DownloadConfig downloadCfg);
-        boolean modifyDownloadTimer(in long timerId, in long timerType, in DownloadConfig downloadCfg);
-        boolean deleteDowloadTimer(in long timerId, in long timerType);
+        boolean createDownloadTimer(in long timerId, in DownloadConfig downloadCfg);
+        boolean modifyDownloadTimer(in long timerId, in DownloadConfig downloadCfg);
+        boolean deleteDowloadTimer(in long timerId);
         boolean deleteDownloadedVideo(in long jobId);
   };
 
@@ -39,8 +39,8 @@ module SpiderCorba
   {
       //Download app function
       void onDownloadStartup(in wstring downloadClusterId);
-      long long getLastSyncTime(in long mappingId, in long mappingType);
-      void updateLastSyntime(in long mappingId, in long mappingType, in long long lastSyncTime);
+      long long getLastSyncTime(in long mappingId);
+      void updateLastSyntime(in long mappingId, in long long lastSyncTime);
       void updateDownloadedVideo(in VideoInfo vInfo);
   };
 };
