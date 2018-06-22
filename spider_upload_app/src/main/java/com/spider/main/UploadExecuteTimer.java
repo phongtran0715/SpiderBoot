@@ -35,7 +35,7 @@ public class UploadExecuteTimer extends TimerTask{
 	UploadConfig uploadConfig;
 	UploadCorbaClient uploadClient;
 	boolean isInitCorba = false;
-	
+
 	public UploadExecuteTimer(String cHomeId) {
 		logger.info("Function UploadExecuteTimer >>>");
 		this.cHomeId = cHomeId;
@@ -50,36 +50,31 @@ public class UploadExecuteTimer extends TimerTask{
 	}
 
 	private void completeTask() {
-		logger.info("Upload timer channel : " + cHomeId + " at : " + new Date());
 		if(isComplete){
 			isComplete = false;
 			Queue<DataDefine.UploadJobData> uploadQueue = UploadTimerManager.queueMap.get(cHomeId); 
 			if( uploadQueue != null && uploadQueue.isEmpty() == false)
 			{
+				logger.info("\n\n");
+				logger.info("==========>> Timer id [" + cHomeId + "] BEGINNIG UPLOAD VIDEO <<==========");
 				DataDefine.UploadJobData jobData = uploadQueue.poll();
 				VideoInfo vInfo = jobData.vInfo;
-				logger.info("Begining upload for job : " + jobData.jobId);
-				logger.info("");
-				if(vInfo.license == 1)
+				logger.info("Begining upload for job : " + jobData.jobId + " at : " + new Date().toString());
+
+				SpiderCorba.SpiderDefinePackage.UploadConfig uploadVideoCfg = getUploadCfg(vInfo.mappingId);
+				if(uploadVideoCfg == null)
 				{
-					logger.error("Video (id =  " + vInfo.videoId + ") license = true. This video will be ignore");
-					updateUploadedInfo(jobData.jobId);
-					isComplete = true;
+					logger.error("Error! Can not get upload video configuration");
 					return;
 				}
-				
-				SpiderCorba.SpiderDefinePackage.UploadConfig uploadVideoCfg = getUploadCfg(vInfo.mappingId, vInfo.mappingType);
-				
-				logger.info("Starting new job (job id = " + jobData.jobId + ") at : " + new Date());
-				//upload video
-				logger.info("=================== Upload video infor ===================");
+				logger.info(">>>> Upload config:");
 				logger.info(" + Video ID :" + vInfo.videoId);
 				logger.info(" + Title :" + vInfo.title);
 				logger.info(" + Video location :" + vInfo.vRenderPath);
 				logger.info(" + Mapping ID :" + vInfo.mappingId);
-				logger.info("==========================================================");
-				File uploadFile = new File(vInfo.vRenderPath);
+				logger.info("<<<<");
 
+				File uploadFile = new File(vInfo.vRenderPath);
 				if (!uploadFile.exists()) {
 					logger.error("FALSE! File to upload : <" + vInfo.vRenderPath + "> not Exist");	
 					logger.info("Upload complete video " + vInfo.videoId);
@@ -87,50 +82,29 @@ public class UploadExecuteTimer extends TimerTask{
 					updateUploadedInfo(jobData.jobId);
 					return;
 				}
-				ClusterInfo clusterInfo = getClusterInfo(vInfo.mappingId, vInfo.mappingType, 
+				ClusterInfo clusterInfo = getClusterInfo(vInfo.mappingId, 
 						DataController.getInstance().TYPE_CLUSTER_RENDER);
-				logger.info("IP = " + clusterInfo.clusterIp);
-				logger.info("User Name = " + clusterInfo.userName);
-				logger.info("Password = " + clusterInfo.password);
-				logger.info("appid config = "+ uploadConfig.appId);
-				logger.info("ip config = "+ uploadConfig.ip);
-
-				String tranferFile = "";
+				if(clusterInfo == null)
+				{
+					logger.error("Error! Can not get upload video configuration");
+					return;
+				}
+				String uploadVideoPath = null;
 				if(clusterInfo.clusterIp.equals(uploadConfig.ip)== false)
 				{
-					//TODO: download video from render cluster
-					SCPDownload scpDownload = new SCPDownload();
-					logger.info("====================================================");
-					logger.info("Begining coopy file : " + vInfo.vRenderPath);
-					boolean success = scpDownload.execute(clusterInfo.clusterIp, clusterInfo.userName, clusterInfo.password,
-							vInfo.vRenderPath, "/tmp/");
-					if(success)
-					{
-						logger.info("Download from render cluster OK");
-					}else {
-						logger.error("ERROR! Download file from render cluster FALSE");
-						isComplete = true;
-						return;
-					}
-					logger.info("====================================================");
-					Path p = Paths.get(vInfo.vRenderPath);
-					String fileName = p.getFileName().toString();
-					tranferFile = "/tmp/" + fileName;
+					uploadVideoPath = copyRenderedVideo(vInfo.vRenderPath, clusterInfo);
 				}else {
-					tranferFile =  vInfo.vRenderPath;
+					uploadVideoPath = vInfo.vRenderPath;
 				}
 
-
-				logger.info("Uploading video : " + tranferFile);
-
 				AuthenInfo authInfo = getAuthenInfo(vInfo.mappingId, vInfo.mappingId);
+				logger.info(">>>> Authen info:");
 				logger.info("Authen infor : user name = " + authInfo.userName);
 				logger.info("Authen infor : api key = " + authInfo.apiKey);
 				logger.info("Authen infor : client secret = " + authInfo.clientSecret);
 				logger.info("Authen infor : client id = " + authInfo.clientId);
-
-				logger.info("Beginning get authen file >>>>");
-				String clientFile = "/tmp/ " + cHomeId + "_client_secrets.json";
+				logger.info("<<<<");
+				String clientFile = "/tmp/" + cHomeId + "_client_secrets.json";
 				CrunchifyJSONFileWrite jsonCreate = new CrunchifyJSONFileWrite();
 				File jsonFile = new File(clientFile);
 				if(jsonFile.exists() == false)
@@ -150,9 +124,8 @@ public class UploadExecuteTimer extends TimerTask{
 				UploadVideo.setclientSecretsFile(clientFile);
 				String storeFile = System.getProperty("user.home") + "/" 
 						+ CREDENTIALS_DIRECTORY + "/upload_" + authInfo.userName;
-				System.out.println("Store file = " + storeFile);
 				File file = new File(storeFile);
-				
+
 				if(file.exists() == false)
 				{
 					logger.error("ERROR : Can not get authen store upload");
@@ -160,25 +133,22 @@ public class UploadExecuteTimer extends TimerTask{
 					updateUploadedInfo(jobData.jobId);
 					return;
 				}
-				
-				UploadVideo.setStoreFile( "upload_" + authInfo.userName);
-				logger.info("Complete get authen file <<<<");
 
-				logger.info("Beginning standardize meta data >>>>");
+				UploadVideo.setStoreFile( "upload_" + authInfo.userName);
+
 				String title = standardizeTitle(vInfo.title, uploadVideoCfg.vTitleTemp, uploadVideoCfg.enableTitle);
 				String desc = standardizeDesc(vInfo.description, uploadVideoCfg.vDescTemp, uploadVideoCfg.enableDes);
 				String tags = standardizeTags(vInfo.tags, uploadVideoCfg.vTagsTemp, uploadVideoCfg.enableTags);
-				logger.info("Complete standardize meta data <<<<");
 
 				logger.info("Beginning upload video " + vInfo.videoId);
-				logger.info("create authen file for email : " + authInfo.userName);
-				
-				boolean isSuccess = UploadVideo.execute(title, desc, tags, tranferFile, "public");
+				logger.info("Create authen file for email : " + authInfo.userName);
+
+				boolean isSuccess = UploadVideo.execute(title, desc, tags, uploadVideoPath, "public");
 				if(isSuccess)
 				{
 					//update process status 
 					updateUploadedInfo(jobData.jobId);
-					deleteTempFile(tranferFile);
+					deleteTempFile(uploadVideoPath);
 					deleteTempFile(clientFile);
 					logger.info("Upload complete video " + vInfo.videoId);
 					//Sleep for next upload
@@ -190,7 +160,9 @@ public class UploadExecuteTimer extends TimerTask{
 				}else {
 					logger.error("FALSE : Can not upload video id = " + vInfo.videoId);
 				}
+
 			}
+			logger.info("==========>> Timer id [" + cHomeId + "] COMPLETE UPLOAD VIDEO <<==========");
 			isComplete = true;
 		}
 		else{
@@ -198,10 +170,26 @@ public class UploadExecuteTimer extends TimerTask{
 			logger.info("Process timer task is still running ...");
 		}
 	}
+
+	private String copyRenderedVideo(String renderedVideoPath, ClusterInfo clusterInfo) {
+		String tranferFile = null;
+		SCPDownload scpDownload = new SCPDownload();
+		logger.info("Begining coopy file : " + renderedVideoPath);
+		boolean success = scpDownload.execute(clusterInfo.clusterIp, clusterInfo.userName, 
+				clusterInfo.password, renderedVideoPath, "/tmp/");
+		if(success == false)
+		{
+			logger.error("ERROR! Can not download renderd video");
+		}else {
+			Path p = Paths.get(renderedVideoPath);
+			String fileName = p.getFileName().toString();
+			tranferFile = "/tmp/" + fileName;	
+		}
+		return tranferFile;
+	}
+
 	private String standardizeTitle(String originTitle, String titleTemp, boolean enableTitle) {
 		logger.info("Function standardizeTitle <<<<< ");
-		logger.info("origin title : " + originTitle);
-		logger.info("title template : " + titleTemp);
 		String result = "";
 		if(enableTitle)
 		{
@@ -214,12 +202,16 @@ public class UploadExecuteTimer extends TimerTask{
 			}else {
 				logger.error("Description template format incorrect");
 			}
-			
+
 		}else {
 			logger.info("enable title template = false");
 			result = originTitle;
 		}
 		logger.info("standardizeTitle result = " + result);
+		if(result.length() > 90)
+		{
+			result = result.substring(0, 90);
+		}
 		return result;
 	}
 
@@ -239,7 +231,13 @@ public class UploadExecuteTimer extends TimerTask{
 		if (listTags != null) {
 			Iterator<String> iteratorTags = listTags.iterator();
 			while (iteratorTags.hasNext()) {
-				result += iteratorTags.next() + System.getProperty("line.separator");
+				String tagItem = iteratorTags.next();
+				if((result + tagItem).length() < 400)
+				{
+					result += tagItem + System.getProperty("line.separator");	
+				}else {
+					break;	
+				}
 			}
 		}
 		logger.info("standardizeTags result = " + result);
@@ -274,10 +272,14 @@ public class UploadExecuteTimer extends TimerTask{
 				logger.error("Description template format incorrect");
 			}
 		}
+		if(result.length() > 4500)
+		{
+			result = result.substring(0, 4500);
+		}
 		logger.info("standardizeDesc result = " + result);
 		return result;
 	}
-	
+
 	private boolean checkIgnoreKeyword(String inputLine)
 	{
 		boolean result = true;
@@ -285,7 +287,6 @@ public class UploadExecuteTimer extends TimerTask{
 			if(inputLine.contains(keyword))
 			{
 				result = false;
-				//logger.info("invalid line : " + inputLine);
 				break;
 			}
 		}
@@ -316,10 +317,9 @@ public class UploadExecuteTimer extends TimerTask{
 		}
 	}
 
-	private ClusterInfo getClusterInfo (int mappingId, int mappingType, int clusterType)
+	private ClusterInfo getClusterInfo (int mappingId, int clusterType)
 	{
-		logger.info("Function getClusterInfo : mapping ID = " + mappingId 
-				+ " mapping type = " + mappingType);
+		logger.info("Function getClusterInfo : mapping ID = " + mappingId );
 		ClusterInfo clusterInfor = null;
 		if(isInitCorba == false)
 		{
@@ -331,7 +331,7 @@ public class UploadExecuteTimer extends TimerTask{
 			{
 				try {
 
-					clusterInfor = uploadClient.uploadAppImpl.getClusterInfo(mappingId, mappingType, clusterType);
+					clusterInfor = uploadClient.uploadAppImpl.getClusterInfo(mappingId, clusterType);
 				}catch (Exception e) {
 					System.out.println(e.toString());
 				}
@@ -343,8 +343,8 @@ public class UploadExecuteTimer extends TimerTask{
 		}
 		return clusterInfor;
 	}
-	
-	private SpiderCorba.SpiderDefinePackage.UploadConfig getUploadCfg (int mappingId, int mappingType)
+
+	private SpiderCorba.SpiderDefinePackage.UploadConfig getUploadCfg (int mappingId)
 	{
 		SpiderCorba.SpiderDefinePackage.UploadConfig uploadCfg = new SpiderCorba.SpiderDefinePackage.UploadConfig();
 		if(isInitCorba == false)
@@ -357,7 +357,7 @@ public class UploadExecuteTimer extends TimerTask{
 			{
 				try {
 
-					uploadCfg = uploadClient.uploadAppImpl.getUploadConfig(mappingId, mappingType);
+					uploadCfg = uploadClient.uploadAppImpl.getUploadConfig(mappingId);
 				}catch (Exception e) {
 					System.out.println(e.toString());
 				}
@@ -369,7 +369,7 @@ public class UploadExecuteTimer extends TimerTask{
 		}
 		return uploadCfg;
 	}
-	
+
 	private AuthenInfo getAuthenInfo(int mappingId, int mappingType)
 	{
 		logger.info("Function getAuthenInfo : mapping ID = " + mappingId 
@@ -385,7 +385,7 @@ public class UploadExecuteTimer extends TimerTask{
 			{
 				try {
 
-					authInfo = uploadClient.uploadAppImpl.getAuthenInfo(mappingId, mappingType);
+					authInfo = uploadClient.uploadAppImpl.getAuthenInfo(mappingId);
 				}catch (Exception e) {
 					System.out.println(e.toString());
 				}

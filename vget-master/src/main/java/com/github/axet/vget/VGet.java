@@ -49,7 +49,6 @@ public class VGet {
     
     public VGet(URL source, File targetDir, String fileName) {
         this(new VideoInfo(source, fileName), targetDir);
-        System.out.println("======== Vget 3 param ===========");
     }
 
     public VGet(VideoInfo info, File targetDir) {

@@ -7,22 +7,12 @@ import com.github.axet.vget.info.VideoInfoUser;
 import com.github.axet.vget.info.VideoInfo.VideoQuality;
 import com.github.axet.vget.info.VideoInfo.VideoType;
 
-/*------------------------------------------------------------------------------
-** History
-
-27-01-2018, [CR-009] phapnd
-    Modify tra ra thong tin extentsion cua file videodownload
- */
-
 public class DirectDownload {
 
-//	public static void main() {
-//		//download("JyhTTkypni0","C:\\Users\\phong.tran\\Downloads\\Video\\spider_video\\");
-//		//download("J2-qgXKoeKw","/home/phongtran0715/Downloads", "phongtestvideo");
-//	}
     public String download(String vId, String storeLocation) {
         String ext = null;
         try {
+        	deleteFileIdExisted(storeLocation + "/" + vId + ".mp4");
             System.out.println("Begining download video id : " + vId);
             String[] vUlrs = {"https://www.youtube.com/watch?v=" + vId};
             for (String vUrl : vUlrs) {
@@ -39,5 +29,17 @@ public class DirectDownload {
         }
         return ext;
     }
+    
+	private void deleteFileIdExisted(String filePath)
+	{
+		File file = new File(filePath);
+		if(file.exists())
+		{
+			if(file.delete() == false)
+			{
+				System.out.println("Failed to delete the file : " + filePath);
+			}	
+		}
+	}
 
 }

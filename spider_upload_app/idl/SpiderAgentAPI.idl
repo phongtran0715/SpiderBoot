@@ -12,7 +12,6 @@ module SpiderCorba
           wstring vDownloadPath;
           wstring vRenderPath;
           long mappingId;
-          long mappingType;
           long processStatus;
           long license;
     };
@@ -46,18 +45,18 @@ module SpiderCorba
         boolean createUploadTimer(in wstring cHomeId);
         boolean deleteUploadTimer(in wstring cHomeId);
         boolean createUploadJob(in long jobId, in VideoInfo vInfo, in wstring cHomeId);
-		boolean deleteUploadJob(in long jobId, in wstring cHomeId);
+        boolean deleteUploadJob(in long jobId, in wstring cHomeId);
   };
 
   interface AgentSide : SpiderDefine
   {
       //Upload app function
       void onUploadStartup(in wstring uploadClusterId);
-      UploadConfig getUploadConfig(in long mappingId, in long mappingType);
+      UploadConfig getUploadConfig(in long mappingId);
       void updateUploadedVideo (in long jobId);
 
       //Other function
-      AuthenInfo getAuthenInfo(in long mappingId, in long mappingType);
-	  ClusterInfo getClusterInfo (in long mappingId, in long mappingType, in long clusterType);
+      AuthenInfo getAuthenInfo(in long mappingId);
+      ClusterInfo getClusterInfo (in long mappingId, in long clusterType);
   };
 };

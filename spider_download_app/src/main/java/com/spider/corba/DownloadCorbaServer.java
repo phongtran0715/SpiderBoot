@@ -14,34 +14,27 @@ import SpiderCorba.DownloadSidePOA;
 
 
 class DownloadImpl extends DownloadSidePOA {
-	private static final Logger logger = Logger.getLogger(DownloadImpl.class);
 
 	@Override
-	public boolean createDownloadTimer(int timerId,
-			SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg) {
-		logger.info("Create new download timer id = " + timerId );
-		DownloadTimerManager.getInstance().createDownloadTimer(timerId, downloadCfg);	
+	public boolean createDownloadTimer(int timerId, int timerInterval) {
+		DownloadTimerManager.getInstance().createDownloadTimer(timerId, timerInterval);	
 		return true;
 	}
 
 	@Override
-	public boolean modifyDownloadTimer(int timerId,
-			SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg) {
-		logger.info("Modify download timer id = " + timerId );		
-		DownloadTimerManager.getInstance().modifyDownloadTimer(timerId, downloadCfg);
+	public boolean modifyDownloadTimer(int timerId, int timerInterval, int syncStatus) {
+		DownloadTimerManager.getInstance().modifyDownloadTimer(timerId, timerInterval, syncStatus);
 		return true;
 	}
 
 	@Override
 	public boolean deleteDowloadTimer(int timerId) {
-		logger.info("Delete download timer id = " + timerId );
 		DownloadTimerManager.getInstance().deleteDownloadTimer(timerId);
 		return true;
 	}
 
 	@Override
 	public boolean deleteDownloadedVideo(int jobId) {
-		logger.info("Delete video by jobId = " + jobId);
 		return true;
 	}
 }

@@ -27,9 +27,10 @@ public class UploadTimerManager {
 	}
 
 	public boolean createUploadTimer(String cHomeId) {
+		logger.info("Create new upload timer for channel : " + cHomeId );
 		boolean isSuccess = false;
 		//check timer is existed
-		if(timerMap.get(cHomeId)== null)
+		if(timerMap.get(cHomeId) == null)
 		{
 			TimerTask timerTask = new UploadExecuteTimer(cHomeId);
 			Timer timer = new Timer();
@@ -52,7 +53,7 @@ public class UploadTimerManager {
 	
 	public boolean deleteUploadTimer(String cHomeId) 
 	{
-		logger.info("Delete upload timer : " + cHomeId);
+		logger.info("Delete upload timer for channel : " + cHomeId);
 		boolean isSuccess = false;
 		if(timerMap.get(cHomeId) != null)
 		{
@@ -78,6 +79,7 @@ public class UploadTimerManager {
 	
 	public boolean createUploadJob(int jobId, VideoInfo vInfo, String cHomeId)
 	{
+		logger.info("Create upload jod id = " + jobId);
 		boolean isSuccess = false;
 		DataDefine.UploadJobData uploadJobData = new DataDefine().new UploadJobData(jobId, vInfo);
 		if(queueMap.get(cHomeId) != null)

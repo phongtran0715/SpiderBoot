@@ -20,17 +20,21 @@ module SpiderCorba
     {
             wstring cHomeId;
             wstring monitorContent;
-            wstring downloadClusterId;
             long mappingType;
-            long timerInterval;
-            long synStatus;
+    };
+
+	struct CustomVideoInfor
+    {
+            long id;
+            wstring videoId;
+            long mappingId;
     };
   };
 
   interface DownloadSide : SpiderDefine
   {
-        boolean createDownloadTimer(in long timerId, in DownloadConfig downloadCfg);
-        boolean modifyDownloadTimer(in long timerId, in DownloadConfig downloadCfg);
+        boolean createDownloadTimer(in long timerId, in long timerInterval);
+        boolean modifyDownloadTimer(in long timerId, in long timerInterval, in long syncStatus);
         boolean deleteDowloadTimer(in long timerId);
         boolean deleteDownloadedVideo(in long jobId);
   };
@@ -42,5 +46,7 @@ module SpiderCorba
       long long getLastSyncTime(in long mappingId);
       void updateLastSyntime(in long mappingId, in long long lastSyncTime);
       void updateDownloadedVideo(in VideoInfo vInfo);
+      DownloadConfig getDownloadConfig(in long mappingId);
+      CustomVideoInfor getCustomVideo(in wstring downloadClusterId);
   };
 };

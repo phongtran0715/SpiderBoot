@@ -13,25 +13,21 @@ import SpiderCorba.SpiderDefinePackage.VideoInfo;
 import spiderboot.data.DataController;
 
 class UploadImpl extends UploadSidePOA {
-	private static final Logger logger = Logger.getLogger(UploadImpl.class);
 
 	@Override
 	public boolean createUploadTimer(String cHomeId) {
-		logger.info("Create new upload timer for channel : " + cHomeId );
 		UploadTimerManager.getInstance().createUploadTimer(cHomeId);
 		return false;
 	}
 
 	@Override
 	public boolean deleteUploadTimer(String cHomeId) {
-		logger.info("Delete upload timer for channel : " + cHomeId);
 		UploadTimerManager.getInstance().deleteUploadTimer(cHomeId);
 		return false;
 	}
 
 	@Override
 	public boolean createUploadJob(int jobId, VideoInfo vInfo, String cHomeId) {
-		logger.info("Create upload jod id = " + jobId);
 		UploadTimerManager.getInstance().createUploadJob(jobId, vInfo, cHomeId);
 		return false;
 	}
@@ -39,7 +35,6 @@ class UploadImpl extends UploadSidePOA {
 	@Override
 	public boolean deleteUploadJob(int jobId, String cHomeId) {
 		// TODO Auto-generated method stub
-		logger.info("Delete upload jod id = " + jobId);
 		return false;
 	}
 }

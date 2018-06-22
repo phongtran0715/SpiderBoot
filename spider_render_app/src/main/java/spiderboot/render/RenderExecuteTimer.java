@@ -70,34 +70,38 @@ public class RenderExecuteTimer extends TimerTask{
 				VideoInfo vInfo = jobData.vInfo;
 			
 				logger.info("Render job ( id = )"  + jobData.jobId + " started at:" + new Date());
-				logger.info("=================== Render video infor ===================");
+				logger.info("\n\n");
+				logger.info("=================== BEGINNING RENDER VIDEO ===================");
 				logger.info(" + Video ID :" + vInfo.videoId);
 				logger.info(" + Title :" + vInfo.title);
 				logger.info(" + Video location :" + vInfo.vDownloadPath);
 				logger.info(" + Mapping ID :" + vInfo.mappingId);
-				logger.info("==========================================================");
 				//TODO: get render information
-				
-				SpiderCorba.SpiderDefinePackage.RenderConfig renderCfg = getRenderConfig(vInfo.mappingId);
-				if(renderCfg != null)
+				SpiderCorba.SpiderDefinePackage.RenderConfig renderCfg = null;
+				try {
+					renderCfg = getRenderConfig(vInfo.mappingId);	
+				}catch (Exception e) {
+					// TODO: handle exception
+					logger.error(e.toString());
+				}
+				 
+				if(renderCfg == null)
 				{
-					logger.info("video intro = " + renderCfg.vIntroTemp);
-					logger.info("video outro = " + renderCfg.vOutroTemp);
-				}else {
-					logger.error("can not get render config");
+					logger.error("Error! Can not get render config");
+					isComplete = true;
 					return;
 				}
 				File uploadFile = new File(vInfo.vDownloadPath);
 
 				if (!uploadFile.exists()) {
-					logger.error("File " + vInfo.vDownloadPath + " not Exist");
-					logger.info("Timer task finished at:" + new Date());
+					logger.error("Error! File " + vInfo.vDownloadPath + " not Exist");
 					isComplete = true;
 					return;
 				}
 				util.createFolderIfNotExist(outputFolder);
 				//check file is existed or not
 				String vOutput = outputFolder + util.prefixOS() + "video_" +vInfo.videoId + "_" + new Date().getTime() +   ".mp4";
+				
 				//process video
 				String vProcessedInput = processVideo(renderCfg, vInfo.vDownloadPath);
 				//convert video
@@ -107,23 +111,23 @@ public class RenderExecuteTimer extends TimerTask{
 				//concast video 
 				concastVideo(tmpVIntro, tmpVProcess, tmpVOutro, 
 						renderCfg.enableIntro, renderCfg.enableOutro, vOutput);
+				
 				//update rendered video information
 				vInfo.vRenderPath = vOutput;
 				vInfo.processStatus = 2;
 				updateRenderedInfo(jobData.jobId, vInfo);
 				//remove all temp file
+				
 				deleteTempFile(vProcessedInput);
 				deleteTempFile(tmpVProcess);
 				deleteTempFile(tmpVIntro);
 				deleteTempFile(tmpVOutro);
 				
-				logger.info("Timer task finished at:" + new Date());
+				logger.info("=================== COMPLETE RENDER VIDEO ===================\n\n");
 			}
 			isComplete = true;
 		}
 		else{
-			//do nothing
-			System.out.println("Process timer task is still running ...");
 		}
 	}
 
@@ -164,6 +168,8 @@ public class RenderExecuteTimer extends TimerTask{
 				.addExtraArgs("-ss", "15")
 				.addExtraArgs("-t", Double.toString(duration))
 				.setInput(inputVideo)
+				.addInput(renderCfg.vLogoTemp)
+				.setComplexFilter("overlay=main_w-overlay_w-5:5")
 				.addOutput(tmpOutput)
 				.setFormat("mp4")
 				.addExtraArgs("-bufsize", "4000k")
@@ -190,17 +196,12 @@ public class RenderExecuteTimer extends TimerTask{
 			@Override
 			public void progress(Progress progress) {
 				double percentage = progress.out_time_ns / duration_ns;
-
-				// Print out interesting information about the progress
-				System.out.println(String.format(
-						"[%.0f%%] status:%s frame:%d time:%s ms fps:%.0f speed:%.2fx",
-						percentage * 100,
+				logger.info(String.format("[%.0f%%] status:%s frame:%d time:%s ms fps:%.0f speed:%.2fx", percentage * 100,
 						progress.status,
 						progress.frame,
 						FFmpegUtils.toTimecode(progress.out_time_ns, TimeUnit.NANOSECONDS),
 						progress.fps.doubleValue(),
-						progress.speed
-						));
+						progress.speed));
 			}
 		});
 		job.run();
