@@ -23,7 +23,7 @@ module SpiderCorba
             long mappingType;
     };
 
-	struct CustomVideoInfor
+    struct CustomVideoInfor
     {
             long id;
             wstring videoId;
@@ -45,8 +45,10 @@ module SpiderCorba
       void onDownloadStartup(in wstring downloadClusterId);
       long long getLastSyncTime(in long mappingId);
       void updateLastSyntime(in long mappingId, in long long lastSyncTime);
-      void updateDownloadedVideo(in VideoInfo vInfo);
+      void insertDownloadedVideo(in VideoInfo vInfo);
+      void updateDownloadedVideo(in long jobId, in VideoInfo vInfo);
       DownloadConfig getDownloadConfig(in long mappingId);
       CustomVideoInfor getCustomVideo(in wstring downloadClusterId);
   };
 };
+

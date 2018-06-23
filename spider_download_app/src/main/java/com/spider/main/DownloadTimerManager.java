@@ -20,7 +20,7 @@ public class DownloadTimerManager {
 	}
 
 	public boolean createDownloadTimer(int timerId, int timerInterval) {
-		logger.info("Create new download timer id = " + timerId );
+		logger.info("Create new download timer id = " + timerId  + "timer interval " + timerInterval);
 		boolean isSuccess = false;
 		//check timer is existed
 		if(timerMap.get(timerId)!= null)

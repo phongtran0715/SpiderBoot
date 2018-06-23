@@ -76,7 +76,14 @@ public class RenderExecuteTimer extends TimerTask{
 				logger.info(" + Title :" + vInfo.title);
 				logger.info(" + Video location :" + vInfo.vDownloadPath);
 				logger.info(" + Mapping ID :" + vInfo.mappingId);
-				//TODO: get render information
+				String extension = vInfo.vDownloadPath.substring(vInfo.vDownloadPath.lastIndexOf(".") + 1);
+				if(extension.equals("mp4") == false)
+				{
+					logger.error("Video type is : " + extension + ". This video will be ignore");
+					isComplete = true;
+					return;
+					
+				}
 				SpiderCorba.SpiderDefinePackage.RenderConfig renderCfg = null;
 				try {
 					renderCfg = getRenderConfig(vInfo.mappingId);	
@@ -162,10 +169,10 @@ public class RenderExecuteTimer extends TimerTask{
 		String tmpOutput = "/tmp/" + new Date().getTime() + ".mp4";
 		FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
 		final FFmpegProbeResult in = ffprobe.probe(inputVideo);
-		Double duration = in.getFormat().duration - 30;
+		Double duration = in.getFormat().duration - 20;
 		FFmpegBuilder builder =
 				new FFmpegBuilder()
-				.addExtraArgs("-ss", "15")
+				.addExtraArgs("-ss", "10")
 				.addExtraArgs("-t", Double.toString(duration))
 				.setInput(inputVideo)
 				.addInput(renderCfg.vLogoTemp)

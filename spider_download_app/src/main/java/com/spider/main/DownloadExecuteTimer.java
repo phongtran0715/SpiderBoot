@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.TimerTask;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.deser.CustomDeserializerFactory;
+
 import com.github.axet.vget.DirectDownload;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.samples.youtube.cmdline.data.Search;
@@ -38,6 +40,7 @@ public class DownloadExecuteTimer extends TimerTask {
 	private final int MONITOR_KEYWORK		= 2;
 	private final int LIST_VIDEO_ONLINE		= 3;
 	private final int LIST_VIDEO_OFFLINE	= 4;
+
 	private static final Logger logger = Logger.getLogger(DownloadExecuteTimer.class);
 
 	public DownloadExecuteTimer(int timerId) {
@@ -104,6 +107,11 @@ public class DownloadExecuteTimer extends TimerTask {
 						File theDir = new File(videoLocation);
 						if (theDir.exists()) {
 							String ext = dowloadHandle.download(vId, videoLocation);
+							if(ext.equals("mp4") == false)
+							{
+								logger.error("Video format is : " + ext +" => does NOT MP4. This video will be ignored!");
+								continue;
+							}
 							vWraper.vDownloadPath = videoFolderBase + "/" + timerId + "/" + vId + "." + ext;
 						}
 						logger.info("Finish download video ID = " + vId + "at : " + new Date().toString());
@@ -111,7 +119,7 @@ public class DownloadExecuteTimer extends TimerTask {
 						//save video infomation
 						if(vWraper != null)
 						{
-							saveVideoInfo(vWraper);	
+							insertVideoInfo(vWraper);	
 						}
 						logger.info("==========>> Timer id [" + timerId + "] DOWNLOADING COMPLETED <<==========\n\n");
 					}
@@ -121,38 +129,54 @@ public class DownloadExecuteTimer extends TimerTask {
 		//Update last sync time
 		updateLastSyncTime(new Date());
 	}
-	
+
 	private void handleListOnlineVideo() {
 		SpiderCorba.SpiderDefinePackage.CustomVideoInfor customVideo = getCustomVideo();
-		// Get video info
-		logger.info("Begin getvideo information video Id = " + customVideo.videoId );
-		VideoWraper vWraper = null;
-		List<Video> videoList = Search.getInstance().getVideoInfo(customVideo.videoId, 
-				DataController.getInstance().downloadConfig.apiKey);
-		Iterator<Video> iteratorSRS = videoList.iterator();
-		if (videoList != null) {
-			if(iteratorSRS.hasNext()) {
-				Video sgVideo = iteratorSRS.next();
-				vWraper = getVideoInfor(sgVideo, customVideo.videoId);
-			}
-		}
-		//Download video
-		DirectDownload dowloadHandle = new DirectDownload();
-		String videoLocation = videoFolderBase + "/" + timerId;
-		util.createFolderIfNotExist(videoLocation);
-		File theDir = new File(videoLocation);
-		if (theDir.exists()) {
-			String ext = dowloadHandle.download(customVideo.videoId, videoLocation);
-			vWraper.vDownloadPath = videoFolderBase + "/" + timerId + "/" + customVideo.videoId + "." + ext;
-		}
-		logger.info("Finish download video ID = " + customVideo.videoId + "at : " + new Date().toString());
-
-		//save video infomation
-		if(vWraper != null)
+		if(customVideo == null || customVideo.videoId.isEmpty())
 		{
-			saveVideoInfo(vWraper);	
+			logger.error("Custom video is empty");
+			return;
 		}
+		logger.info("==========>> Timer id [" + timerId + "] DOWNLOADING CUSTOM VIDEO <<==========");
+		// Get video info
+		try {
+			logger.info("Begin getvideo information video Id = " + customVideo.videoId );
+			VideoWraper vWraper = null;
+			List<Video> videoList = Search.getInstance().getVideoInfo(customVideo.videoId, 
+					DataController.getInstance().downloadConfig.apiKey);
+			Iterator<Video> iteratorSRS = videoList.iterator();
+			if (videoList != null) {
+				if(iteratorSRS.hasNext()) {
+					Video sgVideo = iteratorSRS.next();
+					vWraper = getVideoInfor(sgVideo, customVideo.videoId);
+				}
+			}
+			//Download video
+			DirectDownload dowloadHandle = new DirectDownload();
+			String videoLocation = videoFolderBase + "/" + timerId;
+			util.createFolderIfNotExist(videoLocation);
+			File theDir = new File(videoLocation);
+			if (theDir.exists()) {
+				String ext = dowloadHandle.download(customVideo.videoId, videoLocation);
+				logger.info("Video format : " + ext);
+				vWraper.vDownloadPath = videoFolderBase + "/" + timerId + "/" + customVideo.videoId + "." + ext;
+			}
+			logger.info("Finish download video ID = " + customVideo.videoId + "at : " + new Date().toString());
+
+			//save video infomation
+			if(vWraper != null)
+			{
+				updateVideoInfo(customVideo.id, vWraper);	
+			}else {
+				logger.error("Can not get video information. Save video information false");
+			}
+		}catch(Exception ex)
+		{
+			logger.error(ex.toString());
+		}
+		logger.info("==========>> Timer id [" + timerId + "] COMPLETE DOWNLOAD CUSTOM VIDEO <<==========\n\n");
 	}
+	
 	private void completeTask() {
 		if (isComplete) {
 			isComplete = false;
@@ -167,6 +191,7 @@ public class DownloadExecuteTimer extends TimerTask {
 			case MONITOR_KEYWORK:
 				break;
 			case LIST_VIDEO_ONLINE:
+				handleListOnlineVideo();
 				break;
 			case LIST_VIDEO_OFFLINE:
 				break;
@@ -204,6 +229,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		}
 		return downloadCfg;
 	}
+	
 	private Date getLastSyncTime(int timerId)
 	{
 		Date result = null;
@@ -287,7 +313,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		return vWraper;
 	}
 
-	private void saveVideoInfo(VideoWraper videoWrapper)
+	private void insertVideoInfo(VideoWraper videoWrapper)
 	{
 		if(isInitCorba == false)
 		{
@@ -303,7 +329,8 @@ public class DownloadExecuteTimer extends TimerTask {
 							videoWrapper.vDownloadPath, videoWrapper.vRenderPath, videoWrapper.mappingId,
 							videoWrapper.processStatus, videoWrapper.license);
 
-					downloadClient.downloadAppImpl.updateDownloadedVideo(vInfo);
+					downloadClient.downloadAppImpl.insertDownloadedVideo(vInfo);	
+
 				}catch (Exception e) {
 					logger.error(e.toString());
 				}
@@ -314,7 +341,36 @@ public class DownloadExecuteTimer extends TimerTask {
 			logger.error("Init corba client FALSE");
 		}
 	}
-	
+
+	private void updateVideoInfo(int id, VideoWraper videoWrapper)
+	{
+		if(isInitCorba == false)
+		{
+			isInitCorba = downloadClient.initCorba(downloadConfig.corbaRef);	
+		}
+		if(isInitCorba)
+		{
+			if(downloadClient.downloadAppImpl != null)
+			{
+				try {
+					SpiderCorba.SpiderDefinePackage.VideoInfo vInfo = new VideoInfo(videoWrapper.videoId, videoWrapper.title, 
+							videoWrapper.tag, videoWrapper.description, videoWrapper.thumbnail, 
+							videoWrapper.vDownloadPath, videoWrapper.vRenderPath, videoWrapper.mappingId,
+							videoWrapper.processStatus, videoWrapper.license);
+
+					downloadClient.downloadAppImpl.updateDownloadedVideo(id, vInfo);
+
+				}catch (Exception e) {
+					logger.error(e.toString());
+				}
+			}else {
+				logger.error("Download corba client implementation is NULL");
+			}
+		}else {
+			logger.error("Init corba client FALSE");
+		}
+	}
+
 	private SpiderCorba.SpiderDefinePackage.CustomVideoInfor getCustomVideo() {
 		SpiderCorba.SpiderDefinePackage.CustomVideoInfor customVideo = null;
 		//Reinit corba connection if need
