@@ -56,7 +56,7 @@ public class UploadExecuteTimer extends TimerTask{
 			if( uploadQueue != null && uploadQueue.isEmpty() == false)
 			{
 				logger.info("\n\n");
-				logger.info("==========>> Timer id [" + cHomeId + "] BEGINNIG UPLOAD VIDEO <<==========");
+				logger.info("\n==========>> Timer id [" + cHomeId + "] BEGINNIG UPLOAD VIDEO <<==========");
 				DataDefine.UploadJobData jobData = uploadQueue.poll();
 				VideoInfo vInfo = jobData.vInfo;
 				logger.info("Begining upload for job : " + jobData.jobId + " at : " + new Date().toString());
@@ -65,6 +65,7 @@ public class UploadExecuteTimer extends TimerTask{
 				if(uploadVideoCfg == null)
 				{
 					logger.error("Error! Can not get upload video configuration");
+					isComplete = true;
 					return;
 				}
 				logger.info(">>>> Upload config:");
@@ -87,6 +88,7 @@ public class UploadExecuteTimer extends TimerTask{
 				if(clusterInfo == null)
 				{
 					logger.error("Error! Can not get upload video configuration");
+					isComplete = true;
 					return;
 				}
 				String uploadVideoPath = null;
@@ -125,7 +127,6 @@ public class UploadExecuteTimer extends TimerTask{
 				String storeFile = System.getProperty("user.home") + "/" 
 						+ CREDENTIALS_DIRECTORY + "/upload_" + authInfo.userName;
 				File file = new File(storeFile);
-
 				if(file.exists() == false)
 				{
 					logger.error("ERROR : Can not get authen store upload");
@@ -142,7 +143,6 @@ public class UploadExecuteTimer extends TimerTask{
 
 				logger.info("Beginning upload video " + vInfo.videoId);
 				logger.info("Create authen file for email : " + authInfo.userName);
-
 				boolean isSuccess = UploadVideo.execute(title, desc, tags, uploadVideoPath, "public");
 				if(isSuccess)
 				{
@@ -160,9 +160,8 @@ public class UploadExecuteTimer extends TimerTask{
 				}else {
 					logger.error("FALSE : Can not upload video id = " + vInfo.videoId);
 				}
-
+				logger.info("\n==========>> Timer id [" + cHomeId + "] COMPLETE UPLOAD VIDEO <<==========");
 			}
-			logger.info("==========>> Timer id [" + cHomeId + "] COMPLETE UPLOAD VIDEO <<==========");
 			isComplete = true;
 		}
 		else{

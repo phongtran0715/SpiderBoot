@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpRequest;
@@ -203,7 +204,7 @@ public class Search {
 		}
 	}
 	
-	public List<Video> getVideoInfo(String srcFile, String key) {
+	public List<Video> getVideoInfo(String videoId, String key) {
         List<Video> videoList = null;
         try {
             // This object is used to make YouTube Data API requests. The last
@@ -219,16 +220,13 @@ public class Search {
             //String videoId = stringJoiner.join(videoIds);
             // Call the YouTube Data API's youtube.videos.list method to
             // retrieve the resources that represent the specified videos.
-            //YouTube.Videos.List listVideosRequest = youtube.videos().list("snippet, recordingDetails").setId(videoId);
-            YouTube.Videos.List listVideosRequest = youtube.videos().list("snippet,contentDetails").setId(srcFile);
+            YouTube.Videos.List listVideosRequest = youtube.videos().list("snippet,contentDetails").setId(videoId);
             listVideosRequest.setKey(key);
             VideoListResponse listResponse = listVideosRequest.execute();
 
             videoList = listResponse.getItems();
-            //Iterator<Video> iteratorSearchResults = videoList.iterator();
-            //logger.info("VIDEO INFO|" + videoList);
         } catch (GoogleJsonResponseException e) {
-            System.out.println("ERR_VIDEO INFO|There was a service error: " + e.getDetails().getCode() + " : "
+        	System.out.println("ERR_VIDEO INFO|There was a service error: " + e.getDetails().getCode() + " : "
                     + e.getDetails().getMessage() + ":" + e.toString());
             return videoList;
         } catch (IOException e) {
@@ -240,4 +238,40 @@ public class Search {
         }
         return videoList;
     }
+	
+	public List<Video> getVideoLicense(String videoId, String key) {
+        List<Video> videoList = null;
+        try {
+            // This object is used to make YouTube Data API requests. The last
+            // argument is required, but since we don't need anything
+            // initialized when the HttpRequest is initialized, we override
+            // the interface and provide a no-op function.
+            youtube = new YouTube.Builder(Auth.HTTP_TRANSPORT, Auth.JSON_FACTORY, new HttpRequestInitializer() {
+                @Override
+                public void initialize(HttpRequest request) throws IOException {
+                }
+            }).setApplicationName("getInfo").build();
+            //Joiner stringJoiner = Joiner.on(',');
+            //String videoId = stringJoiner.join(videoIds);
+            // Call the YouTube Data API's youtube.videos.list method to
+            // retrieve the resources that represent the specified videos.
+            YouTube.Videos.List listVideosRequest = youtube.videos().list("contentDetails").setId(videoId);
+            listVideosRequest.setKey(key);
+            VideoListResponse listResponse = listVideosRequest.execute();
+
+            videoList = listResponse.getItems();
+        } catch (GoogleJsonResponseException e) {
+        	System.out.println("ERR_VIDEO INFO|There was a service error: " + e.getDetails().getCode() + " : "
+                    + e.getDetails().getMessage() + ":" + e.toString());
+            return videoList;
+        } catch (IOException e) {
+            System.out.println("ERR_VIDEO INFO|There was an IO error: " + e.getCause() + " : " + e.getMessage());
+            return videoList;
+        } catch (Exception ex) {
+            System.out.println("ERR_VIDEO INFO|" + ex.toString());
+            return videoList;
+        }
+        return videoList;
+    }
+	
 }

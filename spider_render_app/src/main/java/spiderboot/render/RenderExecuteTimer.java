@@ -71,7 +71,7 @@ public class RenderExecuteTimer extends TimerTask{
 			
 				logger.info("Render job ( id = )"  + jobData.jobId + " started at:" + new Date());
 				logger.info("\n\n");
-				logger.info("=================== BEGINNING RENDER VIDEO ===================");
+				logger.info("\n=================== BEGINNING RENDER VIDEO ===================");
 				logger.info(" + Video ID :" + vInfo.videoId);
 				logger.info(" + Title :" + vInfo.title);
 				logger.info(" + Video location :" + vInfo.vDownloadPath);
@@ -130,7 +130,7 @@ public class RenderExecuteTimer extends TimerTask{
 				deleteTempFile(tmpVIntro);
 				deleteTempFile(tmpVOutro);
 				
-				logger.info("=================== COMPLETE RENDER VIDEO ===================\n\n");
+				logger.info("\n=================== COMPLETE RENDER VIDEO ===================\n\n");
 			}
 			isComplete = true;
 		}
@@ -199,7 +199,6 @@ public class RenderExecuteTimer extends TimerTask{
 
 			// Using the FFmpegProbeResult determine the duration of the input
 			final double duration_ns = in.getFormat().duration * TimeUnit.SECONDS.toNanos(1);
-
 			@Override
 			public void progress(Progress progress) {
 				double percentage = progress.out_time_ns / duration_ns;

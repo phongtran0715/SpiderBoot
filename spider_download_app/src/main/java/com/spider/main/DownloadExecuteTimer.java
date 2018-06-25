@@ -91,7 +91,7 @@ public class DownloadExecuteTimer extends TimerTask {
 						if (videoList != null) {
 							if(iteratorSRS.hasNext()) {
 								Video sgVideo = iteratorSRS.next();
-								vWraper = getVideoInfor(sgVideo, vId);
+								vWraper = extractVideoInfor(sgVideo, vId);
 							}
 						}
 						logger.info("Begin download Video ID = " + vId + "at : " + new Date().toString());
@@ -137,7 +137,7 @@ public class DownloadExecuteTimer extends TimerTask {
 			logger.error("Custom video is empty");
 			return;
 		}
-		logger.info("==========>> Timer id [" + timerId + "] DOWNLOADING CUSTOM VIDEO <<==========");
+		logger.info("\n==========>> Timer id [" + timerId + "] DOWNLOADING CUSTOM VIDEO <<==========");
 		// Get video info
 		try {
 			logger.info("Begin getvideo information video Id = " + customVideo.videoId );
@@ -148,7 +148,7 @@ public class DownloadExecuteTimer extends TimerTask {
 			if (videoList != null) {
 				if(iteratorSRS.hasNext()) {
 					Video sgVideo = iteratorSRS.next();
-					vWraper = getVideoInfor(sgVideo, customVideo.videoId);
+					vWraper = extractVideoInfor(sgVideo, customVideo.videoId);
 				}
 			}
 			//Download video
@@ -174,7 +174,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		{
 			logger.error(ex.toString());
 		}
-		logger.info("==========>> Timer id [" + timerId + "] COMPLETE DOWNLOAD CUSTOM VIDEO <<==========\n\n");
+		logger.info("\n==========>> Timer id [" + timerId + "] COMPLETE DOWNLOAD CUSTOM VIDEO <<==========\n\n");
 	}
 	
 	private void completeTask() {
@@ -284,7 +284,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		}
 	}
 
-	private VideoWraper getVideoInfor(Video singleVideo, String videoName) {
+	private VideoWraper extractVideoInfor(Video singleVideo, String videoName) {
 		String videoId = singleVideo.getId();
 		String title = singleVideo.getSnippet().getTitle();
 		String desc = singleVideo.getSnippet().getDescription();
