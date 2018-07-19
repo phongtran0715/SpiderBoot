@@ -10,24 +10,29 @@ import com.github.axet.vget.info.VideoInfo.VideoType;
 public class DirectDownload {
 
     public String download(String vId, String storeLocation) {
-        String ext = null;
+        String videoPath = null;
         try {
         	deleteFileIdExisted(storeLocation + "/" + vId + ".mp4");
             System.out.println("Begining download video id : " + vId);
             String[] vUlrs = {"https://www.youtube.com/watch?v=" + vId};
             for (String vUrl : vUlrs) {
                 VGet v = new VGet(new URL(vUrl), new File(storeLocation), vId);
-                VideoInfoUser user = new VideoInfoUser();
-                user.setUserQuality(VideoQuality.pMaxQuality);
-                user.setUserType(VideoType.MP4);
-                ext = v.download(user);
+//                VideoInfoUser user = new VideoInfoUser();
+//                user.setUserQuality(VideoQuality.pMaxQuality);
+//                user.setUserType(VideoType.MP4);
+                v.download();
+                //videoPath = v.getTarget().getPath();
+                //System.out.println("1: " + v.getTarget().getAbsolutePath());
+                //System.out.println("name : " + v.getTarget().getName());
+                //System.out.println("content file name : " + v.get);
+                System.out.println("Download complete");
             }
             System.out.println("Download completed video id: " + vId);
         } catch (Exception e) {
             System.err.println(e.getMessage());
             throw new RuntimeException(e);
         }
-        return ext;
+        return videoPath;
     }
     
 	private void deleteFileIdExisted(String filePath)

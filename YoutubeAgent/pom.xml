@@ -1,14 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>dowloadApp</groupId>
-	<artifactId>downloadApp</artifactId>
-	<version>0.0.1</version>
+
+	<groupId>Spider</groupId>
+	<artifactId>ServerHelper</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>downloadApp</name>
+	<name>ServerHelper</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -22,27 +22,17 @@
 			<version>1.2.17</version>
 		</dependency>
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.6</version>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>youtube.api</groupId>
 			<artifactId>samples</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>spiderboot.framework</groupId>
-			<artifactId>framework</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sapher</groupId>
-			<artifactId>youtubedl</artifactId>
-			<version>1.1</version>
-		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -68,7 +58,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.spider.main.MainDownload</mainClass>
+							<mainClass>com.spider.agent.App</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

@@ -38,9 +38,13 @@ public class MainDownload {
 		Thread clientThread = new Thread(){
 			public void run(){
 				logger.info("Beginning to init download corba client >>>");
-				DownloadCorbaClient downloadClient = new DownloadCorbaClient();
-				boolean isInitClient = downloadClient.initCorba(downloadConfig.corbaRef);
-				if(isInitClient == false)
+				DownloadCorbaClient downloadClient = DownloadCorbaClient.getInstance();
+				if(downloadClient.isSuccess == false)
+				{
+					downloadClient.initCorba(downloadConfig.corbaRef);
+				}
+				
+				if(downloadClient.isSuccess == false)
 				{
 					logger.error("Error! Can not init download corba client connection.");
 				}else {

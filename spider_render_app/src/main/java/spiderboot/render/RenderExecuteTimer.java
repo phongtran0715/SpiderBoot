@@ -31,7 +31,6 @@ public class RenderExecuteTimer extends TimerTask{
 	String outputFolder;
 	static Utility util = new Utility();
 	RenderConfig renderConfig;
-	boolean isInitCorba = false;
 	RenderCorbaClient renderClient;
 	private static final Logger logger = Logger.getLogger(RenderExecuteTimer.class);
 
@@ -46,7 +45,7 @@ public class RenderExecuteTimer extends TimerTask{
 			e.printStackTrace();
 		}
 		renderClient = new RenderCorbaClient();
-		isInitCorba = renderClient.initCorba(renderConfig.corbaRef);
+		renderClient.initCorba(renderConfig.corbaRef);
 	}
 
 	@Override
@@ -68,7 +67,7 @@ public class RenderExecuteTimer extends TimerTask{
 			{
 				DataDefine.RenderJobData jobData = RenderTimerManager.qRenderJob.poll();
 				VideoInfo vInfo = jobData.vInfo;
-			
+
 				logger.info("Render job ( id = )"  + jobData.jobId + " started at:" + new Date());
 				logger.info("\n\n");
 				logger.info("\n=================== BEGINNING RENDER VIDEO ===================");
@@ -82,7 +81,7 @@ public class RenderExecuteTimer extends TimerTask{
 					logger.error("Video type is : " + extension + ". This video will be ignore");
 					isComplete = true;
 					return;
-					
+
 				}
 				SpiderCorba.SpiderDefinePackage.RenderConfig renderCfg = null;
 				try {
@@ -91,7 +90,7 @@ public class RenderExecuteTimer extends TimerTask{
 					// TODO: handle exception
 					logger.error(e.toString());
 				}
-				 
+
 				if(renderCfg == null)
 				{
 					logger.error("Error! Can not get render config");
@@ -108,7 +107,7 @@ public class RenderExecuteTimer extends TimerTask{
 				util.createFolderIfNotExist(outputFolder);
 				//check file is existed or not
 				String vOutput = outputFolder + util.prefixOS() + "video_" +vInfo.videoId + "_" + new Date().getTime() +   ".mp4";
-				
+
 				//process video
 				String vProcessedInput = processVideo(renderCfg, vInfo.vDownloadPath);
 				//convert video
@@ -118,18 +117,18 @@ public class RenderExecuteTimer extends TimerTask{
 				//concast video 
 				concastVideo(tmpVIntro, tmpVProcess, tmpVOutro, 
 						renderCfg.enableIntro, renderCfg.enableOutro, vOutput);
-				
+
 				//update rendered video information
 				vInfo.vRenderPath = vOutput;
 				vInfo.processStatus = 2;
 				updateRenderedInfo(jobData.jobId, vInfo);
 				//remove all temp file
-				
+
 				deleteTempFile(vProcessedInput);
 				deleteTempFile(tmpVProcess);
 				deleteTempFile(tmpVIntro);
 				deleteTempFile(tmpVOutro);
-				
+
 				logger.info("\n=================== COMPLETE RENDER VIDEO ===================\n\n");
 			}
 			isComplete = true;
@@ -142,10 +141,7 @@ public class RenderExecuteTimer extends TimerTask{
 	{
 		SpiderCorba.SpiderDefinePackage.RenderConfig renderCfg = null;
 		logger.info(">>> Function [getRenderConfig] :");
-		if(isInitCorba == false)
-		{
-			isInitCorba = renderClient.initCorba(renderConfig.corbaRef);	
-		}
+		boolean isInitCorba = renderClient.initCorba(renderConfig.corbaRef);	
 		if(isInitCorba)
 		{
 			if(renderClient.renderAppImpl != null)
@@ -277,10 +273,7 @@ public class RenderExecuteTimer extends TimerTask{
 	private void updateRenderedInfo(int jobId, VideoInfo vInfo)
 	{
 		logger.info(">>> Function [updateRenderedInfo] : job Id = " + jobId);
-		if(isInitCorba == false)
-		{
-			isInitCorba = renderClient.initCorba(renderConfig.corbaRef);	
-		}
+		boolean isInitCorba = renderClient.initCorba(renderConfig.corbaRef);
 		if(isInitCorba)
 		{
 			if(renderClient.renderAppImpl != null)

@@ -1,0 +1,22 @@
+module SpiderCorba
+{
+  interface SpiderDefine
+  {
+     struct ChannelInfo
+     {
+          wstring channelId;
+          wstring channelName;
+          long videoNumber;
+          long viewNumber;
+          long subcriber;
+          long dateCreated;
+          long status;
+     };
+  };
+
+  interface YoutubeAgent : SpiderDefine
+  {
+       void getChannelInfo(in wstring channelId, out wstring channelName, out long videoNumber, 
+		out long viewNUmber, out long subcriber, out long dateCreated, out long status);
+  };
+};

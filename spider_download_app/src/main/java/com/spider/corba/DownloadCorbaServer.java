@@ -41,7 +41,7 @@ class DownloadImpl extends DownloadSidePOA {
 
 
 public class DownloadCorbaServer {
-	private static final Logger logger = Logger.getLogger(DownloadCorbaServer.class);
+	private final Logger logger = Logger.getLogger(DownloadCorbaServer.class);
 
 	public boolean initCorba(String refStr) {
 		boolean isSuccess = false;
@@ -72,7 +72,7 @@ public class DownloadCorbaServer {
 
 			// bind the Object Reference in Naming
 			String contextName =  DataController.getInstance().downloadConfig.appId;
-			logger.info("Carba context name = " + contextName);
+			logger.info("Corba context name = " + contextName);
 			NameComponent path[] = ncRef.to_name(contextName);
 			ncRef.rebind(path, href);
 

@@ -5,7 +5,6 @@ import org.omg.CosNaming.*;
 
 import SpiderCorba.AgentSide;
 import SpiderCorba.AgentSideHelper;
-
 import org.apache.log4j.Logger;
 import org.omg.CORBA.*;
 
@@ -14,10 +13,18 @@ public class DownloadCorbaClient {
 	public AgentSide downloadAppImpl;
 	public final String COMPONENT_NAME = "AgentSide";
 	private Logger logger = Logger.getLogger(DownloadCorbaClient.class);
+	private static DownloadCorbaClient instance = null;
+	public boolean isSuccess = false;
 
+	public static DownloadCorbaClient getInstance() {
+		if (instance == null) {
+			instance = new DownloadCorbaClient();
+		}
+		return instance;
+	}
+	
 	public boolean initCorba(String refStr) {
-		boolean isSuccess = false;
-		logger.info("Function initCorba with refStr = " + refStr);
+		//logger.info("Function initCorba with refStr = " + refStr);
 		try{
 			// create and initialize the ORB
 			String [] args = new String[] { "-ORBInitRef", refStr };

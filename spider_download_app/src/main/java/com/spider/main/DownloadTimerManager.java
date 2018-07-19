@@ -6,7 +6,7 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
 public class DownloadTimerManager {
-	private static final Logger logger = Logger.getLogger(DownloadTimerManager.class);
+	private final Logger logger = Logger.getLogger(DownloadTimerManager.class);
 	private static DownloadTimerManager instance = null;
 	public static HashMap<Integer, Timer> timerMap = new HashMap<Integer, Timer>();
 	public DownloadTimerManager() {
@@ -34,8 +34,9 @@ public class DownloadTimerManager {
 		timer.scheduleAtFixedRate(timerTask, 0, timerInterval * 1000);
 		if (timer != null) {
 			timerMap.put(timerId, timer);
+			isSuccess = true;
 		}
-		isSuccess = true;
+		
 		return isSuccess;
 	}
 
@@ -63,6 +64,7 @@ public class DownloadTimerManager {
 				createDownloadTimer(timerId, timerInterval);
 			}
 		}
+		isSuccess = true;
 		return isSuccess;
 	}
 
