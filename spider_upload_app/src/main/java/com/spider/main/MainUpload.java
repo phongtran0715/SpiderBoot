@@ -40,9 +40,13 @@ public class MainUpload {
 		Thread clientThread = new Thread(){
 			public void run(){
 				logger.info("Beginning to init upload corba client >>>");
-				UploadCorbaClient uploadClient = new UploadCorbaClient();
-				boolean isInitClient = uploadClient.initCorba(uploadConfig.corbaRef);
-				if(isInitClient == false)
+				UploadCorbaClient uploadClient = UploadCorbaClient.getInstance();
+				if(uploadClient.isSuccess == false)
+				{
+					uploadClient.initCorba(uploadConfig.corbaRef);	
+				}
+				
+				if(uploadClient.isSuccess == false)
 				{
 					logger.error("Error! Can not init render upload client connection.");
 				}else {

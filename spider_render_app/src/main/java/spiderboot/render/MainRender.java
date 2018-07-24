@@ -35,9 +35,13 @@ public class MainRender
 		Thread clientThread = new Thread(){
 			public void run(){
 				logger.info("Beginning to init render corba client >>>");
-				RenderCorbaClient renderClient = new RenderCorbaClient();
-				boolean isInitClient = renderClient.initCorba(renderConfig.corbaRef);
-				if(isInitClient == false)
+				RenderCorbaClient renderClient = RenderCorbaClient.getInstance();
+				if(renderClient.isSuccess == false)
+				{
+					renderClient.initCorba(renderConfig.corbaRef);	
+				}
+				
+				if(renderClient.isSuccess == false)
 				{
 					logger.error("Error! Can not init render corba client connection.");
 				}else {

@@ -49,7 +49,7 @@ public class Search {
 	 * Define a global variable that identifies the name of a file that
 	 * contains the developer's API key.
 	 */
-	private final String PROPERTIES_FILENAME = "youtube.properties";
+	//private final String PROPERTIES_FILENAME = "youtube.properties";
 
 	private final long NUMBER_OF_VIDEOS_RETURNED = 25;
 	Properties properties;
@@ -80,6 +80,7 @@ public class Search {
 
 	private void initialize() {
 		// Read the developer key from the properties file.
+		/*
 		properties = new Properties();
 		try {
 			InputStream in = Search.class.getResourceAsStream("/" + PROPERTIES_FILENAME);
@@ -90,6 +91,7 @@ public class Search {
 			+ " : " + e.getMessage());
 			System.exit(1);
 		}
+		*/
 		// This object is used to make YouTube Data API requests. The last
 		// argument is required, but since we don't need anything
 		// initialized when the HttpRequest is initialized, we override
@@ -100,7 +102,7 @@ public class Search {
 		}).setApplicationName("youtube-cmdline-search-sample").build();
 	}
 
-	public List<SearchResult> executeQuery(String queryTerm) {
+	public List<SearchResult> executeQuery(String queryTerm, String apiKey) {
 		try {
 			// Define the API request for retrieving search results.
 			YouTube.Search.List search = youtube.search().list("id,snippet");
@@ -108,7 +110,7 @@ public class Search {
 			// Set your developer key from the {{ Google Cloud Console }} for
 			// non-authenticated requests. See:
 			// {{ https://cloud.google.com/console }}
-			String apiKey = properties.getProperty("youtube.apikey");
+			//String apiKey = properties.getProperty("youtube.apikey");
 			search.setKey(apiKey);
 			search.setQ(queryTerm);
 
@@ -142,12 +144,13 @@ public class Search {
 		return null;
 	}
 
-	public List<SearchResult> getVideoByPublishDate(String channelId, DateTime publishAfter, long MaxResult) {
+	public List<SearchResult> getVideoByPublishDate(String channelId, DateTime publishAfter, 
+			long MaxResult, String apiKey) {
 		List<SearchResult> searchResult = new ArrayList<SearchResult>();
 		try{
 			// Define the API request for retrieving search results.
 			YouTube.Search.List search = youtube.search().list("id,snippet");
-			String apiKey = properties.getProperty("youtube.apikey");
+//			String apiKey = properties.getProperty("youtube.apikey");
 			search.setKey(apiKey);
 			search.setType("video");
 			search.setChannelId(channelId);
@@ -155,6 +158,7 @@ public class Search {
 					+ "snippet/thumbnails/default/url)");
 			search.setPublishedAfter(publishAfter);
 			search.setMaxResults((long) MaxResult);
+			search.setOrder("date");
 			// Call the API and print results.
 			SearchListResponse searchResponse = search.execute();
 			searchResult = searchResponse.getItems();
@@ -240,11 +244,10 @@ public class Search {
 		return videoList;
 	}
 
-	public ChannelListResponse getChannelInfo(String channelId)
+	public ChannelListResponse getChannelInfo(String channelId, String apiKey)
 	{
 		ChannelListResponse response = null;
 		try {
-			String apiKey = properties.getProperty("youtube.apikey");
 			HashMap<String, String> parameters = new HashMap<>();
 			parameters.put("part", "snippet,contentDetails,statistics");
 			parameters.put("id", channelId);
@@ -256,7 +259,7 @@ public class Search {
 			}
 
 			response = channelsListByIdRequest.execute();
-			System.out.println(response);
+			//System.out.println(response);
 		}catch(Exception ex)
 		{
 			System.out.println(ex.toString());

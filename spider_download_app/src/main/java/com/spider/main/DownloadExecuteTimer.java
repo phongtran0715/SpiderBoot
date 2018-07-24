@@ -69,7 +69,7 @@ public class DownloadExecuteTimer extends TimerTask {
 				break;
 			}
 			DateTime ytbTime = new DateTime(lastSyncTime);
-			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(channelId, ytbTime, downloadConfig.maxResult);
+			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(channelId, ytbTime, downloadConfig.maxResult, downloadConfig.apiKey);
 			Iterator<SearchResult> iteratorSearchResults = result.iterator();
 			if (!iteratorSearchResults.hasNext()) {
 			} 

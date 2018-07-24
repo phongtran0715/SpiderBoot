@@ -32,7 +32,7 @@ public class RenderExecuteTimer extends TimerTask{
 	static Utility util = new Utility();
 	RenderConfig renderConfig;
 	RenderCorbaClient renderClient;
-	private static final Logger logger = Logger.getLogger(RenderExecuteTimer.class);
+	private final Logger logger = Logger.getLogger(RenderExecuteTimer.class);
 
 	public RenderExecuteTimer(String appId) {
 		logger.info("Function RenderExecuteTimer >>>");
@@ -44,8 +44,11 @@ public class RenderExecuteTimer extends TimerTask{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		renderClient = new RenderCorbaClient();
-		renderClient.initCorba(renderConfig.corbaRef);
+		renderClient = RenderCorbaClient.getInstance();
+		if(renderClient.isSuccess == false)
+		{
+			renderClient.initCorba(renderConfig.corbaRef);	
+		}
 	}
 
 	@Override
@@ -141,8 +144,12 @@ public class RenderExecuteTimer extends TimerTask{
 	{
 		SpiderCorba.SpiderDefinePackage.RenderConfig renderCfg = null;
 		logger.info(">>> Function [getRenderConfig] :");
-		boolean isInitCorba = renderClient.initCorba(renderConfig.corbaRef);	
-		if(isInitCorba)
+			
+		if(renderClient.isSuccess == false)
+		{
+			renderClient.initCorba(renderConfig.corbaRef);	
+		}
+		if(renderClient.isSuccess == true)
 		{
 			if(renderClient.renderAppImpl != null)
 			{
@@ -150,6 +157,7 @@ public class RenderExecuteTimer extends TimerTask{
 					renderCfg = renderClient.renderAppImpl.getRenderConfig(mappingId);
 				}catch (Exception e) {
 					System.out.println(e.toString());
+					//TODO: retry
 				}
 			}else {
 				logger.error("Render client implementation is NULL");
@@ -186,10 +194,23 @@ public class RenderExecuteTimer extends TimerTask{
 				.setVideoResolution(1280, 720)
 				.setVideoBitRate(2_000_000)
 				.setVideoFrameRate(30)
+				.addMetaTag("title", "\"\"")
+				.addMetaTag("comment", "\"\"")
+				.addMetaTag("artist", "\"\"")
+				.addMetaTag("encoded_by", "\"\"")
+				.addMetaTag("copyright", "\"\"")
+				.addMetaTag("composer", "\"\"")
+				.addMetaTag("performer", "\"\"")
+				.addMetaTag("disc", "\"\"")
+				.addMetaTag("language", "eng")
+				.addMetaTag("encoder", "\"\"")
+				.addMetaTag("publisher", "\"\"")
 				.addExtraArgs("-deinterlace")
 				.addExtraArgs("-preset", "medium")
-				.addExtraArgs("-g", "30")
+				.addExtraArgs("-g", "60")
 				.done();
+		
+		System.out.println(builder.toString());
 
 		FFmpegJob job = executor.createJob(builder, new ProgressListener() {
 
@@ -273,8 +294,11 @@ public class RenderExecuteTimer extends TimerTask{
 	private void updateRenderedInfo(int jobId, VideoInfo vInfo)
 	{
 		logger.info(">>> Function [updateRenderedInfo] : job Id = " + jobId);
-		boolean isInitCorba = renderClient.initCorba(renderConfig.corbaRef);
-		if(isInitCorba)
+		if(renderClient.isSuccess == false)
+		{
+			renderClient.initCorba(renderConfig.corbaRef);
+		}
+		if(renderClient.isSuccess == true)
 		{
 			if(renderClient.renderAppImpl != null)
 			{
@@ -282,6 +306,7 @@ public class RenderExecuteTimer extends TimerTask{
 					renderClient.renderAppImpl.updateRenderedVideo(jobId, vInfo);
 				}catch (Exception e) {
 					System.out.println(e.toString());
+					//TODO: retry
 				}
 			}else {
 				logger.error("Render client implementation is NULL");

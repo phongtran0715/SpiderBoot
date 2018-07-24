@@ -14,9 +14,17 @@ public class UploadCorbaClient {
 	public AgentSide uploadAppImpl;
 	public final String COMPONENT_NAME = "AgentSide";
 	private Logger logger = Logger.getLogger(UploadCorbaClient.class);
+	private static UploadCorbaClient instance = null;
+	public boolean isSuccess = false;
+	
+	public static UploadCorbaClient getInstance() {
+		if (instance == null) {
+			instance = new UploadCorbaClient();
+		}
+		return instance;
+	}
 
 	public boolean initCorba(String refStr) {
-		boolean isSuccess = false;
 		logger.info("Function initCorba with refStr = " + refStr);
 		try{
 			// create and initialize the ORB

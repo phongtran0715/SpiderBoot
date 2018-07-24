@@ -39,8 +39,11 @@ public class UploadExecuteTimer extends TimerTask{
 		logger.info("Function UploadExecuteTimer >>>");
 		this.cHomeId = cHomeId;
 		uploadConfig = DataController.getInstance().uploadConfig;
-		uploadClient = new UploadCorbaClient();
-		uploadClient.initCorba(uploadConfig.corbaRef);
+		uploadClient = UploadCorbaClient.getInstance();
+		if(uploadClient.isSuccess == false)
+		{
+			uploadClient.initCorba(uploadConfig.corbaRef);	
+		}
 	}
 
 	@Override
@@ -294,8 +297,12 @@ public class UploadExecuteTimer extends TimerTask{
 	private void updateUploadedInfo(int jobId) 
 	{
 		logger.info(">>> Function [updateUploadedInfo] : job Id = " + jobId);
-		boolean isInitCorba = uploadClient.initCorba(uploadConfig.corbaRef);
-		if(isInitCorba)
+		if(uploadClient.isSuccess == false)
+		{
+			uploadClient.initCorba(uploadConfig.corbaRef);	
+		}
+		
+		if(uploadClient.isSuccess == true)
 		{
 			if(uploadClient.uploadAppImpl != null)
 			{
@@ -316,8 +323,11 @@ public class UploadExecuteTimer extends TimerTask{
 	{
 		logger.info("Function getClusterInfo : mapping ID = " + mappingId );
 		ClusterInfo clusterInfor = null;
-		boolean isInitCorba = uploadClient.initCorba(uploadConfig.corbaRef);
-		if(isInitCorba)
+		if(uploadClient.isSuccess == false)
+		{
+			uploadClient.initCorba(uploadConfig.corbaRef);
+		}
+		if(uploadClient.isSuccess == true)
 		{
 			if(uploadClient.uploadAppImpl != null)
 			{
@@ -339,8 +349,11 @@ public class UploadExecuteTimer extends TimerTask{
 	private SpiderCorba.SpiderDefinePackage.UploadConfig getUploadCfg (int mappingId)
 	{
 		SpiderCorba.SpiderDefinePackage.UploadConfig uploadCfg = new SpiderCorba.SpiderDefinePackage.UploadConfig();
-		boolean isInitCorba = uploadClient.initCorba(uploadConfig.corbaRef);
-		if(isInitCorba)
+		if(uploadClient.isSuccess == false)
+		{
+			uploadClient.initCorba(uploadConfig.corbaRef);	
+		}
+		if(uploadClient.isSuccess == true)
 		{
 			if(uploadClient.uploadAppImpl != null)
 			{
@@ -364,8 +377,12 @@ public class UploadExecuteTimer extends TimerTask{
 		logger.info("Function getAuthenInfo : mapping ID = " + mappingId 
 				+ " mapping type = " + mappingType);
 		AuthenInfo authInfo = null;
-		boolean isInitCorba = uploadClient.initCorba(uploadConfig.corbaRef);
-		if(isInitCorba)
+		if(uploadClient.isSuccess == false)
+		{
+			uploadClient.initCorba(uploadConfig.corbaRef);	
+		}
+		
+		if(uploadClient.isSuccess == true)
 		{
 			if(uploadClient.uploadAppImpl != null)
 			{

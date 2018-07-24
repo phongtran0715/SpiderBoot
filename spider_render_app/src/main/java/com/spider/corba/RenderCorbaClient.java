@@ -14,14 +14,18 @@ public class RenderCorbaClient {
 
 	public AgentSide renderAppImpl;
 	public final String COMPONENT_NAME = "AgentSide";
-	private static final Logger logger = Logger.getLogger(RenderCorbaClient.class);
+	private  final Logger logger = Logger.getLogger(RenderCorbaClient.class);
+	private static RenderCorbaClient instance = null;
+	public boolean isSuccess = false;
 	
-	public RenderCorbaClient()
-	{
+	public static RenderCorbaClient getInstance() {
+		if (instance == null) {
+			instance = new RenderCorbaClient();
+		}
+		return instance;
 	}
 
 	public boolean initCorba(String refStr) {
-		boolean isSuccess = false;
 		try{
 			// create and initialize the ORB
 			String [] args = new String[] { "-ORBInitRef", refStr };

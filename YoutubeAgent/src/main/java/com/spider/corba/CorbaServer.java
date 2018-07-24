@@ -13,6 +13,7 @@ import org.omg.PortableServer.POAHelper;
 import com.google.api.services.samples.youtube.cmdline.data.Search;
 import com.google.api.services.youtube.model.Channel;
 import com.google.api.services.youtube.model.ChannelListResponse;
+import com.spider.agent.YoutubeDataController;
 
 import SpiderCorba.YoutubeAgent;
 import SpiderCorba.YoutubeAgentHelper;
@@ -23,24 +24,34 @@ class YoutubeAgentImpl extends YoutubeAgentPOA {
 	public void getChannelInfo(String channelId, StringHolder channelName, IntHolder videoNumber, 
 			IntHolder viewNUmber, IntHolder subcriber, IntHolder dateCreated, IntHolder status) {
 		// TODO Auto-generated method stub
-		ChannelListResponse response = Search.getInstance().getChannelInfo(channelId);
+		ChannelListResponse response = Search.getInstance().getChannelInfo(channelId, 
+				YoutubeDataController.getInstance().getYtAgentCfg().apiKey);
 		if(response != null)
 		{
 			java.util.List<Channel> channels = response.getItems();
 			for (Channel channel : channels) {
-			    channelName.value = channel.getSnippet().getTitle();
-			    videoNumber.value = channel.getStatistics().getVideoCount().intValue();
-			    viewNUmber.value = channel.getStatistics().getViewCount().intValue();
-			    subcriber.value = channel.getStatistics().getSubscriberCount().intValue();
-			    dateCreated.value = 0;
-			    status.value = 1;
+				channelName.value = channel.getSnippet().getTitle();
+				videoNumber.value = channel.getStatistics().getVideoCount().intValue();
+				viewNUmber.value = channel.getStatistics().getViewCount().intValue();
+				subcriber.value = channel.getStatistics().getSubscriberCount().intValue();
+				dateCreated.value = 0;
+				status.value = 1;
 			}
 		}
 	}
 }
 
 public class CorbaServer {
-	private static final Logger logger = Logger.getLogger(CorbaServer.class);
+	private final Logger logger = Logger.getLogger(CorbaServer.class);
+	private static CorbaServer instance = null;
+
+	public CorbaServer getInstance() {
+		if(instance == null)
+		{
+			instance = new CorbaServer();
+		}
+		return instance;
+	}
 
 	public boolean initCorba(String refStr) {
 		boolean isSuccess = false;
