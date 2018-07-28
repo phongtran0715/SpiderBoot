@@ -27,7 +27,6 @@ module SpiderCorba
     {
             long id;
             wstring videoId;
-            long mappingId;
     };
   };
 
@@ -48,7 +47,7 @@ module SpiderCorba
       void insertDownloadedVideo(in VideoInfo vInfo);
       void updateDownloadedVideo(in long jobId, in VideoInfo vInfo);
       DownloadConfig getDownloadConfig(in long mappingId);
-      CustomVideoInfor getCustomVideo(in wstring downloadClusterId);
+      CustomVideoInfor getCustomVideo(in wstring downloadClusterId, in long timerId);
   };
 };
 

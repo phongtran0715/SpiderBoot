@@ -25,11 +25,12 @@ import java.util.List;
 
 public class DownloadExecuteTimer extends TimerTask {
 	int timerId;
+	int mappingType = -1;
 	static Utility util;;
 	String videoFolderBase;
 	DateFormat dateFormat;
 	DownloadCorbaClient downloadClient;
-	DownloadConfig downloadConfig;
+	DownloadConfig appProperty;
 	boolean isComplete = true;
 	private final int MONITOR_CHANNEL 		= 0;
 	private final int MONITOR_PLAYLIST	 	= 1;
@@ -43,13 +44,22 @@ public class DownloadExecuteTimer extends TimerTask {
 		this.timerId = timerId;
 		util = new Utility();
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		downloadConfig = DataController.getInstance().downloadConfig;
+		appProperty = DataController.getInstance().downloadConfig;
 		downloadClient = DownloadCorbaClient.getInstance();
 		if(downloadClient.isSuccess == false)
 		{
-			downloadClient.initCorba(downloadConfig.corbaRef);	
+			downloadClient.initCorba(appProperty.corbaRef);	
 		}
-		videoFolderBase = downloadConfig.outputVideo;
+		videoFolderBase = appProperty.outputVideo;
+		//get mapping type
+		SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg = getDownloadConfig();
+		if(downloadCfg == null)
+		{
+			logger.error("Can not get download config");
+			cancel();
+		}else {
+			this.mappingType = downloadCfg.mappingType;	
+		}
 	}
 
 	@Override
@@ -57,10 +67,12 @@ public class DownloadExecuteTimer extends TimerTask {
 		completeTask();
 	}
 
-	private void handleMonitorChannel(String monitorContent)
+	private void handleMonitorChannel()
 	{
 		logger.error("Timer Id [" + timerId + "] Start query to get new video");
-		String cMonitorIds [] = monitorContent.split(",");
+		//get mapping content
+		SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg = getDownloadConfig();
+		String cMonitorIds [] = downloadCfg.monitorContent.split(",");
 		for (String channelId : cMonitorIds) {
 			Date lastSyncTime = getLastSyncTime(timerId);
 			if(lastSyncTime == null)
@@ -69,7 +81,8 @@ public class DownloadExecuteTimer extends TimerTask {
 				break;
 			}
 			DateTime ytbTime = new DateTime(lastSyncTime);
-			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(channelId, ytbTime, downloadConfig.maxResult, downloadConfig.apiKey);
+			List<SearchResult> result = Search.getInstance().getVideoByPublishDate(channelId, ytbTime, 
+					appProperty.maxResult, appProperty.apiKey);
 			Iterator<SearchResult> iteratorSearchResults = result.iterator();
 			if (!iteratorSearchResults.hasNext()) {
 			} 
@@ -83,7 +96,7 @@ public class DownloadExecuteTimer extends TimerTask {
 						logger.info("\n\n");
 						logger.info("==========>> Timer id [" + timerId + "] DOWNLOADING VIDEO <<==========");
 						// Get video info
-						
+
 						logger.info("Begin getvideo information video Id = " + vId );
 						VideoWraper vWraper = null;
 						List<Video> videoList = Search.getInstance().getVideoInfo(vId, 
@@ -95,16 +108,17 @@ public class DownloadExecuteTimer extends TimerTask {
 								vWraper = extractVideoInfor(sgVideo, vId);
 							}
 						}
-						
+
 						logger.info("Begin download Video ID = " + vId);
 						//Download video
-						
+						/*
 						if(vWraper.license == 1)
 						{
 							logger.error("Timer id [" + timerId + "]: Video id = " + vId + " have license = 1. This video will be ignore");
 							continue;
 						}
-						
+						 */
+
 						String videoLocation = videoFolderBase + "/" + timerId;
 						util.createFolderIfNotExist(videoLocation);
 						File theDir = new File(videoLocation);
@@ -136,9 +150,14 @@ public class DownloadExecuteTimer extends TimerTask {
 
 	private void handleListOnlineVideo() {
 		SpiderCorba.SpiderDefinePackage.CustomVideoInfor customVideo = getCustomVideo();
-		if(customVideo == null || customVideo.videoId.isEmpty())
+		if(customVideo == null)
 		{
-			logger.error("Timer id [" + timerId + "]: Custom video is empty");
+			logger.error("Timer id [" + timerId + "]: Custom video is NULL");
+			return;
+		}
+		if(customVideo.videoId.isEmpty())
+		{
+			logger.info("Timer id [" + timerId + "]: Custom video is empty");
 			return;
 		}
 		logger.info("\n==========>> Timer id [" + timerId + "] DOWNLOADING CUSTOM VIDEO <<==========");
@@ -173,7 +192,7 @@ public class DownloadExecuteTimer extends TimerTask {
 				}
 			}
 			logger.info("Timer id [" + timerId +"]: Finish download video ID = " + customVideo.videoId);
-			
+
 		}catch(Exception ex)
 		{
 			logger.error(ex.toString());
@@ -184,11 +203,10 @@ public class DownloadExecuteTimer extends TimerTask {
 	private void completeTask() {
 		if (isComplete) {
 			isComplete = false;
-			SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg = getDownloadConfig();
-			switch(downloadCfg.mappingType)
+			switch(mappingType)
 			{
 			case MONITOR_CHANNEL:
-				handleMonitorChannel(downloadCfg.monitorContent);
+				handleMonitorChannel();
 				break;
 			case MONITOR_PLAYLIST:
 				break;
@@ -212,7 +230,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		//Reinit corba connection if need
 		if(downloadClient.isSuccess == false)
 		{
-			downloadClient.initCorba(downloadConfig.corbaRef);	
+			downloadClient.initCorba(appProperty.corbaRef);	
 		}
 		if(downloadClient.isSuccess)
 		{
@@ -239,7 +257,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		//Reinit corba connection if need
 		if(downloadClient.isSuccess == false)
 		{
-			downloadClient.initCorba(downloadConfig.corbaRef);	
+			downloadClient.initCorba(appProperty.corbaRef);	
 		}
 		if(downloadClient.isSuccess)
 		{
@@ -266,7 +284,7 @@ public class DownloadExecuteTimer extends TimerTask {
 	{
 		if(downloadClient.isSuccess == false)
 		{
-			downloadClient.initCorba(downloadConfig.corbaRef);	
+			downloadClient.initCorba(appProperty.corbaRef);	
 		}
 		if(downloadClient.isSuccess)
 		{
@@ -319,7 +337,7 @@ public class DownloadExecuteTimer extends TimerTask {
 	{
 		if(downloadClient.isSuccess == false)
 		{
-			downloadClient.initCorba(downloadConfig.corbaRef);	
+			downloadClient.initCorba(appProperty.corbaRef);	
 		}
 		if(downloadClient.isSuccess)
 		{
@@ -348,7 +366,7 @@ public class DownloadExecuteTimer extends TimerTask {
 	{
 		if(downloadClient.isSuccess == false)
 		{
-			downloadClient.initCorba(downloadConfig.corbaRef);	
+			downloadClient.initCorba(appProperty.corbaRef);	
 		}
 		if(downloadClient.isSuccess)
 		{
@@ -378,14 +396,14 @@ public class DownloadExecuteTimer extends TimerTask {
 		//Reinit corba connection if need
 		if(downloadClient.isSuccess == false)
 		{
-			downloadClient.initCorba(downloadConfig.corbaRef);	
+			downloadClient.initCorba(appProperty.corbaRef);	
 		}
 		if(downloadClient.isSuccess)
 		{
 			if(downloadClient.downloadAppImpl != null)
 			{
 				try {
-					customVideo = downloadClient.downloadAppImpl.getCustomVideo(downloadConfig.appId);
+					customVideo = downloadClient.downloadAppImpl.getCustomVideo(appProperty.appId, this.timerId);
 				}catch (Exception e) {
 					logger.error("Can not call corba agent server function");
 					logger.error(e.toString());
