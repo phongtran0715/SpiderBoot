@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import com.spider.corba.UploadCorbaClient;
 import com.spider.corba.UploadCorbaServer;
 
-import spiderboot.configuration.UploadConfig;
+import spiderboot.configuration.UploadProperty;
 import spiderboot.data.DataController;
 
 public class MainUpload {
@@ -22,7 +22,7 @@ public class MainUpload {
 		}
 		//Load configuration file
 		String configFile = args[0];
-		final UploadConfig uploadConfig = new UploadConfig(configFile);
+		final UploadProperty uploadConfig = new UploadProperty(configFile);
 		DataController.getInstance().setUploadConfigObj(uploadConfig);
 
 		//Init corba server
@@ -41,24 +41,12 @@ public class MainUpload {
 			public void run(){
 				logger.info("Beginning to init upload corba client >>>");
 				UploadCorbaClient uploadClient = UploadCorbaClient.getInstance();
-				if(uploadClient.isSuccess == false)
+				try
 				{
-					uploadClient.initCorba(uploadConfig.corbaRef);	
-				}
-				
-				if(uploadClient.isSuccess == false)
-				{
-					logger.error("Error! Can not init render upload client connection.");
-				}else {
-					logger.info("Init upload corba client connection successful!");
-					logger.info("Notify startup status to agent");
-					try
-					{
-						logger.info("upload Id = " + uploadConfig.appId);
-						uploadClient.uploadAppImpl.onUploadStartup(uploadConfig.appId);	
-					}catch (Exception e) {
-						logger.error(e);
-					}
+					logger.info("upload Id = " + uploadConfig.appId);
+					uploadClient.uploadAppImpl.onUploadStartup(uploadConfig.appId);	
+				}catch (Exception e) {
+					logger.error(e);
 				}
 			}
 		};

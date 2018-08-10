@@ -18,12 +18,7 @@ module SpiderCorba
 
     struct RenderConfig
     {
-            wstring vIntroTemp;
-            wstring vOutroTemp;
-            wstring vLogoTemp;
-            boolean enableIntro;
-            boolean enableOutro;
-            boolean enableLogo;
+            wstring renderCommand;
     };
   };
 

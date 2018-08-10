@@ -8,13 +8,13 @@ import java.util.Properties;
 import spiderboot.util.Constant;
 import spiderboot.util.Utility;
 
-public class YoutubeAgentConfig {
+public class YoutubeAgentProperty {
 	Utility util; 
 	String configFile;
 	public String apiKey;
 	public String corbaRef;
 	
-	public YoutubeAgentConfig(String configFile) {
+	public YoutubeAgentProperty(String configFile) {
 		this.configFile = configFile;
 		boolean isSuccess = loadConfig();
 		if(isSuccess == false)

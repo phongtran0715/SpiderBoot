@@ -21,7 +21,7 @@ class RenderImpl extends RenderSidePOA {
 	public boolean createRenderJob(int jobId, VideoInfo vInfo) {
 		logger.info("createRenderJob:: jobId = " + jobId);
 		DataDefine.RenderJobData jobData = new DataDefine().new RenderJobData(jobId, vInfo);
-		RenderTimerManager.qRenderJob.add(jobData);
+		RenderTimerManager.getInstance().addJob(jobData);
 		return true;
 	}
 	@Override

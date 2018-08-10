@@ -17,7 +17,7 @@ import com.google.api.services.youtube.model.Video;
 import com.spider.corba.DownloadCorbaClient;
 
 import SpiderCorba.SpiderDefinePackage.VideoInfo;
-import spiderboot.configuration.DownloadConfig;
+import spiderboot.configuration.DownloadProperty;
 import spiderboot.data.DataController;
 import spiderboot.util.Utility;
 import spiderboot.util.VideoWraper;
@@ -30,13 +30,14 @@ public class DownloadExecuteTimer extends TimerTask {
 	String videoFolderBase;
 	DateFormat dateFormat;
 	DownloadCorbaClient downloadClient;
-	DownloadConfig appProperty;
+	DownloadProperty appProperty;
 	boolean isComplete = true;
 	private final int MONITOR_CHANNEL 		= 0;
 	private final int MONITOR_PLAYLIST	 	= 1;
 	private final int MONITOR_KEYWORK		= 2;
 	private final int LIST_VIDEO_ONLINE		= 3;
 	private final int LIST_VIDEO_OFFLINE	= 4;
+	private final int NUM_RETRY				= 3;
 
 	private final Logger logger = Logger.getLogger(DownloadExecuteTimer.class);
 
@@ -45,11 +46,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		util = new Utility();
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		appProperty = DataController.getInstance().downloadConfig;
-		downloadClient = DownloadCorbaClient.getInstance();
-		if(downloadClient.isSuccess == false)
-		{
-			downloadClient.initCorba(appProperty.corbaRef);	
-		}
+		downloadClient = DownloadCorbaClient.getInstance();		
 		videoFolderBase = appProperty.outputVideo;
 		//get mapping type
 		SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg = getDownloadConfig();
@@ -227,81 +224,77 @@ public class DownloadExecuteTimer extends TimerTask {
 
 	private SpiderCorba.SpiderDefinePackage.DownloadConfig getDownloadConfig(){
 		SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg = null;
-		//Reinit corba connection if need
-		if(downloadClient.isSuccess == false)
-		{
-			downloadClient.initCorba(appProperty.corbaRef);	
-		}
-		if(downloadClient.isSuccess)
-		{
+		int count = 1;
+		do {
 			if(downloadClient.downloadAppImpl != null)
 			{
 				try {
 					downloadCfg = downloadClient.downloadAppImpl.getDownloadConfig(timerId);
+					return downloadCfg;
 				}catch (Exception e) {
-					logger.error("Can not call corba agent server function");
+					logger.error("Can not call corba server");
 					logger.error(e.toString());
+					//retry
+					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					downloadClient.resolveAgain();
 				}
 			}else {
 				logger.error("Download client implementation is NULL");
 			}
-		}else {
-			logger.error("Init corba client FALSE");
-		}
+			count++;
+		}while(count < NUM_RETRY);
 		return downloadCfg;
 	}
 
 	private Date getLastSyncTime(int timerId)
 	{
 		Date result = null;
-		//Reinit corba connection if need
-		if(downloadClient.isSuccess == false)
-		{
-			downloadClient.initCorba(appProperty.corbaRef);	
-		}
-		if(downloadClient.isSuccess)
-		{
+		int count = 1;
+		do {
 			if(downloadClient.downloadAppImpl != null)
 			{
 				try {
 					long lastTime = downloadClient.downloadAppImpl.getLastSyncTime(timerId);
-					Date date = new Date(lastTime * 1000);
-					result = date;
+					result = new Date(lastTime * 1000);
+					return result;
 				}catch (Exception e) {
-					logger.error("Can not call corba agent server function");
+					logger.error("Can not call corba server");
 					logger.error(e.toString());
+					//retry
+					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					downloadClient.resolveAgain();
 				}
 			}else {
 				logger.error("Download client implementation is NULL");
 			}
-		}else {
-			logger.error("Init corba client FALSE");
-		}
+			count++;
+		}while(count < NUM_RETRY);
 		return result;
 	}
 
 	private void updateLastSyncTime(Date lastSyncTime)
 	{
-		if(downloadClient.isSuccess == false)
-		{
-			downloadClient.initCorba(appProperty.corbaRef);	
-		}
-		if(downloadClient.isSuccess)
+		int count = 1;
+		do
 		{
 			if(downloadClient.downloadAppImpl != null)
 			{
 				try {
 					Timestamp ts = new Timestamp(new Date().getTime());
 					downloadClient.downloadAppImpl.updateLastSyntime(timerId, ts.getTime() / 1000);
+					return;
 				}catch (Exception e) {
+					logger.error("Can not call corba server");
 					logger.error(e.toString());
+					//retry
+					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					downloadClient.resolveAgain();
 				}
 			}else {
 				logger.error("Download client implementation is NULL");
 			}
-		}else {
-			logger.error("Init corba client FALSE");
-		}
+			count++;
+		}while(count < NUM_RETRY);
 	}
 
 	private VideoWraper extractVideoInfor(Video singleVideo, String videoName) {
@@ -335,12 +328,8 @@ public class DownloadExecuteTimer extends TimerTask {
 
 	private void insertVideoInfo(VideoWraper videoWrapper)
 	{
-		if(downloadClient.isSuccess == false)
-		{
-			downloadClient.initCorba(appProperty.corbaRef);	
-		}
-		if(downloadClient.isSuccess)
-		{
+		int count = 1;
+		do {
 			if(downloadClient.downloadAppImpl != null)
 			{
 				try {
@@ -349,27 +338,26 @@ public class DownloadExecuteTimer extends TimerTask {
 							videoWrapper.vDownloadPath, videoWrapper.vRenderPath, videoWrapper.mappingId,
 							videoWrapper.processStatus, videoWrapper.license);
 
-					downloadClient.downloadAppImpl.insertDownloadedVideo(vInfo);	
-
+					downloadClient.downloadAppImpl.insertDownloadedVideo(vInfo);
+					return;
 				}catch (Exception e) {
+					logger.error("Can not call corba server");
 					logger.error(e.toString());
+					//retry
+					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					downloadClient.resolveAgain();
 				}
 			}else {
 				logger.error("Download corba client implementation is NULL");
 			}
-		}else {
-			logger.error("Init corba client FALSE");
-		}
+			count++;
+		}while(count < NUM_RETRY);
 	}
 
 	private void updateVideoInfo(int id, VideoWraper videoWrapper)
 	{
-		if(downloadClient.isSuccess == false)
-		{
-			downloadClient.initCorba(appProperty.corbaRef);	
-		}
-		if(downloadClient.isSuccess)
-		{
+		int count = 1;
+		do {
 			if(downloadClient.downloadAppImpl != null)
 			{
 				try {
@@ -379,41 +367,44 @@ public class DownloadExecuteTimer extends TimerTask {
 							videoWrapper.processStatus, videoWrapper.license);
 
 					downloadClient.downloadAppImpl.updateDownloadedVideo(id, vInfo);
-
+					return;
 				}catch (Exception e) {
+					logger.error("Can not call corba server");
 					logger.error(e.toString());
+					//retry
+					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					downloadClient.resolveAgain();
 				}
 			}else {
 				logger.error("Download corba client implementation is NULL");
 			}
-		}else {
-			logger.error("Init corba client FALSE");
-		}
+			count++;
+		}while(count < NUM_RETRY);
+
 	}
 
 	private SpiderCorba.SpiderDefinePackage.CustomVideoInfor getCustomVideo() {
 		SpiderCorba.SpiderDefinePackage.CustomVideoInfor customVideo = null;
-		//Reinit corba connection if need
-		if(downloadClient.isSuccess == false)
-		{
-			downloadClient.initCorba(appProperty.corbaRef);	
-		}
-		if(downloadClient.isSuccess)
-		{
+		int count = 1;
+		do {
 			if(downloadClient.downloadAppImpl != null)
 			{
 				try {
 					customVideo = downloadClient.downloadAppImpl.getCustomVideo(appProperty.appId, this.timerId);
+					return customVideo;
 				}catch (Exception e) {
-					logger.error("Can not call corba agent server function");
+					logger.error("Can not call corba server");
 					logger.error(e.toString());
+					//retry
+					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					downloadClient.resolveAgain();
 				}
+				count ++;
 			}else {
 				logger.error("Download client implementation is NULL");
 			}
-		}else {
-			logger.error("Init corba client FALSE");
-		}
+		}while(count < NUM_RETRY);
+
 		return customVideo;
 	}
 }

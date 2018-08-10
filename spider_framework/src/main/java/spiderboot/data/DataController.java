@@ -1,8 +1,8 @@
 package spiderboot.data;
 
-import spiderboot.configuration.DownloadConfig;
-import spiderboot.configuration.RenderConfig;
-import spiderboot.configuration.UploadConfig;
+import spiderboot.configuration.DownloadProperty;
+import spiderboot.configuration.RenderProperty;
+import spiderboot.configuration.UploadProperty;
 
 public class DataController {
 
@@ -11,9 +11,9 @@ public class DataController {
 	public final int TYPE_CLUSTER_DOWNLOAD = 1;
 	public final int TYPE_CLUSTER_RENDER = 2;
 	public final int TYPE_CLUSTER_UPLOAD = 3;
-	public DownloadConfig downloadConfig;
-	public RenderConfig renderConfig;
-	public UploadConfig uploadConfig;
+	public DownloadProperty downloadConfig;
+	public RenderProperty renderConfig;
+	public UploadProperty uploadConfig;
 
 	// static method to create instance of Singleton class
 	public static DataController getInstance()
@@ -24,17 +24,17 @@ public class DataController {
 		return single_instance;
 	}
 	
-	public void setDownloadConfigObj(DownloadConfig downloadConfig)
+	public void setDownloadConfigObj(DownloadProperty downloadConfig)
 	{
 		this.downloadConfig = downloadConfig;
 	}
 	
-	public void setRenderConfigObj(RenderConfig renderConfig)
+	public void setRenderConfigObj(RenderProperty renderConfig)
 	{
 		this.renderConfig = renderConfig;
 	}
 	
-	public void setUploadConfigObj(UploadConfig uploadConfig)
+	public void setUploadConfigObj(UploadProperty uploadConfig)
 	{
 		this.uploadConfig = uploadConfig;
 	}

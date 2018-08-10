@@ -3,7 +3,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import com.spider.corba.RenderCorbaClient;
 import com.spider.corba.RenderCorbaServer;
-import spiderboot.configuration.RenderConfig;
+import spiderboot.configuration.RenderProperty;
 import spiderboot.data.DataController;
 
 public class MainRender 
@@ -17,7 +17,7 @@ public class MainRender
 		}
 		//Load configuration file
 		String configFile = args[0];
-		final RenderConfig renderConfig = new RenderConfig(configFile);
+		final RenderProperty renderConfig = new RenderProperty(configFile);
 		DataController.getInstance().setRenderConfigObj(renderConfig);
 
 		//Init corba server
@@ -36,23 +36,11 @@ public class MainRender
 			public void run(){
 				logger.info("Beginning to init render corba client >>>");
 				RenderCorbaClient renderClient = RenderCorbaClient.getInstance();
-				if(renderClient.isSuccess == false)
+				try
 				{
-					renderClient.initCorba(renderConfig.corbaRef);	
-				}
-				
-				if(renderClient.isSuccess == false)
-				{
-					logger.error("Error! Can not init render corba client connection.");
-				}else {
-					logger.info("Init render corba client connection successful!");
-					logger.info("Notify startup status to agent");
-					try
-					{
-						renderClient.renderAppImpl.onRenderStartup(renderConfig.appId);	
-					}catch (Exception e) {
-						logger.error(e.toString());
-					}
+					renderClient.renderAppImpl.onRenderStartup(renderConfig.appId);	
+				}catch (Exception e) {
+					logger.error(e.toString());
 				}
 			}
 		};

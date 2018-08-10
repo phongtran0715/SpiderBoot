@@ -1,54 +1,62 @@
 package spiderboot.render;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import com.spider.corba.RenderCorbaClient;
 
 import SpiderCorba.SpiderDefinePackage.VideoInfo;
-import net.bramp.ffmpeg.FFmpeg;
-import net.bramp.ffmpeg.FFmpegExecutor;
-import net.bramp.ffmpeg.FFmpegUtils;
-import net.bramp.ffmpeg.FFprobe;
-import net.bramp.ffmpeg.builder.FFmpegBuilder;
-import net.bramp.ffmpeg.job.FFmpegJob;
-import net.bramp.ffmpeg.probe.FFmpegProbeResult;
-import net.bramp.ffmpeg.progress.Progress;
-import net.bramp.ffmpeg.progress.ProgressListener;
-import spiderboot.configuration.RenderConfig;
+import spiderboot.configuration.RenderProperty;
 import spiderboot.data.DataController;
 import spiderboot.util.Utility;
+
+class StreamGobbler extends Thread {
+	final Logger logger = Logger.getLogger(RenderExecuteTimer.class);
+	InputStream is;
+	String type;
+
+	StreamGobbler(InputStream is, String type) {
+		this.is = is;
+		this.type = type;
+	}
+
+	@Override
+	public void run() {
+		try {
+			InputStreamReader isr = new InputStreamReader(is);
+			BufferedReader br = new BufferedReader(isr);
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				logger.info(type + "> " + line);
+			}
+		} catch (IOException ioe) {
+			logger.error(ioe.toString());
+			ioe.printStackTrace();
+		}
+	}
+}
 
 public class RenderExecuteTimer extends TimerTask{
 
 	boolean isComplete = true;
-	FFmpeg ffmpeg;
-	FFprobe ffprobe;
 	String outputFolder;
-	static Utility util = new Utility();
-	RenderConfig renderConfig;
+	Utility util = new Utility();
+	RenderProperty renderProperty;
 	RenderCorbaClient renderClient;
-	private final Logger logger = Logger.getLogger(RenderExecuteTimer.class);
+	final Logger logger = Logger.getLogger(RenderExecuteTimer.class);
+	final int NUM_RETRY	= 3;
 
 	public RenderExecuteTimer(String appId) {
 		logger.info("Function RenderExecuteTimer >>>");
-		renderConfig = DataController.getInstance().renderConfig;
-		outputFolder = renderConfig.outputVideo;
-		try {
-			ffmpeg = new FFmpeg();
-			ffprobe = new FFprobe();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		renderProperty = DataController.getInstance().renderConfig;
+		outputFolder = renderProperty.outputVideo;
 		renderClient = RenderCorbaClient.getInstance();
-		if(renderClient.isSuccess == false)
-		{
-			renderClient.initCorba(renderConfig.corbaRef);	
-		}
 	}
 
 	@Override
@@ -56,7 +64,6 @@ public class RenderExecuteTimer extends TimerTask{
 		try {
 			completeTask();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			logger.error(e.toString());
 		}
@@ -66,9 +73,9 @@ public class RenderExecuteTimer extends TimerTask{
 		if(isComplete){
 			isComplete = false;
 
-			if(RenderTimerManager.qRenderJob.isEmpty() == false)
+			if(RenderTimerManager.getInstance().checkEmptyQueue() == false)
 			{
-				DataDefine.RenderJobData jobData = RenderTimerManager.qRenderJob.poll();
+				DataDefine.RenderJobData jobData = RenderTimerManager.getInstance().getJob();
 				VideoInfo vInfo = jobData.vInfo;
 
 				logger.info("Render job ( id = )"  + jobData.jobId + " started at:" + new Date());
@@ -78,60 +85,45 @@ public class RenderExecuteTimer extends TimerTask{
 				logger.info(" + Title :" + vInfo.title);
 				logger.info(" + Video location :" + vInfo.vDownloadPath);
 				logger.info(" + Mapping ID :" + vInfo.mappingId);
-				String extension = vInfo.vDownloadPath.substring(vInfo.vDownloadPath.lastIndexOf(".") + 1);
-				if(extension.equals("mp4") == false)
-				{
-					logger.error("Video type is : " + extension + ". This video will be ignore");
-					isComplete = true;
-					return;
-
-				}
 				SpiderCorba.SpiderDefinePackage.RenderConfig renderCfg = null;
 				try {
-					renderCfg = getRenderConfig(vInfo.mappingId);	
+					renderCfg = getRenderConfig(vInfo.mappingId);
+					if(renderCfg == null)
+					{
+						logger.error("Error! Can not get render config");
+						isComplete = true;
+						return;
+					}
 				}catch (Exception e) {
-					// TODO: handle exception
 					logger.error(e.toString());
 				}
 
-				if(renderCfg == null)
-				{
-					logger.error("Error! Can not get render config");
-					isComplete = true;
-					return;
-				}
-				File uploadFile = new File(vInfo.vDownloadPath);
-
-				if (!uploadFile.exists()) {
+				File file = new File(vInfo.vDownloadPath);
+				if (!file.exists()) {
 					logger.error("Error! File " + vInfo.vDownloadPath + " not Exist");
 					isComplete = true;
 					return;
 				}
+				
 				util.createFolderIfNotExist(outputFolder);
-				//check file is existed or not
 				String vOutput = outputFolder + util.prefixOS() + "video_" +vInfo.videoId + "_" + new Date().getTime() +   ".mp4";
-
 				//process video
-				String vProcessedInput = processVideo(renderCfg, vInfo.vDownloadPath);
-				//convert video
-				String tmpVIntro = convertVideo(renderCfg.vIntroTemp);	
-				String tmpVOutro = convertVideo(renderCfg.vOutroTemp);	
-				String tmpVProcess =  convertVideo(vProcessedInput);
-				//concast video 
-				concastVideo(tmpVIntro, tmpVProcess, tmpVOutro, 
-						renderCfg.enableIntro, renderCfg.enableOutro, vOutput);
-
-				//update rendered video information
-				vInfo.vRenderPath = vOutput;
-				vInfo.processStatus = 2;
-				updateRenderedInfo(jobData.jobId, vInfo);
-				//remove all temp file
-
-				deleteTempFile(vProcessedInput);
-				deleteTempFile(tmpVProcess);
-				deleteTempFile(tmpVIntro);
-				deleteTempFile(tmpVOutro);
-
+				boolean isSuccess = false;
+				if(renderCfg.renderCommand == null || renderCfg.renderCommand.isEmpty())
+				{
+					vOutput = vInfo.vDownloadPath;
+					isSuccess = true;
+				}else {
+					isSuccess = processVideo(renderCfg.renderCommand, vInfo.vDownloadPath,vOutput);
+				}
+				if(isSuccess)
+				{
+					vInfo.vRenderPath = vOutput;
+					vInfo.processStatus = 2;
+					updateRenderedInfo(jobData.jobId, vInfo);
+				}else {
+					logger.error("Render video [ " + vInfo.videoId + "] FALSE");
+				}
 				logger.info("\n=================== COMPLETE RENDER VIDEO ===================\n\n");
 			}
 			isComplete = true;
@@ -143,193 +135,94 @@ public class RenderExecuteTimer extends TimerTask{
 	private SpiderCorba.SpiderDefinePackage.RenderConfig getRenderConfig(int mappingId)
 	{
 		SpiderCorba.SpiderDefinePackage.RenderConfig renderCfg = null;
-		logger.info(">>> Function [getRenderConfig] :");
-			
-		if(renderClient.isSuccess == false)
-		{
-			renderClient.initCorba(renderConfig.corbaRef);	
-		}
-		if(renderClient.isSuccess == true)
-		{
+		int count = 1;
+		do {
 			if(renderClient.renderAppImpl != null)
 			{
 				try {
 					renderCfg = renderClient.renderAppImpl.getRenderConfig(mappingId);
+					return renderCfg;
 				}catch (Exception e) {
-					System.out.println(e.toString());
-					//TODO: retry
+					logger.error("Can not call corba server");
+					logger.error(e.toString());
+					//retry
+					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					renderClient.resolveAgain();
 				}
 			}else {
 				logger.error("Render client implementation is NULL");
 			}
-		}else {
-			logger.error("Init corba client FALSE");
-		}
+			count++;
+		}while (count < NUM_RETRY);
+
 		return renderCfg;
 	}
-	private String processVideo(SpiderCorba.SpiderDefinePackage.RenderConfig renderCfg, String inputVideo) throws IOException 
+	
+	private boolean processVideo(String command, String vInput, String vOutput)
 	{
-		logger.info("Beginning processVideo : " + inputVideo);
-		String tmpOutput = "/tmp/" + new Date().getTime() + ".mp4";
-		FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
-		final FFmpegProbeResult in = ffprobe.probe(inputVideo);
-		Double duration = in.getFormat().duration - 20;
-		FFmpegBuilder builder =
-				new FFmpegBuilder()
-				.addExtraArgs("-ss", "10")
-				.addExtraArgs("-t", Double.toString(duration))
-				.setInput(inputVideo)
-				.addInput(renderCfg.vLogoTemp)
-				.setComplexFilter("overlay=main_w-overlay_w-5:5")
-				.addOutput(tmpOutput)
-				.setFormat("mp4")
-				.addExtraArgs("-bufsize", "4000k")
-				.addExtraArgs("-maxrate", "1000k")
-				.setAudioCodec("copy")
-				.setAudioSampleRate(FFmpeg.AUDIO_SAMPLE_44100)
-				.setAudioBitRate(1_000_000)
-				.addExtraArgs("-profile:v", "baseline")
-				.setVideoCodec("libx264")
-				.setVideoPixelFormat("yuv420p")
-				.setVideoResolution(1280, 720)
-				.setVideoBitRate(2_000_000)
-				.setVideoFrameRate(30)
-				.addMetaTag("title", "\"\"")
-				.addMetaTag("comment", "\"\"")
-				.addMetaTag("artist", "\"\"")
-				.addMetaTag("encoded_by", "\"\"")
-				.addMetaTag("copyright", "\"\"")
-				.addMetaTag("composer", "\"\"")
-				.addMetaTag("performer", "\"\"")
-				.addMetaTag("disc", "\"\"")
-				.addMetaTag("language", "eng")
-				.addMetaTag("encoder", "\"\"")
-				.addMetaTag("publisher", "\"\"")
-				.addExtraArgs("-deinterlace")
-				.addExtraArgs("-preset", "medium")
-				.addExtraArgs("-g", "60")
-				.done();
+		boolean isSuccess = false;
+		if(command == null || command.isEmpty())
+		{
+			logger.info("FFMPEG command is empty!!!");
+			return isSuccess;
+		}
+		//create script file
+		String scriptFile = "/tmp/" + new Date().getTime() + ".sh";
+		boolean isCreated = util.createFile(scriptFile, command);
+		if(isCreated == true)
+		{
+			 File file = new File(scriptFile);
+			 file.setExecutable(true);
+		}else {
+			logger.error("Can not create ffmpeg script file");
+			return isSuccess;
+		}
 		
-		System.out.println(builder.toString());
-
-		FFmpegJob job = executor.createJob(builder, new ProgressListener() {
-
-			// Using the FFmpegProbeResult determine the duration of the input
-			final double duration_ns = in.getFormat().duration * TimeUnit.SECONDS.toNanos(1);
-			@Override
-			public void progress(Progress progress) {
-				double percentage = progress.out_time_ns / duration_ns;
-				logger.info(String.format("[%.0f%%] status:%s frame:%d time:%s ms fps:%.0f speed:%.2fx", percentage * 100,
-						progress.status,
-						progress.frame,
-						FFmpegUtils.toTimecode(progress.out_time_ns, TimeUnit.NANOSECONDS),
-						progress.fps.doubleValue(),
-						progress.speed));
-			}
-		});
-		job.run();
-		logger.info("Finish processVideo : ");
-		return tmpOutput;
-	}
-
-	private String convertVideo(String inputVideo)
-	{
-		logger.info("Beginning convertVideo video : " + inputVideo);
-		File file = new File(inputVideo);
-		if(file.exists() == false)
-		{
-			logger.error("Input file does not exist!");
-			return null;
+		//create new thread to execute ffmpeg command
+		String[] processCmd = {"sh", scriptFile, vInput, vOutput };
+		ProcessBuilder builder = new ProcessBuilder();
+		builder.command(processCmd);
+		builder.directory(new File(System.getProperty("user.home")));
+		try {
+			Process process = builder.start();
+			StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), "ERROR");
+			StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), "OUTPUT");
+			outputGobbler.start();
+			errorGobbler.start();
+			int exitCode = process.waitFor();
+			assert exitCode == 0;
+			isSuccess = process.exitValue() == 0 ? true : false;;
+		} catch (IOException | InterruptedException e1) {
+			logger.error(e1.toString());
+			e1.printStackTrace();
 		}
-		String tmpOutput = "/tmp/" + new Date().getTime() + ".mp4";
-		FFmpegBuilder builder = new FFmpegBuilder()
-				.setInput(inputVideo)
-				.overrideOutputFiles(true)
-				.addOutput(tmpOutput)
-				.addExtraArgs("-c", "copy")
-				.addExtraArgs("-bsf:v", "h264_mp4toannexb")
-				.addExtraArgs("-f", "mpegts")
-				.done();
-
-		FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
-
-		// Run a one-pass encode
-		executor.createJob(builder).run();
-
-		logger.info("Finish convertVideo : " + inputVideo);
-		return tmpOutput;
-	}
-
-	private String concastVideo(String vIntro, String vMain, String vOutro, 
-			boolean enableIntro, boolean enableOutro, String outputFile)
-	{
-		logger.info("Beginning concastVideo >>> ");
-		logger.info("input video " + vMain);
-		String concast = "concat:";
-		if(enableIntro && (vIntro != null))
-		{
-			concast += vIntro + "|";
-		}
-		concast += vMain;
-		if(enableOutro && (vOutro != null))
-		{
-			concast += "|" + vOutro;
-		}
-		logger.info("concast string :" + concast);
-		FFmpegBuilder builder = new FFmpegBuilder()
-				.setInput(concast)
-				.overrideOutputFiles(true)
-				.addOutput(outputFile)
-				.addExtraArgs("-c", "copy")
-				.addExtraArgs("-bsf:a", "aac_adtstoasc")
-				.done();
-		FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
-
-		// Run a one-pass encode
-		executor.createJob(builder).run();
-		logger.info("Finish concastVideo <<< Output video : " + outputFile);
-		return outputFile;
+		
+		//delete tmp file
+		util.deleteFile(scriptFile);
+		return isSuccess;
 	}
 
 	private void updateRenderedInfo(int jobId, VideoInfo vInfo)
 	{
 		logger.info(">>> Function [updateRenderedInfo] : job Id = " + jobId);
-		if(renderClient.isSuccess == false)
-		{
-			renderClient.initCorba(renderConfig.corbaRef);
-		}
-		if(renderClient.isSuccess == true)
-		{
+		int count = 1;
+		do {
 			if(renderClient.renderAppImpl != null)
 			{
 				try {
 					renderClient.renderAppImpl.updateRenderedVideo(jobId, vInfo);
+					return;
 				}catch (Exception e) {
-					System.out.println(e.toString());
-					//TODO: retry
+					logger.error("Can not call corba server");
+					logger.error(e.toString());
+					//retry
+					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					renderClient.resolveAgain();
 				}
 			}else {
 				logger.error("Render client implementation is NULL");
 			}
-		}else {
-			logger.error("Init corba client FALSE");
-		}
-	}
-
-	private void deleteTempFile(String filePath)
-	{
-		try {
-			File file = new File(filePath);
-			if(file.exists())
-			{
-				if(file.delete() == false)
-				{
-					logger.error("Failed to delete the file : " + filePath);
-				}	
-			}	
-		}catch (Exception e) {
-			logger.error(e.toString());
-		}
-
+			count++;
+		}while(count < NUM_RETRY);
 	}
 }

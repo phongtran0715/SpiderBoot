@@ -7,7 +7,7 @@ import java.util.Properties;
 import spiderboot.util.Constant;
 import spiderboot.util.Utility;
 
-public class DownloadConfig {
+public class DownloadProperty {
 
 	Utility util; 
 	String configFile;
@@ -19,7 +19,7 @@ public class DownloadConfig {
 	public int maxResult;
 	public String corbaRef;
 
-	public DownloadConfig (String configFile)
+	public DownloadProperty (String configFile)
 	{
 		util = new Utility();
 		this.configFile = configFile;

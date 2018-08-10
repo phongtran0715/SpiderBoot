@@ -7,24 +7,25 @@ import java.util.Properties;
 import spiderboot.util.Constant;
 import spiderboot.util.Utility;
 
-public class UploadConfig {
+public class RenderProperty {
 
 	Utility util; 
 	String configFile;
-	
 	public String appId;
-	public int delayTime;
+	public String outputVideo;
+	public String videoFormat;
 	public String corbaRef;
 	public String ip;
 
-	public UploadConfig (String configFile)
+	public RenderProperty (String configFile)
 	{
 		util = new Utility();
 		this.configFile = configFile;
+		System.out.println("config file : " + this.configFile);
 		boolean isSuccess = loadConfig();
 		if(isSuccess == false)
 		{
-			System.out.println("Load download config file FALSE");
+			System.out.println("Load render config file FALSE");
 		}
 	}
 
@@ -40,12 +41,12 @@ public class UploadConfig {
 		try {
 			fileReader = new FileInputStream(fileConfig);
 			prop.load(fileReader);
-
 			//load file configuration
-			appId = prop.getProperty(Constant.UPLOAD_APP_ID, "").trim();
-			delayTime = Integer.parseInt(prop.getProperty(Constant.UPLOAD_DELAY_TIME.trim()));
-			corbaRef = prop.getProperty(Constant.UPLOAD_CORBA_REF, "").trim();
-			ip = prop.getProperty(Constant.UPLOAD_CLUSTER_IP, "127.0.0.1").trim();
+			videoFormat = prop.getProperty(Constant.RENDER_VIDEO_FORMAT, "mp4").trim();
+			appId = prop.getProperty(Constant.RENDER_APP_ID, "").trim();
+			outputVideo = prop.getProperty(Constant.RENDER_OUTPUT_VIDEO_PATH, "").trim();
+			corbaRef = prop.getProperty(Constant.RENDER_CORBA_REF, "").trim();
+			ip = prop.getProperty(Constant.RENDER_IP, "127.0.0.1").trim();
 			result = true;
 		} catch (Exception e) {
 			result = false;

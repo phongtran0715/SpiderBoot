@@ -6,6 +6,8 @@ import org.omg.CosNaming.*;
 
 import SpiderCorba.AgentSide;
 import SpiderCorba.AgentSideHelper;
+import spiderboot.configuration.RenderProperty;
+import spiderboot.data.DataController;
 
 import org.apache.log4j.Logger;
 import org.omg.CORBA.*;
@@ -16,7 +18,12 @@ public class RenderCorbaClient {
 	public final String COMPONENT_NAME = "AgentSide";
 	private  final Logger logger = Logger.getLogger(RenderCorbaClient.class);
 	private static RenderCorbaClient instance = null;
-	public boolean isSuccess = false;
+	ORB orb = null;
+	
+	public RenderCorbaClient() {
+		RenderProperty renderProperty = DataController.getInstance().renderConfig;
+		initCorba(renderProperty.corbaRef);
+	}
 	
 	public static RenderCorbaClient getInstance() {
 		if (instance == null) {
@@ -25,7 +32,7 @@ public class RenderCorbaClient {
 		return instance;
 	}
 
-	public boolean initCorba(String refStr) {
+	public void initCorba(String refStr) {
 		try{
 			// create and initialize the ORB
 			String [] args = new String[] { "-ORBInitRef", refStr };
@@ -41,11 +48,22 @@ public class RenderCorbaClient {
 			// lookup name
 			org.omg.CORBA.Object obj = ncRef.resolve_str(COMPONENT_NAME);
 			renderAppImpl = AgentSideHelper.narrow(obj);
-			isSuccess = true;
 
 		} catch (Exception e) {
 			logger.error("ERROR : " + e.toString());
 		}
-		return isSuccess;
+	}
+	
+	public void resolveAgain() {
+		try {
+			org.omg.CORBA.Object objRef = 
+					orb.resolve_initial_references("NameService");
+			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+			org.omg.CORBA.Object obj = ncRef.resolve_str(COMPONENT_NAME);
+			renderAppImpl = AgentSideHelper.narrow(obj);
+
+		}catch (Exception e) {
+			logger.error("ERROR : " + e.toString());
+		}
 	}
 }

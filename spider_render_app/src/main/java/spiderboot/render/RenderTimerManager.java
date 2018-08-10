@@ -6,9 +6,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class RenderTimerManager {
-	
-	public static Queue<DataDefine.RenderJobData> qRenderJob = new LinkedList<DataDefine.RenderJobData>();
-	private static RenderTimerManager instance = null;
+
+	Queue<DataDefine.RenderJobData> qRenderJob = new LinkedList<DataDefine.RenderJobData>();
+	static RenderTimerManager instance = null;
+	Object queue_lock = new Object();
+
 	public static RenderTimerManager getInstance() {
 		if (instance == null) {
 			instance = new RenderTimerManager();
@@ -28,5 +30,22 @@ public class RenderTimerManager {
 	public void initTimerTask() {
 		//x*1000 -> (x second) 
 		startRenderTimer("RenderApp_01", 5 * 1000);
+	}
+
+	public void addJob(DataDefine.RenderJobData data)
+	{
+		synchronized (queue_lock) {
+			qRenderJob.add(data);	
+		}
+	}
+
+	public boolean checkEmptyQueue() {
+		return qRenderJob.isEmpty();
+	}
+
+	public DataDefine.RenderJobData getJob(){
+		synchronized (queue_lock) {
+			return qRenderJob.poll();	
+		}
 	}
 }

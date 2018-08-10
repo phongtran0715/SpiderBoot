@@ -20,7 +20,7 @@ import com.spider.corba.UploadCorbaClient;
 import SpiderCorba.SpiderDefinePackage.AuthenInfo;
 import SpiderCorba.SpiderDefinePackage.ClusterInfo;
 import SpiderCorba.SpiderDefinePackage.VideoInfo;
-import spiderboot.configuration.UploadConfig;
+import spiderboot.configuration.UploadProperty;
 import spiderboot.data.DataController;
 import spiderboot.util.Utility;
 
@@ -30,20 +30,17 @@ public class UploadExecuteTimer extends TimerTask{
 	boolean isComplete = true;
 	String videoFolderBase;
 	static Utility util = new Utility();
-	private static final Logger logger = Logger.getLogger(UploadExecuteTimer.class);
-	private static final String CREDENTIALS_DIRECTORY = ".oauth-credentials";
-	UploadConfig uploadConfig;
+	static final Logger logger = Logger.getLogger(UploadExecuteTimer.class);
+	static final String CREDENTIALS_DIRECTORY = ".oauth-credentials";
+	final int NUM_RETRY = 3;
+	UploadProperty uploadProperty;
 	UploadCorbaClient uploadClient;
 
 	public UploadExecuteTimer(String cHomeId) {
 		logger.info("Function UploadExecuteTimer >>>");
 		this.cHomeId = cHomeId;
-		uploadConfig = DataController.getInstance().uploadConfig;
+		uploadProperty = DataController.getInstance().uploadConfig;
 		uploadClient = UploadCorbaClient.getInstance();
-		if(uploadClient.isSuccess == false)
-		{
-			uploadClient.initCorba(uploadConfig.corbaRef);	
-		}
 	}
 
 	@Override
@@ -53,123 +50,117 @@ public class UploadExecuteTimer extends TimerTask{
 
 	private void completeTask() {
 		if(isComplete){
-			isComplete = false;
-			Queue<DataDefine.UploadJobData> uploadQueue = UploadTimerManager.queueMap.get(cHomeId); 
-			if( uploadQueue != null && uploadQueue.isEmpty() == false)
+			isComplete = false; 
+			logger.info("\n\n");
+			logger.info("\n==========>> Timer id [" + cHomeId + "] BEGINNIG UPLOAD VIDEO <<==========");
+			DataDefine.UploadJobData jobData = UploadTimerManager.getInstance().getJob(cHomeId);
+			if(jobData == null)
 			{
-				logger.info("\n\n");
-				logger.info("\n==========>> Timer id [" + cHomeId + "] BEGINNIG UPLOAD VIDEO <<==========");
-				DataDefine.UploadJobData jobData = uploadQueue.poll();
-				VideoInfo vInfo = jobData.vInfo;
-				logger.info("Begining upload for job : " + jobData.jobId + " at : " + new Date().toString());
-
-				SpiderCorba.SpiderDefinePackage.UploadConfig uploadVideoCfg = getUploadCfg(vInfo.mappingId);
-				if(uploadVideoCfg == null)
-				{
-					logger.error("Error! Can not get upload video configuration");
-					isComplete = true;
-					return;
-				}
-				logger.info(">>>> Upload config:");
-				logger.info(" + Video ID :" + vInfo.videoId);
-				logger.info(" + Title :" + vInfo.title);
-				logger.info(" + Video location :" + vInfo.vRenderPath);
-				logger.info(" + Mapping ID :" + vInfo.mappingId);
-				logger.info("<<<<");
-
-				File uploadFile = new File(vInfo.vRenderPath);
-				if (!uploadFile.exists()) {
-					logger.error("FALSE! File to upload : <" + vInfo.vRenderPath + "> not Exist");	
-					logger.info("Upload complete video " + vInfo.videoId);
-					isComplete = true;
-					updateUploadedInfo(jobData.jobId);
-					return;
-				}
-				ClusterInfo clusterInfo = getClusterInfo(vInfo.mappingId, 
-						DataController.getInstance().TYPE_CLUSTER_RENDER);
-				if(clusterInfo == null)
-				{
-					logger.error("Error! Can not get upload video configuration");
-					isComplete = true;
-					return;
-				}
-				String uploadVideoPath = null;
-				if(clusterInfo.clusterIp.equals(uploadConfig.ip)== false)
-				{
-					uploadVideoPath = copyRenderedVideo(vInfo.vRenderPath, clusterInfo);
-				}else {
-					uploadVideoPath = vInfo.vRenderPath;
-				}
-
-				AuthenInfo authInfo = getAuthenInfo(vInfo.mappingId, vInfo.mappingId);
-				logger.info(">>>> Authen info:");
-				logger.info("Authen infor : user name = " + authInfo.userName);
-				logger.info("Authen infor : api key = " + authInfo.apiKey);
-				logger.info("Authen infor : client secret = " + authInfo.clientSecret);
-				logger.info("Authen infor : client id = " + authInfo.clientId);
-				logger.info("<<<<");
-				String clientFile = "/tmp/" + cHomeId + "_client_secrets.json";
-				CrunchifyJSONFileWrite jsonCreate = new CrunchifyJSONFileWrite();
-				File jsonFile = new File(clientFile);
-				if(jsonFile.exists() == false)
-				{
-					//Create the file
-					try {
-						if (jsonFile.createNewFile()){
-							logger.error("File created : " + clientFile);
-						}else{
-							logger.error("Can not create file : " + clientFile);
-						}
-					} catch (IOException e) {
-						logger.error(e);
-					}
-				}
-				jsonCreate.execute(authInfo.clientSecret, authInfo.clientId, clientFile);
-				UploadVideo.setclientSecretsFile(clientFile);
-				String storeFile = System.getProperty("user.home") + "/" 
-						+ CREDENTIALS_DIRECTORY + "/upload_" + authInfo.userName;
-				File file = new File(storeFile);
-				if(file.exists() == false)
-				{
-					logger.error("ERROR : Can not get authen store upload");
-					isComplete = true;
-					updateUploadedInfo(jobData.jobId);
-					return;
-				}
-
-				UploadVideo.setStoreFile( "upload_" + authInfo.userName);
-
-				String title = standardizeTitle(vInfo.title, uploadVideoCfg.vTitleTemp, uploadVideoCfg.enableTitle);
-				String desc = standardizeDesc(vInfo.description, uploadVideoCfg.vDescTemp, uploadVideoCfg.enableDes);
-				String tags = standardizeTags(vInfo.tags, uploadVideoCfg.vTagsTemp, uploadVideoCfg.enableTags);
-
-				logger.info("Beginning upload video " + vInfo.videoId);
-				logger.info("Create authen file for email : " + authInfo.userName);
-				boolean isSuccess = UploadVideo.execute(title, desc, tags, uploadVideoPath, "public");
-				if(isSuccess)
-				{
-					//update process status 
-					updateUploadedInfo(jobData.jobId);
-					deleteTempFile(uploadVideoPath);
-					deleteTempFile(clientFile);
-					logger.info("Upload complete video " + vInfo.videoId);
-					//Sleep for next upload
-					try {
-						Thread.sleep(uploadConfig.delayTime *1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}else {
-					logger.error("FALSE : Can not upload video id = " + vInfo.videoId);
-				}
-				logger.info("\n==========>> Timer id [" + cHomeId + "] COMPLETE UPLOAD VIDEO <<==========");
+				logger.info("Queue for channel [" + cHomeId + "] is empty.");
+				return;
 			}
-			isComplete = true;
+			VideoInfo vInfo = jobData.vInfo;
+			logger.info("Begining upload for job : " + jobData.jobId + " at : " + new Date().toString());
+
+			SpiderCorba.SpiderDefinePackage.UploadConfig uploadVideoCfg = getUploadCfg(vInfo.mappingId);
+			if(uploadVideoCfg == null)
+			{
+				logger.error("Error! Can not get upload video configuration");
+				isComplete = true;
+				return;
+			}
+			logger.info(">>>> Upload config:");
+			logger.info(" + Video ID :" + vInfo.videoId);
+			logger.info(" + Title :" + vInfo.title);
+			logger.info(" + Video location :" + vInfo.vRenderPath);
+			logger.info(" + Mapping ID :" + vInfo.mappingId);
+			logger.info("<<<<");
+
+			File uploadFile = new File(vInfo.vRenderPath);
+			if (!uploadFile.exists()) {
+				logger.error("FALSE! File to upload : <" + vInfo.vRenderPath + "> not Exist");	
+				logger.info("Upload complete video " + vInfo.videoId);
+				isComplete = true;
+				updateUploadedInfo(jobData.jobId);
+				return;
+			}
+			ClusterInfo clusterInfo = getClusterInfo(vInfo.mappingId, 
+					DataController.getInstance().TYPE_CLUSTER_RENDER);
+			if(clusterInfo == null)
+			{
+				logger.error("Error! Can not get upload video configuration");
+				isComplete = true;
+				return;
+			}
+			String uploadVideoPath = null;
+			if(clusterInfo.clusterIp.equals(uploadProperty.ip)== false)
+			{
+				uploadVideoPath = copyRenderedVideo(vInfo.vRenderPath, clusterInfo);
+			}else {
+				uploadVideoPath = vInfo.vRenderPath;
+			}
+
+			AuthenInfo authInfo = getAuthenInfo(vInfo.mappingId);
+			logger.info(">>>> Authen info:");
+			logger.info("Authen infor : user name = " + authInfo.userName);
+			logger.info("<<<<");
+			String clientFile = "/tmp/" + cHomeId + "_client_secrets.json";
+			CrunchifyJSONFileWrite jsonCreate = new CrunchifyJSONFileWrite();
+			File jsonFile = new File(clientFile);
+			if(jsonFile.exists() == false)
+			{
+				//Create the file
+				try {
+					if (jsonFile.createNewFile()){
+						logger.error("File created : " + clientFile);
+					}else{
+						logger.error("Can not create file : " + clientFile);
+					}
+				} catch (IOException e) {
+					logger.error(e);
+				}
+			}
+			jsonCreate.execute(authInfo.clientSecret, authInfo.clientId, clientFile);
+			UploadVideo.setclientSecretsFile(clientFile);
+			String storeFile = System.getProperty("user.home") + "/" 
+					+ CREDENTIALS_DIRECTORY + "/upload_" + authInfo.userName;
+			File file = new File(storeFile);
+			if(file.exists() == false)
+			{
+				logger.error("ERROR : Can not get authen store upload");
+				isComplete = true;
+				updateUploadedInfo(jobData.jobId);
+				return;
+			}
+
+			UploadVideo.setStoreFile( "upload_" + authInfo.userName);
+
+			String title = standardizeTitle(vInfo.title, uploadVideoCfg.vTitleTemp, uploadVideoCfg.enableTitle);
+			String desc = standardizeDesc(vInfo.description, uploadVideoCfg.vDescTemp, uploadVideoCfg.enableDes);
+			String tags = standardizeTags(vInfo.tags, uploadVideoCfg.vTagsTemp, uploadVideoCfg.enableTags);
+
+			logger.info("Beginning upload video " + vInfo.videoId);
+			logger.info("Create authen file for email : " + authInfo.userName);
+			boolean isSuccess = UploadVideo.execute(title, desc, tags, uploadVideoPath, "public");
+			if(isSuccess)
+			{
+				//update process status 
+				updateUploadedInfo(jobData.jobId);
+				deleteTempFile(uploadVideoPath);
+				deleteTempFile(clientFile);
+				logger.info("Upload complete video " + vInfo.videoId);
+				//Sleep for next upload
+				try {
+					Thread.sleep(uploadProperty.delayTime *1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}else {
+				logger.error("FALSE : Can not upload video id = " + vInfo.videoId);
+			}
+			logger.info("\n==========>> Timer id [" + cHomeId + "] COMPLETE UPLOAD VIDEO <<==========");
 		}
-		else{
-			//do nothing
-			logger.info("Process timer task is still running ...");
-		}
+		isComplete = true;
 	}
 
 	private String copyRenderedVideo(String renderedVideoPath, ClusterInfo clusterInfo) {
@@ -297,25 +288,16 @@ public class UploadExecuteTimer extends TimerTask{
 	private void updateUploadedInfo(int jobId) 
 	{
 		logger.info(">>> Function [updateUploadedInfo] : job Id = " + jobId);
-		if(uploadClient.isSuccess == false)
+		int count = 1;
+		if(uploadClient.uploadAppImpl != null)
 		{
-			uploadClient.initCorba(uploadConfig.corbaRef);	
-		}
-		
-		if(uploadClient.isSuccess == true)
-		{
-			if(uploadClient.uploadAppImpl != null)
-			{
-				try {
-					uploadClient.uploadAppImpl.updateUploadedVideo(jobId);
-				}catch (Exception e) {
-					System.out.println(e.toString());
-				}
-			}else {
-				logger.error("Upload client implementation is NULL");
+			try {
+				uploadClient.uploadAppImpl.updateUploadedVideo(jobId);
+			}catch (Exception e) {
+				System.out.println(e.toString());
 			}
 		}else {
-			logger.error("Init corba client FALSE");
+			logger.error("Upload client implementation is NULL");
 		}
 	}
 
@@ -323,84 +305,67 @@ public class UploadExecuteTimer extends TimerTask{
 	{
 		logger.info("Function getClusterInfo : mapping ID = " + mappingId );
 		ClusterInfo clusterInfor = null;
-		if(uploadClient.isSuccess == false)
-		{
-			uploadClient.initCorba(uploadConfig.corbaRef);
-		}
-		if(uploadClient.isSuccess == true)
-		{
+		int count = 0;
+		do {
 			if(uploadClient.uploadAppImpl != null)
 			{
 				try {
 
 					clusterInfor = uploadClient.uploadAppImpl.getClusterInfo(mappingId, clusterType);
+					return clusterInfor;
 				}catch (Exception e) {
 					System.out.println(e.toString());
 				}
 			}else {
 				logger.error("Upload client implementation is NULL");
-			}
-		}else {
-			logger.error("Init corba client FALSE");
-		}
+			}	
+			count++;
+		}while(count < NUM_RETRY);
+
 		return clusterInfor;
 	}
 
 	private SpiderCorba.SpiderDefinePackage.UploadConfig getUploadCfg (int mappingId)
 	{
 		SpiderCorba.SpiderDefinePackage.UploadConfig uploadCfg = new SpiderCorba.SpiderDefinePackage.UploadConfig();
-		if(uploadClient.isSuccess == false)
-		{
-			uploadClient.initCorba(uploadConfig.corbaRef);	
-		}
-		if(uploadClient.isSuccess == true)
-		{
+		int count = 1;
+		do {
 			if(uploadClient.uploadAppImpl != null)
 			{
 				try {
 
 					uploadCfg = uploadClient.uploadAppImpl.getUploadConfig(mappingId);
+					return uploadCfg;
 				}catch (Exception e) {
 					System.out.println(e.toString());
 				}
 			}else {
 				logger.error("Upload client implementation is NULL");
 			}
-		}else {
-			logger.error("Init corba client FALSE");
-		}
+			count++;
+		}while(count < NUM_RETRY);
+
 		return uploadCfg;
 	}
 
-	private AuthenInfo getAuthenInfo(int mappingId, int mappingType)
+	private AuthenInfo getAuthenInfo(int mappingId)
 	{
-		logger.info("Function getAuthenInfo : mapping ID = " + mappingId 
-				+ " mapping type = " + mappingType);
+		logger.info("Function getAuthenInfo : mapping ID = " + mappingId );
 		AuthenInfo authInfo = null;
-		if(uploadClient.isSuccess == false)
-		{
-			uploadClient.initCorba(uploadConfig.corbaRef);	
-		}
-		
-		if(uploadClient.isSuccess == true)
-		{
-			if(uploadClient.uploadAppImpl != null)
-			{
-				try {
 
-					authInfo = uploadClient.uploadAppImpl.getAuthenInfo(mappingId);
-				}catch (Exception e) {
-					System.out.println(e.toString());
-				}
-			}else {
-				logger.error("Upload client implementation is NULL");
+		if(uploadClient.uploadAppImpl != null)
+		{
+			try {
+
+				authInfo = uploadClient.uploadAppImpl.getAuthenInfo(mappingId);
+			}catch (Exception e) {
+				System.out.println(e.toString());
 			}
 		}else {
-			logger.error("Init corba client FALSE");
+			logger.error("Upload client implementation is NULL");
 		}
 		return authInfo;
 	}
-
 
 	private void deleteTempFile(String filePath)
 	{

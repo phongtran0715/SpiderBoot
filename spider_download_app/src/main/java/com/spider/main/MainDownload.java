@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import com.spider.corba.DownloadCorbaClient;
 import com.spider.corba.DownloadCorbaServer;
 
-import spiderboot.configuration.DownloadConfig;
+import spiderboot.configuration.DownloadProperty;
 import spiderboot.data.DataController;
 
 public class MainDownload {
@@ -21,7 +21,7 @@ public class MainDownload {
 		}
 		//Load configuration file
 		String configFile = args[0];
-		final DownloadConfig downloadConfig = new DownloadConfig(configFile);
+		final DownloadProperty downloadConfig = new DownloadProperty(configFile);
 		DataController.getInstance().setDownloadConfigObj(downloadConfig);
 		//Init corba server
 
@@ -39,23 +39,11 @@ public class MainDownload {
 			public void run(){
 				logger.info("Beginning to init download corba client >>>");
 				DownloadCorbaClient downloadClient = DownloadCorbaClient.getInstance();
-				if(downloadClient.isSuccess == false)
+				try
 				{
-					downloadClient.initCorba(downloadConfig.corbaRef);
-				}
-				
-				if(downloadClient.isSuccess == false)
-				{
-					logger.error("Error! Can not init download corba client connection.");
-				}else {
-					logger.info("Init download corba client connection successful!");
-					logger.info("Notify startup status to agent");
-					try
-					{
-						downloadClient.downloadAppImpl.onDownloadStartup(downloadConfig.appId);	
-					}catch (Exception e) {
-						logger.error(e);
-					}
+					downloadClient.downloadAppImpl.onDownloadStartup(downloadConfig.appId);	
+				}catch (Exception e) {
+					logger.error(e);
 				}
 			}
 		};

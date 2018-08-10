@@ -6,11 +6,10 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
 public class DownloadTimerManager {
-	private final Logger logger = Logger.getLogger(DownloadTimerManager.class);
-	private static DownloadTimerManager instance = null;
+	final Logger logger = Logger.getLogger(DownloadTimerManager.class);
+	static DownloadTimerManager instance = null;
 	public static HashMap<Integer, Timer> timerMap = new HashMap<Integer, Timer>();
-	public DownloadTimerManager() {
-	}
+	Object timer_mutex = new Object();
 
 	public static DownloadTimerManager getInstance() {
 		if (instance == null) {
@@ -23,20 +22,24 @@ public class DownloadTimerManager {
 		logger.info("Create new download timer id = " + timerId  + "timer interval " + timerInterval);
 		boolean isSuccess = false;
 		//check timer is existed
-		if(timerMap.get(timerId)!= null)
-		{
-			timerMap.get(timerId).cancel();
-			timerMap.get(timerId).purge();
-			timerMap.remove(timerId);
+		synchronized (timer_mutex) {
+			if(timerMap.get(timerId)!= null)
+			{
+				timerMap.get(timerId).cancel();
+				timerMap.get(timerId).purge();
+				timerMap.remove(timerId);
+			}	
 		}
+
 		TimerTask timerTask = new DownloadExecuteTimer(timerId);
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(timerTask, 0, timerInterval * 1000);
 		if (timer != null) {
-			timerMap.put(timerId, timer);
+			synchronized (timer_mutex) {
+				timerMap.put(timerId, timer);	
+			}
 			isSuccess = true;
 		}
-		
 		return isSuccess;
 	}
 
@@ -50,9 +53,11 @@ public class DownloadTimerManager {
 		if(isIdExisted == true )
 		{
 			//reset this timer
-			timerMap.get(timerId).cancel();
-			timerMap.get(timerId).purge();
-			timerMap.remove(timerId);
+			synchronized (timer_mutex) {
+				timerMap.get(timerId).cancel();
+				timerMap.get(timerId).purge();
+				timerMap.remove(timerId);	
+			}
 			if(syncStatus == 1)
 			{
 				createDownloadTimer(timerId, timerInterval);
@@ -72,14 +77,17 @@ public class DownloadTimerManager {
 	{
 		logger.info("Delete download timer id = " + timerId );
 		boolean isSuccess = false;
-		boolean isIdExisted = timerMap.get(timerId) != null;
-		if(isIdExisted == true)
-		{
-			Timer timer = timerMap.get(timerId);
-			timer.cancel();
-			timer.purge();
-			timerMap.remove(timerId);
+		synchronized (timer_mutex) {
+			boolean isIdExisted = timerMap.get(timerId) != null;
+			if(isIdExisted == true)
+			{
+				Timer timer = timerMap.get(timerId);
+				timer.cancel();
+				timer.purge();
+				timerMap.remove(timerId);
+			}	
 		}
+
 		isSuccess = true;		
 		return isSuccess;
 	}
