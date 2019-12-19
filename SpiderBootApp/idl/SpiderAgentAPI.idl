@@ -1,0 +1,108 @@
+module SpiderCorba
+{
+  interface SpiderDefine
+  {
+	struct VideoInfo
+     {
+          wstring videoId;
+          wstring title;
+          wstring tags;
+          wstring description;
+          wstring thumbnail;
+          wstring vDownloadPath;
+          wstring vRenderPath;
+          long mappingId;
+          long processStatus;
+          long license;
+    };
+	
+	struct DownloadConfig
+    {
+            wstring cHomeId;
+            wstring monitorContent;
+            long mappingType;
+    };
+
+    struct RenderConfig
+    {
+            wstring renderCommand;
+    };
+	
+	struct CustomVideoInfor
+    {
+            long id;
+            wstring videoId;
+    };
+	
+	struct UploadConfig
+    {
+            wstring vTitleTemp;
+            wstring vDescTemp;
+            wstring vTagsTemp;
+            boolean enableTitle;
+            boolean enableDes;
+            boolean enableTags;
+    };
+    struct AuthenInfo
+    {
+            wstring userName;
+            wstring apiKey;
+            wstring clientSecret;
+            wstring clientId;
+    };
+	struct ClusterInfo
+    {
+            wstring clusterIp;
+            wstring userName;
+            wstring password;
+    };
+  };
+
+  interface SpiderBootSide : SpiderDefine
+  {
+		//Download function
+		boolean createDownloadTimer(in long timerId, in long timerInterval);
+        boolean modifyDownloadTimer(in long timerId, in long timerInterval, in long syncStatus);
+        boolean deleteDowloadTimer(in long timerId);
+        boolean deleteDownloadedVideo(in long jobId);
+		
+		//Render function
+		boolean createRenderJob(in long jobId, in VideoInfo vInfo);
+        boolean deleteRenderJob(in long jobId);
+        void deleteRenderdVideo(in wstring vLocation);
+		
+		//Upload function
+		boolean createUploadTimer(in wstring cHomeId);
+        boolean deleteUploadTimer(in wstring cHomeId);
+        boolean createUploadJob(in long jobId, in VideoInfo vInfo, in wstring cHomeId);
+        boolean deleteUploadJob(in long jobId, in wstring cHomeId);
+        
+  };
+
+
+  interface AgentSide : SpiderDefine
+  {
+	  //Download app function
+      void onDownloadStartup(in wstring downloadClusterId);
+      long long getLastSyncTime(in long mappingId);
+      void updateLastSyntime(in long mappingId, in long long lastSyncTime);
+      void insertDownloadedVideo(in VideoInfo vInfo);
+      void updateDownloadedVideo(in long jobId, in VideoInfo vInfo);
+      DownloadConfig getDownloadConfig(in long mappingId);
+      CustomVideoInfor getCustomVideo(in wstring downloadClusterId, in long timerId);
+	  
+      //Render app function
+      void onRenderStartup(in wstring renderClusterId);
+      RenderConfig getRenderConfig(in long mappingId);
+      void updateRenderedVideo(in long jobId, in VideoInfo vInfo);
+	  
+	  //Upload app function
+      void onUploadStartup(in wstring uploadClusterId);
+      UploadConfig getUploadConfig(in long mappingId);
+      void updateUploadedVideo (in long jobId);
+
+      //Other function
+      AuthenInfo getAuthenInfo(in long mappingId);
+      ClusterInfo getClusterInfo (in long mappingId, in long clusterType);
+  };
+};

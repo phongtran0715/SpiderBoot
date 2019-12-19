@@ -68,10 +68,11 @@
 			<artifactId>framework</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.schmizz/sshj -->
 		<dependency>
-			<groupId>com.hierynomus</groupId>
-			<artifactId>sshj</artifactId>
-			<version>0.23.0</version>
+		    <groupId>net.schmizz</groupId>
+		    <artifactId>sshj</artifactId>
+		    <version>0.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
