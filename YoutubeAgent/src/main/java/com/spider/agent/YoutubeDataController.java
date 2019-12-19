@@ -1,10 +1,10 @@
 package com.spider.agent;
 
-import spiderboot.configuration.YoutubeAgentConfig;
+import com.spider.config.YoutubeAgentProperty;
 
 public class YoutubeDataController {
 	private static YoutubeDataController instance = null;
-	private YoutubeAgentConfig ytAgentCfg = null;
+	private YoutubeAgentProperty ytAgentCfg = null;
 	
 	public static YoutubeDataController getInstance() {
 		if(instance == null)
@@ -14,10 +14,10 @@ public class YoutubeDataController {
 		return instance;
 	}
 	
-	public YoutubeAgentConfig getYtAgentCfg() {
+	public YoutubeAgentProperty getYtAgentCfg() {
 		return ytAgentCfg;
 	}
-	public void setYtAgentCfg(YoutubeAgentConfig ytAgentCfg) {
+	public void setYtAgentCfg(YoutubeAgentProperty ytAgentCfg) {
 		this.ytAgentCfg = ytAgentCfg;
 	}
 	

@@ -2,7 +2,7 @@ package com.spider.agent;
 
 import org.apache.log4j.Logger;
 import com.spider.corba.CorbaServer;
-import spiderboot.configuration.YoutubeAgentConfig;
+import com.spider.config.YoutubeAgentProperty;
 
 public class App 
 {
@@ -15,7 +15,7 @@ public class App
 		}
 		//Load configuration file
 		String configFile = args[0];
-		final YoutubeAgentConfig ytAgentCfg = new YoutubeAgentConfig(configFile);
+		final YoutubeAgentProperty ytAgentCfg = new YoutubeAgentProperty(configFile);
 		YoutubeDataController.getInstance().setYtAgentCfg(ytAgentCfg);
 		
 		Thread serverThread = new Thread(){
