@@ -21,12 +21,11 @@ public class YoutubeDownload {
 		try {
 			YoutubeDLResponse response = YoutubeDL.execute(request);
 			exitCode = response.getExitCode();
-			logger.info("Download video : " + videoId + " completed!");
+			logger.info("[DOWNLOAD] : Download video : " + videoId + " completed!");
 			logger.info(response.getDirectory());
 		} catch (YoutubeDLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			logger.error(e.toString());
+			logger.error("[DOWNLOAD] : " + e.toString());
 		}
 		return exitCode;
 	}

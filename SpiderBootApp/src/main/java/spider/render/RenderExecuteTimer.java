@@ -52,7 +52,7 @@ public class RenderExecuteTimer extends TimerTask{
 	final int NUM_RETRY	= 3;
 
 	public RenderExecuteTimer(String appId) {
-		logger.info("Function RenderExecuteTimer >>>");
+		logger.info("[RENDER] : Function RenderExecuteTimer >>>");
 		spiderConfig = DataController.getInstance().spiderConfig;
 		outputFolder = spiderConfig.rOutPath;
 		renderClient = SpiderCorbaClient.getInstance();
@@ -64,7 +64,7 @@ public class RenderExecuteTimer extends TimerTask{
 			completeTask();
 		} catch (IOException e) {
 			e.printStackTrace();
-			logger.error(e.toString());
+			logger.error("[RENDER] :" + e.toString());
 		}
 	}
 
@@ -77,9 +77,9 @@ public class RenderExecuteTimer extends TimerTask{
 				DataDefine.RenderJobData jobData = RenderTimerManager.getInstance().getJob();
 				corba.variableDefinePackage.VideoInfo vInfo = jobData.vInfo;
 
-				logger.info("Render job ( id = )"  + jobData.jobId + " started at:" + new Date());
+				logger.info("[RENDER] : Render job ( id = )"  + jobData.jobId + " started at:" + new Date());
 				logger.info("\n\n");
-				logger.info("\n=================== BEGINNING RENDER VIDEO ===================");
+				logger.info("\n[RENDER] : =================== BEGINNING RENDER VIDEO ===================");
 				logger.info(" + Video ID :" + vInfo.videoId);
 				logger.info(" + Title :" + vInfo.title);
 				logger.info(" + Video location :" + vInfo.vDownloadPath);
@@ -89,17 +89,17 @@ public class RenderExecuteTimer extends TimerTask{
 					renderCfg = getRenderConfig(vInfo.mappingId);
 					if(renderCfg == null)
 					{
-						logger.error("Error! Can not get render config");
+						logger.error("[RENDER] : Error! Can not get render config");
 						isComplete = true;
 						return;
 					}
 				}catch (Exception e) {
-					logger.error(e.toString());
+					logger.error("[RENDER] : " + e.toString());
 				}
 
 				File file = new File(vInfo.vDownloadPath);
 				if (!file.exists()) {
-					logger.error("Error! File " + vInfo.vDownloadPath + " not Exist");
+					logger.error("[RENDER] : Error! File " + vInfo.vDownloadPath + " not Exist");
 					isComplete = true;
 					return;
 				}
@@ -121,9 +121,9 @@ public class RenderExecuteTimer extends TimerTask{
 					vInfo.processStatus = 2;
 					updateRenderedInfo(jobData.jobId, vInfo);
 				}else {
-					logger.error("Render video [ " + vInfo.videoId + "] FALSE");
+					logger.error("[RENDER] : Render video [ " + vInfo.videoId + "] FALSE");
 				}
-				logger.info("\n=================== COMPLETE RENDER VIDEO ===================\n\n");
+				logger.info("\n[RENDER] : =================== COMPLETE RENDER VIDEO ===================\n\n");
 			}
 			isComplete = true;
 		}
@@ -142,14 +142,14 @@ public class RenderExecuteTimer extends TimerTask{
 					renderCfg = renderClient.agentSide.getRenderConfig(mappingId);
 					return renderCfg;
 				}catch (Exception e) {
-					logger.error("Can not call corba server");
-					logger.error(e.toString());
+					logger.error("[RENDER] : Can not call corba server");
+					logger.error("[RENDER] :" + e.toString());
 					//retry
-					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					logger.info("[RENDER] : [Count = " + count +"] Begin retry to connetion corba server...");
 					renderClient.resolveAgain();
 				}
 			}else {
-				logger.error("Render client implementation is NULL");
+				logger.error("[RENDER] : Render client implementation is NULL");
 			}
 			count++;
 		}while (count < NUM_RETRY);
@@ -162,7 +162,7 @@ public class RenderExecuteTimer extends TimerTask{
 		boolean isSuccess = false;
 		if(command == null || command.isEmpty())
 		{
-			logger.info("FFMPEG command is empty!!!");
+			logger.info("[RENDER] : FFMPEG command is empty!!!");
 			return isSuccess;
 		}
 		//create script file
@@ -173,7 +173,7 @@ public class RenderExecuteTimer extends TimerTask{
 			 File file = new File(scriptFile);
 			 file.setExecutable(true);
 		}else {
-			logger.error("Can not create ffmpeg script file");
+			logger.error("[RENDER] : Can not create ffmpeg script file");
 			return isSuccess;
 		}
 		
@@ -203,7 +203,7 @@ public class RenderExecuteTimer extends TimerTask{
 
 	private void updateRenderedInfo(int jobId, corba.variableDefinePackage.VideoInfo vInfo)
 	{
-		logger.info(">>> Function [updateRenderedInfo] : job Id = " + jobId);
+		logger.info("[RENDER] : >>> Function [updateRenderedInfo] : job Id = " + jobId);
 		int count = 1;
 		do {
 			if(renderClient.agentSide != null)
@@ -212,14 +212,14 @@ public class RenderExecuteTimer extends TimerTask{
 					renderClient.agentSide.updateRenderedVideo(jobId, vInfo);
 					return;
 				}catch (Exception e) {
-					logger.error("Can not call corba server");
+					logger.error("[RENDER] : Can not call corba server");
 					logger.error(e.toString());
 					//retry
-					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					logger.info("[RENDER] : [Count = " + count +"] Begin retry to connetion corba server...");
 					renderClient.resolveAgain();
 				}
 			}else {
-				logger.error("Render client implementation is NULL");
+				logger.error("[RENDER] : Render client implementation is NULL");
 			}
 			count++;
 		}while(count < NUM_RETRY);

@@ -19,7 +19,7 @@ public class DownloadTimerManager {
 	}
 
 	public boolean createDownloadTimer(int timerId, int timerInterval) {
-		logger.info("Create new download timer id = " + timerId  + "timer interval " + timerInterval);
+		logger.info("[DOWNLOAD] : Create new download timer id = " + timerId  + "timer interval " + timerInterval);
 		boolean isSuccess = false;
 		//check timer is existed
 		synchronized (timer_mutex) {
@@ -45,7 +45,7 @@ public class DownloadTimerManager {
 
 	public boolean modifyDownloadTimer(int timerId, int timerInterval, int syncStatus) 
 	{
-		logger.info("Modify download timer id = " + timerId );	
+		logger.info("[DOWNLOAD] : Modify download timer id = " + timerId );	
 		boolean isSuccess = false;
 		//check timer  id is existed
 		boolean isIdExisted = timerMap.get(timerId) != null;
@@ -75,7 +75,7 @@ public class DownloadTimerManager {
 
 	public boolean deleteDownloadTimer(int timerId) 
 	{
-		logger.info("Delete download timer id = " + timerId );
+		logger.info("[DOWNLOAD] : Delete download timer id = " + timerId );
 		boolean isSuccess = false;
 		synchronized (timer_mutex) {
 			boolean isIdExisted = timerMap.get(timerId) != null;

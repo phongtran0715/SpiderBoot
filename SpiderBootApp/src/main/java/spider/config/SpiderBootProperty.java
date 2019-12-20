@@ -16,6 +16,7 @@ public class SpiderBootProperty {
 	public String corbaRef;
 
 	//Download config
+	public boolean downloadDeploy;
 	public String apiKey;
 	public String clientSecret;
 	public String dAppId;
@@ -23,11 +24,13 @@ public class SpiderBootProperty {
 	public int maxResult;
 	
 	//Render config
+	public boolean renderDeploy;
 	public String rAppId;
 	public String rOutPath;
 	public String rIp;
 	
 	//Upload config
+	public boolean uploadDeploy;
 	public String uAppId;
 	public int delayTime;
 	public String uIp;
@@ -61,6 +64,7 @@ public class SpiderBootProperty {
 			videoFormat = prop.getProperty(Constant.DOWNLOAD_VIDEO_FORMAT, "mp4").trim();
 			
 			//load download config value
+			downloadDeploy = Boolean.parseBoolean(prop.getProperty(Constant.DOWNLOAD_DEPLOY, "false").trim());
 			apiKey = prop.getProperty(Constant.DOWNLOAD_API_KEY, "").trim();
 			clientSecret = prop.getProperty(Constant.DOWNLOAD_CLIENT_SCERET, "").trim();
 			dAppId = prop.getProperty(Constant.DOWNLOAD_APP_ID, "").trim();
@@ -68,11 +72,13 @@ public class SpiderBootProperty {
 			maxResult = Integer.parseInt(prop.getProperty(Constant.DOWNLOAD_MAX_RESULT, "25").trim());
 			
 			//load render config value
+			renderDeploy = Boolean.parseBoolean(prop.getProperty(Constant.RENDER_DEPLOY, "false").trim());
 			videoFormat = prop.getProperty(Constant.RENDER_VIDEO_FORMAT, "mp4").trim();
 			rAppId = prop.getProperty(Constant.RENDER_APP_ID, "").trim();
 			rIp = prop.getProperty(Constant.RENDER_IP, "127.0.0.1").trim();
 			
 			//load upload config value
+			uploadDeploy = Boolean.parseBoolean(prop.getProperty(Constant.UPLOAD_DEPLOY, "false").trim());
 			uAppId = prop.getProperty(Constant.UPLOAD_APP_ID, "").trim();
 			delayTime = Integer.parseInt(prop.getProperty(Constant.UPLOAD_DELAY_TIME.trim()));
 			uIp = prop.getProperty(Constant.UPLOAD_CLUSTER_IP, "127.0.0.1").trim();

@@ -28,7 +28,7 @@ public class UploadTimerManager {
 	}
 
 	public boolean createUploadTimer(String cHomeId) {
-		logger.info("Create new upload timer for channel : " + cHomeId );
+		logger.info("[UPLOAD] : Create new upload timer for channel : " + cHomeId );
 		boolean isSuccess = false;
 		//check timer is existed
 		synchronized (lock_timer) {
@@ -41,7 +41,7 @@ public class UploadTimerManager {
 					timerMap.put(cHomeId, timer);
 				}
 			}else {
-				logger.info("Upload timer id" + cHomeId +" had existed in timer map. It will be ignore!");
+				logger.info("[UPLOAD] : Upload timer id" + cHomeId +" had existed in timer map. It will be ignore!");
 			}
 		}
 
@@ -59,7 +59,7 @@ public class UploadTimerManager {
 
 	public boolean deleteUploadTimer(String cHomeId) 
 	{
-		logger.info("Delete upload timer for channel : " + cHomeId);
+		logger.info("[UPLOAD] : Delete upload timer for channel : " + cHomeId);
 		boolean isSuccess = false;
 		synchronized (lock_timer) {
 			if(timerMap.get(cHomeId) != null)
@@ -68,19 +68,19 @@ public class UploadTimerManager {
 				timer.cancel();
 				timer.purge();
 				timerMap.remove(cHomeId);
-				logger.info("Upload timer " + cHomeId + " is removed from timer map");
+				logger.info("[UPLOAD] : Upload timer " + cHomeId + " is removed from timer map");
 			}
 			else {
-				logger.error("Not found timer " + cHomeId + " in timer map");
+				logger.error("[UPLOAD] : Not found timer " + cHomeId + " in timer map");
 			}	
 		}
 		synchronized (lock_queue) {
 			if(queueMap.get(cHomeId) != null)
 			{
 				queueMap.remove(cHomeId);
-				logger.info("Queue of upload timer : " + cHomeId + " removed from queue map");
+				logger.info("[UPLOAD] : Queue of upload timer : " + cHomeId + " removed from queue map");
 			}else {
-				logger.error("Not found queue of upload timer :" + cHomeId + " in queue map");
+				logger.error("[UPLOAD] : Not found queue of upload timer :" + cHomeId + " in queue map");
 			}	
 		}
 
@@ -90,16 +90,16 @@ public class UploadTimerManager {
 
 	public boolean createUploadJob(int jobId, VideoInfo vInfo, String cHomeId)
 	{
-		logger.info("Create upload jod id = " + jobId);
+		logger.info("[UPLOAD] : Create upload jod id = " + jobId);
 		boolean isSuccess = false;
 		DataDefine.UploadJobData uploadJobData = new DataDefine().new UploadJobData(jobId, vInfo);
 		synchronized (lock_queue) {
 			if(queueMap.get(cHomeId) != null)
 			{
 				queueMap.get(cHomeId).add(uploadJobData);
-				logger.info("JobId  " + jobId + " is added to queue : " + cHomeId);
+				logger.info("[UPLOAD] : JobId  " + jobId + " is added to queue : " + cHomeId);
 			}else {
-				logger.error("Can not found queue for upload id : " + jobId);
+				logger.error("[UPLOAD] : Can not found queue for upload id : " + jobId);
 			}	
 		}
 

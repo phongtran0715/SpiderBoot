@@ -25,7 +25,7 @@ public class SpiderMain {
 		String configFile = args[0];
 		spiderConfig = new SpiderBootProperty(configFile);
 		DataController.getInstance().setDownloadConfigObj(spiderConfig);
-		
+
 		// Init corba server for download app
 		Thread spiderCorbaServer = new Thread() {
 			public void run() {
@@ -35,67 +35,66 @@ public class SpiderMain {
 			}
 		};
 		spiderCorbaServer.start();
-		
-		initDownloadApp();
-		initRenderApp();
-		initUploadApp();
+		if (spiderConfig.downloadDeploy)
+			initDownloadApp();
+		if (spiderConfig.renderDeploy)
+			initRenderApp();
+		if (spiderConfig.uploadDeploy)
+			initUploadApp();
 	}
 
 	private static void initDownloadApp() {
-		// Init corba client for download app
 		Thread downloadClientThread = new Thread() {
 			public void run() {
-				logger.info("Beginning to init download corba client >>>");
+				logger.info("[DOWNLOAD] : Beginning to init download corba client >>>");
 				SpiderCorbaClient downloadClient = SpiderCorbaClient.getInstance();
 				try {
 					downloadClient.agentSide.onDownloadStartup(spiderConfig.dAppId);
 				} catch (Exception e) {
-					logger.error(e);
+					logger.error("[DOWNLOAD]" + e.toString());
 				}
 			}
 		};
 
 		downloadClientThread.start();
-		logger.info("Download app ID: " + spiderConfig.dAppId);
+		logger.info("[DOWNLOAD] : Download app ID: " + spiderConfig.dAppId);
 	}
 
 	private static void initRenderApp() {
-		// Init corba client for render
 		Thread renderClientThread = new Thread() {
 			public void run() {
-				logger.info("Beginning to init render corba client >>>");
+				logger.info("[RENDER] : Beginning to init render corba client >>>");
 				SpiderCorbaClient renderClient = SpiderCorbaClient.getInstance();
 				try {
 					renderClient.agentSide.onRenderStartup(spiderConfig.rAppId);
 				} catch (Exception e) {
-					logger.error(e.toString());
+					logger.error("[RENDER] : " + e.toString());
 				}
 			}
 		};
 
 		renderClientThread.start();
 
-		logger.info("Render app ID : " + spiderConfig.rAppId);
+		logger.info("[RENDER] : Render app ID : " + spiderConfig.rAppId);
 		// create render timer task (only one timer task)
 		RenderTimerManager.getInstance().initTimerTask();
 	}
 
 	private static void initUploadApp() {
-		// Init corba client
 		Thread clientThread = new Thread() {
 			public void run() {
-				logger.info("Beginning to init upload corba client >>>");
+				logger.info("[UPLOAD] : Beginning to init upload corba client >>>");
 				SpiderCorbaClient uploadClient = SpiderCorbaClient.getInstance();
 				try {
-					logger.info("upload Id = " + spiderConfig.uAppId);
+					logger.info("[UPLOAD] : upload Id = " + spiderConfig.uAppId);
 					uploadClient.agentSide.onUploadStartup(spiderConfig.uAppId);
 				} catch (Exception e) {
-					logger.error(e);
+					logger.error("[UPLOAD] : " + e.toString());
 				}
 			}
 		};
 
 		clientThread.start();
-		logger.info("Upload app ID : " + spiderConfig.uAppId);
+		logger.info("[UPLOAD] : Upload app ID : " + spiderConfig.uAppId);
 	}
 }

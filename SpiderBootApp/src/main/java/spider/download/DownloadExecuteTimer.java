@@ -52,7 +52,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		DownloadConfig downloadCfg = getDownloadConfig();
 		if(downloadCfg == null)
 		{
-			logger.error("Can not get download config");
+			logger.error("[DOWNLOAD] : Can not get download config");
 			cancel();
 		}else {
 			this.mappingType = downloadCfg.mappingType;	
@@ -66,7 +66,7 @@ public class DownloadExecuteTimer extends TimerTask {
 
 	private void handleMonitorChannel()
 	{
-		logger.error("Timer Id [" + timerId + "] Start query to get new video");
+		logger.error("[DOWNLOAD] : Timer Id [" + timerId + "] Start query to get new video");
 		//get mapping content
 		DownloadConfig downloadCfg = getDownloadConfig();
 		String cMonitorIds [] = downloadCfg.monitorContent.split(",");
@@ -74,7 +74,7 @@ public class DownloadExecuteTimer extends TimerTask {
 			Date lastSyncTime = getLastSyncTime(timerId);
 			if(lastSyncTime == null)
 			{
-				logger.error("Timer Id [" + timerId + "] Error! Can not get last sync time.");
+				logger.error("[DOWNLOAD] : Timer Id [" + timerId + "] Error! Can not get last sync time.");
 				break;
 			}
 			DateTime ytbTime = new DateTime(lastSyncTime);
@@ -90,11 +90,11 @@ public class DownloadExecuteTimer extends TimerTask {
 					ResourceId rId = singleVideo.getId();
 					if (rId.getKind().equals("youtube#video")) {
 						String vId = rId.getVideoId();
-						logger.info("\n\n");
-						logger.info("==========>> Timer id [" + timerId + "] DOWNLOADING VIDEO <<==========");
+						logger.info("[DOWNLOAD] : \n\n");
+						logger.info("[DOWNLOAD] : ==========>> Timer id [" + timerId + "] DOWNLOADING VIDEO <<==========");
 						// Get video info
 
-						logger.info("Begin getvideo information video Id = " + vId );
+						logger.info("[DOWNLOAD] : Begin getvideo information video Id = " + vId );
 						VideoWraper vWraper = null;
 						List<Video> videoList = Search.getInstance().getVideoInfo(vId, 
 								DataController.getInstance().spiderConfig.apiKey);
@@ -106,7 +106,7 @@ public class DownloadExecuteTimer extends TimerTask {
 							}
 						}
 
-						logger.info("Begin download Video ID = " + vId);
+						logger.info("[DOWNLOAD] : Begin download Video ID = " + vId);
 						//Download video
 						/*
 						if(vWraper.license == 1)
@@ -125,18 +125,18 @@ public class DownloadExecuteTimer extends TimerTask {
 							if(exisCode == 0)
 							{
 								vWraper.vDownloadPath = videoLocation + "/" + vId + ".mp4";
-								//save video infomation
+								//save video information
 								if(vWraper != null)
 								{
 									insertVideoInfo(vWraper);	
 								}
 							}else {
-								logger.error("Can not download video :" + vId );
+								logger.error("[DOWNLOAD] : Can not download video :" + vId );
 							}
 							logger.info("Download exit code : " + exisCode);
 						}
-						logger.info("Timer id [" + timerId + "]: Finish download video ID = " + vId);
-						logger.info("==========>> Timer id [" + timerId + "] DOWNLOADING COMPLETED <<==========\n\n");
+						logger.info("[DOWNLOAD] : Timer id [" + timerId + "]: Finish download video ID = " + vId);
+						logger.info("[DOWNLOAD] : ==========>> Timer id [" + timerId + "] DOWNLOADING COMPLETED <<==========\n\n");
 					}
 				}
 			}
@@ -149,18 +149,18 @@ public class DownloadExecuteTimer extends TimerTask {
 		CustomVideoInfor customVideo = getCustomVideo();
 		if(customVideo == null)
 		{
-			logger.error("Timer id [" + timerId + "]: Custom video is NULL");
+			logger.error("[DOWNLOAD] : Timer id [" + timerId + "]: Custom video is NULL");
 			return;
 		}
 		if(customVideo.videoId.isEmpty())
 		{
-			logger.info("Timer id [" + timerId + "]: Custom video is empty");
+			logger.info("[DOWNLOAD] : Timer id [" + timerId + "]: Custom video is empty");
 			return;
 		}
-		logger.info("\n==========>> Timer id [" + timerId + "] DOWNLOADING CUSTOM VIDEO <<==========");
+		logger.info("\n[DOWNLOAD] : ==========>> Timer id [" + timerId + "] DOWNLOADING CUSTOM VIDEO <<==========");
 		// Get video info
 		try {
-			logger.info("Begin getvideo information video Id = " + customVideo.videoId );
+			logger.info("[DOWNLOAD] : Begin getvideo information video Id = " + customVideo.videoId );
 			VideoWraper vWraper = null;
 			List<Video> videoList = Search.getInstance().getVideoInfo(customVideo.videoId, spiderConfig.apiKey);
 			Iterator<Video> iteratorSRS = videoList.iterator();
@@ -183,17 +183,17 @@ public class DownloadExecuteTimer extends TimerTask {
 					//save video infomation
 					updateVideoInfo(customVideo.id, vWraper);
 				}else {
-					logger.error("Download exit code : " + exisCode);
-					logger.error("Can not download video : " + customVideo.videoId);
+					logger.error("[DOWNLOAD] : Download exit code : " + exisCode);
+					logger.error("[DOWNLOAD] : Can not download video : " + customVideo.videoId);
 				}
 			}
-			logger.info("Timer id [" + timerId +"]: Finish download video ID = " + customVideo.videoId);
+			logger.info("[DOWNLOAD] : Timer id [" + timerId +"]: Finish download video ID = " + customVideo.videoId);
 
 		}catch(Exception ex)
 		{
 			logger.error(ex.toString());
 		}
-		logger.info("\n==========>> Timer id [" + timerId + "] COMPLETE DOWNLOAD CUSTOM VIDEO <<==========\n\n");
+		logger.info("\n[DOWNLOAD] : ==========>> Timer id [" + timerId + "] COMPLETE DOWNLOAD CUSTOM VIDEO <<==========\n\n");
 	}
 
 	private void completeTask() {
@@ -231,14 +231,14 @@ public class DownloadExecuteTimer extends TimerTask {
 					downloadCfg = spiderCorbaClient.agentSide.getDownloadConfig(timerId);
 					return downloadCfg;
 				}catch (Exception e) {
-					logger.error("Can not call corba server");
+					logger.error("[DOWNLOAD] : Can not call corba server");
 					logger.error(e.toString());
 					//retry
-					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					logger.info("[DOWNLOAD] :  [Count = " + count +"] Begin retry to connetion corba server...");
 					spiderCorbaClient.resolveAgain();
 				}
 			}else {
-				logger.error("Download client implementation is NULL");
+				logger.error("[DOWNLOAD] : Download client implementation is NULL");
 			}
 			count++;
 		}while(count < NUM_RETRY);
@@ -257,14 +257,14 @@ public class DownloadExecuteTimer extends TimerTask {
 					result = new Date(lastTime * 1000);
 					return result;
 				}catch (Exception e) {
-					logger.error("Can not call corba server");
+					logger.error("[DOWNLOAD] : Can not call corba server");
 					logger.error(e.toString());
 					//retry
-					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					logger.info("[DOWNLOAD] :  [Count = " + count +"] Begin retry to connetion corba server...");
 					spiderCorbaClient.resolveAgain();
 				}
 			}else {
-				logger.error("Download client implementation is NULL");
+				logger.error("[DOWNLOAD] : Download client implementation is NULL");
 			}
 			count++;
 		}while(count < NUM_RETRY);
@@ -283,14 +283,14 @@ public class DownloadExecuteTimer extends TimerTask {
 					spiderCorbaClient.agentSide.updateLastSyntime(timerId, ts.getTime() / 1000);
 					return;
 				}catch (Exception e) {
-					logger.error("Can not call corba server");
+					logger.error("[DOWNLOAD] : Can not call corba server");
 					logger.error(e.toString());
 					//retry
-					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					logger.info("[DOWNLOAD] : [Count = " + count +"] Begin retry to connetion corba server...");
 					spiderCorbaClient.resolveAgain();
 				}
 			}else {
-				logger.error("Download client implementation is NULL");
+				logger.error("[DOWNLOAD] : Download client implementation is NULL");
 			}
 			count++;
 		}while(count < NUM_RETRY);
@@ -319,7 +319,7 @@ public class DownloadExecuteTimer extends TimerTask {
 		}else {
 			license = 0;
 		}
-		logger.info("Video id = " + videoId + " license content = " + license);
+		logger.info("[DOWNLOAD] : Video id = " + videoId + " license content = " + license);
 		VideoWraper vWraper = new VideoWraper(videoId, title, tags, desc, thumb, 
 				vDownloadPath, vRenderPath, timerId, processStatus, license);
 		return vWraper;
@@ -342,14 +342,14 @@ public class DownloadExecuteTimer extends TimerTask {
 					*/
 					return;
 				}catch (Exception e) {
-					logger.error("Can not call corba server");
+					logger.error("[DOWNLOAD] : Can not call corba server");
 					logger.error(e.toString());
 					//retry
-					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					logger.info("[DOWNLOAD] : [Count = " + count +"] Begin retry to connetion corba server...");
 					spiderCorbaClient.resolveAgain();
 				}
 			}else {
-				logger.error("Download corba client implementation is NULL");
+				logger.error("[DOWNLOAD] : Download corba client implementation is NULL");
 			}
 			count++;
 		}while(count < NUM_RETRY);
@@ -373,14 +373,14 @@ public class DownloadExecuteTimer extends TimerTask {
 					*/
 					return;
 				}catch (Exception e) {
-					logger.error("Can not call corba server");
+					logger.error("[DOWNLOAD] : Can not call corba server");
 					logger.error(e.toString());
 					//retry
-					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					logger.info("[DOWNLOAD] : [Count = " + count +"] Begin retry to connetion corba server...");
 					spiderCorbaClient.resolveAgain();
 				}
 			}else {
-				logger.error("Download corba client implementation is NULL");
+				logger.error("[DOWNLOAD] : Download corba client implementation is NULL");
 			}
 			count++;
 		}while(count < NUM_RETRY);
@@ -397,15 +397,15 @@ public class DownloadExecuteTimer extends TimerTask {
 					customVideo = spiderCorbaClient.agentSide.getCustomVideo(spiderConfig.dAppId, this.timerId);
 					return customVideo;
 				}catch (Exception e) {
-					logger.error("Can not call corba server");
+					logger.error("[DOWNLOAD] : Can not call corba server");
 					logger.error(e.toString());
 					//retry
-					logger.info(" [Count = " + count +"] Begin retry to connetion corba server...");
+					logger.info("[DOWNLOAD] : [Count = " + count +"] Begin retry to connetion corba server...");
 					spiderCorbaClient.resolveAgain();
 				}
 				count ++;
 			}else {
-				logger.error("Download client implementation is NULL");
+				logger.error("[DOWNLOAD] : Download client implementation is NULL");
 			}
 		}while(count < NUM_RETRY);
 
