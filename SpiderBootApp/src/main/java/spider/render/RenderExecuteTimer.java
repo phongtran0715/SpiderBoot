@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
-import corba.variableDefinePackage.RenderConfig;
+import SpiderCorba.SpiderDefinePackage.RenderConfig;
 import spider.corba.SpiderCorbaClient;
 import spider.config.SpiderBootProperty;
 import spider.main.DataController;
@@ -75,7 +75,7 @@ public class RenderExecuteTimer extends TimerTask{
 			if(RenderTimerManager.getInstance().checkEmptyQueue() == false)
 			{
 				DataDefine.RenderJobData jobData = RenderTimerManager.getInstance().getJob();
-				corba.variableDefinePackage.VideoInfo vInfo = jobData.vInfo;
+				SpiderCorba.SpiderDefinePackage.VideoInfo vInfo = jobData.vInfo;
 
 				logger.info("[RENDER] : Render job ( id = )"  + jobData.jobId + " started at:" + new Date());
 				logger.info("\n\n");
@@ -201,7 +201,7 @@ public class RenderExecuteTimer extends TimerTask{
 		return isSuccess;
 	}
 
-	private void updateRenderedInfo(int jobId, corba.variableDefinePackage.VideoInfo vInfo)
+	private void updateRenderedInfo(int jobId, SpiderCorba.SpiderDefinePackage.VideoInfo vInfo)
 	{
 		logger.info("[RENDER] : >>> Function [updateRenderedInfo] : job Id = " + jobId);
 		int count = 1;

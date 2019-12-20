@@ -56,6 +56,17 @@ module SpiderCorba
             wstring userName;
             wstring password;
     };
+    
+    struct ChannelInfo
+    {
+          wstring channelId;
+          wstring channelName;
+          long videoNumber;
+          long viewNumber;
+          long subcriber;
+          long dateCreated;
+          long status;
+     };
   };
 
   interface SpiderBootSide : SpiderDefine
@@ -78,7 +89,6 @@ module SpiderCorba
         boolean deleteUploadJob(in long jobId, in wstring cHomeId);
         
   };
-
 
   interface AgentSide : SpiderDefine
   {
@@ -104,5 +114,11 @@ module SpiderCorba
       //Other function
       AuthenInfo getAuthenInfo(in long mappingId);
       ClusterInfo getClusterInfo (in long mappingId, in long clusterType);
+  };
+  
+  interface YoutubeAgent : SpiderDefine
+  {
+       void getChannelInfo(in wstring channelId, out wstring channelName, out long videoNumber, 
+		out long viewNUmber, out long subcriber, out long dateCreated, out long status);
   };
 };

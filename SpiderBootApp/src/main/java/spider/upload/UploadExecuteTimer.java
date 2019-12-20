@@ -10,19 +10,17 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Queue;
 import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import com.google.api.services.samples.youtube.cmdline.data.UploadVideo;
-
-import corba.variableDefinePackage.AuthenInfo;
-import corba.variableDefinePackage.ClusterInfo;
-import corba.variableDefinePackage.UploadConfig;
-import corba.variableDefinePackage.VideoInfo;
-import spider.corba.SpiderCorbaClient;
+import SpiderCorba.SpiderDefinePackage.AuthenInfo;
+import SpiderCorba.SpiderDefinePackage.ClusterInfo;
+import SpiderCorba.SpiderDefinePackage.UploadConfig;
+import SpiderCorba.SpiderDefinePackage.VideoInfo;
 import spider.config.SpiderBootProperty;
-import spider.main.DataController;
-import spider.helper.Utility;;
+import spider.corba.SpiderCorbaClient;
+import spider.helper.Utility;
+import spider.main.DataController;;
 
 public class UploadExecuteTimer extends TimerTask{
 

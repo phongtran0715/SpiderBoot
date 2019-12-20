@@ -1,6 +1,6 @@
 package spider.upload;
 
-import corba.variableDefinePackage.VideoInfo;
+import SpiderCorba.SpiderDefinePackage.VideoInfo;
 
 public class DataDefine {
 	public class UploadJobData

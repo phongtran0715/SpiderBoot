@@ -4,15 +4,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
+
 import spider.helper.Constant;
 import spider.helper.Utility;
 
 public class SpiderBootProperty {
-
+	final Logger logger = Logger.getLogger(SpiderBootProperty.class);
 	Utility util; 
 	String configFile;
 	//Global config
-	public String videoFormat;
 	public String corbaRef;
 
 	//Download config
@@ -21,12 +23,14 @@ public class SpiderBootProperty {
 	public String clientSecret;
 	public String dAppId;
 	public String dOutputPath;
+	public String dVideoFormat;
 	public int maxResult;
 	
 	//Render config
 	public boolean renderDeploy;
 	public String rAppId;
 	public String rOutPath;
+	public String rVideoFormat;
 	public String rIp;
 	
 	//Upload config
@@ -40,10 +44,9 @@ public class SpiderBootProperty {
 		util = new Utility();
 		this.configFile = configFile;
 		boolean isSuccess = loadConfig();
+		dumpConfig();
 		if(isSuccess == false)
-		{
-			System.out.println("Load download config file FALSE");
-		}
+			logger.error("[CONFIG] : Load download config file FALSE");
 	}
 
 	public boolean loadConfig() {
@@ -61,7 +64,7 @@ public class SpiderBootProperty {
 
 			//load global config value
 			corbaRef = prop.getProperty(Constant.CORBA_REF, "").trim();
-			videoFormat = prop.getProperty(Constant.DOWNLOAD_VIDEO_FORMAT, "mp4").trim();
+			dVideoFormat = prop.getProperty(Constant.DOWNLOAD_VIDEO_FORMAT, "mp4").trim();
 			
 			//load download config value
 			downloadDeploy = Boolean.parseBoolean(prop.getProperty(Constant.DOWNLOAD_DEPLOY, "false").trim());
@@ -73,7 +76,7 @@ public class SpiderBootProperty {
 			
 			//load render config value
 			renderDeploy = Boolean.parseBoolean(prop.getProperty(Constant.RENDER_DEPLOY, "false").trim());
-			videoFormat = prop.getProperty(Constant.RENDER_VIDEO_FORMAT, "mp4").trim();
+			rVideoFormat = prop.getProperty(Constant.RENDER_VIDEO_FORMAT, "mp4").trim();
 			rAppId = prop.getProperty(Constant.RENDER_APP_ID, "").trim();
 			rIp = prop.getProperty(Constant.RENDER_IP, "127.0.0.1").trim();
 			
@@ -90,10 +93,34 @@ public class SpiderBootProperty {
 				try {
 					fileReader.close();
 				} catch (IOException ex) {
-					System.out.println(ex.toString());
+					logger.error("[CONFIG] : " + ex.toString());
 				}
 			}
 		}
 		return result;
+	}
+	
+	private void dumpConfig() {
+		logger.info("=====GLOBAL CONFIG=====");
+		logger.info("corbaRef : " + corbaRef);
+		
+		logger.info("\n=====DOWNLOAD CONFIG=====");
+		logger.info("Download App Id: " + dAppId);
+		logger.info("Download Deploy : " + downloadDeploy);
+		logger.info("apiKey: " + apiKey);
+		logger.info("Download output path: " + dOutputPath);
+		logger.info("Max result download : " + maxResult);		
+		
+		logger.info("\n=====RENDER CONFIG=====");
+		logger.info("REnder Deploy: " + renderDeploy);
+		logger.info("Render app id: " + rAppId);
+		logger.info("render Ip :" + rIp);
+		logger.info("Render video format: " + rVideoFormat);
+		
+		logger.info("\n=====UPLOAD CONFIG=====");
+		logger.info("Upload app id: " + uAppId);
+		logger.info("Upload delay time: " + delayTime);
+		logger.info("Upload Ip : " + uIp);
+		logger.info("\n=====DUMP CONFIG END=====");
 	}
 }

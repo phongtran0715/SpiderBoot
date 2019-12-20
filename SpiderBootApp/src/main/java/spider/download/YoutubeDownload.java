@@ -16,7 +16,7 @@ public class YoutubeDownload {
 		request.setOption("ignore-errors");		// --ignore-errors
 		request.setOption("output", "%(id)s");	// --output "%(id)s"
 		request.setOption("retries", 10);		// --retries 10
-		request.setOption("format", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best");	// --video format
+		//request.setOption("format", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best");	// --video format
 		// Make request and return response
 		try {
 			YoutubeDLResponse response = YoutubeDL.execute(request);

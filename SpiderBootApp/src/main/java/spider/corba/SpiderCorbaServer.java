@@ -1,22 +1,20 @@
 package spider.corba;
 
+import org.apache.log4j.Logger;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAHelper;
+import SpiderCorba.SpiderBootSide;
+import SpiderCorba.SpiderBootSideHelper;
+import SpiderCorba.SpiderBootSidePOA;
+import SpiderCorba.SpiderDefinePackage.VideoInfo;
 import spider.download.DownloadTimerManager;
-import spider.main.DataController;
 import spider.render.DataDefine;
 import spider.render.RenderTimerManager;
-import spider.render.DataDefine.RenderJobData;
-import spider.upload.UploadTimerManager;
-
-import org.omg.CosNaming.*;
-import org.apache.log4j.Logger;
-import org.omg.CORBA.*;
-import org.omg.PortableServer.*;
-import org.omg.PortableServer.POA;
-
-import corba.SpiderBootSide;
-import corba.SpiderBootSideHelper;
-import corba.SpiderBootSidePOA;
-import corba.variableDefinePackage.VideoInfo;;
+import spider.upload.UploadTimerManager;;
 
 
 class SpiderCorbaImpl extends SpiderBootSidePOA {
@@ -97,7 +95,7 @@ class SpiderCorbaImpl extends SpiderBootSidePOA {
 public class SpiderCorbaServer {
 	private final Logger logger = Logger.getLogger(SpiderCorbaServer.class);
 
-	public boolean initCorba(String refStr) {
+	public boolean initCorba(String refStr, String contextName) {
 		boolean isSuccess = false;
 		try 
 		{
@@ -125,16 +123,16 @@ public class SpiderCorbaServer {
 			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
 
 			// bind the Object Reference in Naming
-			String contextName =  DataController.getInstance().spiderConfig.dAppId;
+			//String contextName =  DataController.getInstance().spiderConfig.dAppId;
 			logger.info("Corba context name = " + contextName);
 			NameComponent path[] = ncRef.to_name(contextName);
 			ncRef.rebind(path, href);
 
-			logger.info("Download server ready and waiting ...");
+			logger.info("Spider corba server ["+ contextName +"] ready and waiting ...");
 
 			// wait for invocations from clients
 			orb.run();
-			logger.info("Download server Exiting ...");
+			logger.info("Spider corba server ["+ contextName +"] exiting ...");
 			isSuccess = true;
 		}
 		catch (Exception e) 

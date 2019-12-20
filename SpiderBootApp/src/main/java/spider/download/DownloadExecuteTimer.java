@@ -14,8 +14,9 @@ import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Video;
 
-import corba.variableDefinePackage.CustomVideoInfor;
-import corba.variableDefinePackage.DownloadConfig;
+import SpiderCorba.SpiderDefinePackage.CustomVideoInfor;
+import SpiderCorba.SpiderDefinePackage.DownloadConfig;
+import SpiderCorba.SpiderDefinePackage.VideoInfo;
 import spider.corba.SpiderCorbaClient;
 import spider.config.SpiderBootProperty;
 import spider.main.DataController;
@@ -66,7 +67,7 @@ public class DownloadExecuteTimer extends TimerTask {
 
 	private void handleMonitorChannel()
 	{
-		logger.error("[DOWNLOAD] : Timer Id [" + timerId + "] Start query to get new video");
+		logger.info("[DOWNLOAD] : Timer Id [" + timerId + "] Start query to get new video");
 		//get mapping content
 		DownloadConfig downloadCfg = getDownloadConfig();
 		String cMonitorIds [] = downloadCfg.monitorContent.split(",");
@@ -221,8 +222,8 @@ public class DownloadExecuteTimer extends TimerTask {
 		}
 	}
 
-	private corba.variableDefinePackage.DownloadConfig getDownloadConfig(){
-		corba.variableDefinePackage.DownloadConfig downloadCfg = null;
+	private SpiderCorba.SpiderDefinePackage.DownloadConfig getDownloadConfig(){
+		SpiderCorba.SpiderDefinePackage.DownloadConfig downloadCfg = null;
 		int count = 1;
 		do {
 			if(spiderCorbaClient.agentSide != null)
@@ -332,14 +333,11 @@ public class DownloadExecuteTimer extends TimerTask {
 			if(spiderCorbaClient.agentSide != null)
 			{
 				try {
-					//TODO: phongtn check to create video info class
-					/*
 					VideoInfo vInfo = new VideoInfo(videoWrapper.videoId, videoWrapper.title, 
 							videoWrapper.tag, videoWrapper.description, videoWrapper.thumbnail, 
 							videoWrapper.vDownloadPath, videoWrapper.vRenderPath, videoWrapper.mappingId,
 							videoWrapper.processStatus, videoWrapper.license);
 					spiderCorbaClient.agentSide.insertDownloadedVideo(vInfo);
-					*/
 					return;
 				}catch (Exception e) {
 					logger.error("[DOWNLOAD] : Can not call corba server");
@@ -362,15 +360,12 @@ public class DownloadExecuteTimer extends TimerTask {
 			if(spiderCorbaClient.agentSide != null)
 			{
 				try {
-					//TODO: phongtn check to create video info class
-					/*
 					VideoInfo vInfo = new VideoInfo(videoWrapper.videoId, videoWrapper.title, 
 							videoWrapper.tag, videoWrapper.description, videoWrapper.thumbnail, 
 							videoWrapper.vDownloadPath, videoWrapper.vRenderPath, videoWrapper.mappingId,
 							videoWrapper.processStatus, videoWrapper.license);
 
 					spiderCorbaClient.agentSide.updateDownloadedVideo(id, vInfo);
-					*/
 					return;
 				}catch (Exception e) {
 					logger.error("[DOWNLOAD] : Can not call corba server");

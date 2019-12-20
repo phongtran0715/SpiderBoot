@@ -7,7 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
-import corba.variableDefinePackage.VideoInfo;
+import SpiderCorba.SpiderDefinePackage.VideoInfo;
 
 public class UploadTimerManager {
 	static final Logger logger = Logger.getLogger(UploadTimerManager.class);

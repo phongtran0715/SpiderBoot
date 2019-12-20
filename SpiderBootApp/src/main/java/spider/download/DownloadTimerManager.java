@@ -19,7 +19,7 @@ public class DownloadTimerManager {
 	}
 
 	public boolean createDownloadTimer(int timerId, int timerInterval) {
-		logger.info("[DOWNLOAD] : Create new download timer id = " + timerId  + "timer interval " + timerInterval);
+		logger.info("[DOWNLOAD] : Create new download timer id = " + timerId  + " timer interval " + timerInterval);
 		boolean isSuccess = false;
 		//check timer is existed
 		synchronized (timer_mutex) {
