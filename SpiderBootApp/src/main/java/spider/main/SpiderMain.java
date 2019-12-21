@@ -98,7 +98,7 @@ public class SpiderMain {
 		// Init corba server for upload app
 		Thread uploadCorbaServer = new Thread() {
 			public void run() {
-				logger.info("[UPLOAD] : Beginning to init render corba server >>>");
+				logger.info("[UPLOAD] : Beginning to init upload corba server >>>");
 				SpiderCorbaServer server = new SpiderCorbaServer();
 				server.initCorba(spiderConfig.corbaRef, spiderConfig.uAppId);
 			}

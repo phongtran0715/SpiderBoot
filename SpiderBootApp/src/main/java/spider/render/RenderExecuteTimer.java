@@ -54,7 +54,7 @@ public class RenderExecuteTimer extends TimerTask{
 	public RenderExecuteTimer(String appId) {
 		logger.info("[RENDER] : Function RenderExecuteTimer >>>");
 		spiderConfig = DataController.getInstance().spiderConfig;
-		outputFolder = spiderConfig.rOutPath;
+		outputFolder = spiderConfig.rOutputPath;
 		renderClient = SpiderCorbaClient.getInstance();
 	}
 

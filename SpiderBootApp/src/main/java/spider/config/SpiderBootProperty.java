@@ -29,7 +29,7 @@ public class SpiderBootProperty {
 	//Render config
 	public boolean renderDeploy;
 	public String rAppId;
-	public String rOutPath;
+	public String rOutputPath;
 	public String rVideoFormat;
 	public String rIp;
 	
@@ -64,7 +64,6 @@ public class SpiderBootProperty {
 
 			//load global config value
 			corbaRef = prop.getProperty(Constant.CORBA_REF, "").trim();
-			dVideoFormat = prop.getProperty(Constant.DOWNLOAD_VIDEO_FORMAT, "mp4").trim();
 			
 			//load download config value
 			downloadDeploy = Boolean.parseBoolean(prop.getProperty(Constant.DOWNLOAD_DEPLOY, "false").trim());
@@ -78,6 +77,7 @@ public class SpiderBootProperty {
 			renderDeploy = Boolean.parseBoolean(prop.getProperty(Constant.RENDER_DEPLOY, "false").trim());
 			rVideoFormat = prop.getProperty(Constant.RENDER_VIDEO_FORMAT, "mp4").trim();
 			rAppId = prop.getProperty(Constant.RENDER_APP_ID, "").trim();
+			rOutputPath = prop.getProperty(Constant.RENDER_OUTPUT_VIDEO_PATH, "").trim();
 			rIp = prop.getProperty(Constant.RENDER_IP, "127.0.0.1").trim();
 			
 			//load upload config value

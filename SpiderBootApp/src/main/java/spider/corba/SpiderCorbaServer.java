@@ -123,7 +123,6 @@ public class SpiderCorbaServer {
 			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
 
 			// bind the Object Reference in Naming
-			//String contextName =  DataController.getInstance().spiderConfig.dAppId;
 			logger.info("Corba context name = " + contextName);
 			NameComponent path[] = ncRef.to_name(contextName);
 			ncRef.rebind(path, href);
